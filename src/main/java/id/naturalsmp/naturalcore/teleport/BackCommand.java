@@ -2,6 +2,8 @@ package id.naturalsmp.naturalcore.teleport;
 
 import id.naturalsmp.naturalcore.NaturalCore;
 import id.naturalsmp.naturalcore.utils.ChatUtils;
+import net.md_5.bungee.api.ChatMessageType;
+import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.command.Command;
@@ -97,8 +99,8 @@ public class BackCommand implements CommandExecutor {
                     // Teleport!
                     player.teleport(backLocation);
                     player.playSound(player.getLocation(), "ENTITY_ENDERMAN_TELEPORT", 1f, 1f);
-                    player.sendActionBar(ChatUtils.color("&a&lSAMPAI! &7Kembali ke lokasi terakhir."));
-                    
+                    player.spigot().sendMessage(ChatMessageType.ACTION_BAR, TextComponent.fromLegacyText(ChatUtils.color("&a&lSAMPAI! &7Kembali ke lokasi terakhir.")));
+
                     teleportManager.setWarmup(player, false);
                     cancel();
                     return;

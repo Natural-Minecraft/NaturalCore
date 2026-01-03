@@ -11,6 +11,9 @@ public class GuideListener implements Listener {
     @EventHandler
     public void onPlayerJoin(PlayerJoinEvent event) {
         Player player = event.getPlayer();
+        if (player == null) {
+            return;
+        }
         
         // Kirim welcome message dengan panduan singkat
         if (!player.hasPlayedBefore()) {

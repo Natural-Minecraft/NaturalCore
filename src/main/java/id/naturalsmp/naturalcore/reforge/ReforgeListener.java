@@ -8,7 +8,9 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
 
+import java.util.List;
 import java.util.Random;
 
 public class ReforgeListener implements Listener {
@@ -18,6 +20,10 @@ public class ReforgeListener implements Listener {
     @EventHandler
     public void onInventoryClick(InventoryClickEvent event) {
         if (!(event.getWhoClicked() instanceof Player)) {
+            return;
+        }
+        
+        if (event.getView() == null || event.getView().getTitle() == null) {
             return;
         }
         
@@ -53,11 +59,29 @@ public class ReforgeListener implements Listener {
         Player player = (Player) event.getDamager();
         ItemStack weapon = player.getInventory().getItemInMainHand();
         
-        if (weapon == null || !weapon.hasItemMeta()) {
+        if (weapon == null || weapon.getType() == Material.AIR) {
+            return;
+        }
+        
+        ItemMeta meta = weapon.getItemMeta();
+        if (meta == null || !meta.hasLore()) {
+            return;
+        }
+        
+        List<String> lore = meta.getLore();
+        if (lore == null || lore.isEmpty()) {
             return;
         }
         
         // Check for reforge stats and apply damage modifier
-        // Ini bisa dikembangkan dengan NBT tags atau lore
+        // This can be expanded with NBT tags or advanced lore parsing
+        for (String line : lore) {
+            if (line != null && line.contains("Reforge")) {
+                // Apply damage boost
+                double currentDamage = event.getDamage();
+                event.setDamage(currentDamage * 1.1); // 10% boost as example
+                break;
+            }
+        }
     }
 }

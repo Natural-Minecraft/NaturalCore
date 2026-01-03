@@ -1,13 +1,16 @@
 package id.naturalsmp.naturalcore.altar;
 
 import id.naturalsmp.naturalcore.utils.ChatUtils;
+import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
 
 public class AltarListener implements Listener {
 
@@ -20,31 +23,43 @@ public class AltarListener implements Listener {
     @EventHandler
     public void onPlayerInteract(PlayerInteractEvent event) {
         Player player = event.getPlayer();
+        if (player == null) {
+            return;
+        }
+        
         ItemStack item = event.getItem();
         
         // Handle Altar Wand
         if (item != null && item.getType() == Material.GOLDEN_HOE) {
-            if (item.hasItemMeta() && item.getItemMeta().hasDisplayName()) {
-                String displayName = ChatUtils.stripColor(item.getItemMeta().getDisplayName());
+            ItemMeta meta = item.getItemMeta();
+            if (meta != null && meta.hasDisplayName()) {
+                String displayName = ChatUtils.stripColor(meta.getDisplayName());
                 
                 if (displayName.equals("Altar Wand")) {
                     event.setCancelled(true);
                     
+                    Block clickedBlock = event.getClickedBlock();
+                    if (clickedBlock == null) {
+                        return;
+                    }
+                    
+                    Location blockLoc = clickedBlock.getLocation();
+                    
                     if (event.getAction() == Action.LEFT_CLICK_BLOCK) {
                         // Set Pos1
-                        altarManager.setPos1(event.getClickedBlock().getLocation());
+                        altarManager.setPos1(blockLoc);
                         player.sendMessage(ChatUtils.color("&6&l⛩ &x&F&F&D&7&0&0&lA&x&F&F&B&E&0&0&lL&x&F&F&A&6&0&0&lT&x&F&F&8&D&0&0&lA&x&F&F&7&5&0&0&lR &8» &bPosisi 1 &7disimpan: &e" + 
-                            event.getClickedBlock().getX() + ", " + 
-                            event.getClickedBlock().getY() + ", " + 
-                            event.getClickedBlock().getZ()));
+                            blockLoc.getBlockX() + ", " + 
+                            blockLoc.getBlockY() + ", " + 
+                            blockLoc.getBlockZ()));
                         player.playSound(player.getLocation(), "BLOCK_NOTE_BLOCK_PLING", 1f, 1f);
                     } else if (event.getAction() == Action.RIGHT_CLICK_BLOCK) {
                         // Set Pos2
-                        altarManager.setPos2(event.getClickedBlock().getLocation());
+                        altarManager.setPos2(blockLoc);
                         player.sendMessage(ChatUtils.color("&6&l⛩ &x&F&F&D&7&0&0&lA&x&F&F&B&E&0&0&lL&x&F&F&A&6&0&0&lT&x&F&F&8&D&0&0&lA&x&F&F&7&5&0&0&lR &8» &bPosisi 2 &7disimpan: &e" + 
-                            event.getClickedBlock().getX() + ", " + 
-                            event.getClickedBlock().getY() + ", " + 
-                            event.getClickedBlock().getZ()));
+                            blockLoc.getBlockX() + ", " + 
+                            blockLoc.getBlockY() + ", " + 
+                            blockLoc.getBlockZ()));
                         player.playSound(player.getLocation(), "BLOCK_NOTE_BLOCK_PLING", 1f, 1f);
                     }
                     return;
@@ -54,14 +69,17 @@ public class AltarListener implements Listener {
         
         // Handle Altar Donation
         if (event.getAction() == Action.RIGHT_CLICK_BLOCK) {
-            if (event.getClickedBlock() != null && 
-                altarManager.getTriggerLocation() != null &&
-                event.getClickedBlock().getLocation().equals(altarManager.getTriggerLocation())) {
+            Block clickedBlock = event.getClickedBlock();
+            if (clickedBlock != null && altarManager.getTriggerLocation() != null) {
+                Location triggerLoc = altarManager.getTriggerLocation();
+                Location clickedLoc = clickedBlock.getLocation();
                 
-                event.setCancelled(true);
-                
-                if (item != null && item.getType() != Material.AIR) {
-                    altarManager.donate(player, item);
+                if (clickedLoc.equals(triggerLoc)) {
+                    event.setCancelled(true);
+                    
+                    if (item != null && item.getType() != Material.AIR) {
+                        altarManager.donate(player, item);
+                    }
                 }
             }
         }

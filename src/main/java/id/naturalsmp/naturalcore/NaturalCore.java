@@ -8,6 +8,7 @@ import id.naturalsmp.naturalcore.trader.*;
 import id.naturalsmp.naturalcore.guide.*;
 import id.naturalsmp.naturalcore.quest.*;
 import id.naturalsmp.naturalcore.teleport.*;
+import org.bukkit.command.PluginCommand;
 import org.bukkit.plugin.java.JavaPlugin;
 
 public class NaturalCore extends JavaPlugin {
@@ -99,42 +100,51 @@ public class NaturalCore extends JavaPlugin {
     
     private void registerCommands() {
         // Admin commands
-        getCommand("kickall").setExecutor(new KickAllCommand());
-        getCommand("restartalert").setExecutor(new RestartAlertCommand());
-        getCommand("broadcast").setExecutor(new BroadcastCommand());
+        registerCommand("kickall", new KickAllCommand());
+        registerCommand("restartalert", new RestartAlertCommand());
+        registerCommand("broadcast", new BroadcastCommand());
         
         // Economy commands
-        getCommand("givebal").setExecutor(new GiveBalCommand(vaultManager));
+        registerCommand("givebal", new GiveBalCommand(vaultManager));
         
         // Altar commands
         AltarCommand altarCommand = new AltarCommand(altarManager);
-        getCommand("altarwand").setExecutor(altarCommand);
-        getCommand("altarsetpos1").setExecutor(altarCommand);
-        getCommand("altarsetpos2").setExecutor(altarCommand);
-        getCommand("altarsettrigger").setExecutor(altarCommand);
-        getCommand("altarsetwarp").setExecutor(altarCommand);
-        getCommand("altarsetworld").setExecutor(altarCommand);
-        getCommand("altarstart").setExecutor(altarCommand);
-        getCommand("altardelete").setExecutor(altarCommand);
-        getCommand("dungeon").setExecutor(new DungeonCommand(this, altarManager));
+        registerCommand("altarwand", altarCommand);
+        registerCommand("altarsetpos1", altarCommand);
+        registerCommand("altarsetpos2", altarCommand);
+        registerCommand("altarsettrigger", altarCommand);
+        registerCommand("altarsetwarp", altarCommand);
+        registerCommand("altarsetworld", altarCommand);
+        registerCommand("altarstart", altarCommand);
+        registerCommand("altardelete", altarCommand);
+        registerCommand("dungeon", new DungeonCommand(this, altarManager));
         
         // Quest commands
-        getCommand("questnpc").setExecutor(new QuestCommand(questManager));
+        registerCommand("questnpc", new QuestCommand(questManager));
         
         // Reforge commands
-        getCommand("reforge").setExecutor(new ReforgeCommand());
+        registerCommand("reforge", new ReforgeCommand());
         
         // Trader commands
-        getCommand("trader").setExecutor(new TraderCommand(traderManager));
+        registerCommand("trader", new TraderCommand(traderManager));
         
         // Guide commands
-        getCommand("guide").setExecutor(new GuideCommand());
+        registerCommand("guide", new GuideCommand());
         
         // TPA commands
-        getCommand("tpa").setExecutor(new TPACommand(teleportManager));
-        getCommand("tpaccept").setExecutor(new TPAAcceptCommand(this, teleportManager));
-        getCommand("tpdeny").setExecutor(new TPADenyCommand(teleportManager));
-        getCommand("back").setExecutor(new BackCommand(this, teleportManager));
+        registerCommand("tpa", new TPACommand(teleportManager));
+        registerCommand("tpaccept", new TPAAcceptCommand(this, teleportManager));
+        registerCommand("tpdeny", new TPADenyCommand(teleportManager));
+        registerCommand("back", new BackCommand(this, teleportManager));
+    }
+    
+    private void registerCommand(String name, org.bukkit.command.CommandExecutor executor) {
+        PluginCommand command = getCommand(name);
+        if (command != null) {
+            command.setExecutor(executor);
+        } else {
+            getLogger().warning("Command '" + name + "' not found in plugin.yml!");
+        }
     }
     
     private void registerListeners() {

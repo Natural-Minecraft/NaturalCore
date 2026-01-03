@@ -3,6 +3,8 @@ package id.naturalsmp.naturalcore.quest;
 import id.naturalsmp.naturalcore.utils.ChatUtils;
 import net.citizensnpcs.api.CitizensAPI;
 import net.citizensnpcs.api.event.NPCRightClickEvent;
+import net.citizensnpcs.api.npc.NPC;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -27,12 +29,22 @@ public class QuestListener implements Listener {
     // Handle NPC Click
     @EventHandler(priority = EventPriority.HIGHEST)
     public void onNPCClick(NPCRightClickEvent event) {
-        if (!CitizensAPI.getNPCRegistry().isNPC(event.getNPC().getEntity())) {
+        NPC npc = event.getNPC();
+        if (npc == null || npc.getEntity() == null) {
+            return;
+        }
+        
+        Entity npcEntity = npc.getEntity();
+        if (!CitizensAPI.getNPCRegistry().isNPC(npcEntity)) {
             return;
         }
         
         Player player = event.getClicker();
-        java.util.UUID npcUUID = event.getNPC().getEntity().getUniqueId();
+        if (player == null) {
+            return;
+        }
+        
+        java.util.UUID npcUUID = npcEntity.getUniqueId();
         
         // Check if this is quest NPC
         if (npcUUID.equals(questManager.getNPCPenagihUUID())) {
@@ -52,6 +64,10 @@ public class QuestListener implements Listener {
     @EventHandler
     public void onItemDrop(PlayerDropItemEvent event) {
         ItemStack item = event.getItemDrop().getItemStack();
+        if (item == null) {
+            return;
+        }
+        
         if (questManager.isQuestItem(item)) {
             event.setCancelled(true);
             event.getPlayer().sendMessage(ChatUtils.color("&6&l📜 &x&F&F&C&E&4&7&lS&x&F&F&B&C&4&2&lT&x&F&F&A&B&3&D&lO&x&F&F&9&9&3&8&lR&x&F&F&8&8&3&3&lY &8» &cItem Quest tidak bisa dibuang!"));
@@ -71,8 +87,8 @@ public class QuestListener implements Listener {
         ItemStack cursorItem = event.getCursor();
         
         // Check clicked item
-        if (questManager.isQuestItem(clickedItem)) {
-            if (event.getClickedInventory() != player.getInventory()) {
+        if (clickedItem != null && questManager.isQuestItem(clickedItem)) {
+            if (event.getClickedInventory() != null && event.getClickedInventory() != player.getInventory()) {
                 event.setCancelled(true);
                 player.sendMessage(ChatUtils.color("&6&l📜 &x&F&F&C&E&4&7&lS&x&F&F&B&C&4&2&lT&x&F&F&A&B&3&D&lO&x&F&F&9&9&3&8&lR&x&F&F&8&8&3&3&lY &8» &cItem Quest tidak bisa disimpan di sini!"));
                 player.playSound(player.getLocation(), "BLOCK_NOTE_BLOCK_BASS", 1f, 1f);
@@ -80,8 +96,8 @@ public class QuestListener implements Listener {
         }
         
         // Check cursor item
-        if (questManager.isQuestItem(cursorItem)) {
-            if (event.getClickedInventory() != player.getInventory()) {
+        if (cursorItem != null && questManager.isQuestItem(cursorItem)) {
+            if (event.getClickedInventory() != null && event.getClickedInventory() != player.getInventory()) {
                 event.setCancelled(true);
                 player.sendMessage(ChatUtils.color("&6&l📜 &x&F&F&C&E&4&7&lS&x&F&F&B&C&4&2&lT&x&F&F&A&B&3&D&lO&x&F&F&9&9&3&8&lR&x&F&F&8&8&3&3&lY &8» &cItem Quest tidak bisa disimpan di sini!"));
                 player.playSound(player.getLocation(), "BLOCK_NOTE_BLOCK_BASS", 1f, 1f);
@@ -95,7 +111,7 @@ public class QuestListener implements Listener {
         Iterator<ItemStack> iterator = event.getDrops().iterator();
         while (iterator.hasNext()) {
             ItemStack item = iterator.next();
-            if (questManager.isQuestItem(item)) {
+            if (item != null && questManager.isQuestItem(item)) {
                 iterator.remove();
             }
         }
@@ -105,9 +121,17 @@ public class QuestListener implements Listener {
     @EventHandler
     public void onPlayerRespawn(PlayerRespawnEvent event) {
         Player player = event.getPlayer();
+        if (player == null) {
+            return;
+        }
+        
         org.bukkit.Bukkit.getScheduler().runTaskLater(
             org.bukkit.Bukkit.getPluginManager().getPlugin("NaturalCore"),
-            () -> questManager.returnQuestItem(player),
+            () -> {
+                if (player.isOnline()) {
+                    questManager.returnQuestItem(player);
+                }
+            },
             20L
         );
     }

@@ -206,7 +206,7 @@ public class QuestManager {
                     case 5:
                         player.sendMessage(ChatUtils.color("&fHaikalMabrur &e»&f Boleh tuh! Tolong tagihin ya, ntar gw kasih lu &a20k &fdeh."));
                         player.playSound(player.getLocation(), "UI_TOAST_CHALLENGE_COMPLETE", 1f, 1f);
-                        player.sendActionBar(ChatUtils.color("&e&lQUEST STARTED: &fTagih Utang Petani"));
+                        player.spigot().sendMessage(ChatMessageType.ACTION_BAR, TextComponent.fromLegacyText(ChatUtils.color("&e&lQUEST STARTED: &fTagih Utang Petani")));
                         setQuestStage(player, "started");
                         endDialog(player);
                         cancel();

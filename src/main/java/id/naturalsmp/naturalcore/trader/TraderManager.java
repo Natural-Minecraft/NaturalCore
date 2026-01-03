@@ -10,7 +10,6 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import java.time.LocalTime;
-import java.time.format.DateTimeFormatter;
 
 public class TraderManager {
 
@@ -106,12 +105,14 @@ public class TraderManager {
         }
     }
     
+    @SuppressWarnings("unused")
     public void decreaseStock() {
         if (traderStock > 0) {
             traderStock--;
         }
     }
     
+    @SuppressWarnings("unused")
     public int getStock() {
         return traderStock;
     }

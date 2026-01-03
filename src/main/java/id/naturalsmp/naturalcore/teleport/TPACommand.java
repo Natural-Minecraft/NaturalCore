@@ -64,7 +64,7 @@ public class TPACommand implements CommandExecutor {
         teleportManager.setCooldown(player);
         
         // Message to requester
-        player.sendActionBar(ChatUtils.color("&x&0&E&B&8&C&0&lTPA &8» &7Mengirim request ke &f" + target.getName() + "..."));
+        player.spigot().sendMessage(ChatMessageType.ACTION_BAR, TextComponent.fromLegacyText(ChatUtils.color("&x&0&E&B&8&C&0&lTPA &8» &7Mengirim request ke &f" + target.getName() + "...")));
         player.playSound(player.getLocation(), "UI_BUTTON_CLICK", 1f, 1f);
         
         // Message to target (with clickable buttons)

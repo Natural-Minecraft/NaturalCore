@@ -1,11 +1,13 @@
 package id.naturalsmp.naturalcore.trader;
 
 import id.naturalsmp.naturalcore.utils.ChatUtils;
+import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
 
 public class TraderListener implements Listener {
 
@@ -17,22 +19,29 @@ public class TraderListener implements Listener {
 
     @EventHandler
     public void onInventoryClick(InventoryClickEvent event) {
-        if (!(event.getWhoClicked() instanceof Player)) {
+        if (!(event.getWhoClicked() instanceof Player player)) {
             return;
         }
         
-        String title = ChatUtils.stripColor(event.getView().getTitle());
+        String title = event.getView().getTitle();
+        if (title == null) {
+            return;
+        }
         
-        if (!title.contains("Travelling Trader")) {
+        String strippedTitle = ChatUtils.stripColor(title);
+        if (!strippedTitle.contains("Travelling Trader")) {
             return;
         }
         
         event.setCancelled(true);
         
-        Player player = (Player) event.getWhoClicked();
         ItemStack clicked = event.getCurrentItem();
+        if (clicked == null || clicked.getType() == Material.AIR) {
+            return;
+        }
         
-        if (clicked == null || !clicked.hasItemMeta()) {
+        ItemMeta meta = clicked.getItemMeta();
+        if (meta == null || !meta.hasLore()) {
             return;
         }
         

@@ -22,12 +22,19 @@ public class TeleportListener implements Listener {
     @EventHandler
     public void onPlayerDeath(PlayerDeathEvent event) {
         Player player = event.getEntity();
+        if (player == null) {
+            return;
+        }
         
         if (!player.hasPermission("naturalcore.back")) {
             return;
         }
         
         Location deathLoc = player.getLocation();
+        if (deathLoc == null || deathLoc.getWorld() == null) {
+            return;
+        }
+        
         teleportManager.setBackLocation(player, deathLoc);
         
         // Send death message with clickable /back button

@@ -2,6 +2,8 @@ package id.naturalsmp.naturalcore.teleport;
 
 import id.naturalsmp.naturalcore.NaturalCore;
 import id.naturalsmp.naturalcore.utils.ChatUtils;
+import net.md_5.bungee.api.ChatMessageType;
+import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.Location;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -94,8 +96,8 @@ public class TPAAcceptCommand implements CommandExecutor {
                     
                     requester.playSound(requester.getLocation(), "ENTITY_ENDERMAN_TELEPORT", 1f, 1f);
                     player.playSound(player.getLocation(), "ENTITY_ENDERMAN_TELEPORT", 1f, 1f);
-                    
-                    requester.sendActionBar(ChatUtils.color("&a&lSUKSES! &7Teleportasi berhasil."));
+
+                    requester.spigot().sendMessage(ChatMessageType.ACTION_BAR, TextComponent.fromLegacyText(ChatUtils.color("&a&lSUKSES! &7Teleportasi berhasil.")));
                     
                     teleportManager.setWarmup(requester, false);
                     teleportManager.removeRequest(player);

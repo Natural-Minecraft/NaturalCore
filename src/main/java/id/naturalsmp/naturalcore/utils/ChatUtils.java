@@ -2,31 +2,20 @@ package id.naturalsmp.naturalcore.utils;
 
 import org.bukkit.ChatColor;
 
+/**
+ * Utility class for chat formatting and colors
+ */
 public class ChatUtils {
 
-    /**
-     * Convert color codes to actual colors
-     * @param message Message with & color codes
-     * @return Colored message
-     */
     public static String color(String message) {
         return ChatColor.translateAlternateColorCodes('&', message);
     }
     
-    /**
-     * Strip all color codes from a message
-     * @param message Colored message
-     * @return Plain text message
-     */
     public static String stripColor(String message) {
         return ChatColor.stripColor(message);
     }
     
-    /**
-     * Send a centered message to player
-     * @param message Message to center
-     * @return Centered message
-     */
+    @SuppressWarnings("unused")
     public static String centerMessage(String message) {
         final int CENTER_PX = 154;
         int messagePxSize = 0;
@@ -57,12 +46,10 @@ public class ChatUtils {
             compensated += spaceLength;
         }
         
-        return sb.toString() + message;
+        return sb + message;
     }
     
-    /**
-     * Get symbols for various uses
-     */
+    @SuppressWarnings("unused")
     public static class Symbols {
         public static final String CHECKMARK = "✔";
         public static final String CROSS = "✘";
@@ -77,7 +64,6 @@ public class ChatUtils {
         public static final String WARNING = "⚠";
     }
     
-    // Helper enum for centering text
     private enum DefaultFontInfo {
         A('A', 5), a('a', 5), B('B', 5), b('b', 5), C('C', 5), c('c', 5),
         D('D', 5), d('d', 5), E('E', 5), e('e', 5), F('F', 5), f('f', 4),
@@ -103,8 +89,8 @@ public class ChatUtils {
         LINE('|', 1), TILDE('~', 5), TICK('`', 2), PERIOD('.', 1),
         COMMA(',', 1), SPACE(' ', 3), DEFAULT('a', 4);
         
-        private char character;
-        private int length;
+        private final char character;
+        private final int length;
         
         DefaultFontInfo(char character, int length) {
             this.character = character;

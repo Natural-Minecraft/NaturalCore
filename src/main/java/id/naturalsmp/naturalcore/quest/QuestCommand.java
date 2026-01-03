@@ -2,7 +2,6 @@ package id.naturalsmp.naturalcore.quest;
 
 import id.naturalsmp.naturalcore.utils.ChatUtils;
 import net.citizensnpcs.api.CitizensAPI;
-import net.citizensnpcs.api.npc.NPC;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -132,6 +131,10 @@ public class QuestCommand implements CommandExecutor {
         double minDistance = 5.0;
         
         for (Entity entity : player.getNearbyEntities(5, 5, 5)) {
+            if (entity == null) {
+                continue;
+            }
+            
             if (CitizensAPI.getNPCRegistry().isNPC(entity)) {
                 double distance = entity.getLocation().distance(player.getLocation());
                 if (distance < minDistance) {
