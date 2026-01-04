@@ -8,199 +8,106 @@ description: Core plugin untuk NaturalSMP Server
 depend: [Vault]
 softdepend: [Citizens, DecentHolograms]
 
+# ==========================================
+# DAFTAR COMMANDS
+# ==========================================
 commands:
-  # Admin Commands
-  kickall:
-    description: Kick semua player kecuali yang punya bypass permission
-    usage: /kickall [reason]
-    permission: naturalcore.admin.kickall
-  restartalert:
-    description: Mulai countdown restart server
-    usage: /restartalert <detik>
-    permission: naturalcore.admin.restartalert
-  broadcast:
-    description: Broadcast pesan ke semua player
-    usage: /broadcast <pesan>
-    permission: naturalcore.admin.broadcast
-    
-  # Economy Commands
-  givebal:
-    description: Berikan balance ke player
-    usage: /givebal <player> <amount>
-    permission: naturalcore.admin.givebal
-    
-  # Altar Commands
-  altarwand:
-    description: Dapatkan altar wand untuk mark location
-    usage: /altarwand
-    permission: naturalcore.altar.admin
-  altarsetpos1:
-    description: Set posisi 1 zona altar
-    usage: /altarsetpos1
-    permission: naturalcore.altar.admin
-  altarsetpos2:
-    description: Set posisi 2 zona altar
-    usage: /altarsetpos2
-    permission: naturalcore.altar.admin
-  altarsettrigger:
-    description: Set lokasi trigger donasi
-    usage: /altarsettrigger
-    permission: naturalcore.altar.admin
-  altarsetwarp:
-    description: Set lokasi warp altar
-    usage: /altarsetwarp
-    permission: naturalcore.altar.admin
-  altarsetworld:
-    description: Set world tujuan dungeon
-    usage: /altarsetworld <world>
-    permission: naturalcore.altar.admin
-  altarstart:
-    description: Mulai altar event
-    usage: /altarstart <amount1> [amount2] [amount3]
-    permission: naturalcore.altar.admin
-  altardelete:
-    description: Hapus data altar
-    usage: /altardelete
-    permission: naturalcore.altar.admin
-  dungeon:
-    description: Teleport ke dungeon
-    usage: /dungeon
-    permission: naturalcore.dungeon
-    
-  # Quest Commands
-  questnpc:
-    description: Manage quest NPCs
-    usage: /questnpc <penagih|petani|info|reset>
-    permission: naturalcore.quest.admin
-    
-  # Reforge Commands
-  reforge:
-    description: Buka reforge station
-    usage: /reforge
-    permission: naturalcore.reforge
-    
-  # Trader Commands
-  trader:
-    description: Akses travelling trader
-    usage: /trader <open|info>
-    permission: naturalcore.trader
-    
-  # Guide Commands
-  guide:
-    description: Panduan fitur server
-    usage: /guide [altar|reforge|trader]
-    permission: naturalcore.guide
-    
-  # TPA Commands
-  tpa:
-    description: Request teleport ke player
-    usage: /tpa <player>
-    permission: naturalcore.tpa
-  tpaccept:
-    description: Terima request TPA
-    usage: /tpaccept
-    aliases: [tpyes, yes, terima]
-    permission: naturalcore.tpa
-  tpdeny:
-    description: Tolak request TPA
-    usage: /tpdeny
-    aliases: [tpno, no, tolak]
-    permission: naturalcore.tpa
-  back:
-    description: Kembali ke lokasi terakhir
-    usage: /back [player]
-    permission: naturalcore.back
+  # --- CORE (Jantung Plugin) ---
+  nacore:
+    description: Command utama untuk admin (Reload/Version)
+    aliases: [nc, naturalcore]
+    permission: naturalsmp.admin
+    usage: /nacore <help|reload|version>
 
+  # --- ADMIN MODULE (Yang sudah kita buat) ---
+  kickall:
+    description: Kick seluruh player di server
+    permission: naturalcs.kickall
+    usage: /kickall confirm <alasan>
+
+  restartalert:
+    description: Memulai hitung mundur restart server
+    aliases: [ra]
+    permission: naturalcs.restartalert
+    usage: /restartalert confirm
+
+  bc:
+    description: Broadcast pesan ke seluruh server
+    aliases: [broadcast, siar]
+    permission: naturalcs.broadcast
+    usage: /bc <pesan>
+
+  # --- ECONOMY MODULE (Next Project) ---
+  givebal:
+    description: Memberikan uang ke player (NaturalCoin)
+    permission: naturalcs.givebalance
+    usage: /givebal <player> <jumlah>
+
+  # --- ALTAR QUEST MODULE (Future) ---
+  altarwand:
+    description: Mengambil wand untuk set lokasi altar
+    permission: naturalsmp.admin
+
+  altarstart:
+    description: Memulai event donasi altar
+    permission: naturalsmp.admin
+    usage: /altarstart <jumlah1> [jumlah2] [jumlah3]
+
+  altarsetworld:
+    description: Mengatur world tujuan dungeon
+    permission: naturalsmp.admin
+
+  altarsetwarp:
+    description: Mengatur titik spawn altar (sebelum dungeon buka)
+    permission: naturalsmp.admin
+
+  altarsettrigger:
+    description: Mengatur blok donasi & lokasi hologram
+    permission: naturalsmp.admin
+
+  altardelete:
+    description: Reset progress altar & hapus hologram
+    permission: naturalsmp.admin
+
+  dungeon:
+    description: Teleport ke dungeon (Via Altar)
+    aliases: [warp]
+
+  # --- REFORGE MODULE (Future) ---
+  reforgeadmin:
+    description: Mengambil batu reforge (Admin)
+    permission: op
+    usage: /reforgeadmin <tipe> <stat> <chance>
+
+  # --- TRADER MODULE (Future) ---
+  wanderingtrader:
+    description: Membuka menu trader real-time
+    aliases: [wt, trader]
+
+  resettrader:
+    description: Reset stok trader
+    permission: op
+
+  setharga:
+    description: Set harga trader manual
+    permission: op
+
+# ==========================================
+# DAFTAR PERMISSIONS (Opsional - Biar rapi di LuckPerms)
+# ==========================================
 permissions:
-  naturalcore.*:
-    description: Akses semua permission NaturalCore
-    children:
-      naturalcore.admin.*: true
-      naturalcore.altar.*: true
-      naturalcore.quest.*: true
-      naturalcore.reforge: true
-      naturalcore.trader: true
-      naturalcore.guide: true
-      naturalcore.dungeon: true
-      naturalcore.tpa: true
-      naturalcore.back: true
-      
-  naturalcore.admin.*:
-    description: Akses semua admin commands
-    children:
-      naturalcore.admin.kickall: true
-      naturalcore.admin.restartalert: true
-      naturalcore.admin.broadcast: true
-      naturalcore.admin.givebal: true
-      naturalcore.admin.bypass: true
-      
-  naturalcore.admin.kickall:
-    description: Permission untuk /kickall
+  naturalsmp.admin:
+    description: Izin full akses NaturalCore
     default: op
-  naturalcore.admin.restartalert:
-    description: Permission untuk /restartalert
+
+  naturalcs.kickall:
+    description: Izin kick semua player
     default: op
-  naturalcore.admin.broadcast:
-    description: Permission untuk /broadcast
+
+  naturalcs.restartalert:
+    description: Izin alert restart
     default: op
-  naturalcore.admin.givebal:
-    description: Permission untuk /givebal
+
+  naturalcs.broadcast:
+    description: Izin broadcast
     default: op
-  naturalcore.admin.bypass:
-    description: Bypass kickall dan restrictions
-    default: op
-    
-  naturalcore.altar.*:
-    description: Akses semua altar commands
-    children:
-      naturalcore.altar.admin: true
-      
-  naturalcore.altar.admin:
-    description: Permission untuk altar admin commands
-    default: op
-    
-  naturalcore.quest.*:
-    description: Akses semua quest commands
-    children:
-      naturalcore.quest.admin: true
-      
-  naturalcore.quest.admin:
-    description: Permission untuk quest admin commands
-    default: op
-    
-  naturalcore.dungeon:
-    description: Permission untuk dungeon commands
-    default: true
-    
-  naturalcore.reforge:
-    description: Permission untuk reforge system
-    default: true
-    
-  naturalcore.trader:
-    description: Permission untuk trader system
-    default: true
-    
-  naturalcore.guide:
-    description: Permission untuk guide commands
-    default: true
-    
-  naturalcore.tpa:
-    description: Permission untuk TPA system
-    default: true
-  naturalcore.tpa.bypass:
-    description: Bypass TPA cooldown
-    default: op
-    
-  naturalcore.back:
-    description: Permission untuk back command
-    default: true
-  naturalcore.back.others:
-    description: Permission untuk back player lain
-    default: op
-    
-  naturalcore.nature:
-    description: Permission untuk rank Nature (no dungeon cooldown)
-    default: false
-  naturalcore.mvp:
-    description: Permission untuk rank MVP (reduced cooldown)
-    default: false

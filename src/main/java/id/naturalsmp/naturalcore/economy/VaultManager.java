@@ -1,40 +1,31 @@
 package id.naturalsmp.naturalcore.economy;
 
+import id.naturalsmp.naturalcore.NaturalCore;
 import net.milkbowl.vault.economy.Economy;
 import org.bukkit.plugin.RegisteredServiceProvider;
-import org.bukkit.plugin.java.JavaPlugin;
 
 public class VaultManager {
 
-    private final JavaPlugin plugin;
-    private Economy economy;
-    
-    public VaultManager(JavaPlugin plugin) {
+    private final NaturalCore plugin;
+    private Economy econ = null;
+
+    public VaultManager(NaturalCore plugin) {
         this.plugin = plugin;
-        setupEconomy();
     }
-    
-    private void setupEconomy() {
+
+    public boolean setupEconomy() {
         if (plugin.getServer().getPluginManager().getPlugin("Vault") == null) {
-            plugin.getLogger().warning("Vault plugin tidak ditemukan! Economy features akan disabled.");
-            return;
+            return false;
         }
-        
         RegisteredServiceProvider<Economy> rsp = plugin.getServer().getServicesManager().getRegistration(Economy.class);
         if (rsp == null) {
-            plugin.getLogger().warning("Economy provider tidak ditemukan!");
-            return;
+            return false;
         }
-        
-        economy = rsp.getProvider();
-        plugin.getLogger().info("Vault economy berhasil di-hook!");
+        econ = rsp.getProvider();
+        return econ != null;
     }
-    
+
     public Economy getEconomy() {
-        return economy;
-    }
-    
-    public boolean hasEconomy() {
-        return economy != null;
+        return econ;
     }
 }

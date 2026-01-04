@@ -1,67 +1,22 @@
 # ==========================================
-# NaturalCore Configuration
+#      NATURAL CORE - CONFIGURATION
 # ==========================================
 
-# Prefix untuk semua message plugin
-prefix: "&6&l[NaturalCore] &r"
+# Prefix untuk pesan-pesan di chat
+prefix:
+  admin: "&6&lNaturalCore &8» &r"
+  altar: "&6&l⛩ &x&F&F&D&7&0&0&lA&x&F&F&B&E&0&0&lL&x&F&F&A&6&0&0&lT&x&F&F&8&D&0&0&lA&x&F&F&7&5&0&0&lR &8» &r"
+  trader: "&8[&6Trader&8] &r"
+  guide: "&8[&e&lGUIDE&8] &r"
 
-# Altar Settings
-altar:
-  enabled: true
-  duration: 300  # Duration in seconds (5 minutes)
-  rewards:
-    - "DIAMOND:5"
-    - "EMERALD:10"
-    - "GOLDEN_APPLE:3"
-
-# Reforge Settings
-reforge:
-  enabled: true
-  cost: 5000
-  min-boost: 5
-  max-boost: 15
-  success-rate: 70  # Percentage
-
-# Trader Settings
-trader:
-  enabled: true
-  schedule:
-    morning: "12:00-14:00"
-    evening: "20:00-22:00"
-  stock: 10
-  items:
-    diamond:
-      price: 1000
-      stock: 5
-    emerald:
-      price: 500
-      stock: 10
-    golden_apple:
-      price: 2000
-      stock: 3
-
-# Teleport Settings
-teleport:
-  warmup-seconds: 3  # Warmup time before teleport
-  tpa-cooldown-seconds: 60  # Cooldown between TPA requests
-  request-timeout-seconds: 60  # Time before TPA request expires
-
-# Quest Settings
-quest:
-  npc:
-    penagih: ""  # UUID will be saved here
-    petani: ""   # UUID will be saved here
-
-# Guide Settings
-guide:
-  welcome-message: true
-  show-tips: true
-
-# Messages
+# Pesan Umum
 messages:
-  no-permission: "&cKamu tidak memiliki permission untuk ini!"
-  player-only: "&cCommand ini hanya untuk player!"
-  invalid-player: "&cPlayer tidak ditemukan!"
-  invalid-number: "&cMasukkan angka yang valid!"
-  success: "&a&l✔ &aBerhasil!"
-  error: "&c&l✘ &cTerjadi error!"
+  no-permission: "&cMaaf, kamu tidak punya akses."
+  reload-success: "&aKonfigurasi berhasil dimuat ulang!"
+  reload-fail: "&cGagal memuat ulang config. Cek console!"
+  cooldown: "&cTunggu &e%time% &cdetik lagi."
+
+# Pengaturan Modul
+settings:
+  restart-alert-time: 10 # Detik
+  broadcast-cooldown: 5 # Detik
