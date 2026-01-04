@@ -13,6 +13,10 @@ import id.naturalsmp.naturalcore.trader.TraderCommand;
 import id.naturalsmp.naturalcore.trader.TraderListener;
 import id.naturalsmp.naturalcore.trader.TraderManager;
 import id.naturalsmp.naturalcore.utils.ChatUtils;
+
+import id.naturalsmp.naturalcore.warp.WarpManager;
+import id.naturalsmp.naturalcore.warp.WarpCommand;
+
 import org.bukkit.plugin.java.JavaPlugin;
 
 public final class NaturalCore extends JavaPlugin {
@@ -26,23 +30,21 @@ public final class NaturalCore extends JavaPlugin {
     private TradeEditor tradeEditor;
     private TraderManager traderManager;
 
+    private WarpManager warpManager;
+
     @Override
     public void onEnable() {
         instance = this;
 
-        // 1. Pesan Startup Keren
         getLogger().info(ChatUtils.colorize("&6&lNaturalCore &aStarting up..."));
 
-        // 2. Setup Config Default
         saveDefaultConfig();
 
-        // 3. Setup Economy (Vault)
         vaultManager = new VaultManager(this);
         if (!vaultManager.setupEconomy()) {
             getLogger().severe("Vault tidak ditemukan! Fitur ekonomi dimatikan.");
         }
 
-        // 4. Initialize Trader Module
         currencyManager = new CurrencyManager(this);
         tradeEditor = new TradeEditor(this);
         traderManager = new TraderManager(this, tradeEditor);
@@ -64,6 +66,16 @@ public final class NaturalCore extends JavaPlugin {
         if (getCommand("givecurrency") != null) getCommand("givecurrency").setExecutor(traderCmd);
         if (getCommand("tradeeditor") != null) getCommand("tradeeditor").setExecutor(traderCmd);
         if (getCommand("wanderingtrader") != null) getCommand("wanderingtrader").setExecutor(traderCmd);
+
+        // Setup Warp System
+        this.warpManager = new WarpManager(this);
+
+        WarpCommand warpCmd = new WarpCommand(this);
+        getCommand("warp").setExecutor(warpCmd);
+        getCommand("warps").setExecutor(warpCmd);
+        getCommand("setwarp").setExecutor(warpCmd);
+        getCommand("delwarp").setExecutor(warpCmd);
+        getCommand("setwarpicon").setExecutor(warpCmd);
 
         getLogger().info(ChatUtils.colorize("&6&lNaturalCore &asudah aktif sepenuhnya!"));
     }
