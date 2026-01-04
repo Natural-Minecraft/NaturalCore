@@ -79,10 +79,22 @@ commands:
     permission: op
     usage: /reforgeadmin <tipe> <stat> <chance>
 
-  # --- TRADER MODULE (Future) ---
+  # --- TRADER MODULE ---
   wanderingtrader:
     description: Membuka menu trader real-time
     aliases: [wt, trader]
+    permission: naturalsmp.admin
+    usage: /wanderingtrader <spawn|despawn|setloc>
+
+  givecurrency:
+    description: Give special currency to player
+    permission: naturalsmp.admin
+    usage: /givecurrency <player> <amount>
+
+  tradeeditor:
+    description: Open the trade editor GUI
+    permission: naturalsmp.admin
+    usage: /tradeeditor
 
   resettrader:
     description: Reset stok trader

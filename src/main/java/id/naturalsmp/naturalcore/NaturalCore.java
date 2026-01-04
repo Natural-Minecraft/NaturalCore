@@ -7,6 +7,11 @@ import id.naturalsmp.naturalcore.admin.NaturalCoreCommand;
 
 import id.naturalsmp.naturalcore.economy.VaultManager;
 
+import id.naturalsmp.naturalcore.trader.CurrencyManager;
+import id.naturalsmp.naturalcore.trader.TradeEditor;
+import id.naturalsmp.naturalcore.trader.TraderCommand;
+import id.naturalsmp.naturalcore.trader.TraderListener;
+import id.naturalsmp.naturalcore.trader.TraderManager;
 import id.naturalsmp.naturalcore.utils.ChatUtils;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -15,6 +20,11 @@ public final class NaturalCore extends JavaPlugin {
     // Singleton Instance (Agar bisa diakses dari class lain)
     private static NaturalCore instance;
     private VaultManager vaultManager;
+    
+    // Trader Module
+    private CurrencyManager currencyManager;
+    private TradeEditor tradeEditor;
+    private TraderManager traderManager;
 
     @Override
     public void onEnable() {
@@ -32,7 +42,15 @@ public final class NaturalCore extends JavaPlugin {
             getLogger().severe("Vault tidak ditemukan! Fitur ekonomi dimatikan.");
         }
 
-        // 4. Register Commands (Kita cicil satu per satu)
+        // 4. Initialize Trader Module
+        currencyManager = new CurrencyManager(this);
+        tradeEditor = new TradeEditor(this);
+        traderManager = new TraderManager(this, tradeEditor);
+        
+        // Register Trader Listener
+        getServer().getPluginManager().registerEvents(new TraderListener(traderManager, tradeEditor), this);
+
+        // 5. Register Commands (Kita cicil satu per satu)
         // Format: getCommand("nama_di_plugin_yml").setExecutor(new ClassCommand());
 
         // --- Admin Module ---
@@ -41,6 +59,12 @@ public final class NaturalCore extends JavaPlugin {
         if (getCommand("bc") != null) getCommand("bc").setExecutor(new BroadcastCommand());
         if (getCommand("nacore") != null) getCommand("nacore").setExecutor(new NaturalCoreCommand());
 
+        // --- Trader Module ---
+        TraderCommand traderCmd = new TraderCommand(currencyManager, traderManager, tradeEditor);
+        if (getCommand("givecurrency") != null) getCommand("givecurrency").setExecutor(traderCmd);
+        if (getCommand("tradeeditor") != null) getCommand("tradeeditor").setExecutor(traderCmd);
+        if (getCommand("wanderingtrader") != null) getCommand("wanderingtrader").setExecutor(traderCmd);
+
         getLogger().info(ChatUtils.colorize("&6&lNaturalCore &asudah aktif sepenuhnya!"));
     }
 
@@ -48,6 +72,9 @@ public final class NaturalCore extends JavaPlugin {
     public void onDisable() {
         getLogger().info(ChatUtils.colorize("&c&lNaturalCore &idisabling..."));
         // Di sini nanti kita akan save data Altar/Trader sebelum server mati
+        if (traderManager != null) {
+            traderManager.onDisable();
+        }
     }
 
     // Getter untuk Instance
