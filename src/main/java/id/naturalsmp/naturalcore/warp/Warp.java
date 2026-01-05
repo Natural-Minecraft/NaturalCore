@@ -2,7 +2,6 @@ package id.naturalsmp.naturalcore.warp;
 
 import org.bukkit.Location;
 import org.bukkit.Material;
-
 import java.util.List;
 
 public class Warp {
@@ -17,12 +16,11 @@ public class Warp {
         this.id = id;
         this.location = location;
         this.slot = slot;
-        this.displayName = "&a" + id; // Default warna hijau
-        this.icon = Material.ENDER_PEARL; // Default icon
+        this.displayName = "&a" + id;
+        this.icon = Material.ENDER_PEARL;
         this.lore = List.of("&7Klik untuk teleport.");
     }
 
-    // Constructor lengkap untuk load dari config
     public Warp(String id, String displayName, Location location, Material icon, int slot, List<String> lore) {
         this.id = id;
         this.displayName = displayName;
@@ -32,7 +30,6 @@ public class Warp {
         this.lore = lore;
     }
 
-    // Getters & Setters
     public String getId() { return id; }
     public String getDisplayName() { return displayName; }
     public void setDisplayName(String displayName) { this.displayName = displayName; }

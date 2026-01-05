@@ -4,7 +4,6 @@ import id.naturalsmp.naturalcore.NaturalCore;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
-import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 
 import java.io.File;
@@ -15,27 +14,47 @@ public class WarpManager {
 
     private final NaturalCore plugin;
     private final Map<String, Warp> warps = new HashMap<>();
-    private File file;
-    private FileConfiguration config;
+    private final File warpFolder;
 
     public WarpManager(NaturalCore plugin) {
         this.plugin = plugin;
+        // Tentukan lokasi folder: plugins/NaturalCore/warps/
+        this.warpFolder = new File(plugin.getDataFolder(), "warps");
+
+        // Buat folder jika belum ada
+        if (!warpFolder.exists()) {
+            warpFolder.mkdirs();
+        }
+
         loadWarps();
     }
 
     public void createWarp(String id, Location loc) {
-        // Cari slot kosong pertama
+        // Cari slot kosong otomatis
         int slot = 0;
         while (isSlotTaken(slot)) {
             slot++;
         }
-        warps.put(id.toLowerCase(), new Warp(id, loc, slot));
-        saveWarps();
+
+        // Buat object warp baru
+        Warp newWarp = new Warp(id.toLowerCase(), loc, slot);
+        warps.put(id.toLowerCase(), newWarp);
+
+        // Simpan ke file <id>.yml
+        saveWarpToFile(newWarp);
     }
 
     public void deleteWarp(String id) {
-        warps.remove(id.toLowerCase());
-        saveWarps();
+        String lowerId = id.toLowerCase();
+        if (warps.containsKey(lowerId)) {
+            warps.remove(lowerId);
+
+            // Hapus file fisiknya
+            File file = new File(warpFolder, lowerId + ".yml");
+            if (file.exists()) {
+                file.delete();
+            }
+        }
     }
 
     public Warp getWarp(String id) {
@@ -50,62 +69,85 @@ public class WarpManager {
         return warps.values().stream().anyMatch(w -> w.getSlot() == slot);
     }
 
-    // --- CONFIG SYSTEM (warps.yml) ---
+    // --- LOGIKA LOAD DARI FOLDER ---
 
     public void loadWarps() {
-        file = new File(plugin.getDataFolder(), "warps.yml");
-        if (!file.exists()) {
-            plugin.saveResource("warps.yml", false);
-        }
-        config = YamlConfiguration.loadConfiguration(file);
         warps.clear();
 
-        if (config.getConfigurationSection("warps") == null) return;
+        // Ambil semua file di dalam folder 'warps'
+        File[] files = warpFolder.listFiles();
+        if (files == null) return;
 
-        for (String id : config.getConfigurationSection("warps").getKeys(false)) {
-            String path = "warps." + id + ".";
+        for (File file : files) {
+            // Cuma baca file yang akhiran .yml
+            if (file.isFile() && file.getName().endsWith(".yml")) {
+                YamlConfiguration config = YamlConfiguration.loadConfiguration(file);
 
-            String displayName = config.getString(path + "display", "&a" + id);
-            Material icon = Material.valueOf(config.getString(path + "icon", "ENDER_PEARL"));
-            int slot = config.getInt(path + "slot", 0);
-            List<String> lore = config.getStringList(path + "lore");
+                try {
+                    String id = file.getName().replace(".yml", "");
 
-            // Load Location
-            String worldName = config.getString(path + "world");
-            if (worldName == null || Bukkit.getWorld(worldName) == null) continue; // Skip jika world invalid
+                    String displayName = config.getString("display", "&a" + id);
+                    Material icon = Material.valueOf(config.getString("icon", "ENDER_PEARL"));
+                    int slot = config.getInt("slot", 0);
+                    List<String> lore = config.getStringList("lore");
 
-            double x = config.getDouble(path + "x");
-            double y = config.getDouble(path + "y");
-            double z = config.getDouble(path + "z");
-            float yaw = (float) config.getDouble(path + "yaw");
-            float pitch = (float) config.getDouble(path + "pitch");
+                    // Load Location Data
+                    String worldName = config.getString("location.world");
+                    if (worldName == null || Bukkit.getWorld(worldName) == null) {
+                        plugin.getLogger().warning("World untuk warp '" + id + "' tidak ditemukan! Skip.");
+                        continue;
+                    }
 
-            Location loc = new Location(Bukkit.getWorld(worldName), x, y, z, yaw, pitch);
+                    double x = config.getDouble("location.x");
+                    double y = config.getDouble("location.y");
+                    double z = config.getDouble("location.z");
+                    float yaw = (float) config.getDouble("location.yaw");
+                    float pitch = (float) config.getDouble("location.pitch");
 
-            warps.put(id.toLowerCase(), new Warp(id, displayName, loc, icon, slot, lore));
+                    Location loc = new Location(Bukkit.getWorld(worldName), x, y, z, yaw, pitch);
+
+                    // Masukkan ke memori
+                    warps.put(id, new Warp(id, displayName, loc, icon, slot, lore));
+
+                } catch (Exception e) {
+                    plugin.getLogger().severe("Gagal memuat warp dari file: " + file.getName());
+                    e.printStackTrace();
+                }
+            }
+        }
+        plugin.getLogger().info("Berhasil memuat " + warps.size() + " warp.");
+    }
+
+    // --- LOGIKA SAVE KE FILE INDIVIDUAL ---
+
+    public void saveWarps() {
+        // Loop semua warp di memori dan simpan satu per satu
+        for (Warp warp : warps.values()) {
+            saveWarpToFile(warp);
         }
     }
 
-    public void saveWarps() {
-        config.set("warps", null); // Reset data lama
+    private void saveWarpToFile(Warp warp) {
+        File file = new File(warpFolder, warp.getId() + ".yml");
+        YamlConfiguration config = new YamlConfiguration();
 
-        for (Warp w : warps.values()) {
-            String path = "warps." + w.getId() + ".";
-            config.set(path + "display", w.getDisplayName());
-            config.set(path + "icon", w.getIcon().name());
-            config.set(path + "slot", w.getSlot());
-            config.set(path + "lore", w.getLore());
-            config.set(path + "world", w.getLocation().getWorld().getName());
-            config.set(path + "x", w.getLocation().getX());
-            config.set(path + "y", w.getLocation().getY());
-            config.set(path + "z", w.getLocation().getZ());
-            config.set(path + "yaw", w.getLocation().getYaw());
-            config.set(path + "pitch", w.getLocation().getPitch());
-        }
+        config.set("display", warp.getDisplayName());
+        config.set("icon", warp.getIcon().name());
+        config.set("slot", warp.getSlot());
+        config.set("lore", warp.getLore());
+
+        // Simpan Lokasi Rapi
+        config.set("location.world", warp.getLocation().getWorld().getName());
+        config.set("location.x", warp.getLocation().getX());
+        config.set("location.y", warp.getLocation().getY());
+        config.set("location.z", warp.getLocation().getZ());
+        config.set("location.yaw", warp.getLocation().getYaw());
+        config.set("location.pitch", warp.getLocation().getPitch());
 
         try {
             config.save(file);
         } catch (IOException e) {
+            plugin.getLogger().severe("Gagal menyimpan warp: " + warp.getId());
             e.printStackTrace();
         }
     }
