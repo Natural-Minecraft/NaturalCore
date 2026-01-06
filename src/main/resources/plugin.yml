@@ -14,12 +14,15 @@ softdepend: [Citizens, DecentHolograms, CoinsEngine]
 commands:
   # --- CORE ---
   nacore:
-    description: Command utama untuk admin (Reload/Version)
-    aliases: [nc, naturalcore]
+    description: Main command
     permission: naturalsmp.admin
-    usage: /nacore <help|reload|version>
 
   # --- ADMIN MODULE ---
+  givebal:
+    description: Memberikan uang (Rupiah/NC) ke player
+    permission: naturalcs.givebalance
+    usage: /givebal <player> <rupiah/naturalcoin> <jumlah>
+
   kickall:
     description: Kick seluruh player di server
     permission: naturalcs.kickall
