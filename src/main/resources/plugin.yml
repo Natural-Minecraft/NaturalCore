@@ -6,7 +6,7 @@ author: NaturalSMP
 description: Core plugin untuk NaturalSMP Server
 
 depend: [Vault]
-softdepend: [Citizens, DecentHolograms]
+softdepend: [Citizens, DecentHolograms, CoinsEngine]
 
 # ==========================================
 # DAFTAR COMMANDS

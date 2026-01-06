@@ -4,6 +4,7 @@ import id.naturalsmp.naturalcore.admin.BroadcastCommand;
 import id.naturalsmp.naturalcore.admin.KickAllCommand;
 import id.naturalsmp.naturalcore.admin.NaturalCoreCommand;
 import id.naturalsmp.naturalcore.admin.RestartAlertCommand;
+import id.naturalsmp.naturalcore.admin.GiveBalCommand;
 import id.naturalsmp.naturalcore.economy.VaultManager;
 import id.naturalsmp.naturalcore.trader.CurrencyManager;
 import id.naturalsmp.naturalcore.trader.TradeEditor;
@@ -39,7 +40,10 @@ public final class NaturalCore extends JavaPlugin {
         // 3. Setup Economy (Vault)
         this.vaultManager = new VaultManager(this);
         if (!vaultManager.setupEconomy()) {
-            getLogger().warning("Vault/Economy tidak ditemukan! Fitur ekonomi mungkin error.");
+            getLogger().warning("Vault/Economy tidak ditemukan!");
+        } else {
+            // Register Command
+            getCommand("givebal").setExecutor(new GiveBalCommand());
         }
 
         // 4. Setup Warp Module

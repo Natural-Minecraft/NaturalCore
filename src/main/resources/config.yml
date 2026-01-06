@@ -5,18 +5,62 @@
 # Prefix untuk pesan-pesan di chat
 prefix:
   admin: "&6&lNaturalCore &8» &r"
+  # Prefix Hex Color Altar kamu tetap aman disini:
   altar: "&6&l⛩ &x&F&F&D&7&0&0&lA&x&F&F&B&E&0&0&lL&x&F&F&A&6&0&0&lT&x&F&F&8&D&0&0&lA&x&F&F&7&5&0&0&lR &8» &r"
   trader: "&8[&6Trader&8] &r"
   guide: "&8[&e&lGUIDE&8] &r"
+  # Prefix baru untuk Economy
+  economy: "&8[&aEconomy&8] &r"
 
-# Pesan Umum
+# ==========================================
+#          PENGATURAN EKONOMI
+# ==========================================
+economy:
+  # Mata Uang Utama (Vault/Rupiah)
+  vault:
+    enabled: true
+    symbol: "Rp"
+    # Daftar kata kunci command (admin bisa ketik salah satu ini)
+    aliases:
+      - "rupiah"
+      - "rp"
+      - "money"
+      - "duit"
+
+  # Mata Uang Kedua (CoinsEngine/NaturalCoin)
+  coins-engine:
+    enabled: true
+    # ID Currency harus SAMA PERSIS dengan ID di folder plugin CoinsEngine
+    currency-id: "naturalcoin"
+    symbol: "NC"
+    aliases:
+      - "naturalcoin"
+      - "nc"
+      - "coin"
+      - "koin"
+
+# ==========================================
+#              PESAN - PESAN
+# ==========================================
 messages:
+  # -- Umum --
   no-permission: "&cMaaf, kamu tidak punya akses."
   reload-success: "&aKonfigurasi berhasil dimuat ulang!"
   reload-fail: "&cGagal memuat ulang config. Cek console!"
   cooldown: "&cTunggu &e%time% &cdetik lagi."
+  player-not-found: "&cPemain &f%player% &ctidak ditemukan atau offline."
 
-# Pengaturan Modul
+  # -- Error Input --
+  invalid-amount: "&cMasukan jumlah angka yang valid (contoh: 10000)."
+  invalid-currency: "&cMata uang tidak dikenali. Gunakan salah satu: &f%aliases%"
+
+  # -- Transaksi Sukses --
+  give-success-sender: "&aBerhasil mengirim &e%symbol% %amount% &ake &f%target%&a."
+  give-success-target: "&aKamu menerima &e%symbol% %amount% &adari Admin!"
+
+# ==========================================
+#            PENGATURAN MODUL
+# ==========================================
 settings:
   restart-alert-time: 10 # Detik
   broadcast-cooldown: 5 # Detik
