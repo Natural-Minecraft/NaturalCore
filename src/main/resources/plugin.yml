@@ -1,5 +1,5 @@
 name: NaturalCore
-version: 1.1.0
+version: 1.1.2
 main: id.naturalsmp.naturalcore.NaturalCore
 api-version: 1.20
 author: NaturalSMP
@@ -63,20 +63,23 @@ commands:
 
   # --- TRADER MODULE ---
   wanderingtrader:
-    description: Mengelola Wandering Trader
+    description: Buka menu trader
     aliases: [wt, trader]
-    permission: naturalsmp.admin
-    usage: /wanderingtrader <spawn|despawn|setloc|setinterval|next>
-
-  givecurrency:
-    description: Memberikan Quest Paper ke player
-    permission: naturalsmp.admin
-    usage: /givecurrency <player> <amount>
-
-  tradeeditor:
-    description: Buka GUI trade editor
-    permission: naturalsmp.admin
-    usage: /tradeeditor
+  settrader:
+    description: Admin setup item
+    permission: naturalsmp.trader.admin
+  resettrader:
+    description: Reset data trader
+    permission: naturalsmp.trader.admin
+  setharga:
+    description: Set harga per slot
+    permission: naturalsmp.trader.admin
+  setallharga:
+    description: Set harga massal
+    permission: naturalsmp.trader.admin
+  setallstok:
+    description: Set stok massal
+    permission: naturalsmp.trader.admin
 
 # ==========================================
 # DAFTAR PERMISSIONS
@@ -96,4 +99,8 @@ permissions:
 
   naturalcs.broadcast:
     description: Izin broadcast
+    default: op
+
+  naturalcs.trader.admin:
+    description: Izin admin trade
     default: op

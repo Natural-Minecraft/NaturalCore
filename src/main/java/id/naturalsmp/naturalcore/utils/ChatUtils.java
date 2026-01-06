@@ -31,4 +31,8 @@ public class ChatUtils {
     public static Component format(String message) {
         return LegacyComponentSerializer.legacyAmpersand().deserialize(colorize(message));
     }
+
+    public static String stripColor(String message) {
+        return ChatColor.stripColor(colorize(message));
+    }
 }

@@ -2,136 +2,163 @@ package id.naturalsmp.naturalcore.trader;
 
 import id.naturalsmp.naturalcore.utils.ChatUtils;
 import org.bukkit.Bukkit;
+import org.bukkit.Material;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.Inventory;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
 import org.jetbrains.annotations.NotNull;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class TraderCommand implements CommandExecutor {
 
-    private final CurrencyManager currencyManager;
-    private final TraderManager traderManager;
-    private final TradeEditor tradeEditor;
+    private final CurrencyManager currencyManager; // (Opsional/Unused for now)
+    private final TraderManager manager;
+    private final TradeEditor editor; // (Opsional)
 
-    public TraderCommand(CurrencyManager currencyManager, TraderManager traderManager, TradeEditor tradeEditor) {
+    public TraderCommand(CurrencyManager currencyManager, TraderManager manager, TradeEditor editor) {
         this.currencyManager = currencyManager;
-        this.traderManager = traderManager;
-        this.tradeEditor = tradeEditor;
+        this.manager = manager;
+        this.editor = editor;
     }
 
     @Override
     public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, @NotNull String[] args) {
-        if (command.getName().equalsIgnoreCase("givecurrency")) {
-            if (!sender.hasPermission("naturalcore.admin")) {
-                sender.sendMessage(ChatUtils.format("&cYou do not have permission!"));
-                return true;
-            }
 
+        // --- PLAYER COMMAND: /wt ---
+        if (label.equalsIgnoreCase("wanderingtrader") || label.equalsIgnoreCase("wt")) {
+            if (!(sender instanceof Player)) return true;
+            openTraderMenu((Player) sender);
+            return true;
+        }
+
+        // --- ADMIN COMMANDS ---
+        if (!sender.hasPermission("op")) {
+            sender.sendMessage(ChatUtils.colorize("&cNo permission."));
+            return true;
+        }
+
+        // 1. /settrader (GUI Input Barang)
+        if (label.equalsIgnoreCase("settrader")) {
+            if (!(sender instanceof Player)) return true;
+            Player p = (Player) sender;
+            Inventory inv = Bukkit.createInventory(null, 36, ChatUtils.colorize("&cInput 35 Barang"));
+
+            // Load item yang sudah ada
+            for (int i = 0; i < 35; i++) {
+                if (manager.getItem(i) != null) {
+                    inv.setItem(i, manager.getItem(i));
+                }
+            }
+            p.openInventory(inv);
+            return true;
+        }
+
+        // 2. /resettrader
+        if (label.equalsIgnoreCase("resettrader")) {
+            manager.resetAll();
+            sender.sendMessage(ChatUtils.colorize("&8[&6Trader&8] &aData trader berhasil direset total!"));
+            return true;
+        }
+
+        // 3. /setharga <slot> <harga>
+        if (label.equalsIgnoreCase("setharga")) {
             if (args.length < 2) {
-                sender.sendMessage(ChatUtils.format("&cUsage: /givecurrency <player> <amount>"));
+                sender.sendMessage(ChatUtils.colorize("&cUsage: /setharga <slot 0-34> <harga>"));
                 return true;
             }
-
-            Player target = Bukkit.getPlayer(args[0]);
-            if (target == null) {
-                sender.sendMessage(ChatUtils.format("&cPlayer not found!"));
-                return true;
-            }
-
             try {
-                int amount = Integer.parseInt(args[1]);
-                currencyManager.giveCurrency(target, amount);
-                sender.sendMessage(ChatUtils.format("&aGave " + amount + " Quest Paper to " + target.getName()));
+                int slot = Integer.parseInt(args[0]);
+                double price = Double.parseDouble(args[1]);
+                manager.setPrice(slot, price);
+                manager.saveData();
+                sender.sendMessage(ChatUtils.colorize("&8[&6Trader&8] &aHarga slot " + slot + " diset ke &e$" + price));
             } catch (NumberFormatException e) {
-                sender.sendMessage(ChatUtils.format("&cInvalid amount!"));
+                sender.sendMessage("&cAngka tidak valid!");
             }
             return true;
         }
 
-        if (command.getName().equalsIgnoreCase("tradeeditor")) {
-            if (!(sender instanceof Player player)) {
-                sender.sendMessage(ChatUtils.format("&cOnly players can use this command!"));
-                return true;
-            }
-
-            if (!player.hasPermission("naturalcore.admin")) {
-                player.sendMessage(ChatUtils.format("&cYou do not have permission!"));
-                return true;
-            }
-
-            tradeEditor.openEditor(player);
+        // 4. /setallharga <harga>
+        if (label.equalsIgnoreCase("setallharga")) {
+            if (args.length < 1) return true;
+            double price = Double.parseDouble(args[0]);
+            for (int i = 0; i < 35; i++) manager.setPrice(i, price);
+            manager.saveData();
+            sender.sendMessage(ChatUtils.colorize("&8[&6Trader&8] &aSemua item diset ke &e$" + price));
             return true;
         }
-        
-        if (command.getName().equalsIgnoreCase("wanderingtrader")) {
-             if (!sender.hasPermission("naturalcore.admin")) {
-                sender.sendMessage(ChatUtils.format("&cYou do not have permission!"));
-                return true;
-            }
-            
-            if (args.length == 0) {
-                sender.sendMessage(ChatUtils.format("&cUsage: /wanderingtrader <spawn|despawn|setloc|setinterval|next>"));
-                return true;
-            }
 
-            if (args[0].equalsIgnoreCase("spawn")) {
-                if (traderManager.isTraderActive()) {
-                    sender.sendMessage(ChatUtils.format("&cTrader is already spawned!"));
-                    return true;
-                }
-                traderManager.forceSpawn();
-                sender.sendMessage(ChatUtils.format("&aTrader spawned manually!"));
-                return true;
-            }
-            
-            if (args[0].equalsIgnoreCase("despawn")) {
-                if (!traderManager.isTraderActive()) {
-                    sender.sendMessage(ChatUtils.format("&cTrader is not currently spawned."));
-                    return true;
-                }
-                traderManager.forceDespawn();
-                sender.sendMessage(ChatUtils.format("&aTrader despawned manually!"));
-                return true;
-            }
-            
-            if (args[0].equalsIgnoreCase("setloc")) {
-                if (sender instanceof Player player) {
-                    traderManager.setSpawnLocation(player.getLocation());
-                    sender.sendMessage(ChatUtils.format("&aTrader spawn location set!"));
+        // 5. /setallstok <jumlah>
+        if (label.equalsIgnoreCase("setallstok")) {
+            if (args.length < 1) return true;
+            int stok = Integer.parseInt(args[0]);
+            for (int i = 0; i < 35; i++) manager.setStock(i, stok);
+            manager.saveData();
+            sender.sendMessage(ChatUtils.colorize("&8[&6Trader&8] &aSemua stok diset ke &e" + stok));
+            return true;
+        }
+
+        return true;
+    }
+
+    private void openTraderMenu(Player p) {
+        String hari = manager.getCurrentDayName();
+        // Title Real-Time
+        String title = "&8WT | " + hari + " | " + manager.getNow().getHour() + ":" + String.format("%02d", manager.getNow().getMinute()) + " WIB";
+
+        Inventory inv = Bukkit.createInventory(null, 27, ChatUtils.colorize(title));
+
+        // Glass Pane Filler
+        ItemStack glass = new ItemStack(Material.GRAY_STAINED_GLASS_PANE);
+        ItemMeta gMeta = glass.getItemMeta();
+        gMeta.setDisplayName(" ");
+        glass.setItemMeta(gMeta);
+
+        for (int i = 0; i < 27; i++) inv.setItem(i, glass);
+
+        // Isi Item Sesuai Hari
+        int startIndex = manager.getTodayStartIndex();
+        int guiSlot = 11;
+
+        for (int i = 0; i < 5; i++) {
+            int realIdx = startIndex + i;
+            ItemStack item = manager.getItem(realIdx);
+
+            if (item != null && item.getType() != Material.AIR) {
+                ItemStack display = item.clone();
+                ItemMeta meta = display.getItemMeta();
+
+                // Format Lore Skript Style
+                List<String> lore = new ArrayList<>();
+                lore.add(ChatUtils.colorize("&r"));
+                lore.add(ChatUtils.colorize("&7Harga: &a$" + manager.getPrice(realIdx)));
+                lore.add(ChatUtils.colorize("&7Stok: &e" + manager.getStock(realIdx)));
+
+                if (manager.getStock(realIdx) > 0) {
+                    lore.add(ChatUtils.colorize("&eKlik untuk membeli"));
                 } else {
-                    sender.sendMessage(ChatUtils.format("&cOnly players can set location!"));
+                    lore.add(ChatUtils.colorize("&cSTOK HABIS"));
                 }
-                return true;
-            }
 
-            if (args[0].equalsIgnoreCase("setinterval")) {
-                if (args.length < 2) {
-                    sender.sendMessage(ChatUtils.format("&cUsage: /wanderingtrader setinterval <seconds>"));
-                    return true;
-                }
-                try {
-                    long seconds = Long.parseLong(args[1]);
-                    if (seconds < 600) {
-                        sender.sendMessage(ChatUtils.format("&cInterval must be at least 600 seconds (10 minutes)!"));
-                        return true;
-                    }
-                    traderManager.setInterval(seconds);
-                    sender.sendMessage(ChatUtils.format("&aSpawn interval set to " + seconds + " seconds."));
-                } catch (NumberFormatException e) {
-                    sender.sendMessage(ChatUtils.format("&cInvalid number!"));
-                }
-                return true;
+                meta.setLore(lore);
+                display.setItemMeta(meta);
+                inv.setItem(guiSlot, display);
+            } else {
+                // Tampilkan Barrier kalau slot kosong
+                ItemStack barrier = new ItemStack(Material.BARRIER);
+                ItemMeta bMeta = barrier.getItemMeta();
+                bMeta.setDisplayName(ChatUtils.colorize("&cKosong"));
+                barrier.setItemMeta(bMeta);
+                inv.setItem(guiSlot, barrier);
             }
-
-            if (args[0].equalsIgnoreCase("next")) {
-                sender.sendMessage(ChatUtils.format(traderManager.getStatusMessage()));
-                return true;
-            }
-            
-            return true;
+            guiSlot++;
         }
-
-        return false;
+        p.openInventory(inv);
     }
 }
