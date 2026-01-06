@@ -1,6 +1,7 @@
 # ==========================================
 #      NATURAL CORE - CONFIGURATION
 # ==========================================
+config-version: 1.2 # Penanda versi config (jangan disentuh!)
 
 # Prefix untuk pesan-pesan di chat
 prefix:

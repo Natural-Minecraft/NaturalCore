@@ -10,6 +10,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
+import org.bukkit.event.inventory.InventoryDragEvent; // Wajib import
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
@@ -25,9 +26,9 @@ public class WarpGUI implements Listener {
         this.plugin = plugin;
     }
 
+    @SuppressWarnings("deprecation")
     public void openGUI(Player player, boolean isEditor) {
-        // --- 1. SET TITLE DENGAN HEX ---
-        // Hex color &#252525 (Dark Gray) + Text Centered style
+        // Title Estetik
         String title = isEditor
                 ? "&c&lWARP EDITOR (Klik Kanan Hapus)"
                 : "&#252525◤ ᴡᴀʀᴘꜱ ᴍᴇɴᴜ ◥";
@@ -59,44 +60,37 @@ public class WarpGUI implements Listener {
         player.playSound(player.getLocation(), Sound.BLOCK_CHEST_OPEN, 1f, 1f);
     }
 
-    // --- LOGIKA ITEM & LORE BARU ---
-
+    @SuppressWarnings("deprecation")
     private ItemStack createWarpItem(Warp w, boolean isEditor) {
         ItemStack item = new ItemStack(w.getIcon());
         ItemMeta meta = item.getItemMeta();
 
-        // 1. Title Case Name (spawn_point -> Spawn Point)
         String titleCasedName = toTitleCase(w.getId());
         meta.setDisplayName(ChatUtils.colorize("&a" + titleCasedName));
 
         List<String> lore = new ArrayList<>();
-
         if (isEditor) {
-            lore.add(ChatUtils.colorize("&8" + w.getId())); // ID Disimpan disini
+            lore.add(ChatUtils.colorize("&8" + w.getId()));
             lore.add("");
             lore.add(ChatUtils.colorize("&e&l[EDITOR MODE]"));
             lore.add(ChatUtils.colorize("&7Klik Kanan untuk &cHAPUS"));
         } else {
-            // --- FORMAT LORE REQUEST ---
-            lore.add(ChatUtils.colorize("&8" + w.getId())); // Baris 1: ID Asli (Hidden color)
+            lore.add(ChatUtils.colorize("&8" + w.getId()));
             lore.add("");
             lore.add(ChatUtils.colorize("&7Warp ke " + titleCasedName));
             lore.add("");
             lore.add(ChatUtils.colorize("&a➥ &lKLIK UNTUK WARP"));
             lore.add("");
         }
-
         meta.setLore(lore);
         item.setItemMeta(meta);
         return item;
     }
 
-    // Helper untuk mengubah "nama_warp" menjadi "Nama Warp"
     private String toTitleCase(String input) {
         if (input == null || input.isEmpty()) return input;
         StringBuilder sb = new StringBuilder();
         boolean nextTitleCase = true;
-
         for (char c : input.replace("_", " ").toCharArray()) {
             if (Character.isSpaceChar(c)) {
                 nextTitleCase = true;
@@ -111,6 +105,7 @@ public class WarpGUI implements Listener {
         return sb.toString();
     }
 
+    @SuppressWarnings("deprecation")
     private void fillBorder(Inventory inv) {
         ItemStack border = new ItemStack(Material.GRAY_STAINED_GLASS_PANE);
         ItemMeta meta = border.getItemMeta();
@@ -138,74 +133,76 @@ public class WarpGUI implements Listener {
     private List<Integer> getAutoPositions(int count) {
         List<Integer> slots = new ArrayList<>();
         if (count == 0) return slots;
-
         if (count == 1) { slots.add(22); }
         else if (count == 2) { slots.add(21); slots.add(23); }
         else if (count == 3) { slots.add(20); slots.add(22); slots.add(24); }
         else if (count == 4) { slots.add(21); slots.add(23); slots.add(30); slots.add(32); }
         else if (count == 5) { slots.add(20); slots.add(22); slots.add(24); slots.add(30); slots.add(32); }
         else if (count == 6) { slots.add(20); slots.add(22); slots.add(24); slots.add(29); slots.add(31); slots.add(33); }
-        else if (count == 7) {
-            slots.add(19); slots.add(21); slots.add(23); slots.add(25);
-            slots.add(29); slots.add(31); slots.add(33);
-        }
-        else if (count == 8) {
-            slots.add(19); slots.add(21); slots.add(23); slots.add(25);
-            slots.add(28); slots.add(30); slots.add(32); slots.add(34);
-        }
-        else {
-            for (int slot : getPlayableSlots()) slots.add(slot);
-        }
+        else if (count == 7) { slots.add(19); slots.add(21); slots.add(23); slots.add(25); slots.add(29); slots.add(31); slots.add(33); }
+        else if (count == 8) { slots.add(19); slots.add(21); slots.add(23); slots.add(25); slots.add(28); slots.add(30); slots.add(32); slots.add(34); }
+        else { for (int slot : getPlayableSlots()) slots.add(slot); }
         return slots;
     }
 
-    // --- EVENT HANDLER (LISTENER) ---
+    // --- EVENT HANDLER ---
 
     @EventHandler
+    @SuppressWarnings("deprecation")
     public void onClick(InventoryClickEvent e) {
         if (!(e.getWhoClicked() instanceof Player)) return;
         Player p = (Player) e.getWhoClicked();
-        String title = e.getView().getTitle();
+        String strippedTitle = ChatUtils.stripColor(e.getView().getTitle());
 
-        // Cek Title (Termasuk yang pakai Hex)
-        // Kita cek pakai contains "WARP" saja biar aman dari simbol aneh
-        if (!ChatUtils.stripColor(title).contains("WARP")) return;
+        // FIX: Cek font estetik "ᴡᴀʀᴘꜱ" atau simbol unik "◤"
+        // Kita pakai simbol "◤" karena itu paling unik dan pasti ada di menu
+        if (strippedTitle.contains("◤") || strippedTitle.contains("WARP EDITOR")) {
 
-        e.setCancelled(true);
+            // CANCEL KLIK APAPUN DI GUI
+            e.setCancelled(true);
 
-        ItemStack clicked = e.getCurrentItem();
-        if (clicked == null || clicked.getType() == Material.AIR) return;
-        if (clicked.getType() == Material.GRAY_STAINED_GLASS_PANE) return;
+            ItemStack clicked = e.getCurrentItem();
+            if (clicked == null || clicked.getType() == Material.AIR) return;
+            if (clicked.getType() == Material.GRAY_STAINED_GLASS_PANE) return;
 
-        // Ambil ID Warp dari Lore Baris Pertama (&8{id})
-        ItemMeta meta = clicked.getItemMeta();
-        if (!meta.hasLore() || meta.getLore().isEmpty()) return;
+            // Pastikan klik di Top Inventory
+            if (e.getClickedInventory() != e.getView().getTopInventory()) return;
 
-        // Strip color dari lore baris 0 untuk dapat ID bersih (misal "spawn")
-        String warpId = ChatUtils.stripColor(meta.getLore().get(0));
-        Warp w = plugin.getWarpManager().getWarp(warpId);
+            ItemMeta meta = clicked.getItemMeta();
+            if (!meta.hasLore() || meta.getLore().isEmpty()) return;
 
-        if (w == null) {
-            // Safety check, harusnya gak mungkin null
-            return;
-        }
+            String warpId = ChatUtils.stripColor(meta.getLore().get(0));
+            Warp w = plugin.getWarpManager().getWarp(warpId);
 
-        // --- MODE EDITOR ---
-        if (editorMode.containsKey(p.getUniqueId())) {
-            if (e.getClick().isRightClick()) {
-                plugin.getWarpManager().deleteWarp(w.getId());
-                p.playSound(p.getLocation(), Sound.BLOCK_ANVIL_BREAK, 1f, 1f);
-                p.sendMessage(ChatUtils.colorize("&c&lWARP &8» &fWarp &c" + w.getId() + " &ftelah dihapus!"));
-                openGUI(p, true);
+            if (w == null) return;
+
+            // Mode Editor
+            if (editorMode.containsKey(p.getUniqueId())) {
+                if (e.getClick().isRightClick()) {
+                    plugin.getWarpManager().deleteWarp(w.getId());
+                    p.playSound(p.getLocation(), Sound.BLOCK_ANVIL_BREAK, 1f, 1f);
+                    p.sendMessage(ChatUtils.colorize("&c&lWARP &8» &fWarp &c" + w.getId() + " &ftelah dihapus!"));
+                    openGUI(p, true);
+                }
+                return;
             }
-            return;
-        }
 
-        // --- MODE PLAYER ---
-        p.closeInventory();
-        p.teleport(w.getLocation());
-        p.playSound(p.getLocation(), Sound.ENTITY_ENDERMAN_TELEPORT, 1f, 1f);
-        p.sendTitle(ChatUtils.colorize("&a" + toTitleCase(w.getId())), ChatUtils.colorize("&7Teleporting..."), 0, 20, 10);
+            // Mode Player
+            p.closeInventory();
+            p.teleport(w.getLocation());
+            p.playSound(p.getLocation(), Sound.ENTITY_ENDERMAN_TELEPORT, 1f, 1f);
+            p.sendTitle(ChatUtils.colorize("&a" + toTitleCase(w.getId())), ChatUtils.colorize("&7Teleporting..."), 0, 20, 10);
+        }
+    }
+
+    // --- TAMBAHAN PENTING: DRAG EVENT ---
+    @EventHandler
+    public void onDrag(InventoryDragEvent e) {
+        String strippedTitle = ChatUtils.stripColor(e.getView().getTitle());
+        // Fix: Cek font estetik
+        if (strippedTitle.contains("◤") || strippedTitle.contains("WARP EDITOR")) {
+            e.setCancelled(true);
+        }
     }
 
     @EventHandler

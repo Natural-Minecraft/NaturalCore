@@ -9,7 +9,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryClickEvent;
-import org.bukkit.event.inventory.InventoryDragEvent; // <-- Tambahan
+import org.bukkit.event.inventory.InventoryDragEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
@@ -26,28 +26,42 @@ public class NaturalCoreGUI implements Listener {
         this.plugin = plugin;
     }
 
+    @SuppressWarnings("deprecation")
     public void openGUI(Player player) {
-        // Title Estetik (Pastikan konsisten)
+        // Title Estetik
         String title = "&#00AAFF&lɴᴀᴛᴜʀᴀʟ ᴄᴏʀᴇ &8| &7ʜᴇʟᴘ";
         Inventory inv = Bukkit.createInventory(null, 45, ChatUtils.colorize(title));
 
         fillBackground(inv);
 
-        // --- ITEMS (Sama seperti sebelumnya) ---
+        // Ambil Versi dari plugin.yml dan config.yml
+        String jarVersion = plugin.getDescription().getVersion();
+        String configVersion = plugin.getConfig().getString("config-version", "Unknown");
+
+        String versionStatus = jarVersion.equals(configVersion) ? "&a(Matched)" : "&c(Config Mismatch!)";
+
+        // --- ITEMS ---
         inv.setItem(20, createItem(Material.NETHER_STAR, "&b&lCORE COMMANDS",
-                "&7Command dasar untuk manajemen plugin.", "", "&e/nacore reload", "&e/nacore version"));
+                "&7Command dasar plugin.",
+                "",
+                "&e/nacore reload",
+                "&e/nacore version",
+                "",
+                "&7Plugin Ver: &fv" + jarVersion,
+                "&7Config Ver: &fv" + configVersion + " " + versionStatus
+        ));
 
         inv.setItem(21, createItem(Material.NETHERITE_AXE, "&c&lADMIN TOOLS",
-                "&7Alat bantu moderasi.", "", "&e/kickall", "&e/restartalert", "&e/bc"));
+                "&7Alat moderasi.", "", "&e/kickall", "&e/restartalert", "&e/bc"));
 
         inv.setItem(22, createItem(Material.ENDER_EYE, "&a&lWARP SYSTEM",
-                "&7Manajemen lokasi teleportasi.", "", "&e/warps", "&e/setwarp", "&e/delwarp"));
+                "&7Manajemen warp.", "", "&e/warps", "&e/setwarp", "&e/delwarp"));
 
         inv.setItem(23, createItem(Material.EMERALD, "&6&lTRADER SYSTEM",
-                "&7Sistem pedagang keliling.", "", "&e/wt", "&e/settrader", "&e/setharga"));
+                "&7Pedagang keliling.", "", "&e/wt", "&e/settrader", "&e/setharga"));
 
         inv.setItem(24, createItem(Material.GOLD_INGOT, "&e&lECONOMY",
-                "&7Sistem mata uang.", "", "&e/givebal <player> <currency> <jml>"));
+                "&7Sistem uang.", "", "&e/givebal <player> <currency> <jml>"));
 
         inv.setItem(40, createItem(Material.BARRIER, "&c&lCLOSE MENU", "&7Tutup menu."));
 
@@ -55,16 +69,18 @@ public class NaturalCoreGUI implements Listener {
         player.playSound(player.getLocation(), Sound.BLOCK_NOTE_BLOCK_PLING, 1f, 1f);
     }
 
-    // --- HELPER METHODS ---
+    @SuppressWarnings("deprecation")
     private ItemStack createItem(Material material, String name, String... loreLines) {
         ItemStack item = new ItemStack(material);
         ItemMeta meta = item.getItemMeta();
-        meta.setDisplayName(ChatUtils.colorize(name));
-        List<String> lore = new ArrayList<>();
-        for (String line : loreLines) lore.add(ChatUtils.colorize(line));
-        meta.setLore(lore);
-        meta.addItemFlags(ItemFlag.HIDE_ATTRIBUTES);
-        item.setItemMeta(meta);
+        if (meta != null) {
+            meta.setDisplayName(ChatUtils.colorize(name));
+            List<String> lore = new ArrayList<>();
+            for (String line : loreLines) lore.add(ChatUtils.colorize(line));
+            meta.setLore(lore);
+            meta.addItemFlags(ItemFlag.HIDE_ATTRIBUTES);
+            item.setItemMeta(meta);
+        }
         return item;
     }
 
@@ -73,38 +89,49 @@ public class NaturalCoreGUI implements Listener {
         for (int i = 0; i < inv.getSize(); i++) inv.setItem(i, glass);
     }
 
-    // --- EVENT LISTENER (KEAMANAN) ---
+    // --- KEAMANAN SUPER KETAT ---
 
-    // 1. Cegah Klik & Shift-Klik
+    // Method Helper untuk mengecek apakah ini GUI NaturalCore
+    private boolean isNaturalCoreGUI(String title) {
+        String stripped = ChatUtils.stripColor(title);
+        // Kita cek karakter unik yang pasti ada
+        // "ɴᴀᴛᴜʀᴀʟ" atau "CORE" atau simbol "|"
+        return stripped.contains("ɴᴀᴛᴜʀᴀʟ") || stripped.contains("CORE") || stripped.contains("HELP");
+    }
+
     @EventHandler
+    @SuppressWarnings("deprecation")
     public void onClick(InventoryClickEvent e) {
-        if (ChatUtils.stripColor(e.getView().getTitle()).contains("NATURAL CORE")) {
+        // Cek Judul
+        if (isNaturalCoreGUI(e.getView().getTitle())) {
+
+            // 1. BATALKAN SEMUA INTERAKSI
             e.setCancelled(true);
+
             if (e.getCurrentItem() == null) return;
+
+            // 2. Pastikan yang diklik adalah GUI atas
+            if (e.getClickedInventory() != e.getView().getTopInventory()) return;
 
             Player p = (Player) e.getWhoClicked();
 
-            // Jika klik Gold Ingot (Economy)
             if (e.getCurrentItem().getType() == Material.GOLD_INGOT) {
                 p.closeInventory();
-                p.sendMessage(ChatUtils.colorize("&e&lTIP: &7Gunakan command berikut:"));
-                p.sendMessage(ChatUtils.colorize("&f/givebal <player> <rupiah/nc> <jumlah>"));
+                p.sendMessage(ChatUtils.colorize("&e&lTIP: &7Gunakan: &f/givebal <player> <rupiah/nc> <jumlah>"));
                 p.playSound(p.getLocation(), Sound.UI_BUTTON_CLICK, 1f, 1f);
             }
-
-            // Tombol Close
-            if (e.getCurrentItem().getType() == Material.BARRIER) {
+            else if (e.getCurrentItem().getType() == Material.BARRIER) {
                 p.closeInventory();
                 p.playSound(p.getLocation(), Sound.UI_BUTTON_CLICK, 1f, 1f);
             }
         }
     }
 
-    // 2. Cegah Dragging (Geser item pake mouse ditahan)
     @EventHandler
     public void onDrag(InventoryDragEvent e) {
-        if (ChatUtils.stripColor(e.getView().getTitle()).contains("NATURAL CORE")) {
-            e.setCancelled(true); // KUNCI MATI
+        if (isNaturalCoreGUI(e.getView().getTitle())) {
+            // BATALKAN GESER ITEM
+            e.setCancelled(true);
         }
     }
 }

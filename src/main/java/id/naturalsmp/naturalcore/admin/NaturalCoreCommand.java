@@ -47,7 +47,16 @@ public class NaturalCoreCommand implements CommandExecutor {
 
             case "version":
             case "ver":
-                sender.sendMessage(ChatUtils.colorize("&bNaturalCore &7v" + NaturalCore.getInstance().getDescription().getVersion()));
+                String vJar = NaturalCore.getInstance().getDescription().getVersion();
+                String vCfg = ConfigUtils.getString("config-version");
+                if (vCfg == null) vCfg = "&cOld/Missing";
+
+                sender.sendMessage(ChatUtils.colorize("&8&m--------------------------------"));
+                sender.sendMessage(ChatUtils.colorize("&6&l NATURAL CORE &7Status"));
+                sender.sendMessage(ChatUtils.colorize(""));
+                sender.sendMessage(ChatUtils.colorize("&7Plugin Version : &a" + vJar));
+                sender.sendMessage(ChatUtils.colorize("&7Config Version : &e" + vCfg));
+                sender.sendMessage(ChatUtils.colorize("&8&m--------------------------------"));
                 break;
 
             // Fallback command help versi Text (buat Console)
