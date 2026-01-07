@@ -1,67 +1,119 @@
 # ==========================================
 #      NATURAL CORE - CONFIGURATION
 # ==========================================
-config-version: 1.2 # Penanda versi config (jangan disentuh!)
+config-version: 1.2
 
-# Prefix untuk pesan-pesan di chat
+# PREFIX SETTINGS (Gradasi Biru -> Hijau)
+# Format: Natural (Biru) + NamaModul (Hijau)
 prefix:
-  admin: "&6&lNaturalCore &8» &r"
-  # Prefix Hex Color Altar kamu tetap aman disini:
-  altar: "&6&l⛩ &x&F&F&D&7&0&0&lA&x&F&F&B&E&0&0&lL&x&F&F&A&6&0&0&lT&x&F&F&8&D&0&0&lA&x&F&F&7&5&0&0&lR &8» &r"
-  trader: "&8[&6Trader&8] &r"
-  guide: "&8[&e&lGUIDE&8] &r"
-  # Prefix baru untuk Economy
-  economy: "&8[&aEconomy&8] &r"
+  admin: "&#00AAFF&lNatural&#55FF55&lCore &8» &r"
+  economy: "&#00AAFF&lNatural&#55FF55&lEco &8» &r"
+  trader: "&#00AAFF&lNatural&#55FF55&lTrader &8» &r"
+  spawn: "&#00AAFF&lNatural&#55FF55&lSpawn &8» &r"
+  warp: "&#00AAFF&lNatural&#55FF55&lWarp &8» &r"
+  home: "&#00AAFF&lNatural&#55FF55&lHome &8» &r"
+  teleport: "&#00AAFF&lNatural&#55FF55&lTeleport &8» &r"
 
 # ==========================================
 #          PENGATURAN EKONOMI
 # ==========================================
 economy:
-  # Mata Uang Utama (Vault/Rupiah)
   vault:
     enabled: true
     symbol: "Rp"
-    # Daftar kata kunci command (admin bisa ketik salah satu ini)
     aliases:
       - "rupiah"
       - "rp"
       - "money"
       - "duit"
-
-  # Mata Uang Kedua (CoinsEngine/NaturalCoin)
   coins-engine:
     enabled: true
-    # ID Currency harus SAMA PERSIS dengan ID di folder plugin CoinsEngine
     currency-id: "naturalcoin"
     symbol: "NC"
     aliases:
       - "naturalcoin"
       - "nc"
       - "coin"
-      - "koin"
+
+# ==========================================
+#            PENGATURAN HOME
+# ==========================================
+home:
+  # Folder penyimpanan: plugins/NaturalCore/homes/
+
+  # Format permission: naturalsmp.home.limit.<group>
+  # Contoh: naturalsmp.home.limit.vip -> Dapat 5 home
+  limits:
+    default: 3
+    vip: 5
+    mvp: 15
+    nature: 30
+    admin: 100
 
 # ==========================================
 #              PESAN - PESAN
 # ==========================================
 messages:
-  # -- Umum --
+
+  # --- ESSENTIALS ---
+  gamemode-changed: "&aGamemode diubah ke &e%mode%&a."
+  gamemode-changed-other: "&aGamemode &e%target% &adiubah ke &e%mode%&a."
+
+  fly-enabled: "&aFlight mode &eENABLED&a."
+  fly-disabled: "&cFlight mode &eDISABLED&c."
+  fly-other: "&aFlight mode untuk &e%target% &atelah &e%status%&a."
+
+  heal-success: "&aKamu telah dipulihkan."
+  heal-other: "&aTelah memulihkan &e%target%&a."
+
+  feed-success: "&aRasa lapar dihilangkan."
+  feed-other: "&aTelah memberi makan &e%target%&a."
+
+  invsee-open: "&aMembuka inventory &e%target%&a."
+  endersee-open: "&aMembuka enderchest &e%target%&a."
+
+  # --- ECO MESSAGES ---
   no-permission: "&cMaaf, kamu tidak punya akses."
   reload-success: "&aKonfigurasi berhasil dimuat ulang!"
-  reload-fail: "&cGagal memuat ulang config. Cek console!"
-  cooldown: "&cTunggu &e%time% &cdetik lagi."
-  player-not-found: "&cPemain &f%player% &ctidak ditemukan atau offline."
+  player-not-found: "&cPemain &f%player% &ctidak ditemukan."
+  invalid-amount: "&cMasukan jumlah angka yang valid!"
+  invalid-currency: "&cMata uang salah. Gunakan: &f%aliases%"
 
-  # -- Error Input --
-  invalid-amount: "&cMasukan jumlah angka yang valid (contoh: 10000)."
-  invalid-currency: "&cMata uang tidak dikenali. Gunakan salah satu: &f%aliases%"
-
-  # -- Transaksi Sukses --
   give-success-sender: "&aBerhasil mengirim &e%symbol% %amount% &ake &f%target%&a."
   give-success-target: "&aKamu menerima &e%symbol% %amount% &adari Admin!"
 
-# ==========================================
-#            PENGATURAN MODUL
-# ==========================================
+  # --- SPAWN MESSAGES ---
+  spawn-set: "&aLokasi spawn utama berhasil diatur!"
+  spawn-teleport: "&aBerhasil teleport ke Spawn!"
+  spawn-not-set: "&cLokasi Spawn belum diatur oleh Admin!"
+
+  # --- HOME MESSAGES ---
+  home-set: "&aHome &e%name% &aberhasil dibuat!"
+  home-teleport: "&aTeleport ke home &e%name%&a..."
+  home-deleted: "&cHome &e%name% &ctelah dihapus."
+  home-not-found: "&cHome &e%name% &ctidak ditemukan!"
+  home-limit-reached: "&cKamu sudah mencapai batas maksimal home! (%limit%)"
+  home-list: "&aDaftar Home kamu: &f%homes%"
+  home-exist: "&cHome dengan nama tersebut sudah ada!"
+
+  # --- TELEPORT MESSAGES ---
+  tp-success: "&aTeleportasi ke &e%target%&a."
+  tphere-success: "&aMenarik &e%target% &ake lokasimu."
+
+  # TPA (Request)
+  tpa-sent: "&aPermintaan teleport dikirim ke &e%target%&a."
+  tpa-received: "&e%player% &7ingin teleport ke kamu."
+  tpahere-received: "&e%player% &7ingin menarik kamu ke lokasinya."
+
+  # Action
+  tpa-accept-sender: "&aPermintaan diterima! Teleportasi..."
+  tpa-accept-target: "&aKamu menerima permintaan &e%player%&a."
+  tpa-deny-sender: "&cPermintaan teleport ditolak oleh &e%target%&c."
+  tpa-deny-target: "&cKamu menolak permintaan &e%player%&c."
+  tpa-no-request: "&cTidak ada permintaan teleport yang aktif."
+  tpa-timeout: "&cPermintaan teleport kadaluarsa."
+
+
 settings:
-  restart-alert-time: 10 # Detik
-  broadcast-cooldown: 5 # Detik
+  restart-alert-time: 10
+  broadcast-cooldown: 5

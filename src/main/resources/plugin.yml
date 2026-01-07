@@ -40,6 +40,18 @@ commands:
     permission: naturalcs.broadcast
     usage: /bc <pesan>
 
+  setspawn:
+    description: Mengatur lokasi spawn
+    permission: naturalsmp.admin
+
+  tp:
+    description: Teleport player (Admin)
+    permission: naturalsmp.tp
+
+  tphere:
+    description: Tarik player (Admin)
+    permission: naturalsmp.tphere
+
   # --- WARP MODULE ---
   warp:
     description: Teleport ke warp atau buka menu warp
@@ -83,6 +95,39 @@ commands:
   setallstok:
     description: Set stok massal
     permission: naturalsmp.trader.admin
+
+# Spawn
+  spawn:
+    description: Teleport ke spawn utama
+    permission: naturalsmp.spawn
+
+# Home
+  sethome:
+    description: Set lokasi home
+    permission: naturalsmp.home.use
+  delhome:
+    description: Hapus home
+    permission: naturalsmp.home.use
+  home:
+    description: Teleport ke home
+    permission: naturalsmp.home.use
+  homes:
+    description: Lihat daftar home
+    permission: naturalsmp.home.use
+
+# TPA
+  tpa:
+    description: Request teleport ke player
+    permission: naturalsmp.tpa
+  tpahere:
+    description: Request player ke kita
+    permission: naturalsmp.tpa
+  tpaccept:
+    description: Terima tpa
+    permission: naturalsmp.tpa
+  tpdeny:
+    description: Tolak tpa
+    permission: naturalsmp.tpa
 
 # ==========================================
 # DAFTAR PERMISSIONS
