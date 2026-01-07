@@ -4,9 +4,8 @@ main: id.naturalsmp.naturalcore.NaturalCore
 api-version: 1.21
 author: NaturalSMP
 description: Core plugin untuk NaturalSMP Server
-
-depend: [Vault]
-softdepend: [Citizens, DecentHolograms, CoinsEngine]
+depend: [Vault, DecentHolograms, Citizens]
+softdepend: [PlaceholderAPI, CoinsEngine]
 
 # ==========================================
 # DAFTAR COMMANDS
@@ -22,55 +21,123 @@ commands:
     description: Memberikan uang (Rupiah/NC) ke player
     permission: naturalcs.givebalance
     usage: /givebal <player> <rupiah/naturalcoin> <jumlah>
-
+  setbal:
+    description: Set saldo player
+    permission: naturalsmp.economy.admin
+  takebal:
+    description: Tarik saldo player
+    permission: naturalsmp.economy.admin
   kickall:
     description: Kick seluruh player di server
     permission: naturalcs.kickall
     usage: /kickall confirm <alasan>
-
   restartalert:
     description: Memulai hitung mundur restart server
     aliases: [ra]
     permission: naturalcs.restartalert
     usage: /restartalert confirm
-
   bc:
     description: Broadcast pesan ke seluruh server
     aliases: [broadcast, siar]
     permission: naturalcs.broadcast
     usage: /bc <pesan>
-
   setspawn:
     description: Mengatur lokasi spawn
     permission: naturalsmp.admin
-
   tp:
     description: Teleport player (Admin)
     permission: naturalsmp.tp
-
   tphere:
     description: Tarik player (Admin)
     permission: naturalsmp.tphere
+
+  # --- ECONOMY ---
+  baltop:
+    description: Top 10 player terkaya
+  bal:
+    description: Cek saldo
+    aliases: [ balance, money ]
+  pay:
+    description: Kirim uang
+
+  # --- ESSENTIALS: GAMEMODE (BARU) ---
+  gamemode:
+    description: Ganti gamemode
+    aliases: [gm]
+    permission: naturalsmp.gamemode
+  gmc:
+    description: Creative
+    permission: naturalsmp.gamemode
+  gms:
+    description: Survival
+    permission: naturalsmp.gamemode
+  gma:
+    description: Adventure
+    permission: naturalsmp.gamemode
+  gmsp:
+    description: Spectator
+    permission: naturalsmp.gamemode
+
+  # --- ESSENTIALS: UTILITY (BARU) ---
+  fly:
+    description: Mode terbang
+    permission: naturalsmp.fly
+  heal:
+    description: Sembuhkan darah
+    permission: naturalsmp.heal
+  feed:
+    description: Isi lapar
+    permission: naturalsmp.feed
+  trash:
+    description: Buang sampah
+  craft:
+    description: Crafting table
+    aliases: [wb]
+    permission: naturalsmp.craft
+  invsee:
+    description: Cek tas player
+    permission: naturalsmp.invsee
+  enderchest:
+    description: Cek ec player
+    aliases: [ec]
+    permission: naturalsmp.enderchest
+
+  # --- MODERATION (BARU) ---
+  kick:
+    description: Kick player
+    permission: naturalsmp.kick
+  ban:
+    description: Ban player
+    permission: naturalsmp.ban
+  unban:
+    description: Unban player
+    permission: naturalsmp.unban
+  god:
+    description: God mode
+    permission: naturalsmp.god
+  vanish:
+    description: Menghilang
+    aliases: [v]
+    permission: naturalsmp.vanish
+  whois:
+    description: Cek info player
+    permission: naturalsmp.whois
 
   # --- WARP MODULE ---
   warp:
     description: Teleport ke warp atau buka menu warp
     usage: /warp [nama]
-
   warps:
     description: Buka menu warp GUI
     usage: /warps [edit]
-
   setwarp:
     description: Membuat warp baru di lokasi saat ini
     permission: naturalsmp.admin
     usage: /setwarp <nama>
-
   delwarp:
     description: Menghapus warp
     permission: naturalsmp.admin
     usage: /delwarp <nama>
-
   setwarpicon:
     description: Set icon warp ke item di tangan
     permission: naturalsmp.admin
