@@ -2,57 +2,74 @@ package id.naturalsmp.naturalcore.trader;
 
 import id.naturalsmp.naturalcore.NaturalCore;
 import id.naturalsmp.naturalcore.utils.ChatUtils;
-import org.bukkit.Material;
-import org.bukkit.NamespacedKey;
+import id.naturalsmp.naturalcore.utils.ConfigUtils;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
-import org.bukkit.persistence.PersistentDataType;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class CurrencyManager {
 
     private final NaturalCore plugin;
-    private final NamespacedKey currencyKey;
 
+    // --- [TAMBAHAN BARU] CONSTRUCTOR ---
+    // Ini yang bikin error sebelumnya hilang.
     public CurrencyManager(NaturalCore plugin) {
         this.plugin = plugin;
-        this.currencyKey = new NamespacedKey(plugin, "naturaltradercoin");
     }
 
-    public ItemStack getCurrencyItem(int amount) {
-        ItemStack item = new ItemStack(Material.PAPER, amount);
-        ItemMeta meta = item.getItemMeta();
+    // --- STATIC HELPER METHODS ---
 
-        if (meta != null) {
-            meta.displayName(ChatUtils.format("&6&lTrader Coins"));
-            meta.lore(List.of(
-                    ChatUtils.format("&7Digunakan untuk melakukan trade pada"),
-                    ChatUtils.format("&7Wandering Trader.")
-            ));
-
-            meta.getPersistentDataContainer().set(currencyKey, PersistentDataType.BYTE, (byte) 1);
-            
-            item.setItemMeta(meta);
-        }
-        return item;
-    }
-
-    public boolean isValidCurrency(ItemStack item) {
-        if (item == null || item.getType() == Material.AIR) return false;
-        if (!item.hasItemMeta()) return false;
-
-        return item.getItemMeta().getPersistentDataContainer().has(currencyKey, PersistentDataType.BYTE);
-    }
-
-    public void giveCurrency(Player player, int amount) {
-        ItemStack currency = getCurrencyItem(amount);
-        if (player.getInventory().firstEmpty() != -1) {
-            player.getInventory().addItem(currency);
+    public static String getSymbol(boolean useCoinsEngine) {
+        if (useCoinsEngine) {
+            return ConfigUtils.getString("economy.coins-engine.symbol");
         } else {
-            player.getWorld().dropItemNaturally(player.getLocation(), currency);
+            return ConfigUtils.getString("economy.vault.symbol");
         }
-        player.sendMessage(ChatUtils.format("&aReceived " + amount + " Quest Paper(s)!"));
+    }
+
+    public static String formatPrice(double amount, boolean useCoinsEngine) {
+        String symbol = getSymbol(useCoinsEngine);
+        return ChatUtils.colorize("&a" + symbol + " " + ChatUtils.format(amount));
+    }
+
+    public static boolean hasMoney(Player p, double amount, boolean useCoinsEngine) {
+        if (useCoinsEngine) {
+            return true; // Placeholder CoinsEngine
+        } else {
+            return NaturalCore.getInstance().getVaultManager().getEconomy().has(p, amount);
+        }
+    }
+
+    public static void takeMoney(Player p, double amount, boolean useCoinsEngine) {
+        if (useCoinsEngine) {
+            // Placeholder CoinsEngine
+        } else {
+            NaturalCore.getInstance().getVaultManager().getEconomy().withdrawPlayer(p, amount);
+        }
+    }
+
+    public static ItemStack addPriceToItem(ItemStack item, double price, boolean useCoinsEngine) {
+        if (item == null) return null;
+
+        ItemMeta meta = item.getItemMeta();
+        if (meta == null) return item;
+
+        List<String> lore = new ArrayList<>();
+
+        if (meta.hasLore()) {
+            lore.addAll(meta.getLore());
+        }
+
+        lore.add("");
+        lore.add(ChatUtils.colorize("&7Harga: " + formatPrice(price, useCoinsEngine)));
+        lore.add(ChatUtils.colorize("&eKlik untuk membeli!"));
+
+        meta.setLore(lore);
+
+        item.setItemMeta(meta);
+        return item;
     }
 }

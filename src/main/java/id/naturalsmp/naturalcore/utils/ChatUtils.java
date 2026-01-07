@@ -6,18 +6,13 @@ import java.util.regex.Pattern;
 
 public class ChatUtils {
 
-    // Pattern untuk mendeteksi warna Hex: &#RRGGBB
     private static final Pattern HEX_PATTERN = Pattern.compile("&#([A-Fa-f0-9]{6})");
 
     public static String colorize(String message) {
         if (message == null) return "";
-
-        // 1. Translate Hex Color (&#123456)
         Matcher matcher = HEX_PATTERN.matcher(message);
         StringBuffer buffer = new StringBuffer();
-
         while (matcher.find()) {
-            // Ubah &#RRGGBB menjadi format BungeeCord (&x&r&r&g&g&b&b)
             String hexCode = matcher.group(1);
             StringBuilder replacement = new StringBuilder("§x");
             for (char c : hexCode.toCharArray()) {
@@ -26,12 +21,34 @@ public class ChatUtils {
             matcher.appendReplacement(buffer, replacement.toString());
         }
         matcher.appendTail(buffer);
-
-        // 2. Translate Standard Color (&a, &b, etc)
         return ChatColor.translateAlternateColorCodes('&', buffer.toString());
     }
 
     public static String stripColor(String message) {
         return ChatColor.stripColor(colorize(message));
+    }
+
+    // --- FORMATTER ANGKA ---
+
+    public static String format(double number) {
+        return String.format("%,.0f", number);
+    }
+
+    public static String format(int number) {
+        return String.format("%,d", number);
+    }
+
+    // --- [PENTING] FORMATTER STRING (PENYELAMAT ERROR) ---
+    // Ini yang dicari oleh CurrencyManager
+    public static String format(String input) {
+        if (input == null) return "";
+        try {
+            // Coba ubah string jadi angka
+            double val = Double.parseDouble(input);
+            return format(val);
+        } catch (NumberFormatException e) {
+            // Kalau bukan angka, kembalikan teks berwarna
+            return colorize(input);
+        }
     }
 }

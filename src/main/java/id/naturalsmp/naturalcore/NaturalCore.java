@@ -34,6 +34,15 @@ import id.naturalsmp.naturalcore.inventory.InventoryCommand;
 import id.naturalsmp.naturalcore.utility.PlayerUtilCommand;
 import id.naturalsmp.naturalcore.utility.MenuUtilCommand;
 
+import id.naturalsmp.naturalcore.economy.EconomyCommand;
+import id.naturalsmp.naturalcore.economy.BaltopGUI;
+
+import id.naturalsmp.naturalcore.moderation.PunishmentManager;
+import id.naturalsmp.naturalcore.moderation.ModerationCommand;
+import id.naturalsmp.naturalcore.moderation.ModerationListener;
+import id.naturalsmp.naturalcore.moderation.GodVanishCommand;
+
+import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 
 public final class NaturalCore extends JavaPlugin {
@@ -49,6 +58,8 @@ public final class NaturalCore extends JavaPlugin {
     private TraderManager traderManager;
     private TradeEditor tradeEditor;
     private CurrencyManager currencyManager;
+
+    private PunishmentManager punishmentManager;
 
     @Override
     public void onEnable() {
@@ -169,6 +180,34 @@ public final class NaturalCore extends JavaPlugin {
         getCommand("trash").setExecutor(menuUtil);
         getCommand("craft").setExecutor(menuUtil);
 
+        // 9. Setup Economy
+        EconomyCommand ecoCmd = new EconomyCommand();
+        getCommand("bal").setExecutor(ecoCmd);
+        getCommand("pay").setExecutor(ecoCmd);
+        getCommand("setbal").setExecutor(ecoCmd); // Dan lain-lain
+
+        // GUI Baltop
+        BaltopGUI baltopGUI = new BaltopGUI();
+        getServer().getPluginManager().registerEvents(baltopGUI, this);
+        getCommand("baltop").setExecutor((sender, cmd, label, args) -> {
+            if (sender instanceof Player) baltopGUI.openGUI((Player) sender);
+            return true;
+        });
+
+        // 10. Setup Moderation
+        this.punishmentManager = new PunishmentManager(this);
+        ModerationCommand modCmd = new ModerationCommand(this);
+        GodVanishCommand gvCmd = new GodVanishCommand();
+
+        getCommand("ban").setExecutor(modCmd);
+        getCommand("unban").setExecutor(modCmd);
+        getCommand("kick").setExecutor(modCmd);
+        getCommand("god").setExecutor(gvCmd);
+        getCommand("vanish").setExecutor(gvCmd);
+        getCommand("whois").setExecutor(gvCmd);
+
+        getServer().getPluginManager().registerEvents(new ModerationListener(this), this);
+
         getLogger().info(ChatUtils.colorize("&6&lNaturalCore &asudah aktif sepenuhnya!"));
     }
 
@@ -195,5 +234,13 @@ public final class NaturalCore extends JavaPlugin {
 
     public TraderManager getTraderManager() {
         return traderManager;
+    }
+
+    public id.naturalsmp.naturalcore.home.HomeManager getHomeManager() {
+        return homeManager;
+    }
+
+    public id.naturalsmp.naturalcore.moderation.PunishmentManager getPunishmentManager() {
+        return punishmentManager;
     }
 }
