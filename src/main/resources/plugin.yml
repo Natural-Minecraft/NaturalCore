@@ -11,22 +11,10 @@ softdepend: [PlaceholderAPI, CoinsEngine]
 # DAFTAR COMMANDS
 # ==========================================
 commands:
-  # --- CORE ---
+  # --- CORE & ADMIN ---
   nacore:
-    description: Main command
+    description: Main command plugin
     permission: naturalsmp.admin
-
-  # --- ADMIN MODULE ---
-  givebal:
-    description: Memberikan uang (Rupiah/NC) ke player
-    permission: naturalcs.givebalance
-    usage: /givebal <player> <rupiah/naturalcoin> <jumlah>
-  setbal:
-    description: Set saldo player
-    permission: naturalsmp.economy.admin
-  takebal:
-    description: Tarik saldo player
-    permission: naturalsmp.economy.admin
   kickall:
     description: Kick seluruh player di server
     permission: naturalcs.kickall
@@ -41,9 +29,6 @@ commands:
     aliases: [broadcast, siar]
     permission: naturalcs.broadcast
     usage: /bc <pesan>
-  setspawn:
-    description: Mengatur lokasi spawn
-    permission: naturalsmp.admin
   tp:
     description: Teleport player (Admin)
     permission: naturalsmp.tp
@@ -51,16 +36,26 @@ commands:
     description: Tarik player (Admin)
     permission: naturalsmp.tphere
 
-  # --- ECONOMY ---
+  # --- ECONOMY MODULE ---
+  givebal:
+    description: Memberikan uang (Rupiah/NC) ke player
+    permission: naturalcs.givebalance
+    usage: /givebal <player> <rupiah/naturalcoin> <jumlah>
+  setbal:
+    description: Set saldo player (Vault)
+    permission: naturalsmp.economy.admin
+  takebal:
+    description: Tarik saldo player (Vault)
+    permission: naturalsmp.economy.admin
   baltop:
     description: Top 10 player terkaya
   bal:
     description: Cek saldo
-    aliases: [ balance, money ]
+    aliases: [balance, money]
   pay:
     description: Kirim uang
 
-  # --- ESSENTIALS: GAMEMODE (BARU) ---
+  # --- ESSENTIALS: GAMEMODE ---
   gamemode:
     description: Ganti gamemode
     aliases: [gm]
@@ -78,7 +73,7 @@ commands:
     description: Spectator
     permission: naturalsmp.gamemode
 
-  # --- ESSENTIALS: UTILITY (BARU) ---
+  # --- ESSENTIALS: UTILITY ---
   fly:
     description: Mode terbang
     permission: naturalsmp.fly
@@ -102,16 +97,7 @@ commands:
     aliases: [ec]
     permission: naturalsmp.enderchest
 
-  # --- MODERATION (BARU) ---
-  kick:
-    description: Kick player
-    permission: naturalsmp.kick
-  ban:
-    description: Ban player
-    permission: naturalsmp.ban
-  unban:
-    description: Unban player
-    permission: naturalsmp.unban
+  # --- MODERATION (God/Vanish/Whois Only) ---
   god:
     description: God mode
     permission: naturalsmp.god
@@ -163,12 +149,15 @@ commands:
     description: Set stok massal
     permission: naturalsmp.trader.admin
 
-# Spawn
+  # --- SPAWN MODULE ---
   spawn:
     description: Teleport ke spawn utama
     permission: naturalsmp.spawn
+  setspawn:
+    description: Mengatur lokasi spawn
+    permission: naturalsmp.admin
 
-# Home
+  # --- HOME MODULE ---
   sethome:
     description: Set lokasi home
     permission: naturalsmp.home.use
@@ -182,7 +171,7 @@ commands:
     description: Lihat daftar home
     permission: naturalsmp.home.use
 
-# TPA
+  # --- TELEPORT MODULE (TPA) ---
   tpa:
     description: Request teleport ke player
     permission: naturalsmp.tpa

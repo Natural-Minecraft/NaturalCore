@@ -29,40 +29,65 @@ public class NaturalCoreGUI implements Listener {
     @SuppressWarnings("deprecation")
     public void openGUI(Player player) {
         // Title Estetik
-        String title = "&#00AAFF&lɴᴀᴛᴜʀᴀʟ ᴄᴏʀᴇ &8| &7ʜᴇʟᴘ";
+        String title = "&#00AAFF&lɴᴀᴛᴜʀᴀʟ ᴄᴏʀᴇ &8| &7ᴠ1.3";
         Inventory inv = Bukkit.createInventory(null, 45, ChatUtils.colorize(title));
 
         fillBackground(inv);
 
-        // Ambil Versi dari plugin.yml dan config.yml
+        // Ambil Versi
         String jarVersion = plugin.getDescription().getVersion();
         String configVersion = plugin.getConfig().getString("config-version", "Unknown");
+        String versionStatus = jarVersion.equals(configVersion) ? "&a(Matched)" : "&c(Mismatch!)";
 
-        String versionStatus = jarVersion.equals(configVersion) ? "&a(Matched)" : "&c(Config Mismatch!)";
+        // --- ROW 2: MAIN FEATURES ---
 
-        // --- ITEMS ---
-        inv.setItem(20, createItem(Material.NETHER_STAR, "&b&lCORE COMMANDS",
-                "&7Command dasar plugin.",
-                "",
-                "&e/nacore reload",
-                "&e/nacore version",
-                "",
-                "&7Plugin Ver: &fv" + jarVersion,
-                "&7Config Ver: &fv" + configVersion + " " + versionStatus
-        ));
+        // 1. CORE INFO (Slot 19)
+        inv.setItem(19, createItem(Material.NETHER_STAR, "&b&lCORE INFO",
+                "&7Status Plugin & Config.", "",
+                "&7Plugin Ver: &f" + jarVersion,
+                "&7Config Ver: &f" + configVersion + " " + versionStatus,
+                "", "&e/nacore reload"));
 
-        inv.setItem(21, createItem(Material.NETHERITE_AXE, "&c&lADMIN TOOLS",
-                "&7Alat moderasi.", "", "&e/kickall", "&e/restartalert", "&e/bc"));
+        // 2. MODERATION (Slot 20) - BARU
+        inv.setItem(20, createItem(Material.DIAMOND_SWORD, "&c&lMODERATION",
+                "&7Sistem hukuman & pantauan.", "",
+                "&e/ban, /unban, /kick",
+                "&e/mute, /unmute",
+                "&e/god, /vanish",
+                "&e/invsee, /whois"));
 
-        inv.setItem(22, createItem(Material.ENDER_EYE, "&a&lWARP SYSTEM",
-                "&7Manajemen warp.", "", "&e/warps", "&e/setwarp", "&e/delwarp"));
+        // 3. ESSENTIALS (Slot 21) - BARU
+        inv.setItem(21, createItem(Material.CHEST, "&e&lESSENTIALS",
+                "&7Alat bantu survival.", "",
+                "&e/gm, /fly, /heal",
+                "&e/feed, /trash, /craft",
+                "&e/enderchest"));
 
-        inv.setItem(23, createItem(Material.EMERALD, "&6&lTRADER SYSTEM",
-                "&7Pedagang keliling.", "", "&e/wt", "&e/settrader", "&e/setharga"));
+        // 4. ECONOMY (Slot 22)
+        inv.setItem(22, createItem(Material.GOLD_INGOT, "&6&lECONOMY",
+                "&7Sistem keuangan server.", "",
+                "&e/bal, /pay",
+                "&e/baltop (GUI)",
+                "&e/setbal, /takebal"));
 
-        inv.setItem(24, createItem(Material.GOLD_INGOT, "&e&lECONOMY",
-                "&7Sistem uang.", "", "&e/givebal <player> <currency> <jml>"));
+        // 5. WARP & SPAWN (Slot 23)
+        inv.setItem(23, createItem(Material.ENDER_EYE, "&a&lLOCATIONS",
+                "&7Manajemen lokasi.", "",
+                "&e/spawn, /setspawn",
+                "&e/warps, /setwarp"));
 
+        // 6. HOME & TP (Slot 24)
+        inv.setItem(24, createItem(Material.RED_BED, "&d&lPLAYER TP",
+                "&7Teleportasi player.", "",
+                "&e/home, /sethome",
+                "&e/tpa, /tpahere"));
+
+        // 7. TRADER (Slot 25)
+        inv.setItem(25, createItem(Material.EMERALD, "&2&lNPC TRADER",
+                "&7Pedagang keliling.", "",
+                "&e/wt, /settrader"));
+
+        // CLOSE (Slot 40)
         inv.setItem(40, createItem(Material.BARRIER, "&c&lCLOSE MENU", "&7Tutup menu."));
 
         player.openInventory(inv);
@@ -78,7 +103,7 @@ public class NaturalCoreGUI implements Listener {
             List<String> lore = new ArrayList<>();
             for (String line : loreLines) lore.add(ChatUtils.colorize(line));
             meta.setLore(lore);
-            meta.addItemFlags(ItemFlag.HIDE_ATTRIBUTES);
+            meta.addItemFlags(ItemFlag.HIDE_ATTRIBUTES, ItemFlag.HIDE_ITEM_SPECIFICS);
             item.setItemMeta(meta);
         }
         return item;
@@ -89,38 +114,21 @@ public class NaturalCoreGUI implements Listener {
         for (int i = 0; i < inv.getSize(); i++) inv.setItem(i, glass);
     }
 
-    // --- KEAMANAN SUPER KETAT ---
-
-    // Method Helper untuk mengecek apakah ini GUI NaturalCore
+    // --- KEAMANAN ---
     private boolean isNaturalCoreGUI(String title) {
         String stripped = ChatUtils.stripColor(title);
-        // Kita cek karakter unik yang pasti ada
-        // "ɴᴀᴛᴜʀᴀʟ" atau "CORE" atau simbol "|"
-        return stripped.contains("ɴᴀᴛᴜʀᴀʟ") || stripped.contains("CORE") || stripped.contains("HELP");
+        return stripped.contains("ɴᴀᴛᴜʀᴀʟ") || stripped.contains("CORE") || stripped.contains("v1.3");
     }
 
     @EventHandler
-    @SuppressWarnings("deprecation")
     public void onClick(InventoryClickEvent e) {
-        // Cek Judul
         if (isNaturalCoreGUI(e.getView().getTitle())) {
-
-            // 1. BATALKAN SEMUA INTERAKSI
             e.setCancelled(true);
-
             if (e.getCurrentItem() == null) return;
-
-            // 2. Pastikan yang diklik adalah GUI atas
             if (e.getClickedInventory() != e.getView().getTopInventory()) return;
 
             Player p = (Player) e.getWhoClicked();
-
-            if (e.getCurrentItem().getType() == Material.GOLD_INGOT) {
-                p.closeInventory();
-                p.sendMessage(ChatUtils.colorize("&e&lTIP: &7Gunakan: &f/givebal <player> <rupiah/nc> <jumlah>"));
-                p.playSound(p.getLocation(), Sound.UI_BUTTON_CLICK, 1f, 1f);
-            }
-            else if (e.getCurrentItem().getType() == Material.BARRIER) {
+            if (e.getCurrentItem().getType() == Material.BARRIER) {
                 p.closeInventory();
                 p.playSound(p.getLocation(), Sound.UI_BUTTON_CLICK, 1f, 1f);
             }
@@ -129,9 +137,6 @@ public class NaturalCoreGUI implements Listener {
 
     @EventHandler
     public void onDrag(InventoryDragEvent e) {
-        if (isNaturalCoreGUI(e.getView().getTitle())) {
-            // BATALKAN GESER ITEM
-            e.setCancelled(true);
-        }
+        if (isNaturalCoreGUI(e.getView().getTitle())) e.setCancelled(true);
     }
 }

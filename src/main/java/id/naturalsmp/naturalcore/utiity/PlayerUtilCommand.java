@@ -14,46 +14,31 @@ public class PlayerUtilCommand implements CommandExecutor {
     @Override
     public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, @NotNull String[] args) {
 
-        String prefix = ConfigUtils.getString("prefix.admin");
+        // Cek command label atau args[0] jika dipanggil dari /nacore
+        String cmdName = label;
 
-        // Logic mencari target (Diri sendiri atau orang lain)
-        Player target = (sender instanceof Player) ? (Player) sender : null;
-        if (args.length > 0 && sender.hasPermission(getPerm(label) + ".others")) {
-            target = Bukkit.getPlayer(args[0]);
+        // Logic Target:
+        // Jika args > 0, cek apakah itu nama player
+        Player target = null;
+        if (sender instanceof Player) target = (Player) sender;
+
+        // Admin mode: /heal <player>
+        if (args.length > 0 && sender.hasPermission("naturalsmp." + cmdName + ".others")) {
+            Player t = Bukkit.getPlayer(args[0]);
+            if (t != null) target = t;
         }
 
         if (target == null) {
-            if (!(sender instanceof Player)) {
-                sender.sendMessage("Console must specify player.");
-                return true;
-            }
-            target = (Player) sender; // Fallback ke diri sendiri
-        }
-
-        // Check Permission
-        if (!sender.hasPermission(getPerm(label))) {
-            sender.sendMessage(ConfigUtils.getString("messages.no-permission"));
+            sender.sendMessage(ConfigUtils.getString("messages.player-not-found").replace("%player%", args.length > 0 ? args[0] : "Target"));
             return true;
         }
 
-        // --- /FLY ---
-        if (label.equalsIgnoreCase("fly")) {
-            boolean flight = !target.getAllowFlight();
-            target.setAllowFlight(flight);
+        String prefix = ConfigUtils.getString("prefix.admin");
 
-            String msgTarget = flight ? "messages.fly-enabled" : "messages.fly-disabled";
-            target.sendMessage(prefix + ConfigUtils.getString(msgTarget));
+        // --- HEAL ---
+        if (cmdName.equalsIgnoreCase("heal")) {
+            if (!sender.hasPermission("naturalsmp.heal")) return noPerm(sender);
 
-            if (!sender.equals(target)) {
-                sender.sendMessage(prefix + ConfigUtils.getString("messages.fly-other")
-                        .replace("%target%", target.getName())
-                        .replace("%status%", flight ? "ENABLED" : "DISABLED"));
-            }
-            return true;
-        }
-
-        // --- /HEAL ---
-        if (label.equalsIgnoreCase("heal")) {
             target.setHealth(target.getAttribute(org.bukkit.attribute.Attribute.GENERIC_MAX_HEALTH).getValue());
             target.setFoodLevel(20);
             target.setSaturation(20);
@@ -68,8 +53,10 @@ public class PlayerUtilCommand implements CommandExecutor {
             return true;
         }
 
-        // --- /FEED ---
-        if (label.equalsIgnoreCase("feed")) {
+        // --- FEED ---
+        if (cmdName.equalsIgnoreCase("feed")) {
+            if (!sender.hasPermission("naturalsmp.feed")) return noPerm(sender);
+
             target.setFoodLevel(20);
             target.setSaturation(20);
 
@@ -82,10 +69,31 @@ public class PlayerUtilCommand implements CommandExecutor {
             return true;
         }
 
+        // --- FLY ---
+        if (cmdName.equalsIgnoreCase("fly")) {
+            if (!sender.hasPermission("naturalsmp.fly")) return noPerm(sender);
+
+            boolean flight = !target.getAllowFlight();
+            target.setAllowFlight(flight);
+
+            String status = flight ? "ENABLED" : "DISABLED";
+            String msgTarget = flight ? "messages.fly-enabled" : "messages.fly-disabled";
+
+            target.sendMessage(prefix + ConfigUtils.getString(msgTarget));
+
+            if (!sender.equals(target)) {
+                sender.sendMessage(prefix + ConfigUtils.getString("messages.fly-other")
+                        .replace("%target%", target.getName())
+                        .replace("%status%", status));
+            }
+            return true;
+        }
+
         return true;
     }
 
-    private String getPerm(String label) {
-        return "naturalsmp." + label.toLowerCase();
+    private boolean noPerm(CommandSender s) {
+        s.sendMessage(ConfigUtils.getString("messages.no-permission"));
+        return true;
     }
 }

@@ -1,8 +1,8 @@
 package id.naturalsmp.naturalcore;
+import id.naturalsmp.naturalcore.NaturalCoreCommand;
 
 import id.naturalsmp.naturalcore.admin.BroadcastCommand;
 import id.naturalsmp.naturalcore.admin.KickAllCommand;
-import id.naturalsmp.naturalcore.admin.NaturalCoreCommand;
 import id.naturalsmp.naturalcore.admin.RestartAlertCommand;
 import id.naturalsmp.naturalcore.admin.GiveBalCommand;
 import id.naturalsmp.naturalcore.economy.VaultManager;
@@ -39,7 +39,11 @@ import id.naturalsmp.naturalcore.economy.BaltopGUI;
 
 import id.naturalsmp.naturalcore.moderation.PunishmentManager;
 import id.naturalsmp.naturalcore.moderation.ModerationCommand;
-import id.naturalsmp.naturalcore.moderation.ModerationListener;
+
+import id.naturalsmp.naturalcore.fun.FunCommand;
+import id.naturalsmp.naturalcore.fun.FunListener;
+import id.naturalsmp.naturalcore.general.RTPCommand;
+
 import id.naturalsmp.naturalcore.moderation.GodVanishCommand;
 
 import org.bukkit.entity.Player;
@@ -107,6 +111,15 @@ public final class NaturalCore extends JavaPlugin {
         if (getCommand("delhome") != null) getCommand("delhome").setExecutor(homeCmd);
         if (getCommand("home") != null) getCommand("home").setExecutor(homeCmd);
         if (getCommand("homes") != null) getCommand("homes").setExecutor(homeCmd);
+        // Fun
+        FunCommand funCmd = new FunCommand();
+        getCommand("gg").setExecutor(funCmd);
+        getCommand("noob").setExecutor(funCmd);
+        getServer().getPluginManager().registerEvents(new FunListener(), this);
+        // General
+        RTPCommand rtpCmd = new RTPCommand();
+        getCommand("resource").setExecutor(rtpCmd);
+        getCommand("survival").setExecutor(rtpCmd);
 
         // Trader (Citizens Check)
         if (getServer().getPluginManager().getPlugin("Citizens") != null) {
@@ -139,11 +152,7 @@ public final class NaturalCore extends JavaPlugin {
         if (getCommand("restartalert") != null) getCommand("restartalert").setExecutor(new RestartAlertCommand());
         if (getCommand("bc") != null) getCommand("bc").setExecutor(new BroadcastCommand());
 
-        // Register MAIN Dashboard Command (/nacore)
-        // Ini akan membuka GUI Menu Admin
-        if (getCommand("nacore") != null) {
-            getCommand("nacore").setExecutor(new NaturalCoreCommand(this));
-        }
+        getCommand("nacore").setExecutor(new NaturalCoreCommand(this));
 
         // Setup Teleport Module
         TeleportManager tpManager = new TeleportManager(this);
@@ -199,15 +208,11 @@ public final class NaturalCore extends JavaPlugin {
         ModerationCommand modCmd = new ModerationCommand(this);
         GodVanishCommand gvCmd = new GodVanishCommand();
 
-        getCommand("ban").setExecutor(modCmd);
-        getCommand("unban").setExecutor(modCmd);
-        getCommand("kick").setExecutor(modCmd);
         getCommand("god").setExecutor(gvCmd);
         getCommand("vanish").setExecutor(gvCmd);
         getCommand("whois").setExecutor(gvCmd);
 
-        getServer().getPluginManager().registerEvents(new ModerationListener(this), this);
-
+        getServer().getPluginManager().registerEvents(new id.naturalsmp.naturalcore.moderation.ModerationListener(this), this);
         getLogger().info(ChatUtils.colorize("&6&lNaturalCore &asudah aktif sepenuhnya!"));
     }
 

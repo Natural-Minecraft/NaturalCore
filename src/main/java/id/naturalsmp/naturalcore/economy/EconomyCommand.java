@@ -18,9 +18,11 @@ public class EconomyCommand implements CommandExecutor {
 
         String prefix = ConfigUtils.getString("prefix.economy");
         Economy eco = NaturalCore.getInstance().getVaultManager().getEconomy();
+        String cmd = label.toLowerCase();
+        String symbol = ConfigUtils.getString("economy.vault.symbol");
 
-        // --- /BALANCE [PLAYER] ---
-        if (label.equalsIgnoreCase("balance") || label.equalsIgnoreCase("bal") || label.equalsIgnoreCase("money")) {
+        // --- /BALANCE ---
+        if (cmd.equals("balance") || cmd.equals("bal") || cmd.equals("money")) {
             Player target = (sender instanceof Player) ? (Player) sender : null;
             if (args.length > 0) target = Bukkit.getPlayer(args[0]);
 
@@ -30,81 +32,106 @@ public class EconomyCommand implements CommandExecutor {
             }
 
             double bal = eco.getBalance(target);
-            String symbol = ConfigUtils.getString("economy.vault.symbol");
             sender.sendMessage(prefix + ConfigUtils.getString("messages.balance-check")
                     .replace("%target%", target.getName())
                     .replace("%symbol%", symbol)
-                    .replace("%amount%", String.format("%,.0f", bal))); // Format angka 10,000
+                    .replace("%amount%", ChatUtils.format(bal)));
             return true;
         }
 
-        // --- /PAY <PLAYER> <AMOUNT> ---
-        if (label.equalsIgnoreCase("pay")) {
-            if (!(sender instanceof Player)) return true;
-            Player p = (Player) sender;
-
+        // --- /SETBAL <PLAYER> <AMOUNT> ---
+        if (cmd.equals("setbal")) {
+            if (!sender.hasPermission("naturalsmp.economy.admin")) return noPerm(sender);
             if (args.length < 2) {
-                p.sendMessage(ChatUtils.colorize("&cUsage: /pay <player> <amount>"));
+                sender.sendMessage(ChatUtils.colorize("&cUsage: /setbal <player> <amount>"));
                 return true;
             }
-
             Player target = Bukkit.getPlayer(args[0]);
             if (target == null) {
-                p.sendMessage(ConfigUtils.getString("messages.player-not-found").replace("%player%", args[0]));
-                return true;
-            }
-
-            if (target.equals(p)) {
-                p.sendMessage(ChatUtils.colorize("&cTidak bisa kirim ke diri sendiri!"));
+                sender.sendMessage(ConfigUtils.getString("messages.player-not-found").replace("%player%", args[0]));
                 return true;
             }
 
             double amount;
-            try {
-                amount = Double.parseDouble(args[1]);
-            } catch (NumberFormatException e) {
-                p.sendMessage(ConfigUtils.getString("messages.invalid-amount"));
+            try { amount = Double.parseDouble(args[1]); }
+            catch (Exception e) { sender.sendMessage(ConfigUtils.getString("messages.invalid-amount")); return true; }
+
+            // Logic Set: Reset ke 0 lalu deposit
+            double current = eco.getBalance(target);
+            eco.withdrawPlayer(target, current);
+            eco.depositPlayer(target, amount);
+
+            sender.sendMessage(prefix + ConfigUtils.getString("messages.balance-set")
+                    .replace("%target%", target.getName())
+                    .replace("%symbol%", symbol)
+                    .replace("%amount%", ChatUtils.format(amount)));
+            return true;
+        }
+
+        // --- /TAKEBAL <PLAYER> <AMOUNT> ---
+        if (cmd.equals("takebal")) {
+            if (!sender.hasPermission("naturalsmp.economy.admin")) return noPerm(sender);
+            if (args.length < 2) {
+                sender.sendMessage(ChatUtils.colorize("&cUsage: /takebal <player> <amount>"));
+                return true;
+            }
+            Player target = Bukkit.getPlayer(args[0]);
+            if (target == null) {
+                sender.sendMessage(ConfigUtils.getString("messages.player-not-found").replace("%player%", args[0]));
                 return true;
             }
 
-            if (amount <= 0) {
-                p.sendMessage(ConfigUtils.getString("messages.invalid-amount"));
+            double amount;
+            try { amount = Double.parseDouble(args[1]); }
+            catch (Exception e) { sender.sendMessage(ConfigUtils.getString("messages.invalid-amount")); return true; }
+
+            eco.withdrawPlayer(target, amount);
+
+            sender.sendMessage(prefix + ConfigUtils.getString("messages.balance-take")
+                    .replace("%target%", target.getName())
+                    .replace("%symbol%", symbol)
+                    .replace("%amount%", ChatUtils.format(amount)));
+            return true;
+        }
+
+        // --- /PAY ---
+        if (cmd.equals("pay")) {
+            if (!(sender instanceof Player)) return true;
+            Player p = (Player) sender;
+            if (args.length < 2) {
+                p.sendMessage(ChatUtils.colorize("&cUsage: /pay <player> <amount>"));
+                return true;
+            }
+            Player target = Bukkit.getPlayer(args[0]);
+            if (target == null || target.equals(p)) {
+                p.sendMessage(ConfigUtils.getString("messages.player-not-found").replace("%player%", args[0]));
                 return true;
             }
 
-            if (eco.getBalance(p) < amount) {
+            double amount;
+            try { amount = Double.parseDouble(args[1]); }
+            catch (Exception e) { p.sendMessage(ConfigUtils.getString("messages.invalid-amount")); return true; }
+
+            if (amount <= 0 || !eco.has(p, amount)) {
                 p.sendMessage(prefix + ConfigUtils.getString("messages.pay-fail"));
                 return true;
             }
 
-            // Transaksi
             eco.withdrawPlayer(p, amount);
             eco.depositPlayer(target, amount);
 
-            String symbol = ConfigUtils.getString("economy.vault.symbol");
-
-            // Pesan Sender
             p.sendMessage(prefix + ConfigUtils.getString("messages.pay-sent")
-                    .replace("%symbol%", symbol)
-                    .replace("%amount%", String.valueOf(amount))
-                    .replace("%target%", target.getName()));
-
-            // Pesan Target
+                    .replace("%symbol%", symbol).replace("%amount%", ChatUtils.format(amount)).replace("%target%", target.getName()));
             target.sendMessage(prefix + ConfigUtils.getString("messages.pay-received")
-                    .replace("%symbol%", symbol)
-                    .replace("%amount%", String.valueOf(amount))
-                    .replace("%player%", p.getName()));
+                    .replace("%symbol%", symbol).replace("%amount%", ChatUtils.format(amount)).replace("%player%", p.getName()));
             return true;
         }
 
-        // --- ADMIN: /SETBAL & /TAKEBAL ---
-        // (Saya singkat logicnya, mirip dengan givebal tapi set/withdraw)
-        if (label.equalsIgnoreCase("setbal")) {
-            if (!sender.hasPermission("naturalsmp.economy.admin")) return true;
-            // Logic set balance Vault...
-            // (Implementasi standar vault)
-        }
+        return true;
+    }
 
+    private boolean noPerm(CommandSender s) {
+        s.sendMessage(ConfigUtils.getString("messages.no-permission"));
         return true;
     }
 }

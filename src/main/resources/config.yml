@@ -61,9 +61,52 @@ moderation:
   kick-message: "&c&lDIKICK DARI SERVER!\n\n&7Alasan: &f%reason%"
 
 # ==========================================
+#           FUN & EXTRAS
+# ==========================================
+fun:
+  # Cooldown dalam detik
+  cooldown: 30
+
+  # Worlds dimana player BOLEH join (selain ini akan dilempar ke spawn)
+  # Masukkan nama world spawn/lobby di sini
+  allowed-join-worlds:
+    - "spawn"
+    - "world"
+    - "world_nether"
+    - "world_the_end"
+    - "Resources"
+
+  warden-kill-xp: 500
+
+# ==========================================
 #              PESAN - PESAN
 # ==========================================
 messages:
+
+  # --- FUN ---
+  gg-message: "&b&lGG &fdari &e%player%"
+  noob-message: "&c&lNOOB &fdari &e%player%"
+  cooldown-msg: "&cTunggu &e%time% detik &clagi."
+
+  # --- RTP ---
+  rtp-resource: "&aMenuju dunia Resource... &7(Mohon tunggu)"
+  rtp-survival: "&aTeleportasi Random Survival..."
+  rtp-already-here: "&cKamu sudah berada di dunia ini!"
+
+  # --- FUN ---
+  gg:
+    description: Broadcast GG
+  noob:
+    description: Broadcast NOOB
+
+  # --- RTP & GENERAL ---
+  resource:
+    description: RTP ke Resource World
+    aliases: [rsc]
+    permission: naturalsmp.resource
+  survival:
+    description: RTP ke Survival World
+    aliases: [rtp]
 
   # --- ESSENTIALS ---
   gamemode-changed: "&aGamemode diubah ke &e%mode%&a."
