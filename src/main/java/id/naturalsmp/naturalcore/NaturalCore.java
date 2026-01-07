@@ -248,4 +248,8 @@ public final class NaturalCore extends JavaPlugin {
     public id.naturalsmp.naturalcore.moderation.PunishmentManager getPunishmentManager() {
         return punishmentManager;
     }
+
+    public SpawnManager getSpawnManager() {
+        return spawnManager;
+    }
 }
