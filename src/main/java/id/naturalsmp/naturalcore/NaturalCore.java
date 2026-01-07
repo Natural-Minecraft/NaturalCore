@@ -1,51 +1,38 @@
 package id.naturalsmp.naturalcore;
-import id.naturalsmp.naturalcore.NaturalCoreCommand;
 
+import id.naturalsmp.naturalcore.NaturalCoreCommand;
 import id.naturalsmp.naturalcore.admin.BroadcastCommand;
 import id.naturalsmp.naturalcore.admin.KickAllCommand;
 import id.naturalsmp.naturalcore.admin.RestartAlertCommand;
 import id.naturalsmp.naturalcore.admin.GiveBalCommand;
 import id.naturalsmp.naturalcore.economy.VaultManager;
-
 import id.naturalsmp.naturalcore.home.HomeGUI;
 import id.naturalsmp.naturalcore.home.HomeManager;
 import id.naturalsmp.naturalcore.home.HomeCommand;
-
 import id.naturalsmp.naturalcore.spawn.SpawnCommand;
 import id.naturalsmp.naturalcore.spawn.SpawnManager;
-
 import id.naturalsmp.naturalcore.trader.CurrencyManager;
 import id.naturalsmp.naturalcore.trader.TradeEditor;
 import id.naturalsmp.naturalcore.trader.TraderCommand;
 import id.naturalsmp.naturalcore.trader.TraderListener;
 import id.naturalsmp.naturalcore.trader.TraderManager;
-
 import id.naturalsmp.naturalcore.teleport.TeleportManager;
 import id.naturalsmp.naturalcore.teleport.TeleportCommand;
-
 import id.naturalsmp.naturalcore.utils.ChatUtils;
-
 import id.naturalsmp.naturalcore.warp.WarpCommand;
 import id.naturalsmp.naturalcore.warp.WarpManager;
-
 import id.naturalsmp.naturalcore.gamemode.GamemodeCommand;
 import id.naturalsmp.naturalcore.inventory.InventoryCommand;
-
 import id.naturalsmp.naturalcore.utility.PlayerUtilCommand;
 import id.naturalsmp.naturalcore.utility.MenuUtilCommand;
-
 import id.naturalsmp.naturalcore.economy.EconomyCommand;
 import id.naturalsmp.naturalcore.economy.BaltopGUI;
-
 import id.naturalsmp.naturalcore.moderation.PunishmentManager;
 import id.naturalsmp.naturalcore.moderation.ModerationCommand;
-
 import id.naturalsmp.naturalcore.fun.FunCommand;
 import id.naturalsmp.naturalcore.fun.FunListener;
 import id.naturalsmp.naturalcore.general.RTPCommand;
-
 import id.naturalsmp.naturalcore.moderation.GodVanishCommand;
-
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -71,185 +58,172 @@ public final class NaturalCore extends JavaPlugin {
 
         // 1. Pesan Startup
         getLogger().info(ChatUtils.colorize("&6&lNaturalCore &aStarting up..."));
+
         // 2. Setup Config
         saveDefaultConfig();
 
-        // Setup Economy (Vault)
+        // 3. Setup Economy (Vault)
         this.vaultManager = new VaultManager(this);
         if (!vaultManager.setupEconomy()) {
-            getLogger().warning("Vault/Economy tidak ditemukan!");
+            getLogger().warning("Vault/Economy tidak ditemukan! Beberapa fitur mungkin error.");
         } else {
-            // Register Command
-            getCommand("givebal").setExecutor(new GiveBalCommand());
+            registerCmd("givebal", new GiveBalCommand());
         }
 
-        // Setup Warp Module
+        // 4. Setup Warp Module
         this.warpManager = new WarpManager(this);
         WarpCommand warpCmd = new WarpCommand(this);
+        registerCmd("warp", warpCmd);
+        registerCmd("warps", warpCmd);
+        registerCmd("setwarp", warpCmd);
+        registerCmd("delwarp", warpCmd);
+        registerCmd("setwarpicon", warpCmd);
 
-        if (getCommand("warp") != null) getCommand("warp").setExecutor(warpCmd);
-        if (getCommand("warps") != null) getCommand("warps").setExecutor(warpCmd);
-        if (getCommand("setwarp") != null) getCommand("setwarp").setExecutor(warpCmd);
-        if (getCommand("delwarp") != null) getCommand("delwarp").setExecutor(warpCmd);
-        if (getCommand("setwarpicon") != null) getCommand("setwarpicon").setExecutor(warpCmd);
-
-        // Spawn Command
+        // 5. Spawn Command
         this.spawnManager = new SpawnManager(this);
         SpawnCommand spawnCmd = new SpawnCommand(spawnManager);
+        registerCmd("spawn", spawnCmd);
+        registerCmd("setspawn", spawnCmd);
 
-        if (getCommand("spawn") != null) getCommand("spawn").setExecutor(spawnCmd);
-        if (getCommand("setspawn") != null) getCommand("setspawn").setExecutor(spawnCmd);
-
-        // Home
+        // 6. Home Module
         this.homeManager = new HomeManager(this);
         HomeGUI homeGUI = new HomeGUI(this);
         getServer().getPluginManager().registerEvents(homeGUI, this);
 
         HomeCommand homeCmd = new HomeCommand(homeManager, homeGUI);
+        registerCmd("sethome", homeCmd);
+        registerCmd("delhome", homeCmd);
+        registerCmd("home", homeCmd);
+        registerCmd("homes", homeCmd);
 
-        if (getCommand("sethome") != null) getCommand("sethome").setExecutor(homeCmd);
-        if (getCommand("delhome") != null) getCommand("delhome").setExecutor(homeCmd);
-        if (getCommand("home") != null) getCommand("home").setExecutor(homeCmd);
-        if (getCommand("homes") != null) getCommand("homes").setExecutor(homeCmd);
-        // Fun
+        // 7. Fun Module
         FunCommand funCmd = new FunCommand();
-        getCommand("gg").setExecutor(funCmd);
-        getCommand("noob").setExecutor(funCmd);
+        registerCmd("gg", funCmd);
+        registerCmd("noob", funCmd);
         getServer().getPluginManager().registerEvents(new FunListener(), this);
-        // General
-        RTPCommand rtpCmd = new RTPCommand();
-        getCommand("resource").setExecutor(rtpCmd);
-        getCommand("survival").setExecutor(rtpCmd);
 
-        // Trader (Citizens Check)
+        // 8. General / RTP
+        RTPCommand rtpCmd = new RTPCommand();
+        registerCmd("resource", rtpCmd);
+        registerCmd("survival", rtpCmd);
+
+        // 9. Trader (Citizens Check)
         if (getServer().getPluginManager().getPlugin("Citizens") != null) {
             getLogger().info("Citizens ditemukan. Mengaktifkan Trader Module...");
 
-            // Initialize Helpers & Manager
             this.currencyManager = new CurrencyManager(this);
             this.tradeEditor = new TradeEditor(this);
             this.traderManager = new TraderManager(this, tradeEditor);
 
-            // Register Commands
             TraderCommand traderCmd = new TraderCommand(currencyManager, traderManager, tradeEditor);
 
-            if (getCommand("wanderingtrader") != null) getCommand("wanderingtrader").setExecutor(traderCmd);
-            if (getCommand("settrader") != null) getCommand("settrader").setExecutor(traderCmd);
-            if (getCommand("resettrader") != null) getCommand("resettrader").setExecutor(traderCmd);
-            if (getCommand("setharga") != null) getCommand("setharga").setExecutor(traderCmd);
-            if (getCommand("setallharga") != null) getCommand("setallharga").setExecutor(traderCmd);
-            if (getCommand("setallstok") != null) getCommand("setallstok").setExecutor(traderCmd);
+            // Gunakan "wt" sesuai key di plugin.yml yang baru
+            registerCmd("wt", traderCmd);
+            registerCmd("settrader", traderCmd);
+            registerCmd("resettrader", traderCmd);
+            registerCmd("setharga", traderCmd);
+            registerCmd("setallharga", traderCmd);
+            registerCmd("setallstok", traderCmd);
 
-            // Register Listener
             getServer().getPluginManager().registerEvents(new TraderListener(traderManager, tradeEditor), this);
-
         } else {
             getLogger().warning("Citizens tidak ditemukan! Modul Trader dinonaktifkan.");
         }
 
-        // Admin Commands
-        if (getCommand("kickall") != null) getCommand("kickall").setExecutor(new KickAllCommand());
-        if (getCommand("restartalert") != null) getCommand("restartalert").setExecutor(new RestartAlertCommand());
-        if (getCommand("bc") != null) getCommand("bc").setExecutor(new BroadcastCommand());
+        // 10. Admin Commands
+        registerCmd("nacore", new NaturalCoreCommand(this));
+        registerCmd("kickall", new KickAllCommand());
+        registerCmd("restartalert", new RestartAlertCommand());
+        registerCmd("bc", new BroadcastCommand());
 
-        getCommand("nacore").setExecutor(new NaturalCoreCommand(this));
-
-        // Setup Teleport Module
+        // 11. Setup Teleport Module
         TeleportManager tpManager = new TeleportManager(this);
         TeleportCommand tpCmd = new TeleportCommand(tpManager);
+        registerCmd("tp", tpCmd);
+        registerCmd("tphere", tpCmd);
+        registerCmd("tpa", tpCmd);
+        registerCmd("tpahere", tpCmd);
+        registerCmd("tpaccept", tpCmd);
+        registerCmd("tpdeny", tpCmd);
 
-        getCommand("tp").setExecutor(tpCmd);
-        getCommand("tphere").setExecutor(tpCmd);
-        getCommand("tpa").setExecutor(tpCmd);
-        getCommand("tpahere").setExecutor(tpCmd);
-        getCommand("tpaccept").setExecutor(tpCmd);
-        getCommand("tpdeny").setExecutor(tpCmd);
-
+        // 12. Essentials Modules
         // A. Gamemode
         GamemodeCommand gmCmd = new GamemodeCommand();
-        getCommand("gamemode").setExecutor(gmCmd);
-        getCommand("gmc").setExecutor(gmCmd);
-        getCommand("gms").setExecutor(gmCmd);
-        getCommand("gma").setExecutor(gmCmd);
-        getCommand("gmsp").setExecutor(gmCmd);
+        registerCmd("gamemode", gmCmd);
+        registerCmd("gmc", gmCmd);
+        registerCmd("gms", gmCmd);
+        registerCmd("gma", gmCmd);
+        registerCmd("gmsp", gmCmd);
 
         // B. Inventory
         InventoryCommand invCmd = new InventoryCommand();
-        getCommand("invsee").setExecutor(invCmd);
-        getCommand("enderchest").setExecutor(invCmd);
+        registerCmd("invsee", invCmd);
+        registerCmd("enderchest", invCmd);
 
-        // C. Utility (Fly, Heal, Feed)
+        // C. Utility (Player)
         PlayerUtilCommand playerUtil = new PlayerUtilCommand();
-        getCommand("fly").setExecutor(playerUtil);
-        getCommand("heal").setExecutor(playerUtil);
-        getCommand("feed").setExecutor(playerUtil);
+        registerCmd("fly", playerUtil);
+        registerCmd("heal", playerUtil);
+        registerCmd("feed", playerUtil);
 
         // D. Utility (Menu)
         MenuUtilCommand menuUtil = new MenuUtilCommand();
-        getCommand("trash").setExecutor(menuUtil);
-        getCommand("craft").setExecutor(menuUtil);
+        registerCmd("trash", menuUtil);
+        registerCmd("craft", menuUtil);
 
-        // 9. Setup Economy
+        // 13. Economy Module
         EconomyCommand ecoCmd = new EconomyCommand();
-        getCommand("bal").setExecutor(ecoCmd);
-        getCommand("pay").setExecutor(ecoCmd);
-        getCommand("setbal").setExecutor(ecoCmd); // Dan lain-lain
+        registerCmd("bal", ecoCmd);
+        registerCmd("pay", ecoCmd);
+        registerCmd("setbal", ecoCmd);
+        registerCmd("takebal", ecoCmd);
 
-        // GUI Baltop
+        // 14. Baltop GUI
         BaltopGUI baltopGUI = new BaltopGUI();
         getServer().getPluginManager().registerEvents(baltopGUI, this);
-        getCommand("baltop").setExecutor((sender, cmd, label, args) -> {
+        registerCmd("baltop", (sender, cmd, label, args) -> {
             if (sender instanceof Player) baltopGUI.openGUI((Player) sender);
             return true;
         });
 
-        // 10. Setup Moderation
-        this.punishmentManager = new PunishmentManager(this);
-        ModerationCommand modCmd = new ModerationCommand(this);
+        // 15. Moderation Module (Lite)
+        this.punishmentManager = new PunishmentManager(this); // Tetap di-init untuk GodVanishCommand
         GodVanishCommand gvCmd = new GodVanishCommand();
+        registerCmd("god", gvCmd);
+        registerCmd("vanish", gvCmd);
+        registerCmd("whois", gvCmd);
 
-        getCommand("god").setExecutor(gvCmd);
-        getCommand("vanish").setExecutor(gvCmd);
-        getCommand("whois").setExecutor(gvCmd);
-
+        // Listener Moderation (untuk God/Vanish logic)
         getServer().getPluginManager().registerEvents(new id.naturalsmp.naturalcore.moderation.ModerationListener(this), this);
-        getLogger().info(ChatUtils.colorize("&6&lNaturalCore &asudah aktif sepenuhnya!"));
+
+        getLogger().info(ChatUtils.colorize("&6&lNaturalCore v" + getDescription().getVersion() + " &asudah aktif sepenuhnya!"));
     }
 
     @Override
     public void onDisable() {
         getLogger().info(ChatUtils.colorize("&c&lNaturalCore &idisabling..."));
-        // Save data warp sebelum mati
         if (warpManager != null) {
             warpManager.saveWarps();
         }
     }
 
-    public static NaturalCore getInstance() {
-        return instance;
-    }
+    // --- GETTERS ---
+    public static NaturalCore getInstance() { return instance; }
+    public VaultManager getVaultManager() { return vaultManager; }
+    public WarpManager getWarpManager() { return warpManager; }
+    public TraderManager getTraderManager() { return traderManager; }
+    public HomeManager getHomeManager() { return homeManager; }
+    public PunishmentManager getPunishmentManager() { return punishmentManager; }
+    public SpawnManager getSpawnManager() { return spawnManager; }
 
-    public VaultManager getVaultManager() {
-        return vaultManager;
-    }
-
-    public WarpManager getWarpManager() {
-        return warpManager;
-    }
-
-    public TraderManager getTraderManager() {
-        return traderManager;
-    }
-
-    public id.naturalsmp.naturalcore.home.HomeManager getHomeManager() {
-        return homeManager;
-    }
-
-    public id.naturalsmp.naturalcore.moderation.PunishmentManager getPunishmentManager() {
-        return punishmentManager;
-    }
-
-    public SpawnManager getSpawnManager() {
-        return spawnManager;
+    // --- HELPER UNTUK MENCEGAH CRASH ---
+    private void registerCmd(String name, org.bukkit.command.CommandExecutor executor) {
+        if (getCommand(name) != null) {
+            getCommand(name).setExecutor(executor);
+        } else {
+            // Peringatan ini akan muncul di console jika ada command yang belum ada di plugin.yml
+            // Tapi server TIDAK akan crash.
+            getLogger().warning("SKIPPING COMMAND: '" + name + "' (Tidak ditemukan di plugin.yml)");
+        }
     }
 }

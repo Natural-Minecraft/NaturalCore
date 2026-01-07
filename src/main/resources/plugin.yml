@@ -11,53 +11,49 @@ softdepend: [PlaceholderAPI, CoinsEngine]
 # DAFTAR COMMANDS
 # ==========================================
 commands:
-  # --- CORE & ADMIN ---
+  # --- CORE ---
   nacore:
     description: Main command plugin
     permission: naturalsmp.admin
   kickall:
-    description: Kick seluruh player di server
+    description: Kick seluruh player
     permission: naturalcs.kickall
-    usage: /kickall confirm <alasan>
   restartalert:
-    description: Memulai hitung mundur restart server
+    description: Alert restart
     aliases: [ra]
     permission: naturalcs.restartalert
-    usage: /restartalert confirm
   bc:
-    description: Broadcast pesan ke seluruh server
-    aliases: [broadcast, siar]
+    description: Broadcast
+    aliases: [broadcast]
     permission: naturalcs.broadcast
-    usage: /bc <pesan>
   tp:
-    description: Teleport player (Admin)
+    description: Teleport admin
     permission: naturalsmp.tp
   tphere:
-    description: Tarik player (Admin)
+    description: Tarik player
     permission: naturalsmp.tphere
 
-  # --- ECONOMY MODULE ---
+  # --- ECONOMY ---
   givebal:
-    description: Memberikan uang (Rupiah/NC) ke player
+    description: Give balance
     permission: naturalcs.givebalance
-    usage: /givebal <player> <rupiah/naturalcoin> <jumlah>
   setbal:
-    description: Set saldo player (Vault)
+    description: Set saldo
     permission: naturalsmp.economy.admin
   takebal:
-    description: Tarik saldo player (Vault)
+    description: Tarik saldo
     permission: naturalsmp.economy.admin
   baltop:
-    description: Top 10 player terkaya
+    description: Top balance
   bal:
     description: Cek saldo
     aliases: [balance, money]
   pay:
     description: Kirim uang
 
-  # --- ESSENTIALS: GAMEMODE ---
+  # --- ESSENTIALS ---
   gamemode:
-    description: Ganti gamemode
+    description: Gamemode
     aliases: [gm]
     permission: naturalsmp.gamemode
   gmc:
@@ -73,74 +69,69 @@ commands:
     description: Spectator
     permission: naturalsmp.gamemode
 
-  # --- ESSENTIALS: UTILITY ---
   fly:
-    description: Mode terbang
+    description: Terbang
     permission: naturalsmp.fly
   heal:
-    description: Sembuhkan darah
+    description: Heal
     permission: naturalsmp.heal
   feed:
-    description: Isi lapar
+    description: Feed
     permission: naturalsmp.feed
   trash:
-    description: Buang sampah
+    description: Sampah
   craft:
-    description: Crafting table
+    description: Crafting
     aliases: [wb]
     permission: naturalsmp.craft
   invsee:
-    description: Cek tas player
+    description: Cek tas
     permission: naturalsmp.invsee
   enderchest:
-    description: Cek ec player
+    description: Cek ec
     aliases: [ec]
     permission: naturalsmp.enderchest
 
-  # --- MODERATION (God/Vanish/Whois Only) ---
+  # --- MODERATION ---
   god:
     description: God mode
     permission: naturalsmp.god
   vanish:
-    description: Menghilang
+    description: Vanish
     aliases: [v]
     permission: naturalsmp.vanish
   whois:
-    description: Cek info player
+    description: Info player
     permission: naturalsmp.whois
 
-  # --- WARP MODULE ---
+  # --- WARP ---
   warp:
-    description: Teleport ke warp atau buka menu warp
-    usage: /warp [nama]
+    description: Ke warp
   warps:
-    description: Buka menu warp GUI
-    usage: /warps [edit]
+    description: Menu warp
   setwarp:
-    description: Membuat warp baru di lokasi saat ini
+    description: Set warp
     permission: naturalsmp.admin
-    usage: /setwarp <nama>
   delwarp:
-    description: Menghapus warp
+    description: Hapus warp
     permission: naturalsmp.admin
-    usage: /delwarp <nama>
   setwarpicon:
-    description: Set icon warp ke item di tangan
+    description: Icon warp
     permission: naturalsmp.admin
-    usage: /setwarpicon <nama>
 
-  # --- TRADER MODULE ---
-  wanderingtrader:
-    description: Buka menu trader
-    aliases: [wt, trader]
+  # --- TRADER (FIXED DISINI) ---
+  wt:  # <--- DULU wanderingtrader, SEKARANG wt (Biar match sama Java)
+    description: Menu trader
+    aliases: [trader, wanderingtrader]
+    permission: naturalsmp.trader.admin
   settrader:
-    description: Admin setup item
+    description: Setup trader
     permission: naturalsmp.trader.admin
   resettrader:
-    description: Reset data trader
+    description: Reset trader
     permission: naturalsmp.trader.admin
   setharga:
-    description: Set harga per slot
+    description: Set harga
     permission: naturalsmp.trader.admin
   setallharga:
     description: Set harga massal
@@ -149,62 +140,59 @@ commands:
     description: Set stok massal
     permission: naturalsmp.trader.admin
 
-  # --- SPAWN MODULE ---
+  # --- SPAWN ---
   spawn:
-    description: Teleport ke spawn utama
+    description: Ke spawn
     permission: naturalsmp.spawn
   setspawn:
-    description: Mengatur lokasi spawn
+    description: Set spawn
     permission: naturalsmp.admin
 
-  # --- HOME MODULE ---
+  # --- HOME ---
   sethome:
-    description: Set lokasi home
+    description: Set home
     permission: naturalsmp.home.use
   delhome:
     description: Hapus home
     permission: naturalsmp.home.use
   home:
-    description: Teleport ke home
+    description: Ke home
     permission: naturalsmp.home.use
   homes:
-    description: Lihat daftar home
+    description: List home
     permission: naturalsmp.home.use
 
-  # --- TELEPORT MODULE (TPA) ---
-  tpa:
-    description: Request teleport ke player
-    permission: naturalsmp.tpa
-  tpahere:
-    description: Request player ke kita
-    permission: naturalsmp.tpa
-  tpaccept:
-    description: Terima tpa
-    permission: naturalsmp.tpa
-  tpdeny:
-    description: Tolak tpa
-    permission: naturalsmp.tpa
+  # --- FUN & RTP ---
+  gg:
+    description: GG
+  noob:
+    description: Noob
+  resource:
+    description: RTP Resource
+    aliases: [rsc]
+    permission: naturalsmp.resource
+  survival:
+    description: RTP Survival
+    aliases: [rtp]
 
-# ==========================================
-# DAFTAR PERMISSIONS
-# ==========================================
+  # --- TPA ---
+  tpa:
+    description: TPA Request
+  tpahere:
+    description: TPA Here
+  tpaccept:
+    description: Accept
+  tpdeny:
+    description: Deny
+
 permissions:
   naturalsmp.admin:
-    description: Izin full akses NaturalCore
     default: op
-
   naturalcs.kickall:
-    description: Izin kick semua player
     default: op
-
   naturalcs.restartalert:
-    description: Izin alert restart
     default: op
-
   naturalcs.broadcast:
-    description: Izin broadcast
     default: op
-
   naturalcs.trader.admin:
-    description: Izin admin trade
     default: op
