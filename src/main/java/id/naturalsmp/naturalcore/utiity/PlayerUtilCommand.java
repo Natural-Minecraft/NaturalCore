@@ -3,6 +3,7 @@ package id.naturalsmp.naturalcore.utility;
 import id.naturalsmp.naturalcore.utils.ConfigUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.Sound;
+import org.bukkit.attribute.Attribute; // IMPORT PENTING
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -14,32 +15,38 @@ public class PlayerUtilCommand implements CommandExecutor {
     @Override
     public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, @NotNull String[] args) {
 
-        // Cek command label atau args[0] jika dipanggil dari /nacore
-        String cmdName = label;
+        String cmdName = label.toLowerCase();
 
-        // Logic Target:
-        // Jika args > 0, cek apakah itu nama player
-        Player target = null;
-        if (sender instanceof Player) target = (Player) sender;
+        Player target = (sender instanceof Player) ? (Player) sender : null;
 
-        // Admin mode: /heal <player>
-        if (args.length > 0 && sender.hasPermission("naturalsmp." + cmdName + ".others")) {
-            Player t = Bukkit.getPlayer(args[0]);
-            if (t != null) target = t;
+        // Cek argumen jika admin ingin heal orang lain
+        if (args.length > 0) {
+            // Cek permission dulu sebelum memproses argumen
+            String permNode = "naturalsmp." + (cmdName.equals("fly") ? "fly" : cmdName.equals("heal") ? "heal" : "feed");
+            if (sender.hasPermission(permNode + ".others")) {
+                Player t = Bukkit.getPlayer(args[0]);
+                if (t != null) target = t;
+            }
         }
 
         if (target == null) {
-            sender.sendMessage(ConfigUtils.getString("messages.player-not-found").replace("%player%", args.length > 0 ? args[0] : "Target"));
-            return true;
+            if (!(sender instanceof Player)) { sender.sendMessage("Console must specify player"); return true; }
+            // Jika target null tapi sender player, berarti target = diri sendiri
+            target = (Player) sender;
         }
 
         String prefix = ConfigUtils.getString("prefix.admin");
 
         // --- HEAL ---
-        if (cmdName.equalsIgnoreCase("heal")) {
+        if (cmdName.equals("heal")) {
             if (!sender.hasPermission("naturalsmp.heal")) return noPerm(sender);
 
-            target.setHealth(target.getAttribute(org.bukkit.attribute.Attribute.GENERIC_MAX_HEALTH).getValue());
+            // FIX HEAL LOGIC
+            double maxHealth = 20.0;
+            if (target.getAttribute(Attribute.GENERIC_MAX_HEALTH) != null) {
+                maxHealth = target.getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue();
+            }
+            target.setHealth(maxHealth);
             target.setFoodLevel(20);
             target.setSaturation(20);
             target.setFireTicks(0);
@@ -54,7 +61,7 @@ public class PlayerUtilCommand implements CommandExecutor {
         }
 
         // --- FEED ---
-        if (cmdName.equalsIgnoreCase("feed")) {
+        if (cmdName.equals("feed")) {
             if (!sender.hasPermission("naturalsmp.feed")) return noPerm(sender);
 
             target.setFoodLevel(20);
@@ -70,7 +77,7 @@ public class PlayerUtilCommand implements CommandExecutor {
         }
 
         // --- FLY ---
-        if (cmdName.equalsIgnoreCase("fly")) {
+        if (cmdName.equals("fly")) {
             if (!sender.hasPermission("naturalsmp.fly")) return noPerm(sender);
 
             boolean flight = !target.getAllowFlight();

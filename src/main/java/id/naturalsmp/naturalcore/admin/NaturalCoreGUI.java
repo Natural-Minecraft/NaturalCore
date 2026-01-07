@@ -26,75 +26,30 @@ public class NaturalCoreGUI implements Listener {
         this.plugin = plugin;
     }
 
-    @SuppressWarnings("deprecation")
     public void openGUI(Player player) {
-        // Title Estetik
         String title = "&#00AAFF&lɴᴀᴛᴜʀᴀʟ ᴄᴏʀᴇ &8| &7ᴠ1.3";
         Inventory inv = Bukkit.createInventory(null, 45, ChatUtils.colorize(title));
 
         fillBackground(inv);
 
-        // Ambil Versi
         String jarVersion = plugin.getDescription().getVersion();
         String configVersion = plugin.getConfig().getString("config-version", "Unknown");
         String versionStatus = jarVersion.equals(configVersion) ? "&a(Matched)" : "&c(Mismatch!)";
 
-        // --- ROW 2: MAIN FEATURES ---
-
-        // 1. CORE INFO (Slot 19)
-        inv.setItem(19, createItem(Material.NETHER_STAR, "&b&lCORE INFO",
-                "&7Status Plugin & Config.", "",
-                "&7Plugin Ver: &f" + jarVersion,
-                "&7Config Ver: &f" + configVersion + " " + versionStatus,
-                "", "&e/nacore reload"));
-
-        // 2. MODERATION (Slot 20) - BARU
-        inv.setItem(20, createItem(Material.DIAMOND_SWORD, "&c&lMODERATION",
-                "&7Sistem hukuman & pantauan.", "",
-                "&e/ban, /unban, /kick",
-                "&e/mute, /unmute",
-                "&e/god, /vanish",
-                "&e/invsee, /whois"));
-
-        // 3. ESSENTIALS (Slot 21) - BARU
-        inv.setItem(21, createItem(Material.CHEST, "&e&lESSENTIALS",
-                "&7Alat bantu survival.", "",
-                "&e/gm, /fly, /heal",
-                "&e/feed, /trash, /craft",
-                "&e/enderchest"));
-
-        // 4. ECONOMY (Slot 22)
-        inv.setItem(22, createItem(Material.GOLD_INGOT, "&6&lECONOMY",
-                "&7Sistem keuangan server.", "",
-                "&e/bal, /pay",
-                "&e/baltop (GUI)",
-                "&e/setbal, /takebal"));
-
-        // 5. WARP & SPAWN (Slot 23)
-        inv.setItem(23, createItem(Material.ENDER_EYE, "&a&lLOCATIONS",
-                "&7Manajemen lokasi.", "",
-                "&e/spawn, /setspawn",
-                "&e/warps, /setwarp"));
-
-        // 6. HOME & TP (Slot 24)
-        inv.setItem(24, createItem(Material.RED_BED, "&d&lPLAYER TP",
-                "&7Teleportasi player.", "",
-                "&e/home, /sethome",
-                "&e/tpa, /tpahere"));
-
-        // 7. TRADER (Slot 25)
-        inv.setItem(25, createItem(Material.EMERALD, "&2&lNPC TRADER",
-                "&7Pedagang keliling.", "",
-                "&e/wt, /settrader"));
-
-        // CLOSE (Slot 40)
+        // ITEMS
+        inv.setItem(19, createItem(Material.NETHER_STAR, "&b&lCORE INFO", "&7Status Plugin & Config.", "", "&7Plugin Ver: &f" + jarVersion, "&7Config Ver: &f" + configVersion + " " + versionStatus, "", "&e/nacore reload"));
+        inv.setItem(20, createItem(Material.DIAMOND_SWORD, "&c&lMODERATION", "&7Sistem hukuman & pantauan.", "", "&e/god, /vanish", "&e/whois"));
+        inv.setItem(21, createItem(Material.CHEST, "&e&lESSENTIALS", "&7Alat bantu survival.", "", "&e/gm, /fly, /heal", "&e/feed, /trash, /craft", "&e/invsee, /enderchest"));
+        inv.setItem(22, createItem(Material.GOLD_INGOT, "&6&lECONOMY", "&7Sistem keuangan.", "", "&e/bal, /pay", "&e/baltop", "&e/setbal, /takebal", "&e/givebal"));
+        inv.setItem(23, createItem(Material.ENDER_EYE, "&a&lLOCATIONS", "&7Manajemen lokasi.", "", "&e/spawn, /setspawn", "&e/warps, /setwarp"));
+        inv.setItem(24, createItem(Material.RED_BED, "&d&lPLAYER TP", "&7Teleportasi player.", "", "&e/home, /sethome", "&e/tpa, /tpahere"));
+        inv.setItem(25, createItem(Material.EMERALD, "&2&lNPC TRADER", "&7Pedagang keliling.", "", "&e/wt, /settrader"));
         inv.setItem(40, createItem(Material.BARRIER, "&c&lCLOSE MENU", "&7Tutup menu."));
 
         player.openInventory(inv);
         player.playSound(player.getLocation(), Sound.BLOCK_NOTE_BLOCK_PLING, 1f, 1f);
     }
 
-    @SuppressWarnings("deprecation")
     private ItemStack createItem(Material material, String name, String... loreLines) {
         ItemStack item = new ItemStack(material);
         ItemMeta meta = item.getItemMeta();
@@ -103,7 +58,7 @@ public class NaturalCoreGUI implements Listener {
             List<String> lore = new ArrayList<>();
             for (String line : loreLines) lore.add(ChatUtils.colorize(line));
             meta.setLore(lore);
-            meta.addItemFlags(ItemFlag.HIDE_ATTRIBUTES, ItemFlag.HIDE_ITEM_SPECIFICS);
+            meta.addItemFlags(ItemFlag.HIDE_ATTRIBUTES);
             item.setItemMeta(meta);
         }
         return item;
@@ -114,18 +69,17 @@ public class NaturalCoreGUI implements Listener {
         for (int i = 0; i < inv.getSize(); i++) inv.setItem(i, glass);
     }
 
-    // --- KEAMANAN ---
-    private boolean isNaturalCoreGUI(String title) {
-        String stripped = ChatUtils.stripColor(title);
-        return stripped.contains("ɴᴀᴛᴜʀᴀʟ") || stripped.contains("CORE") || stripped.contains("v1.3");
-    }
-
+    // --- KEAMANAN (FIXED) ---
     @EventHandler
     public void onClick(InventoryClickEvent e) {
-        if (isNaturalCoreGUI(e.getView().getTitle())) {
-            e.setCancelled(true);
+        // Cek Title dengan stripColor agar aman dari kode warna
+        String title = ChatUtils.stripColor(e.getView().getTitle());
+
+        // Logikanya: Jika title mengandung "NATURAL CORE", batalkan SEMUA interaksi
+        if (title.contains("NATURAL CORE") || title.contains("v1.3")) {
+            e.setCancelled(true); // <--- KUNCI UTAMA (Anti Maling)
+
             if (e.getCurrentItem() == null) return;
-            if (e.getClickedInventory() != e.getView().getTopInventory()) return;
 
             Player p = (Player) e.getWhoClicked();
             if (e.getCurrentItem().getType() == Material.BARRIER) {
@@ -137,6 +91,8 @@ public class NaturalCoreGUI implements Listener {
 
     @EventHandler
     public void onDrag(InventoryDragEvent e) {
-        if (isNaturalCoreGUI(e.getView().getTitle())) e.setCancelled(true);
+        if (ChatUtils.stripColor(e.getView().getTitle()).contains("NATURAL CORE")) {
+            e.setCancelled(true);
+        }
     }
 }

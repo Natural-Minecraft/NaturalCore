@@ -175,4 +175,38 @@ public class HomeManager {
         list.sort(Comparator.comparing(Home::getName));
         return list;
     }
+
+    /**
+     * Mendapatkan batas maksimal home secara dinamis berdasarkan config.
+     * Logika: Mencari nilai tertinggi dari permission yang dimiliki player.
+     */
+    public int getMaxHomes(Player p) {
+        // 1. Shortcut untuk Unlimited
+        if (p.hasPermission("naturalsmp.home.limit.unlimited")) {
+            return 999;
+        }
+
+        // 2. Ambil semua key di bawah 'home.limits' secara otomatis
+        org.bukkit.configuration.ConfigurationSection limitSection =
+                NaturalCore.getInstance().getConfig().getConfigurationSection("home.limits");
+
+        if (limitSection == null) return 2; // Safety fallback
+
+        int highestLimit = 0;
+
+        // 3. Loop semua rank yang ada di config (default, vip, mvp, pro, dll)
+        for (String rank : limitSection.getKeys(false)) {
+            // Cek apakah player punya permission: naturalsmp.home.limit.<rank>
+            if (p.hasPermission("naturalsmp.home.limit." + rank)) {
+                int value = limitSection.getInt(rank);
+                // Ambil nilai tertinggi jika player punya banyak permission rank
+                if (value > highestLimit) {
+                    highestLimit = value;
+                }
+            }
+        }
+
+        // 4. Jika tidak punya permission rank apapun, kembalikan nilai 'default'
+        return highestLimit > 0 ? highestLimit : limitSection.getInt("default", 2);
+    }
 }

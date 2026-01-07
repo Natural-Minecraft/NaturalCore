@@ -33,6 +33,7 @@ import id.naturalsmp.naturalcore.fun.FunCommand;
 import id.naturalsmp.naturalcore.fun.FunListener;
 import id.naturalsmp.naturalcore.general.RTPCommand;
 import id.naturalsmp.naturalcore.moderation.GodVanishCommand;
+import id.naturalsmp.naturalcore.NaturalCoreExpansion;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -192,6 +193,12 @@ public final class NaturalCore extends JavaPlugin {
         registerCmd("god", gvCmd);
         registerCmd("vanish", gvCmd);
         registerCmd("whois", gvCmd);
+
+        // 16. Register Placeholders (Jika PAPI ada)
+        if (getServer().getPluginManager().getPlugin("PlaceholderAPI") != null) {
+            new NaturalCoreExpansion(this).register();
+            getLogger().info("PlaceholderAPI ditemukan. Expansion terdaftar.");
+        }
 
         // Listener Moderation (untuk God/Vanish logic)
         getServer().getPluginManager().registerEvents(new id.naturalsmp.naturalcore.moderation.ModerationListener(this), this);
