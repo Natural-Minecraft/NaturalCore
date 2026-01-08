@@ -1,19 +1,36 @@
 # ==========================================
 #      NATURAL CORE - CONFIGURATION
 # ==========================================
-config-version: 1.4
+config-version: 1.5
 
-# PREFIX SETTINGS (Gradasi Biru -> Hijau)
-# Format: Natural (Biru) + NamaModul (Hijau)
+# --- PREFIX SETTINGS ---
+# Gunakan format Hex &#RRGGBB untuk warna modern
 prefix:
-  admin: "&#00AAFF&lNatural&#55FF55&lCore &8» &r"
-  economy: "&#00AAFF&lNatural&#55FF55&lEco &8» &r"
-  moderation: "&#00AAFF&lNatural&#55FF55&lMod &8» &r"
-  trader: "&#00AAFF&lNatural&#55FF55&lTrader &8» &r"
-  spawn: "&#00AAFF&lNatural&#55FF55&lSpawn &8» &r"
-  warp: "&#00AAFF&lNatural&#55FF55&lWarp &8» &r"
-  home: "&#00AAFF&lNatural&#55FF55&lHome &8» &r"
-  teleport: "&#00AAFF&lNatural&#55FF55&lTeleport &8» &r"
+  admin: "&#00AAFF&lNatural&#55FF55&lCore &8» &f"
+  economy: "&#00AAFF&lNatural&#55FF55&lEco &8» &f"
+  moderation: "&#00AAFF&lNatural&#55FF55&lMod &8» &f"
+  trader: "&#00AAFF&lNatural&#55FF55&lTrader &8» &f"
+  spawn: "&#00AAFF&lNatural&#55FF55&lSpawn &8» &f"
+  warp: "&#00AAFF&lNatural&#55FF55&lWarp &8» &f"
+  home: "&#00AAFF&lNatural&#55FF55&lHome &8» &f"
+  teleport: "&#00AAFF&lNatural&#55FF55&lTeleport &8» &f"
+
+# ==========================================
+#           CHAT & SOCIAL SYSTEM
+# ==========================================
+chat:
+  enabled: true
+
+  # Format Chat Global
+  # %displayname% = Prefix + Nama + Suffix (dari LuckPerms)
+  # %player%      = Nama Asli
+  format: "%displayname% &8» &f{message}"
+
+  # Format Private Message (MSG)
+  msg-format-sender: "&8[&bme &8→ &b{receiver}&8] &f{message}"
+  msg-format-receiver: "&8[&b{sender} &8→ &bme&8] &f{message}"
+
+  allow-color: true
 
 # ==========================================
 #          PENGATURAN EKONOMI
@@ -22,40 +39,19 @@ economy:
   vault:
     enabled: true
     symbol: "Rp"
-    aliases:
-      - "rupiah"
-      - "rp"
-      - "money"
-      - "duit"
+    aliases: ["rupiah", "rp", "money", "duit"]
   coins-engine:
     enabled: true
     currency-id: "naturalcoin"
     symbol: "NC"
-    aliases:
-      - "naturalcoin"
-      - "nc"
-      - "coin"
-
-# ==========================================
-#           CHAT & SOCIAL SYSTEM
-# ==========================================
-chat:
-  enabled: true
-  # Format: {prefix} {name} {suffix} {message}
-  # Gunakan %player% untuk nama asli
-  format: "{prefix}&f%player%{suffix} &8» &f{message}"
-
-  # Izin menggunakan warna di chat (naturalsmp.chat.color)
-  allow-color: true
+    aliases: ["naturalcoin", "nc", "coin"]
 
 # ==========================================
 #            PENGATURAN HOME
 # ==========================================
 home:
   # Folder penyimpanan: plugins/NaturalCore/homes/
-
   # Format permission: naturalsmp.home.limit.<group>
-  # Contoh: naturalsmp.home.limit.vip -> Dapat 5 home
   limits:
     default: 3
     vip: 5
@@ -67,93 +63,92 @@ home:
 #           FUN & EXTRAS
 # ==========================================
 fun:
-  # Cooldown dalam detik
   cooldown: 30
-
-  # Worlds dimana player BOLEH join (selain ini akan dilempar ke spawn)
-  # Masukkan nama world spawn/lobby di sini
   allowed-join-worlds:
     - "spawn"
     - "world"
     - "world_nether"
     - "world_the_end"
     - "Resources"
-
   warden-kill-xp: 500
+
+settings:
+  restart-alert-time: 10
+  broadcast-cooldown: 5
 
 # ==========================================
 #              PESAN - PESAN
 # ==========================================
 messages:
 
-  # --- SOCIAL (Set 'none' untuk mematikan) ---
-  join-message: "&8[&a+&8] &r%displayname%"
-  quit-message: "&8[&c-&8] &r%displayname%"
-  first-join-message: "&d&lWELCOME &8| &f%player% &7baru saja mendarat di NaturalSMP! &e(#%count%)"
+  # --- GLOBAL ---
+  no-permission: "&c&l✘ &7Maaf, kamu tidak punya akses."
+  reload-success: "&a&l✔ &7Konfigurasi berhasil dimuat ulang!"
+  player-not-found: "&c&l✘ &7Pemain &f%player% &ctidak ditemukan/offline."
 
-  # Pesan sambutan (MOTD) saat masuk server
+  # --- SOCIAL ---
+  join-message: "&8[&a+&8] &7%displayname%"
+  quit-message: "&8[&c-&8] &7%displayname%"
+  first-join-message: "&d&lNEW &8┃ &fWelcome &d%displayname% &7to the server! &e(#%count%)"
+
   motd:
     - "&8&m--------------------------------"
     - " &6&lWelcome to NaturalSMP!"
     - " &7Selamat bermain, %player%!"
     - "&8&m--------------------------------"
-    -
+
   # --- FUN ---
-  gg-message: "&b&lGG &fdari &e%displayname%"
-  noob-message: "&c&lNOOB &fdari &e%displayname%"
-  cooldown-msg: "&cTunggu &e%time% detik &clagi."
+  gg-message: "&8[&b&lGG&8] &f%displayname% &7mengatakan &bGood Game!"
+  noob-message: "&8[&c&lNOOB&8] &f%displayname% &7berteriak &cNOOB!"
+  cooldown-msg: "&e&l⚠ &7Tunggu &c%time% detik &7lagi."
+
+  # --- UTILITIES (NEW) ---
+  msg-no-reply: "&cTidak ada orang yang bisa dibalas."
+  msg-player-only: "&cConsole tidak bisa melakukan ini."
+
+  repair-success: "&e&l⚒ &7Item di tangan berhasil diperbaiki!"
+  hat-success: "&a&l🎩 &7Item dipasang sebagai topi!"
+  hat-fail: "&cPegang item dulu untuk dijadikan topi."
+
+  nick-set: "&aNickname kamu diubah menjadi: &r{nick}"
+  nick-reset: "&aNickname dikembalikan ke default."
+
+  time-day: "&e&l☀ &7Waktu diubah menjadi &fSiang&7."
+  time-night: "&9&l☾ &7Waktu diubah menjadi &fMalam&7."
+  weather-sun: "&e&l☀ &7Cuaca cerah."
+  weather-rain: "&9&l☂ &7Hujan turun."
 
   # --- RTP ---
   rtp-resource: "&aMenuju dunia Resource... &7(Mohon tunggu)"
   rtp-survival: "&aTeleportasi Random Survival..."
   rtp-already-here: "&cKamu sudah berada di dunia ini!"
 
-  # --- FUN ---
-  gg:
-    description: Broadcast GG
-  noob:
-    description: Broadcast NOOB
-
-  # --- RTP & GENERAL ---
-  resource:
-    description: RTP ke Resource World
-    aliases: [rsc]
-    permission: naturalsmp.resource
-  survival:
-    description: RTP ke Survival World
-    aliases: [rtp]
-
   # --- ESSENTIALS ---
-  gamemode-changed: "&aGamemode diubah ke &e%mode%&a."
-  gamemode-changed-other: "&aGamemode &e%target% &adiubah ke &e%mode%&a."
+  gamemode-changed: "&7Gamemode diubah ke &b%mode%&7."
+  gamemode-changed-other: "&7Gamemode &f%target% &7diubah ke &b%mode%&7."
 
-  fly-enabled: "&aFlight mode &eENABLED&a."
-  fly-disabled: "&cFlight mode &eDISABLED&c."
-  fly-other: "&aFlight mode untuk &e%target% &atelah &e%status%&a."
+  fly-enabled: "&b&l✈ &7Flight mode &aENABLED&7."
+  fly-disabled: "&b&l✈ &7Flight mode &cDISABLED&7."
+  fly-other: "&b&l✈ &7Flight mode &f%target% &7telah &e%status%&7."
 
-  heal-success: "&aKamu telah dipulihkan."
-  heal-other: "&aTelah memulihkan &e%target%&a."
+  heal-success: "&d&l❤ &7Kamu telah dipulihkan."
+  heal-other: "&d&l❤ &7Telah memulihkan &f%target%&7."
+  feed-success: "&6&l🍗 &7Rasa lapar dihilangkan."
 
-  feed-success: "&aRasa lapar dihilangkan."
-  feed-other: "&aTelah memberi makan &e%target%&a."
+  invsee-open: "&7Membuka inventory &f%target%&7."
+  endersee-open: "&7Membuka enderchest &f%target%&7."
 
-  invsee-open: "&aMembuka inventory &e%target%&a."
-  endersee-open: "&aMembuka enderchest &e%target%&a."
-
-  # --- ECO MESSAGES ---
-  no-permission: "&cMaaf, kamu tidak punya akses."
-  reload-success: "&aKonfigurasi berhasil dimuat ulang!"
-  player-not-found: "&cPemain &f%player% &ctidak ditemukan."
+  # --- ECONOMY ---
   invalid-amount: "&cMasukan jumlah angka yang valid!"
   invalid-currency: "&cMata uang salah. Gunakan: &f%aliases%"
-  balance-check: "&aSaldo &e%target%&a: &f%symbol% %amount%"
-  balance-set: "&aSaldo &e%target% &adiatur menjadi &f%symbol% %amount%"
-  balance-take: "&aMengambil &f%symbol% %amount% &adari &e%target%"
-  pay-sent: "&aKamu mengirim &f%symbol% %amount% &ake &e%target%"
-  pay-received: "&aKamu menerima &f%symbol% %amount% &adari &e%player%"
+  balance-check: "&7Saldo &f%target%&7: &a%symbol% %amount%"
+  balance-set: "&7Saldo &f%target% &7diatur menjadi &a%symbol% %amount%"
+  balance-take: "&7Mengambil &a%symbol% %amount% &7dari &f%target%"
+  pay-sent: "&7Kamu mengirim &a%symbol% %amount% &7ke &f%target%"
+  pay-received: "&7Kamu menerima &a%symbol% %amount% &7dari &f%player%"
   pay-fail: "&cSaldo tidak cukup!"
-  give-success-sender: "&aBerhasil mengirim &e%symbol% %amount% &ake &f%target%&a."
-  give-success-target: "&aKamu menerima &e%symbol% %amount% &adari Admin!"
+  give-success-sender: "&7Berhasil mengirim &e%symbol% %amount% &7ke &f%target%&7."
+  give-success-target: "&7Kamu menerima &e%symbol% %amount% &7dari Admin!"
 
   # --- MODERATION ---
   god-enabled: "&aGod Mode &eAKTIF&a."
@@ -161,44 +156,29 @@ messages:
   vanish-enabled: "&aVanish &eAKTIF &7(Kamu sekarang menghilang)."
   vanish-disabled: "&cVanish &eNONAKTIF &7(Kamu terlihat kembali)."
 
-  player-banned: "&aPlayer &e%player% &atelah dibanned &7(%time%). &7Alasan: %reason%"
-  player-unbanned: "&aPlayer &e%player% &atelah di-unban."
-  player-muted: "&aPlayer &e%player% &atelah dimute &7(%time%)."
-  player-unmuted: "&aPlayer &e%player% &atelah di-unmute."
-  player-kicked: "&aPlayer &e%player% &atelah dikick."
-
-  # --- SPAWN MESSAGES ---
+  # --- SPAWN ---
   spawn-set: "&aLokasi spawn utama berhasil diatur!"
   spawn-teleport: "&aBerhasil teleport ke Spawn!"
   spawn-not-set: "&cLokasi Spawn belum diatur oleh Admin!"
 
-  # --- HOME MESSAGES ---
-  home-set: "&aHome &e%name% &aberhasil dibuat!"
-  home-teleport: "&aTeleport ke home &e%name%&a..."
-  home-deleted: "&cHome &e%name% &ctelah dihapus."
-  home-not-found: "&cHome &e%name% &ctidak ditemukan!"
-  home-limit-reached: "&cKamu sudah mencapai batas maksimal home! (%limit%)"
-  home-list: "&aDaftar Home kamu: &f%homes%"
+  # --- HOME ---
+  home-set: "&a&l✔ &7Home &f%name% &7berhasil dibuat!"
+  home-teleport: "&7Teleport ke home &b%name%&7..."
+  home-deleted: "&c&l🗑 &7Home &f%name% &7telah dihapus."
+  home-not-found: "&c&l✘ &7Home &f%name% &7tidak ditemukan!"
+  home-limit: "&c&l⚠ &7Limit home tercapai! &8(&f%current%&8/&c%max%&8)"
+  home-list: "&7Daftar Home kamu: &f%homes%"
   home-exist: "&cHome dengan nama tersebut sudah ada!"
 
-  # --- TELEPORT MESSAGES ---
-  tp-success: "&aTeleportasi ke &e%target%&a."
-  tphere-success: "&aMenarik &e%target% &ake lokasimu."
-
-  # TPA (Request)
-  tpa-sent: "&aPermintaan teleport dikirim ke &e%target%&a."
-  tpa-received: "&e%player% &7ingin teleport ke kamu."
-  tpahere-received: "&e%player% &7ingin menarik kamu ke lokasinya."
-
-  # Action
+  # --- TELEPORT ---
+  tp-success: "&7Teleportasi ke &f%target%&7."
+  tphere-success: "&7Menarik &f%target% &7ke lokasimu."
+  tpa-sent: "&7Permintaan teleport dikirim ke &f%target%&7."
+  tpa-received: "&f%player% &7ingin teleport ke kamu."
+  tpahere-received: "&f%player% &7ingin menarik kamu ke lokasinya."
   tpa-accept-sender: "&aPermintaan diterima! Teleportasi..."
-  tpa-accept-target: "&aKamu menerima permintaan &e%player%&a."
-  tpa-deny-sender: "&cPermintaan teleport ditolak oleh &e%target%&c."
-  tpa-deny-target: "&cKamu menolak permintaan &e%player%&c."
+  tpa-accept-target: "&aKamu menerima permintaan &f%player%&a."
+  tpa-deny-sender: "&cPermintaan teleport ditolak oleh &f%target%&c."
+  tpa-deny-target: "&cKamu menolak permintaan &f%player%&c."
   tpa-no-request: "&cTidak ada permintaan teleport yang aktif."
   tpa-timeout: "&cPermintaan teleport kadaluarsa."
-
-
-settings:
-  restart-alert-time: 10
-  broadcast-cooldown: 5

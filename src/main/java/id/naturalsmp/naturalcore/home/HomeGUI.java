@@ -3,6 +3,7 @@ package id.naturalsmp.naturalcore.home;
 import id.naturalsmp.naturalcore.NaturalCore;
 import id.naturalsmp.naturalcore.utils.ChatUtils;
 import org.bukkit.Bukkit;
+import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
@@ -20,64 +21,80 @@ import java.util.List;
 public class HomeGUI implements Listener {
 
     private final NaturalCore plugin;
-    private final String GUI_TITLE = "&#00AAFF&lɴᴀᴛᴜʀᴀʟ ʜᴏᴍᴇ"; // Title Estetik
+    // Title menggunakan Hex Color sesuai request
+    private final String GUI_TITLE = "&#00AAFF&lɴᴀᴛᴜʀᴀʟ ʜᴏᴍᴇ";
 
     public HomeGUI(NaturalCore plugin) {
         this.plugin = plugin;
     }
 
-    public void open(Player p, int page) {
-        // 1. Ambil data home
-        List<Home> homes = plugin.getHomeManager().getSortedHomes(p);
+    // --- BRIDGE UNTUK COMMAND ---
+    // HomeCommand memanggil openGUI(p), kita arahkan ke halaman 0
+    public void openGUI(Player p) {
+        open(p, 0);
+    }
 
-        // Validasi Page (Biar gak error index)
+    public void open(Player p, int page) {
+        // 1. Ambil data home (List Nama)
+        List<String> homes = plugin.getHomeManager().getSortedHomes(p);
+
+        // Validasi jika kosong
         if (homes.isEmpty()) {
             p.sendMessage(ChatUtils.colorize("&cKamu belum punya home! Gunakan /sethome <nama>"));
             return;
         }
 
-        // 2. Setup Inventory 1 Row (9 Slot)
+        // 2. Pagination Logic
+        int itemsPerPage = 5; // Slot 2, 3, 4, 5, 6
+        int totalPages = (int) Math.ceil((double) homes.size() / itemsPerPage);
+
+        // Safety check page boundaries
+        if (page < 0) page = 0;
+        if (page >= totalPages) page = totalPages - 1;
+
+        // 3. Setup Inventory 1 Row (9 Slot)
+        // Kita tambahkan page number di title agar Listener bisa membacanya nanti
         Inventory inv = Bukkit.createInventory(null, 9, ChatUtils.colorize(GUI_TITLE + " &8(" + (page + 1) + ")"));
 
-        // 3. Pasang Pembatas (Slot 1 & 7)
+        // 4. Pasang Pembatas (Slot 1 & 7)
         ItemStack pane = new ItemStack(Material.GRAY_STAINED_GLASS_PANE);
         ItemMeta paneMeta = pane.getItemMeta();
-        paneMeta.setDisplayName(" ");
-        pane.setItemMeta(paneMeta);
+        if (paneMeta != null) {
+            paneMeta.setDisplayName(" ");
+            pane.setItemMeta(paneMeta);
+        }
 
         inv.setItem(1, pane);
         inv.setItem(7, pane);
 
-        // 4. Logic Pagination
-        int itemsPerPage = 5; // Slot 2, 3, 4, 5, 6
-        int totalPages = (int) Math.ceil((double) homes.size() / itemsPerPage);
-
-        // Safety check page
-        if (page < 0) page = 0;
-        if (page >= totalPages) page = totalPages - 1;
-
+        // 5. Isi Slot 2-6 dengan Home
         int startIndex = page * itemsPerPage;
         int endIndex = Math.min(startIndex + itemsPerPage, homes.size());
 
-        // 5. Isi Slot 2-6 dengan Home
         int slotGUI = 2; // Mulai dari slot 2
+
         for (int i = startIndex; i < endIndex; i++) {
-            Home home = homes.get(i);
-            inv.setItem(slotGUI, createHomeItem(home));
+            String homeName = homes.get(i);
+            // Ambil lokasi dari Manager
+            Location loc = plugin.getHomeManager().getHome(p, homeName);
+
+            if (loc != null) {
+                inv.setItem(slotGUI, createHomeItem(homeName, loc));
+            }
             slotGUI++;
         }
 
         // 6. Tombol Navigasi (Arrow)
         // Tombol Previous (Slot 0)
         if (page > 0) {
-            inv.setItem(0, createNavButton("&e&l« Previous Page", page - 1));
+            inv.setItem(0, createNavButton("&e&l« Previous Page"));
         } else {
             inv.setItem(0, pane); // Tutup pakai kaca kalau gak ada prev
         }
 
         // Tombol Next (Slot 8)
         if (page < totalPages - 1) {
-            inv.setItem(8, createNavButton("&e&lNext Page »", page + 1));
+            inv.setItem(8, createNavButton("&e&lNext Page »"));
         } else {
             inv.setItem(8, pane); // Tutup pakai kaca kalau gak ada next
         }
@@ -88,31 +105,31 @@ public class HomeGUI implements Listener {
 
     // --- HELPER ITEMS ---
 
-    private ItemStack createHomeItem(Home home) {
+    private ItemStack createHomeItem(String name, Location loc) {
         ItemStack item = new ItemStack(Material.RED_BED);
         ItemMeta meta = item.getItemMeta();
-        meta.setDisplayName(ChatUtils.colorize("&a&l" + home.getName()));
+        if (meta != null) {
+            meta.setDisplayName(ChatUtils.colorize("&a&l" + name)); // Nama Home hijau tebal
 
-        List<String> lore = new ArrayList<>();
-        lore.add(ChatUtils.colorize("&7World: &f" + home.getLocation().getWorld().getName()));
-        lore.add(ChatUtils.colorize("&7Coords: &f" + (int)home.getLocation().getX() + ", " + (int)home.getLocation().getY() + ", " + (int)home.getLocation().getZ()));
-        lore.add("");
-        lore.add(ChatUtils.colorize("&eKlik untuk teleport!"));
+            List<String> lore = new ArrayList<>();
+            lore.add(ChatUtils.colorize("&7World: &f" + loc.getWorld().getName()));
+            lore.add(ChatUtils.colorize("&7Coords: &f" + loc.getBlockX() + ", " + loc.getBlockY() + ", " + loc.getBlockZ()));
+            lore.add("");
+            lore.add(ChatUtils.colorize("&eKlik untuk teleport!"));
 
-        meta.setLore(lore);
-        item.setItemMeta(meta);
+            meta.setLore(lore);
+            item.setItemMeta(meta);
+        }
         return item;
     }
 
-    private ItemStack createNavButton(String name, int targetPage) {
+    private ItemStack createNavButton(String name) {
         ItemStack item = new ItemStack(Material.ARROW);
         ItemMeta meta = item.getItemMeta();
-        meta.setDisplayName(ChatUtils.colorize(name));
-
-        // Simpan target page di lore (Hidden trick, atau parsing title nanti)
-        // Kita pakai parsing title saja di listener biar simpel
-
-        item.setItemMeta(meta);
+        if (meta != null) {
+            meta.setDisplayName(ChatUtils.colorize(name));
+            item.setItemMeta(meta);
+        }
         return item;
     }
 
@@ -120,9 +137,13 @@ public class HomeGUI implements Listener {
 
     @EventHandler
     public void onClick(InventoryClickEvent e) {
-        String title = ChatUtils.stripColor(e.getView().getTitle());
-        // Cek Font Estetik "ɴᴀᴛᴜʀᴀʟ ʜᴏᴍᴇ"
-        if (!title.contains("ɴᴀᴛᴜʀᴀʟ ʜᴏᴍᴇ")) return;
+        // Ambil Title dan Strip Color biar aman saat compare
+        String titleRaw = e.getView().getTitle();
+        String titleClean = ChatUtils.stripColor(titleRaw);
+
+        // Cek apakah title mengandung "NATURAL HOME" (sesuai font estetik di atas yang kalau di strip jadi huruf kapital biasa/mirip)
+        // Atau cek pakai method contains biasa kalau stripColor merusak font unicode
+        if (!titleRaw.contains("ɴᴀᴛᴜʀᴀʟ ʜᴏᴍᴇ")) return;
 
         e.setCancelled(true); // Anti Maling
 
@@ -132,12 +153,15 @@ public class HomeGUI implements Listener {
         Player p = (Player) e.getWhoClicked();
         int slot = e.getSlot();
 
-        // Ambil halaman saat ini dari Title "Natural Home (1)" -> ambil angka 1
+        // Parse halaman saat ini dari Title "Natural Home (1)" -> ambil angka 1
         int currentPage = 0;
         try {
-            String numStr = title.substring(title.lastIndexOf("(") + 1, title.lastIndexOf(")"));
+            // Ambil text di dalam kurung terakhir
+            String numStr = titleClean.substring(titleClean.lastIndexOf("(") + 1, titleClean.lastIndexOf(")"));
             currentPage = Integer.parseInt(numStr) - 1; // Karena index mulai dari 0
-        } catch (Exception ignored) {}
+        } catch (Exception ignored) {
+            // Fallback jika parsing gagal
+        }
 
         // 1. Tombol Previous (Slot 0)
         if (slot == 0 && e.getCurrentItem().getType() == Material.ARROW) {
@@ -154,18 +178,18 @@ public class HomeGUI implements Listener {
         // 3. Klik Item Home (Slot 2-6)
         if (slot >= 2 && slot <= 6) {
             if (e.getCurrentItem().getType() == Material.RED_BED) {
-                // Ambil nama home dari Display Name item
+                // Ambil nama home dari Display Name item (Hapus kode warna)
                 String homeName = ChatUtils.stripColor(e.getCurrentItem().getItemMeta().getDisplayName());
 
                 p.closeInventory();
-                plugin.getHomeManager().teleportHome(p, homeName);
+                p.performCommand("home " + homeName); // Cara paling aman memanggil teleport logic
             }
         }
     }
 
     @EventHandler
     public void onDrag(InventoryDragEvent e) {
-        if (ChatUtils.stripColor(e.getView().getTitle()).contains("ɴᴀᴛᴜʀᴀʟ ʜᴏᴍᴇ")) {
+        if (e.getView().getTitle().contains("ɴᴀᴛᴜʀᴀʟ ʜᴏᴍᴇ")) {
             e.setCancelled(true);
         }
     }

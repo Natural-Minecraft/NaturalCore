@@ -1,5 +1,5 @@
 name: NaturalCore
-version: 1.4
+version: 1.5
 main: id.naturalsmp.naturalcore.NaturalCore
 api-version: 1.21
 author: NaturalSMP
@@ -37,6 +37,41 @@ commands:
     description: Intip enderchest player lain
     aliases: [ecsee]
     permission: naturalsmp.endersee
+
+  # --- MESSAGING ---
+  msg:
+    description: Kirim pesan pribadi
+    aliases: [tell, w, whisper]
+  reply:
+    description: Balas pesan terakhir
+    aliases: [r]
+
+  # --- UTILITIES (WORLD) ---
+  day:
+    description: Ubah waktu ke siang
+    permission: naturalsmp.time
+  night:
+    description: Ubah waktu ke malam
+    permission: naturalsmp.time
+  sun:
+    description: Ubah cuaca cerah
+    permission: naturalsmp.time
+  rain:
+    description: Ubah cuaca hujan
+    permission: naturalsmp.time
+
+  # --- PERKS ---
+  hat:
+    description: Pakai item di kepala
+    permission: naturalsmp.hat
+  repair:
+    description: Perbaiki item
+    aliases: [fix]
+    permission: naturalsmp.repair
+  nick:
+    description: Ganti nickname
+    aliases: [nickname]
+    permission: naturalsmp.nick
 
   # --- ECONOMY ---
   givebal:
@@ -89,6 +124,10 @@ commands:
     description: Crafting
     aliases: [wb]
     permission: naturalsmp.craft
+  anvil:
+    description: Buka virtual anvil
+    aliases: [ av ]
+    permission: naturalsmp.anvil
   invsee:
     description: Cek tas
     permission: naturalsmp.invsee

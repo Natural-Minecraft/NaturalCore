@@ -35,6 +35,10 @@ import id.naturalsmp.naturalcore.moderation.ModerationCommand;
 import id.naturalsmp.naturalcore.fun.FunCommand;
 import id.naturalsmp.naturalcore.fun.FunListener;
 import id.naturalsmp.naturalcore.general.RTPCommand;
+import id.naturalsmp.naturalcore.chat.MessageManager;
+import id.naturalsmp.naturalcore.chat.PrivateMessageCommand;
+import id.naturalsmp.naturalcore.utility.WorldUtilCommand;
+import id.naturalsmp.naturalcore.utility.EssentialPerksCommand;
 
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -50,11 +54,10 @@ public final class NaturalCore extends JavaPlugin {
     private HomeManager homeManager;
     private VanishManager vanishManager;
     private TeleportManager teleportManager;
-
-    // Trader Module Variables
     private TraderManager traderManager;
     private TradeEditor tradeEditor;
     private CurrencyManager currencyManager;
+    private MessageManager messageManager;
 
     @Override
     public void onEnable() {
@@ -182,6 +185,7 @@ public final class NaturalCore extends JavaPlugin {
         MenuUtilCommand menuUtil = new MenuUtilCommand();
         registerCmd("trash", menuUtil);
         registerCmd("craft", menuUtil);
+        registerCmd("anvil", menuUtil);
 
         // 13. Economy Module
         EconomyCommand ecoCmd = new EconomyCommand();
@@ -215,8 +219,25 @@ public final class NaturalCore extends JavaPlugin {
             getLogger().info("PlaceholderAPI ditemukan. Expansion terdaftar.");
         }
 
-        // 17. Chat Listener (Format & Join/Quit)
+        // 17. Messaging System (NEW)
         getServer().getPluginManager().registerEvents(new ChatListener(this), this);
+        this.messageManager = new MessageManager();
+        PrivateMessageCommand pmCmd = new PrivateMessageCommand(this);
+        registerCmd("msg", pmCmd);
+        registerCmd("reply", pmCmd);
+
+        // 18. World Utils (NEW)
+        WorldUtilCommand worldCmd = new WorldUtilCommand();
+        registerCmd("day", worldCmd);
+        registerCmd("night", worldCmd);
+        registerCmd("sun", worldCmd);
+        registerCmd("rain", worldCmd);
+
+        // 19. Perks (Hat, Repair, Nick) (NEW)
+        EssentialPerksCommand perksCmd = new EssentialPerksCommand();
+        registerCmd("hat", perksCmd);
+        registerCmd("repair", perksCmd);
+        registerCmd("nick", perksCmd);
 
         // Selesai
         getLogger().info(ChatUtils.colorize("&6&lNaturalCore v" + getDescription().getVersion() + " &asudah aktif sepenuhnya!"));
@@ -238,7 +259,8 @@ public final class NaturalCore extends JavaPlugin {
     public HomeManager getHomeManager() { return homeManager; }
     public SpawnManager getSpawnManager() { return spawnManager; }
     public TeleportManager getTeleportManager() { return teleportManager; }
-    public VanishManager getVanishManager() { return vanishManager; } // Getter baru
+    public VanishManager getVanishManager() { return vanishManager; }
+    public MessageManager getMessageManager() { return messageManager; }
 
     // --- HELPER UNTUK MENCEGAH CRASH ---
     private void registerCmd(String name, org.bukkit.command.CommandExecutor executor) {
