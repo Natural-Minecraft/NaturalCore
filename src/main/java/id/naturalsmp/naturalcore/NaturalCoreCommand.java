@@ -2,7 +2,7 @@ package id.naturalsmp.naturalcore;
 
 import id.naturalsmp.naturalcore.admin.NaturalCoreGUI;
 import id.naturalsmp.naturalcore.economy.EconomyCommand;
-import id.naturalsmp.naturalcore.moderation.GodVanishCommand;
+import id.naturalsmp.naturalcore.moderation.ModerationCommand;
 import id.naturalsmp.naturalcore.utility.PlayerUtilCommand;
 import id.naturalsmp.naturalcore.utils.ChatUtils;
 import id.naturalsmp.naturalcore.utils.ConfigUtils;
@@ -18,16 +18,17 @@ public class NaturalCoreCommand implements CommandExecutor {
 
     private final NaturalCore plugin;
 
-    // Simpan instance command lain untuk dipanggil
+    // Instance command lain untuk dipanggil via /nacore
     private final PlayerUtilCommand playerUtil;
     private final EconomyCommand economyUtil;
-    private final GodVanishCommand modUtil;
+    private final ModerationCommand modUtil; // <--- Variable tipe baru
 
     public NaturalCoreCommand(NaturalCore plugin) {
         this.plugin = plugin;
         this.playerUtil = new PlayerUtilCommand();
         this.economyUtil = new EconomyCommand();
-        this.modUtil = new GodVanishCommand();
+        // Init ModerationCommand (butuh plugin instance)
+        this.modUtil = new ModerationCommand(plugin);
     }
 
     @Override
@@ -37,6 +38,8 @@ public class NaturalCoreCommand implements CommandExecutor {
         if (args.length == 0) {
             if (sender instanceof Player) {
                 new NaturalCoreGUI(plugin).openGUI((Player) sender);
+            } else {
+                sender.sendMessage("Hanya player yang bisa membuka GUI.");
             }
             return true;
         }
@@ -45,7 +48,7 @@ public class NaturalCoreCommand implements CommandExecutor {
 
         // --- ADMIN UTILS ---
         if (sub.equals("reload")) {
-            if (!sender.hasPermission("naturalsmp.admin")) return true;
+            if (!sender.hasPermission("naturalsmp.admin")) return noPerm(sender);
             plugin.reloadConfig();
             ConfigUtils.reload();
             sender.sendMessage(ConfigUtils.getString("prefix.admin") + ConfigUtils.getString("messages.reload-success"));
@@ -58,14 +61,11 @@ public class NaturalCoreCommand implements CommandExecutor {
         }
 
         // --- PROXY KE COMMAND LAIN ---
-        // Kita geser argumen. Contoh: "/nacore heal steve" -> "heal" "steve"
-        // Args baru untuk executor: "steve"
+        // Geser argumen: "/nacore heal steve" -> args untuk heal adalah "steve"
         String[] newArgs = Arrays.copyOfRange(args, 1, args.length);
 
         // 1. Player Utils (Heal, Feed, Fly)
         if (sub.equals("heal") || sub.equals("feed") || sub.equals("fly")) {
-            // Panggil onCommand milik PlayerUtilCommand
-            // Label kita palsukan jadi nama subcommand (misal "heal")
             playerUtil.onCommand(sender, command, sub, newArgs);
             return true;
         }
@@ -77,12 +77,18 @@ public class NaturalCoreCommand implements CommandExecutor {
         }
 
         // 3. Moderation (God, Vanish, Whois)
+        // Delegate ke ModerationCommand
         if (sub.equals("god") || sub.equals("vanish") || sub.equals("v") || sub.equals("whois")) {
             modUtil.onCommand(sender, command, sub, newArgs);
             return true;
         }
 
         sender.sendMessage(ChatUtils.colorize("&cSub-command tidak ditemukan."));
+        return true;
+    }
+
+    private boolean noPerm(CommandSender s) {
+        s.sendMessage(ConfigUtils.getString("messages.no-permission"));
         return true;
     }
 }

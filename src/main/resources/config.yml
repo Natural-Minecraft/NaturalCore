@@ -1,7 +1,7 @@
 # ==========================================
 #      NATURAL CORE - CONFIGURATION
 # ==========================================
-config-version: 1.3
+config-version: 1.4
 
 # PREFIX SETTINGS (Gradasi Biru -> Hijau)
 # Format: Natural (Biru) + NamaModul (Hijau)
@@ -37,6 +37,18 @@ economy:
       - "coin"
 
 # ==========================================
+#           CHAT & SOCIAL SYSTEM
+# ==========================================
+chat:
+  enabled: true
+  # Format: {prefix} {name} {suffix} {message}
+  # Gunakan %player% untuk nama asli
+  format: "{prefix}&f%player%{suffix} &8» &f{message}"
+
+  # Izin menggunakan warna di chat (naturalsmp.chat.color)
+  allow-color: true
+
+# ==========================================
 #            PENGATURAN HOME
 # ==========================================
 home:
@@ -50,15 +62,6 @@ home:
     mvp: 15
     nature: 30
     admin: 100
-
-# ==========================================
-#        PENGATURAN MODERATION
-# ==========================================
-moderation:
-  # Format waktu banned/mute (Pesan saat login/chat)
-  ban-message: "&c&lKAMU TELAH DIBANNED!\n\n&7Alasan: &f%reason%\n&7Berakhir: &f%time%\n\n&eAjukan banding di Discord kami."
-  mute-message: "&cKamu sedang dimute! Berakhir dalam: &e%time%"
-  kick-message: "&c&lDIKICK DARI SERVER!\n\n&7Alasan: &f%reason%"
 
 # ==========================================
 #           FUN & EXTRAS
@@ -83,9 +86,21 @@ fun:
 # ==========================================
 messages:
 
+  # --- SOCIAL (Set 'none' untuk mematikan) ---
+  join-message: "&8[&a+&8] &r%displayname%"
+  quit-message: "&8[&c-&8] &r%displayname%"
+  first-join-message: "&d&lWELCOME &8| &f%player% &7baru saja mendarat di NaturalSMP! &e(#%count%)"
+
+  # Pesan sambutan (MOTD) saat masuk server
+  motd:
+    - "&8&m--------------------------------"
+    - " &6&lWelcome to NaturalSMP!"
+    - " &7Selamat bermain, %player%!"
+    - "&8&m--------------------------------"
+    -
   # --- FUN ---
-  gg-message: "&b&lGG &fdari &e%player%"
-  noob-message: "&c&lNOOB &fdari &e%player%"
+  gg-message: "&b&lGG &fdari &e%displayname%"
+  noob-message: "&c&lNOOB &fdari &e%displayname%"
   cooldown-msg: "&cTunggu &e%time% detik &clagi."
 
   # --- RTP ---

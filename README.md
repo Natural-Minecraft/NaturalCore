@@ -1,88 +1,103 @@
-# 🍃 NaturalCore v1.3 (Fun & Essentials Update)
+# 🍃 NaturalCore v1.4 (The Social Update)
 
-**NaturalCore** adalah plugin "All-in-One" untuk server Minecraft Survival/SMP. Plugin ini menggantikan kebutuhan akan plugin dasar seperti Essentials, Economy, dan RTP system dengan fitur yang lebih ringan, estetik, dan terintegrasi.
+**NaturalCore** adalah plugin "All-in-One" untuk server Minecraft Survival/SMP. Plugin ini menggantikan kebutuhan akan banyak plugin dasar dengan satu solusi yang ringan, estetik, dan terintegrasi.
+
+Versi **1.4** membawa pembaruan besar pada sistem **Chat**, **Social**, dan **Moderation**.
 
 ---
 
-## ✨ Fitur Utama
-* **Modular System:** Fitur dipisah per kategori (Economy, Fun, Essentials, dll).
-* **Dual Economy:** Support Vault (Rupiah) dan CoinsEngine (NaturalCoin).
-* **Fun & RTP:** Broadcast GG/Noob, Warden Logger, dan RTP System.
-* **GUI Based:** Hampir semua fitur memiliki menu GUI (Baltop, Home, Warp, Admin).
-* **Hex Color Support:** Mendukung kode warna gradasi (contoh: `&#00AAFF`).
+## ✨ Fitur Utama v1.4
+* **💬 Chat Formatting:** Integrasi penuh dengan Vault/LuckPerms (Prefix, Suffix, & Hex Color).
+* **👋 Custom Join/Quit:** Pesan sambutan (MOTD) dan notifikasi join yang mendukung Placeholder.
+* **🎒 Essentials Split:** Pemisahan command inventory (`/ec` untuk pemain, `/endersee` untuk admin).
+* **🛡️ Vanish V2:** Sistem menghilang yang lebih aman (Hidden from Tablist & Login Glitch fixed).
+* **📊 Dynamic Limits:** Batas sethome yang bisa diatur per-rank tanpa batas via Config.
+* **🧩 PlaceholderAPI:** Support variable custom untuk Scoreboard/TAB.
 
 ---
 
 ## 🛠️ Daftar Command & Permission
 
-### 🎮 Fun & RTP (New!)
+### 💬 Social & Fun (New!)
 | Command | Permission | Deskripsi |
 | :--- | :--- | :--- |
-| `/gg` | - | Broadcast "GG" (Cooldown 30s). |
-| `/noob` | - | Broadcast "NOOB" (Cooldown 30s). |
-| `/resource`, `/rsc` | `naturalsmp.resource` | RTP ke dunia Resource (via BetterRTP). |
-| `/survival`, `/rtp` | - | RTP Random di dunia Survival (via BetterRTP). |
-| **Auto Lobby** | - | Player otomatis dipindah ke Spawn jika login di world terlarang. |
-| **Warden Log** | - | Logger koordinat & XP saat membunuh Warden. |
+| `/gg` | - | Broadcast "GG" dengan format rank (Cooldown 30s). |
+| `/noob` | - | Broadcast "NOOB" dengan format rank (Cooldown 30s). |
+| **Chat Color** | `naturalsmp.chat.color` | Izin menggunakan kode warna/hex di chat. |
 
-### 🎒 Essentials & Utilities
+### 🎒 Essentials & Inventory
 | Command | Permission | Deskripsi |
 | :--- | :--- | :--- |
-| `/nacore <cmd>` | `naturalsmp.admin` | Main command untuk akses fitur admin. |
-| `/gmc`, `/gms`, `/gmsp` | `naturalsmp.gamemode` | Ganti gamemode cepat. |
-| `/fly` | `naturalsmp.fly` | Mode terbang. |
-| `/heal`, `/feed` | `naturalsmp.heal/feed` | Isi darah dan lapar. |
-| `/invsee <player>` | `naturalsmp.invsee` | Intip isi tas player. |
-| `/enderchest <player>` | `naturalsmp.enderchest` | Intip enderchest player. |
+| `/ec` | `naturalsmp.enderchest` | Membuka Enderchest sendiri. |
+| `/endersee <player>` | `naturalsmp.endersee` | Intip Enderchest pemain lain (Admin). |
+| `/invsee <player>` | `naturalsmp.invsee` | Intip/Edit inventory pemain lain. |
 | `/trash` | - | Membuka tempat sampah. |
-| `/craft` | `naturalsmp.craft` | Membuka crafting table portable. |
+| `/craft` / `/wb` | `naturalsmp.craft` | Membuka Crafting Table portable. |
+| `/fly` | `naturalsmp.fly` | Mode terbang. |
+| `/heal` | `naturalsmp.heal` | Mengisi darah & saturation. |
+| `/feed` | `naturalsmp.feed` | Mengisi rasa lapar. |
+| `/gmc`, `/gms`, `/gmsp` | `naturalsmp.gamemode` | Ganti gamemode cepat. |
 
-### 👮 Moderation (Lite)
-*Note: Gunakan AdvancedBan untuk fitur Ban/Kick/Mute.*
+### 🛡️ Moderation (Lite)
 | Command | Permission | Deskripsi |
 | :--- | :--- | :--- |
 | `/god` | `naturalsmp.god` | Mode kebal (Invulnerable). |
-| `/vanish` / `/v` | `naturalsmp.vanish` | Menghilang dari list player. |
-| `/whois <player>` | `naturalsmp.whois` | Cek info detail player (IP, UUID, dll). |
+| `/vanish` / `/v` | `naturalsmp.vanish` | Menghilang dari game & tablist. |
+| `/whois <player>` | `naturalsmp.whois` | Cek info detail (IP, UUID, God/Vanish Status). |
+| **See Vanish** | `naturalsmp.vanish.see` | Melihat admin yang sedang vanish. |
 
 ### 💰 Economy
 | Command | Permission | Deskripsi |
 | :--- | :--- | :--- |
-| `/bal`, `/money` | - | Cek saldo sendiri/orang lain. |
+| `/bal` | - | Cek saldo sendiri/orang lain. |
 | `/pay <player>` | - | Kirim uang ke pemain lain. |
 | `/baltop` | - | Menu GUI Top 10 pemain terkaya. |
 | `/setbal`, `/takebal` | `naturalsmp.economy.admin` | Atur saldo pemain (Admin). |
 | `/givebal` | `naturalcs.givebalance` | Give balance dual currency. |
 
-### 🏠 Home & Teleport
+### 🏠 Home, Warp & Teleport
 | Command | Permission | Deskripsi |
 | :--- | :--- | :--- |
 | `/sethome <nama>` | `naturalsmp.home.use` | Set rumah. |
 | `/home`, `/homes` | `naturalsmp.home.use` | Buka GUI daftar home. |
-| `/tpa <player>` | `naturalsmp.tpa` | Request teleport ke pemain. |
-| `/tpahere <player>` | `naturalsmp.tpa` | Request tarik pemain. |
-| `/tp`, `/tphere` | `naturalsmp.tp` | Teleport paksa (Admin). |
-
-### 📍 Warp & Spawn
-| Command | Permission | Deskripsi |
-| :--- | :--- | :--- |
+| `/tpa`, `/tpahere` | - | Request teleport. |
 | `/spawn` | `naturalsmp.spawn` | Teleport ke spawn utama. |
 | `/setspawn` | `naturalsmp.admin` | Set lokasi spawn. |
 | `/warps` | - | Buka GUI Warp. |
 | `/setwarp`, `/delwarp` | `naturalsmp.admin` | Atur lokasi warp. |
-
-### ⛩️ NPC Trader
-| Command | Permission | Deskripsi |
-| :--- | :--- | :--- |
-| `/wt` | `naturalsmp.trader.admin` | Spawn Wandering Trader Custom. |
-| `/settrader` | `naturalsmp.trader.admin` | Setup item Trader. |
+| `/rtp`, `/resource` | `naturalsmp.resource` | Teleport Random (via BetterRTP). |
 
 ---
 
-## 📂 Konfigurasi
-Semua pesan bisa diedit di `config.yml`.
-**Dependencies:**
-- Java 21+
-- Paper 1.21+
-- Vault & Economy Plugin (EssentialsEco/CoinsEngine)
-- BetterRTP (Untuk fitur RTP)
+## 🧩 Placeholders
+Gunakan placeholder ini di **Scoreboard (TAB)** atau plugin lain (Memerlukan PlaceholderAPI).
+
+| Placeholder | Deskripsi |
+| :--- | :--- |
+| `%naturalcore_homes%` | Jumlah home yang dimiliki player saat ini. |
+| `%naturalcore_maxhomes%` | Batas maksimal home player (sesuai rank). |
+
+**Config Placeholder:**
+Gunakan `%displayname%` di dalam `config.yml` (pesan join/quit/motd) untuk menampilkan Nama Lengkap + Prefix/Suffix dari LuckPerms.
+
+---
+
+## 📂 Instalasi & Requirements
+
+**Requirements:**
+1.  **Java 21** (Minimum).
+2.  **Paper 1.21+**.
+3.  **Vault** (Wajib untuk Economy & Chat).
+4.  **LuckPerms** (Direkomendasikan untuk Prefix/Suffix).
+5.  **Citizens** (Opsional, untuk fitur NPC Trader).
+
+**Cara Install:**
+1.  Matikan server.
+2.  Hapus folder `NaturalCore` lama (Sangat disarankan saat update ke v1.4 karena perubahan Config).
+3.  Masukkan `NaturalCore-1.4.jar` ke folder plugins.
+4.  Nyalakan server.
+5.  Edit `config.yml` sesuai kebutuhan.
+
+---
+
+**Developed with ❤️ by NaturalSMP Team**

@@ -1,10 +1,12 @@
 package id.naturalsmp.naturalcore;
 
 import id.naturalsmp.naturalcore.NaturalCoreCommand;
+import id.naturalsmp.naturalcore.NaturalCoreExpansion;
 import id.naturalsmp.naturalcore.admin.BroadcastCommand;
 import id.naturalsmp.naturalcore.admin.KickAllCommand;
 import id.naturalsmp.naturalcore.admin.RestartAlertCommand;
 import id.naturalsmp.naturalcore.admin.GiveBalCommand;
+import id.naturalsmp.naturalcore.chat.ChatListener;
 import id.naturalsmp.naturalcore.economy.VaultManager;
 import id.naturalsmp.naturalcore.home.HomeGUI;
 import id.naturalsmp.naturalcore.home.HomeManager;
@@ -27,51 +29,61 @@ import id.naturalsmp.naturalcore.utility.PlayerUtilCommand;
 import id.naturalsmp.naturalcore.utility.MenuUtilCommand;
 import id.naturalsmp.naturalcore.economy.EconomyCommand;
 import id.naturalsmp.naturalcore.economy.BaltopGUI;
-import id.naturalsmp.naturalcore.moderation.PunishmentManager;
+import id.naturalsmp.naturalcore.moderation.VanishManager;
+import id.naturalsmp.naturalcore.moderation.VanishListener;
 import id.naturalsmp.naturalcore.moderation.ModerationCommand;
 import id.naturalsmp.naturalcore.fun.FunCommand;
 import id.naturalsmp.naturalcore.fun.FunListener;
 import id.naturalsmp.naturalcore.general.RTPCommand;
-import id.naturalsmp.naturalcore.moderation.GodVanishCommand;
-import id.naturalsmp.naturalcore.NaturalCoreExpansion;
+
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 
 public final class NaturalCore extends JavaPlugin {
 
     private static NaturalCore instance;
-    private VaultManager vaultManager;
 
+    // Managers
+    private VaultManager vaultManager;
     private WarpManager warpManager;
     private SpawnManager spawnManager;
     private HomeManager homeManager;
+    private VanishManager vanishManager;
+    private TeleportManager teleportManager;
 
-    // Variable Trader Module
+    // Trader Module Variables
     private TraderManager traderManager;
     private TradeEditor tradeEditor;
     private CurrencyManager currencyManager;
-
-    private PunishmentManager punishmentManager;
 
     @Override
     public void onEnable() {
         instance = this;
 
-        // 1. Pesan Startup
+        // 1. Startup Log
         getLogger().info(ChatUtils.colorize("&6&lNaturalCore &aStarting up..."));
 
         // 2. Setup Config
         saveDefaultConfig();
 
-        // 3. Setup Economy (Vault)
+        // 3. Setup Vault (Economy & Chat)
         this.vaultManager = new VaultManager(this);
+
+        // Setup Economy
         if (!vaultManager.setupEconomy()) {
-            getLogger().warning("Vault/Economy tidak ditemukan! Beberapa fitur mungkin error.");
+            getLogger().warning("Vault/Economy tidak ditemukan! Fitur uang terbatas.");
         } else {
             registerCmd("givebal", new GiveBalCommand());
         }
 
-        // 4. Setup Warp Module
+        // Setup Chat (LuckPerms Link)
+        if (vaultManager.setupChat()) {
+            getLogger().info("Vault Chat Hooked! (Prefix/Suffix enabled)");
+        } else {
+            getLogger().warning("Vault Chat tidak ditemukan. Prefix/Suffix tidak akan muncul.");
+        }
+
+        // 4. Warp Module
         this.warpManager = new WarpManager(this);
         WarpCommand warpCmd = new WarpCommand(this);
         registerCmd("warp", warpCmd);
@@ -80,7 +92,7 @@ public final class NaturalCore extends JavaPlugin {
         registerCmd("delwarp", warpCmd);
         registerCmd("setwarpicon", warpCmd);
 
-        // 5. Spawn Command
+        // 5. Spawn Module
         this.spawnManager = new SpawnManager(this);
         SpawnCommand spawnCmd = new SpawnCommand(spawnManager);
         registerCmd("spawn", spawnCmd);
@@ -108,7 +120,7 @@ public final class NaturalCore extends JavaPlugin {
         registerCmd("resource", rtpCmd);
         registerCmd("survival", rtpCmd);
 
-        // 9. Trader (Citizens Check)
+        // 9. Trader Module (Citizens Check)
         if (getServer().getPluginManager().getPlugin("Citizens") != null) {
             getLogger().info("Citizens ditemukan. Mengaktifkan Trader Module...");
 
@@ -117,8 +129,6 @@ public final class NaturalCore extends JavaPlugin {
             this.traderManager = new TraderManager(this, tradeEditor);
 
             TraderCommand traderCmd = new TraderCommand(currencyManager, traderManager, tradeEditor);
-
-            // Gunakan "wt" sesuai key di plugin.yml yang baru
             registerCmd("wt", traderCmd);
             registerCmd("settrader", traderCmd);
             registerCmd("resettrader", traderCmd);
@@ -131,15 +141,15 @@ public final class NaturalCore extends JavaPlugin {
             getLogger().warning("Citizens tidak ditemukan! Modul Trader dinonaktifkan.");
         }
 
-        // 10. Admin Commands
+        // 10. Admin Core Commands
         registerCmd("nacore", new NaturalCoreCommand(this));
         registerCmd("kickall", new KickAllCommand());
         registerCmd("restartalert", new RestartAlertCommand());
         registerCmd("bc", new BroadcastCommand());
 
-        // 11. Setup Teleport Module
-        TeleportManager tpManager = new TeleportManager(this);
-        TeleportCommand tpCmd = new TeleportCommand(tpManager);
+        // 11. Teleport Module
+        this.teleportManager = new TeleportManager(this);
+        TeleportCommand tpCmd = new TeleportCommand(teleportManager);
         registerCmd("tp", tpCmd);
         registerCmd("tphere", tpCmd);
         registerCmd("tpa", tpCmd);
@@ -156,10 +166,11 @@ public final class NaturalCore extends JavaPlugin {
         registerCmd("gma", gmCmd);
         registerCmd("gmsp", gmCmd);
 
-        // B. Inventory
+        // B. Inventory (Update: Split Self vs Admin)
         InventoryCommand invCmd = new InventoryCommand();
         registerCmd("invsee", invCmd);
-        registerCmd("enderchest", invCmd);
+        registerCmd("enderchest", invCmd); // Self (/ec)
+        registerCmd("endersee", invCmd);   // Admin (/endersee)
 
         // C. Utility (Player)
         PlayerUtilCommand playerUtil = new PlayerUtilCommand();
@@ -187,22 +198,27 @@ public final class NaturalCore extends JavaPlugin {
             return true;
         });
 
-        // 15. Moderation Module (Lite)
-        this.punishmentManager = new PunishmentManager(this); // Tetap di-init untuk GodVanishCommand
-        GodVanishCommand gvCmd = new GodVanishCommand();
-        registerCmd("god", gvCmd);
-        registerCmd("vanish", gvCmd);
-        registerCmd("whois", gvCmd);
+        // 15. Moderation Module (Refactored)
+        this.vanishManager = new VanishManager(this);
 
-        // 16. Register Placeholders (Jika PAPI ada)
+        ModerationCommand modCmd = new ModerationCommand(this);
+        registerCmd("god", modCmd);
+        registerCmd("vanish", modCmd);
+        registerCmd("whois", modCmd);
+
+        // Register Vanish Listener (Realtime Hide)
+        getServer().getPluginManager().registerEvents(new VanishListener(this), this);
+
+        // 16. PlaceholderAPI Expansion
         if (getServer().getPluginManager().getPlugin("PlaceholderAPI") != null) {
             new NaturalCoreExpansion(this).register();
             getLogger().info("PlaceholderAPI ditemukan. Expansion terdaftar.");
         }
 
-        // Listener Moderation (untuk God/Vanish logic)
-        getServer().getPluginManager().registerEvents(new id.naturalsmp.naturalcore.moderation.ModerationListener(this), this);
+        // 17. Chat Listener (Format & Join/Quit)
+        getServer().getPluginManager().registerEvents(new ChatListener(this), this);
 
+        // Selesai
         getLogger().info(ChatUtils.colorize("&6&lNaturalCore v" + getDescription().getVersion() + " &asudah aktif sepenuhnya!"));
     }
 
@@ -220,17 +236,16 @@ public final class NaturalCore extends JavaPlugin {
     public WarpManager getWarpManager() { return warpManager; }
     public TraderManager getTraderManager() { return traderManager; }
     public HomeManager getHomeManager() { return homeManager; }
-    public PunishmentManager getPunishmentManager() { return punishmentManager; }
     public SpawnManager getSpawnManager() { return spawnManager; }
+    public TeleportManager getTeleportManager() { return teleportManager; }
+    public VanishManager getVanishManager() { return vanishManager; } // Getter baru
 
     // --- HELPER UNTUK MENCEGAH CRASH ---
     private void registerCmd(String name, org.bukkit.command.CommandExecutor executor) {
         if (getCommand(name) != null) {
             getCommand(name).setExecutor(executor);
         } else {
-            // Peringatan ini akan muncul di console jika ada command yang belum ada di plugin.yml
-            // Tapi server TIDAK akan crash.
-            getLogger().warning("SKIPPING COMMAND: '" + name + "' (Tidak ditemukan di plugin.yml)");
+            getLogger().warning("SKIPPING COMMAND: '" + name + "' (Tidak ditemukan di plugin.yml, tapi server aman)");
         }
     }
 }

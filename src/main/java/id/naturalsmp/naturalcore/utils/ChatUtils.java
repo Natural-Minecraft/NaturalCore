@@ -1,6 +1,11 @@
 package id.naturalsmp.naturalcore.utils;
 
-import org.bukkit.ChatColor;
+import id.naturalsmp.naturalcore.NaturalCore;
+import net.md_5.bungee.api.ChatColor;
+import net.milkbowl.vault.chat.Chat;
+import org.bukkit.entity.Player;
+
+import java.text.DecimalFormat;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -11,44 +16,51 @@ public class ChatUtils {
     public static String colorize(String message) {
         if (message == null) return "";
         Matcher matcher = HEX_PATTERN.matcher(message);
-        StringBuffer buffer = new StringBuffer();
+        StringBuilder buffer = new StringBuilder();
         while (matcher.find()) {
-            String hexCode = matcher.group(1);
-            StringBuilder replacement = new StringBuilder("§x");
-            for (char c : hexCode.toCharArray()) {
-                replacement.append("§").append(c);
-            }
-            matcher.appendReplacement(buffer, replacement.toString());
+            matcher.appendReplacement(buffer, ChatColor.of("#" + matcher.group(1)).toString());
         }
-        matcher.appendTail(buffer);
-        return ChatColor.translateAlternateColorCodes('&', buffer.toString());
+        return ChatColor.translateAlternateColorCodes('&', matcher.appendTail(buffer).toString());
     }
 
     public static String stripColor(String message) {
         return ChatColor.stripColor(colorize(message));
     }
 
-    // --- FORMATTER ANGKA ---
-
-    public static String format(double number) {
-        return String.format("%,.0f", number);
+    public static String format(double amount) {
+        return new DecimalFormat("#,###.##").format(amount);
     }
 
-    public static String format(int number) {
-        return String.format("%,d", number);
-    }
+    /**
+     * METHOD BARU: Mengganti placeholder %displayname% dan %player%
+     * sekaligus memberi warna.
+     */
+    public static String formatMessage(Player p, String message) {
+        if (message == null) return "";
 
-    // --- [PENTING] FORMATTER STRING (PENYELAMAT ERROR) ---
-    // Ini yang dicari oleh CurrencyManager
-    public static String format(String input) {
-        if (input == null) return "";
+        // 1. Ambil Data Vault (Prefix/Suffix)
+        String prefix = "";
+        String suffix = "";
+
         try {
-            // Coba ubah string jadi angka
-            double val = Double.parseDouble(input);
-            return format(val);
-        } catch (NumberFormatException e) {
-            // Kalau bukan angka, kembalikan teks berwarna
-            return colorize(input);
-        }
+            Chat chat = NaturalCore.getInstance().getVaultManager().getChat();
+            if (chat != null) {
+                prefix = chat.getPlayerPrefix(p);
+                suffix = chat.getPlayerSuffix(p);
+            }
+        } catch (Exception ignored) {}
+
+        // 2. Buat DisplayName (Gabungan Prefix + Nama + Suffix)
+        String displayName = prefix + p.getName() + suffix;
+
+        // 3. Replace Placeholders
+        // %displayname% -> [Owner] Steve [Ganteng]
+        // %player%      -> Steve (Nama Asli)
+        String result = message
+                .replace("%displayname%", displayName)
+                .replace("%player%", p.getName());
+
+        // 4. Colorize hasil akhirnya
+        return colorize(result);
     }
 }

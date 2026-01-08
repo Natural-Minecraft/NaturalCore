@@ -20,7 +20,10 @@ public class FunCommand implements CommandExecutor {
     @Override
     public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, @NotNull String[] args) {
 
-        if (!(sender instanceof Player)) return true;
+        if (!(sender instanceof Player)) {
+            sender.sendMessage("Command ini hanya untuk player.");
+            return true;
+        }
         Player p = (Player) sender;
 
         // Cek Cooldown
@@ -30,20 +33,24 @@ public class FunCommand implements CommandExecutor {
             return true;
         }
 
-        String msg = "";
+        String rawMsg = "";
 
         // --- /GG ---
         if (label.equalsIgnoreCase("gg")) {
-            msg = ConfigUtils.getString("messages.gg-message").replace("%player%", p.getName());
+            rawMsg = ConfigUtils.getString("messages.gg-message");
         }
 
         // --- /NOOB ---
         else if (label.equalsIgnoreCase("noob")) {
-            msg = ConfigUtils.getString("messages.noob-message").replace("%player%", p.getName());
+            rawMsg = ConfigUtils.getString("messages.noob-message");
         }
 
+        // FIX: Gunakan formatMessage agar %displayname% terbaca
+        // formatMessage otomatis handle warna dan replace %player% juga
+        String finalMsg = ChatUtils.formatMessage(p, rawMsg);
+
         // Broadcast
-        Bukkit.broadcastMessage(ChatUtils.colorize(msg));
+        Bukkit.broadcastMessage(finalMsg);
 
         // Set Cooldown
         int seconds = ConfigUtils.getInt("fun.cooldown");

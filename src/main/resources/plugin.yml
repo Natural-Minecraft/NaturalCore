@@ -1,5 +1,5 @@
 name: NaturalCore
-version: 1.3
+version: 1.4
 main: id.naturalsmp.naturalcore.NaturalCore
 api-version: 1.21
 author: NaturalSMP
@@ -32,6 +32,11 @@ commands:
   tphere:
     description: Tarik player
     permission: naturalsmp.tphere
+
+  endersee:
+    description: Intip enderchest player lain
+    aliases: [ecsee]
+    permission: naturalsmp.endersee
 
   # --- ECONOMY ---
   givebal:
@@ -88,7 +93,7 @@ commands:
     description: Cek tas
     permission: naturalsmp.invsee
   enderchest:
-    description: Cek ec
+    description: Buka enderchest sendiri
     aliases: [ec]
     permission: naturalsmp.enderchest
 
@@ -195,4 +200,12 @@ permissions:
   naturalcs.broadcast:
     default: op
   naturalcs.trader.admin:
+    default: op
+  naturalsmp.home.limit.*:
+    description: Izin untuk semua jenis limit home
+    children:
+      naturalsmp.home.limit.default: true
+      naturalsmp.home.limit.unlimited: true
+  naturalsmp.home.limit.unlimited:
+    description: Izin untuk membuat home tanpa batas
     default: op
