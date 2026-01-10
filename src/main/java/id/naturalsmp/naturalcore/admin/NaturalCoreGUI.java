@@ -2,6 +2,7 @@ package id.naturalsmp.naturalcore.admin;
 
 import id.naturalsmp.naturalcore.NaturalCore;
 import id.naturalsmp.naturalcore.utils.ChatUtils;
+import id.naturalsmp.naturalcore.utils.ConfigUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.Sound;
@@ -11,7 +12,6 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryDragEvent;
 import org.bukkit.inventory.Inventory;
-import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
@@ -21,77 +21,110 @@ import java.util.List;
 public class NaturalCoreGUI implements Listener {
 
     private final NaturalCore plugin;
+    // Title Modern (Hex Color)
+    private final String GUI_TITLE = "&#00AAFF&lɴᴀᴛᴜʀᴀʟ &#55FF55&lᴀᴅᴍɪɴ";
 
     public NaturalCoreGUI(NaturalCore plugin) {
         this.plugin = plugin;
+        // Register Listener Otomatis saat GUI dibuat (Hati-hati duplikat listener jika sering new)
+        // Cara yang lebih aman: Daftarkan listener 1x di Main Class, tapi untuk simplifikasi kita pakai static check atau register di sini
     }
 
-    public void openGUI(Player player) {
-        String title = "&#00AAFF&lɴᴀᴛᴜʀᴀʟ ᴄᴏʀᴇ &8| &7ᴠ1.3";
-        Inventory inv = Bukkit.createInventory(null, 45, ChatUtils.colorize(title));
+    public void openGUI(Player p) {
+        // Buat Inventory 3 Row (27 Slot)
+        Inventory inv = Bukkit.createInventory(null, 27, ChatUtils.colorize(GUI_TITLE));
 
-        fillBackground(inv);
+        // --- FILLER (Kaca) ---
+        ItemStack filler = createItem(Material.GRAY_STAINED_GLASS_PANE, " ");
+        for (int i = 0; i < 27; i++) {
+            inv.setItem(i, filler);
+        }
 
-        String jarVersion = plugin.getDescription().getVersion();
-        String configVersion = plugin.getConfig().getString("config-version", "Unknown");
-        String versionStatus = jarVersion.equals(configVersion) ? "&a(Matched)" : "&c(Mismatch!)";
+        // --- ITEMS ---
 
-        // ITEMS
-        inv.setItem(19, createItem(Material.NETHER_STAR, "&b&lCORE INFO", "&7Status Plugin & Config.", "", "&7Plugin Ver: &f" + jarVersion, "&7Config Ver: &f" + configVersion + " " + versionStatus, "", "&e/nacore reload"));
-        inv.setItem(20, createItem(Material.DIAMOND_SWORD, "&c&lMODERATION", "&7Sistem hukuman & pantauan.", "", "&e/god, /vanish", "&e/whois"));
-        inv.setItem(21, createItem(Material.CHEST, "&e&lESSENTIALS", "&7Alat bantu survival.", "", "&e/gm, /fly, /heal", "&e/feed, /trash, /craft", "&e/invsee, /enderchest"));
-        inv.setItem(22, createItem(Material.GOLD_INGOT, "&6&lECONOMY", "&7Sistem keuangan.", "", "&e/bal, /pay", "&e/baltop", "&e/setbal, /takebal", "&e/givebal"));
-        inv.setItem(23, createItem(Material.ENDER_EYE, "&a&lLOCATIONS", "&7Manajemen lokasi.", "", "&e/spawn, /setspawn", "&e/warps, /setwarp"));
-        inv.setItem(24, createItem(Material.RED_BED, "&d&lPLAYER TP", "&7Teleportasi player.", "", "&e/home, /sethome", "&e/tpa, /tpahere"));
-        inv.setItem(25, createItem(Material.EMERALD, "&2&lNPC TRADER", "&7Pedagang keliling.", "", "&e/wt, /settrader"));
-        inv.setItem(40, createItem(Material.BARRIER, "&c&lCLOSE MENU", "&7Tutup menu."));
+        // 1. Reload Config (Slot 11)
+        inv.setItem(11, createItem(Material.EMERALD, "&a&lReload Config", "&7Klik untuk reload config.yml"));
 
-        player.openInventory(inv);
-        player.playSound(player.getLocation(), Sound.BLOCK_NOTE_BLOCK_PLING, 1f, 1f);
+        // 2. Set Spawn (Slot 13)
+        inv.setItem(13, createItem(Material.BEACON, "&b&lSet Spawn", "&7Set lokasi spawn utama", "&7di posisi kamu berdiri."));
+
+        // 3. Creative Mode (Slot 15)
+        inv.setItem(15, createItem(Material.DIAMOND_CHESTPLATE, "&e&lCreative Mode", "&7Ubah gamemode ke Creative"));
+
+        // 4. Survival Mode (Slot 16 - Sebelahnya)
+        // inv.setItem(16, createItem(Material.IRON_CHESTPLATE, "&7&lSurvival Mode", "&7Ubah gamemode ke Survival")); // Opsional
+
+        // 5. Close (Slot 22)
+        inv.setItem(26, createItem(Material.BARRIER, "&c&lClose"));
+
+        p.openInventory(inv);
+        p.playSound(p.getLocation(), Sound.BLOCK_NOTE_BLOCK_PLLING, 1f, 1f);
+
+        // Register Listener SEMENTARA (Sebaiknya register di Main Class 1x saja)
+        // Tapi untuk fix cepat, pastikan listener ini terdaftar di NaturalCore.java
     }
 
-    private ItemStack createItem(Material material, String name, String... loreLines) {
-        ItemStack item = new ItemStack(material);
+    private ItemStack createItem(Material mat, String name, String... lore) {
+        ItemStack item = new ItemStack(mat);
         ItemMeta meta = item.getItemMeta();
         if (meta != null) {
             meta.setDisplayName(ChatUtils.colorize(name));
-            List<String> lore = new ArrayList<>();
-            for (String line : loreLines) lore.add(ChatUtils.colorize(line));
-            meta.setLore(lore);
-            meta.addItemFlags(ItemFlag.HIDE_ATTRIBUTES);
+            List<String> loreList = new ArrayList<>();
+            for (String l : lore) {
+                loreList.add(ChatUtils.colorize(l));
+            }
+            meta.setLore(loreList);
             item.setItemMeta(meta);
         }
         return item;
     }
 
-    private void fillBackground(Inventory inv) {
-        ItemStack glass = createItem(Material.BLACK_STAINED_GLASS_PANE, "&8");
-        for (int i = 0; i < inv.getSize(); i++) inv.setItem(i, glass);
-    }
+    // --- EVENT LISTENER ---
+    // Pastikan class ini di-register di NaturalCore.java:
+    // getServer().getPluginManager().registerEvents(new NaturalCoreGUI(this), this);
 
-    // --- KEAMANAN (FIXED) ---
     @EventHandler
     public void onClick(InventoryClickEvent e) {
-        // Cek Title dengan stripColor agar aman dari kode warna
+        // Cek Title (Strip Color biar aman)
         String title = ChatUtils.stripColor(e.getView().getTitle());
+        String expected = ChatUtils.stripColor(GUI_TITLE);
 
-        // Logikanya: Jika title mengandung "NATURAL CORE", batalkan SEMUA interaksi
-        if (title.contains("NATURAL CORE") || title.contains("v1.3")) {
-            e.setCancelled(true); // <--- KUNCI UTAMA (Anti Maling)
+        if (!title.equals(expected)) return;
 
-            if (e.getCurrentItem() == null) return;
+        // 1. CANCEL EVENT (Anti Steal)
+        e.setCancelled(true);
 
-            Player p = (Player) e.getWhoClicked();
-            if (e.getCurrentItem().getType() == Material.BARRIER) {
-                p.closeInventory();
-                p.playSound(p.getLocation(), Sound.UI_BUTTON_CLICK, 1f, 1f);
-            }
+        if (e.getCurrentItem() == null || e.getCurrentItem().getType() == Material.AIR) return;
+
+        Player p = (Player) e.getWhoClicked();
+        Material mat = e.getCurrentItem().getType();
+
+        // 2. LOGIC
+        if (mat == Material.EMERALD) {
+            p.performCommand("nacore reload");
+            p.closeInventory();
+        }
+        else if (mat == Material.BEACON) {
+            p.performCommand("setspawn");
+            p.closeInventory();
+        }
+        else if (mat == Material.DIAMOND_CHESTPLATE) {
+            p.performCommand("gmc");
+            p.closeInventory();
+        }
+        else if (mat == Material.BARRIER) {
+            p.closeInventory();
+            p.playSound(p.getLocation(), Sound.UI_BUTTON_CLICK, 1f, 1f);
         }
     }
 
+    // 3. HANDLE DRAG EVENT (Anti Steal saat nge-drag item)
     @EventHandler
     public void onDrag(InventoryDragEvent e) {
-        if (ChatUtils.stripColor(e.getView().getTitle()).contains("NATURAL CORE")) {
+        String title = ChatUtils.stripColor(e.getView().getTitle());
+        String expected = ChatUtils.stripColor(GUI_TITLE);
+
+        if (title.equals(expected)) {
             e.setCancelled(true);
         }
     }

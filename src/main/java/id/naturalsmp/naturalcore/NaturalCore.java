@@ -2,10 +2,7 @@ package id.naturalsmp.naturalcore;
 
 import id.naturalsmp.naturalcore.NaturalCoreCommand;
 import id.naturalsmp.naturalcore.NaturalCoreExpansion;
-import id.naturalsmp.naturalcore.admin.BroadcastCommand;
-import id.naturalsmp.naturalcore.admin.KickAllCommand;
-import id.naturalsmp.naturalcore.admin.RestartAlertCommand;
-import id.naturalsmp.naturalcore.admin.GiveBalCommand;
+import id.naturalsmp.naturalcore.admin.*;
 import id.naturalsmp.naturalcore.chat.ChatListener;
 import id.naturalsmp.naturalcore.economy.VaultManager;
 import id.naturalsmp.naturalcore.home.HomeGUI;
@@ -132,6 +129,10 @@ public final class NaturalCore extends JavaPlugin {
         registerCmd("survival", rtpCmd);
 
         // 10. Admin Core Commands
+        // Init GUI Listener
+        NaturalCoreGUI adminGUI = new NaturalCoreGUI(this);
+        getServer().getPluginManager().registerEvents(adminGUI, this);
+
         registerCmd("nacore", new NaturalCoreCommand(this));
         registerCmd("kickall", new KickAllCommand());
         registerCmd("restartalert", new RestartAlertCommand());
