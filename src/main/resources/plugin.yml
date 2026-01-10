@@ -4,7 +4,7 @@ main: id.naturalsmp.naturalcore.NaturalCore
 api-version: 1.21
 author: NaturalSMP
 description: Core plugin untuk NaturalSMP Server
-depend: [Vault, DecentHolograms, Citizens]
+depend: [Vault, DecentHolograms]
 softdepend: [PlaceholderAPI, CoinsEngine]
 
 # ==========================================
@@ -163,26 +163,11 @@ commands:
     description: Icon warp
     permission: naturalsmp.admin
 
-  # --- TRADER (FIXED DISINI) ---
-  wt:  # <--- DULU wanderingtrader, SEKARANG wt (Biar match sama Java)
-    description: Menu trader
-    aliases: [trader, wanderingtrader]
-    permission: naturalsmp.trader.admin
-  settrader:
-    description: Setup trader
-    permission: naturalsmp.trader.admin
-  resettrader:
-    description: Reset trader
-    permission: naturalsmp.trader.admin
-  setharga:
-    description: Set harga
-    permission: naturalsmp.trader.admin
-  setallharga:
-    description: Set harga massal
-    permission: naturalsmp.trader.admin
-  setallstok:
-    description: Set stok massal
-    permission: naturalsmp.trader.admin
+  # --- TRADER ---
+  traderadmin:
+    description: Admin trader configuration
+    usage: /traderadmin <create|remove|list|reload>
+    permission: naturalsmp.admin
 
   # --- SPAWN ---
   spawn:
@@ -237,8 +222,6 @@ permissions:
   naturalcs.restartalert:
     default: op
   naturalcs.broadcast:
-    default: op
-  naturalcs.trader.admin:
     default: op
   naturalsmp.home.limit.*:
     description: Izin untuk semua jenis limit home

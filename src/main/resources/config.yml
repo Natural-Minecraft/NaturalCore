@@ -3,6 +3,10 @@
 # ==========================================
 config-version: 1.5
 
+# --- BUTTON MODULES ---
+modules:
+  trader: true
+
 # --- PREFIX SETTINGS ---
 # Gunakan format Hex &#RRGGBB untuk warna modern
 prefix:

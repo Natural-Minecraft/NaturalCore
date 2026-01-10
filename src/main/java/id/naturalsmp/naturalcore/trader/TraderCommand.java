@@ -1,164 +1,125 @@
 package id.naturalsmp.naturalcore.trader;
 
 import id.naturalsmp.naturalcore.utils.ChatUtils;
-import org.bukkit.Bukkit;
-import org.bukkit.Material;
+import org.bukkit.Location;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.Inventory;
-import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.ItemMeta;
 import org.jetbrains.annotations.NotNull;
-
-import java.util.ArrayList;
-import java.util.List;
 
 public class TraderCommand implements CommandExecutor {
 
-    private final CurrencyManager currencyManager; // (Opsional/Unused for now)
-    private final TraderManager manager;
-    private final TradeEditor editor; // (Opsional)
+    private final TraderManager traderManager;
 
-    public TraderCommand(CurrencyManager currencyManager, TraderManager manager, TradeEditor editor) {
-        this.currencyManager = currencyManager;
-        this.manager = manager;
-        this.editor = editor;
+    public TraderCommand(TraderManager traderManager) {
+        this.traderManager = traderManager;
     }
 
     @Override
-    public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, @NotNull String[] args) {
-
-        // --- PLAYER COMMAND: /wt ---
-        if (label.equalsIgnoreCase("wanderingtrader") || label.equalsIgnoreCase("wt")) {
-            if (!(sender instanceof Player)) return true;
-            openTraderMenu((Player) sender);
+    public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label,
+            @NotNull String[] args) {
+        if (!sender.hasPermission("naturalsmp.admin")) {
+            sender.sendMessage(ChatUtils.colorize("&cYou do not have permission."));
             return true;
         }
 
-        // --- ADMIN COMMANDS ---
-        if (!sender.hasPermission("op")) {
-            sender.sendMessage(ChatUtils.colorize("&cNo permission."));
+        if (args.length == 0) {
+            sendHelp(sender);
             return true;
         }
 
-        // 1. /settrader (GUI Input Barang)
-        if (label.equalsIgnoreCase("settrader")) {
-            if (!(sender instanceof Player)) return true;
-            Player p = (Player) sender;
-            Inventory inv = Bukkit.createInventory(null, 36, ChatUtils.colorize("&cInput 35 Barang"));
+        String sub = args[0].toLowerCase();
 
-            // Load item yang sudah ada
-            for (int i = 0; i < 35; i++) {
-                if (manager.getItem(i) != null) {
-                    inv.setItem(i, manager.getItem(i));
+        switch (sub) {
+            case "create":
+                if (!(sender instanceof Player)) {
+                    sender.sendMessage("Player only.");
+                    return true;
                 }
-            }
-            p.openInventory(inv);
-            return true;
-        }
+                if (args.length < 2) {
+                    sender.sendMessage(ChatUtils.colorize("&eUsage: /traderadmin create <name>"));
+                    return true;
+                }
+                Player p = (Player) sender;
+                String displayName = String.join(" ", args).substring(7); // "create " length is 7
+                String id = "trader_" + System.currentTimeMillis();
 
-        // 2. /resettrader
-        if (label.equalsIgnoreCase("resettrader")) {
-            manager.resetAll();
-            sender.sendMessage(ChatUtils.colorize("&8[&6Trader&8] &aData trader berhasil direset total!"));
-            return true;
-        }
+                if (traderManager.createTrader(id, displayName, p.getLocation())) {
+                    sender.sendMessage(ChatUtils.colorize("&eTrader &f" + displayName + " &ecreated successfully."));
+                } else {
+                    sender.sendMessage(ChatUtils.colorize("&eFailed to create trader."));
+                }
+                break;
 
-        // 3. /setharga <slot> <harga>
-        if (label.equalsIgnoreCase("setharga")) {
-            if (args.length < 2) {
-                sender.sendMessage(ChatUtils.colorize("&cUsage: /setharga <slot 0-34> <harga>"));
-                return true;
-            }
-            try {
-                int slot = Integer.parseInt(args[0]);
-                double price = Double.parseDouble(args[1]);
-                manager.setPrice(slot, price);
-                manager.saveData();
-                sender.sendMessage(ChatUtils.colorize("&8[&6Trader&8] &aHarga slot " + slot + " diset ke &e$" + price));
-            } catch (NumberFormatException e) {
-                sender.sendMessage("&cAngka tidak valid!");
-            }
-            return true;
-        }
+            case "remove":
+                if (!(sender instanceof Player)) {
+                    sender.sendMessage("Player only.");
+                    return true;
+                }
+                p = (Player) sender;
+                Entity target = getTargetEntity(p);
 
-        // 4. /setallharga <harga>
-        if (label.equalsIgnoreCase("setallharga")) {
-            if (args.length < 1) return true;
-            double price = Double.parseDouble(args[0]);
-            for (int i = 0; i < 35; i++) manager.setPrice(i, price);
-            manager.saveData();
-            sender.sendMessage(ChatUtils.colorize("&8[&6Trader&8] &aSemua item diset ke &e$" + price));
-            return true;
-        }
+                if (target == null) {
+                    sender.sendMessage(ChatUtils.colorize("&eYou are not looking at any entity."));
+                    return true;
+                }
 
-        // 5. /setallstok <jumlah>
-        if (label.equalsIgnoreCase("setallstok")) {
-            if (args.length < 1) return true;
-            int stok = Integer.parseInt(args[0]);
-            for (int i = 0; i < 35; i++) manager.setStock(i, stok);
-            manager.saveData();
-            sender.sendMessage(ChatUtils.colorize("&8[&6Trader&8] &aSemua stok diset ke &e" + stok));
-            return true;
+                TraderData data = traderManager.getTraderByEntity(target);
+                if (data == null) {
+                    sender.sendMessage(ChatUtils.colorize("&eThat is not a registered trader."));
+                    return true;
+                }
+
+                if (traderManager.removeTrader(data.getId())) {
+                    sender.sendMessage(ChatUtils.colorize("&eTrader removed."));
+                }
+                break;
+
+            case "list":
+                sender.sendMessage(ChatUtils.colorize("&e&lTrader List:"));
+                for (TraderData t : traderManager.getTraders()) {
+                    Location loc = t.getLocation();
+                    String locStr = String.format("%s, %.0f, %.0f, %.0f", loc.getWorld().getName(), loc.getX(),
+                            loc.getY(), loc.getZ());
+                    sender.sendMessage(ChatUtils.colorize(" &7- &f" + t.getDisplayName() + " &7(" + locStr + ")"));
+                }
+                break;
+
+            case "reload":
+                traderManager.reload();
+                sender.sendMessage(ChatUtils.colorize("&eTrader configuration reloaded."));
+                break;
+
+            default:
+                sendHelp(sender);
+                break;
         }
 
         return true;
     }
 
-    private void openTraderMenu(Player p) {
-        String hari = manager.getCurrentDayName();
-        // Title Real-Time
-        String title = "&8WT | " + hari + " | " + manager.getNow().getHour() + ":" + String.format("%02d", manager.getNow().getMinute()) + " WIB";
+    private void sendHelp(CommandSender sender) {
+        sender.sendMessage(ChatUtils.colorize("&e&lTrader Admin Help"));
+        sender.sendMessage(ChatUtils.colorize("&7/traderadmin create <name> &f- Create trader at your location"));
+        sender.sendMessage(ChatUtils.colorize("&7/traderadmin remove &f- Remove trader you are looking at"));
+        sender.sendMessage(ChatUtils.colorize("&7/traderadmin list &f- List all traders"));
+        sender.sendMessage(ChatUtils.colorize("&7/traderadmin reload &f- Reload traders from config"));
+    }
 
-        Inventory inv = Bukkit.createInventory(null, 27, ChatUtils.colorize(title));
-
-        // Glass Pane Filler
-        ItemStack glass = new ItemStack(Material.GRAY_STAINED_GLASS_PANE);
-        ItemMeta gMeta = glass.getItemMeta();
-        gMeta.setDisplayName(" ");
-        glass.setItemMeta(gMeta);
-
-        for (int i = 0; i < 27; i++) inv.setItem(i, glass);
-
-        // Isi Item Sesuai Hari
-        int startIndex = manager.getTodayStartIndex();
-        int guiSlot = 11;
-
-        for (int i = 0; i < 5; i++) {
-            int realIdx = startIndex + i;
-            ItemStack item = manager.getItem(realIdx);
-
-            if (item != null && item.getType() != Material.AIR) {
-                ItemStack display = item.clone();
-                ItemMeta meta = display.getItemMeta();
-
-                // Format Lore Skript Style
-                List<String> lore = new ArrayList<>();
-                lore.add(ChatUtils.colorize("&r"));
-                lore.add(ChatUtils.colorize("&7Harga: &a$" + manager.getPrice(realIdx)));
-                lore.add(ChatUtils.colorize("&7Stok: &e" + manager.getStock(realIdx)));
-
-                if (manager.getStock(realIdx) > 0) {
-                    lore.add(ChatUtils.colorize("&eKlik untuk membeli"));
-                } else {
-                    lore.add(ChatUtils.colorize("&cSTOK HABIS"));
-                }
-
-                meta.setLore(lore);
-                display.setItemMeta(meta);
-                inv.setItem(guiSlot, display);
-            } else {
-                // Tampilkan Barrier kalau slot kosong
-                ItemStack barrier = new ItemStack(Material.BARRIER);
-                ItemMeta bMeta = barrier.getItemMeta();
-                bMeta.setDisplayName(ChatUtils.colorize("&cKosong"));
-                barrier.setItemMeta(bMeta);
-                inv.setItem(guiSlot, barrier);
+    // Helper to get target entity
+    private Entity getTargetEntity(Player player) {
+        for (Entity e : player.getNearbyEntities(5, 5, 5)) {
+            // Simple ray trace check or distance check
+            // For simplicity, checking if player is looking at it within 3 blocks
+            org.bukkit.util.Vector toEntity = e.getLocation().toVector().subtract(player.getEyeLocation().toVector());
+            org.bukkit.util.Vector direction = player.getEyeLocation().getDirection();
+            double dot = toEntity.normalize().dot(direction);
+            if (dot > 0.95) { // Threshold
+                return e;
             }
-            guiSlot++;
         }
-        p.openInventory(inv);
+        return null;
     }
 }
