@@ -24,7 +24,8 @@ public class ChatListener implements Listener {
     // 1. CHAT FORMATTING
     @EventHandler(priority = EventPriority.HIGH)
     public void onChat(AsyncPlayerChatEvent e) {
-        if (!ConfigUtils.getBoolean("chat.enabled")) return;
+        if (!ConfigUtils.getBoolean("chat.enabled"))
+            return;
 
         Player p = e.getPlayer();
         String message = e.getMessage();
@@ -32,6 +33,11 @@ public class ChatListener implements Listener {
         // Izin Warna Chat
         if (ConfigUtils.getBoolean("chat.allow-color") && p.hasPermission("naturalsmp.chat.color")) {
             message = ChatUtils.colorize(message);
+        }
+
+        // Parse Emojis (NEW - ChatEmojis Feature)
+        if (EmojiManager.getInstance() != null) {
+            message = EmojiManager.getInstance().parseEmojis(p, message);
         }
 
         // Ambil format dari config

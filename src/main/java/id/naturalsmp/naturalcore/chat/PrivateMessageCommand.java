@@ -21,10 +21,11 @@ public class PrivateMessageCommand implements CommandExecutor {
     }
 
     @Override
-    public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, @NotNull String[] args) {
+    public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label,
+            @NotNull String[] args) {
 
         if (!(sender instanceof Player)) {
-            sender.sendMessage("Console use: msg <player> <message>");
+            sender.sendMessage(ChatUtils.colorize("&cUsage: /" + label + " <player> <message>"));
             return true;
         }
         Player p = (Player) sender;
@@ -73,6 +74,11 @@ public class PrivateMessageCommand implements CommandExecutor {
     private void sendPrivateMessage(Player sender, Player receiver, String message) {
         // Update Reply Target
         plugin.getMessageManager().setReplyTarget(sender, receiver);
+
+        // Parse Emojis dalam pesan
+        if (EmojiManager.getInstance() != null) {
+            message = EmojiManager.getInstance().parseEmojis(sender, message);
+        }
 
         // Format Pesan
         String formatSender = ConfigUtils.getString("chat.msg-format-sender")

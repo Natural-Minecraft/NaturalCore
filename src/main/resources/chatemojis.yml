@@ -1,0 +1,175 @@
+# ==========================================
+#       NATURAL CORE - CHAT EMOJIS
+# ==========================================
+# Terinspirasi dari ChatEmojis by RMJTromp
+# Mengganti emoticon teks menjadi karakter emoji
+
+enabled: true
+
+# Permission dasar untuk menggunakan emoji
+# naturalsmp.emoji.use - Akses dasar
+# naturalsmp.emoji.* - Akses semua emoji (termasuk yang restricted)
+
+# ==========================================
+#           DAFTAR EMOJI
+# ==========================================
+# Format:
+#   nama-emoji:
+#     char: "karakter emoji"
+#     triggers: ["trigger1", "trigger2"]  
+#     permission: "" (kosong = semua bisa pakai)
+
+list:
+  # --- EKSPRESI WAJAH ---
+  smile:
+    char: "☺"
+    triggers: [":)", ":smile:"]
+    permission: ""
+  grin:
+    char: "😀"
+    triggers: [":D", ":grin:"]
+    permission: ""
+  sad:
+    char: "☹"
+    triggers: [":(", ":sad:"]
+    permission: ""
+  wow:
+    char: "😮"
+    triggers: [":o", ":O", ":wow:"]
+    permission: ""
+  wink:
+    char: "😉"
+    triggers: [";)", ":wink:"]
+    permission: ""
+  cool:
+    char: "😎"
+    triggers: ["B)", ":cool:", ":sunglasses:"]
+    permission: ""
+  angry:
+    char: "😠"
+    triggers: [">:(", ":angry:"]
+    permission: ""
+  cry:
+    char: "😢"
+    triggers: [":'(", ":cry:"]
+    permission: ""
+  thinking:
+    char: "🤔"
+    triggers: [":think:", ":thinking:", ":hmm:"]
+    permission: ""
+
+  # --- SIMBOL & IKON ---
+  heart:
+    char: "❤"
+    triggers: ["<3", ":heart:", ":love:"]
+    permission: ""
+  fire:
+    char: "🔥"
+    triggers: [":fire:", ":hot:"]
+    permission: ""
+  star:
+    char: "⭐"
+    triggers: [":star:"]
+    permission: ""
+  check:
+    char: "✔"
+    triggers: [":check:", ":yes:", ":ok:"]
+    permission: ""
+  cross:
+    char: "✖"
+    triggers: [":x:", ":no:", ":cross:"]
+    permission: ""
+  skull:
+    char: "☠"
+    triggers: [":skull:", ":dead:"]
+    permission: ""
+  sun:
+    char: "☀"
+    triggers: [":sun:"]
+    permission: ""
+  moon:
+    char: "☽"
+    triggers: [":moon:"]
+    permission: ""
+  music:
+    char: "♫"
+    triggers: [":music:", ":note:"]
+    permission: ""
+  arrow:
+    char: "➜"
+    triggers: ["->", ":arrow:"]
+    permission: ""
+  snowflake:
+    char: "❄"
+    triggers: [":snow:", ":snowflake:", ":cold:"]
+    permission: ""
+  lightning:
+    char: "⚡"
+    triggers: [":zap:", ":lightning:", ":bolt:"]
+    permission: ""
+
+  # --- MINECRAFT THEMED ---
+  sword:
+    char: "⚔"
+    triggers: [":sword:", ":pvp:"]
+    permission: ""
+  shield:
+    char: "🛡"
+    triggers: [":shield:"]
+    permission: ""
+  crown:
+    char: "👑"
+    triggers: [":crown:", ":king:"]
+    permission: ""
+  diamond:
+    char: "💎"
+    triggers: [":diamond:", ":gem:"]
+    permission: ""
+  coin:
+    char: "🪙"
+    triggers: [":coin:", ":money:"]
+    permission: ""
+  pickaxe:
+    char: "⛏"
+    triggers: [":pick:", ":pickaxe:", ":mine:"]
+    permission: ""
+
+  # --- GESTURES ---
+  thumbsup:
+    char: "👍"
+    triggers: [":+1:", ":thumbsup:", ":up:"]
+    permission: ""
+  thumbsdown:
+    char: "👎"
+    triggers: [":-1:", ":thumbsdown:", ":down:"]
+    permission: ""
+  wave:
+    char: "👋"
+    triggers: [":wave:", ":hi:", ":bye:"]
+    permission: ""
+  clap:
+    char: "👏"
+    triggers: [":clap:"]
+    permission: ""
+  shrug:
+    char: "¯\\_(ツ)_/¯"
+    triggers: [":shrug:"]
+    permission: ""
+
+  # --- MISC ---
+  party:
+    char: "🎉"
+    triggers: [":party:", ":celebrate:"]
+    permission: ""
+  gift:
+    char: "🎁"
+    triggers: [":gift:", ":present:"]
+    permission: ""
+  zzz:
+    char: "💤"
+    triggers: [":zzz:", ":sleep:"]
+    permission: ""
+  poop:
+    char: "💩"
+    triggers: [":poop:"]
+    permission: "naturalsmp.emoji.poop"

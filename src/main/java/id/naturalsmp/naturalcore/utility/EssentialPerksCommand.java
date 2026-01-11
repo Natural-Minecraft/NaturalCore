@@ -15,15 +15,18 @@ import org.jetbrains.annotations.NotNull;
 public class EssentialPerksCommand implements CommandExecutor {
 
     @Override
-    public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, @NotNull String[] args) {
-        if (!(sender instanceof Player)) return true;
+    public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label,
+            @NotNull String[] args) {
+        if (!(sender instanceof Player))
+            return true;
         Player p = (Player) sender;
-        String cmd = label.toLowerCase();
+        String cmdName = command.getName().toLowerCase(); // FIX: Gunakan getName() agar alias terbaca
         String prefix = ConfigUtils.getString("prefix.admin");
 
         // --- HAT ---
-        if (cmd.equals("hat")) {
-            if (!p.hasPermission("naturalsmp.hat")) return noPerm(p);
+        if (cmdName.equals("hat")) {
+            if (!p.hasPermission("naturalsmp.hat"))
+                return noPerm(p);
 
             ItemStack hand = p.getInventory().getItemInMainHand();
             if (hand == null || hand.getType() == Material.AIR) {
@@ -39,8 +42,9 @@ public class EssentialPerksCommand implements CommandExecutor {
         }
 
         // --- REPAIR ---
-        if (cmd.equals("repair")) {
-            if (!p.hasPermission("naturalsmp.repair")) return noPerm(p);
+        if (cmdName.equals("repair")) {
+            if (!p.hasPermission("naturalsmp.repair"))
+                return noPerm(p);
 
             ItemStack item = p.getInventory().getItemInMainHand();
             if (item == null || item.getType() == Material.AIR) {
@@ -54,8 +58,9 @@ public class EssentialPerksCommand implements CommandExecutor {
         }
 
         // --- NICK ---
-        if (cmd.equals("nick")) {
-            if (!p.hasPermission("naturalsmp.nick")) return noPerm(p);
+        if (cmdName.equals("nick")) {
+            if (!p.hasPermission("naturalsmp.nick"))
+                return noPerm(p);
 
             if (args.length == 0) {
                 p.sendMessage(ChatUtils.colorize("&cUsage: /nick <nama/off>"));

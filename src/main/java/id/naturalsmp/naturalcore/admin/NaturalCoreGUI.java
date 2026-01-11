@@ -26,11 +26,19 @@ public class NaturalCoreGUI implements Listener {
 
     public NaturalCoreGUI(NaturalCore plugin) {
         this.plugin = plugin;
-        // Register Listener Otomatis saat GUI dibuat (Hati-hati duplikat listener jika sering new)
-        // Cara yang lebih aman: Daftarkan listener 1x di Main Class, tapi untuk simplifikasi kita pakai static check atau register di sini
+        // Register Listener Otomatis saat GUI dibuat (Hati-hati duplikat listener jika
+        // sering new)
+        // Cara yang lebih aman: Daftarkan listener 1x di Main Class, tapi untuk
+        // simplifikasi kita pakai static check atau register di sini
     }
 
     public void openGUI(Player p) {
+        // PERMISSION CHECK: Hanya Admin yang bisa buka GUI ini
+        if (!p.hasPermission("naturalsmp.admin")) {
+            p.sendMessage(ConfigUtils.getString("messages.no-permission"));
+            return;
+        }
+
         // Buat Inventory 3 Row (27 Slot)
         Inventory inv = Bukkit.createInventory(null, 27, ChatUtils.colorize(GUI_TITLE));
 
@@ -46,13 +54,15 @@ public class NaturalCoreGUI implements Listener {
         inv.setItem(11, createItem(Material.EMERALD, "&a&lReload Config", "&7Klik untuk reload config.yml"));
 
         // 2. Set Spawn (Slot 13)
-        inv.setItem(13, createItem(Material.BEACON, "&b&lSet Spawn", "&7Set lokasi spawn utama", "&7di posisi kamu berdiri."));
+        inv.setItem(13,
+                createItem(Material.BEACON, "&b&lSet Spawn", "&7Set lokasi spawn utama", "&7di posisi kamu berdiri."));
 
         // 3. Creative Mode (Slot 15)
         inv.setItem(15, createItem(Material.DIAMOND_CHESTPLATE, "&e&lCreative Mode", "&7Ubah gamemode ke Creative"));
 
         // 4. Survival Mode (Slot 16 - Sebelahnya)
-        // inv.setItem(16, createItem(Material.IRON_CHESTPLATE, "&7&lSurvival Mode", "&7Ubah gamemode ke Survival")); // Opsional
+        inv.setItem(16, createItem(Material.IRON_CHESTPLATE, "&7&lSurvival Mode",
+                "&7Ubah gamemode ke Survival")); // Opsional
 
         // 5. Close (Slot 22)
         inv.setItem(26, createItem(Material.BARRIER, "&c&lClose"));
@@ -81,7 +91,8 @@ public class NaturalCoreGUI implements Listener {
 
     // --- EVENT LISTENER ---
     // Pastikan class ini di-register di NaturalCore.java:
-    // getServer().getPluginManager().registerEvents(new NaturalCoreGUI(this), this);
+    // getServer().getPluginManager().registerEvents(new NaturalCoreGUI(this),
+    // this);
 
     @EventHandler
     public void onClick(InventoryClickEvent e) {
@@ -89,32 +100,48 @@ public class NaturalCoreGUI implements Listener {
         String title = ChatUtils.stripColor(e.getView().getTitle());
         String expected = ChatUtils.stripColor(GUI_TITLE);
 
-        if (!title.equals(expected)) return;
+        if (!title.equals(expected))
+            return;
 
-        // 1. CANCEL EVENT (Anti Steal)
+        // 1. CANCEL EVENT - SEMUA INTERAKSI (Anti Steal)
         e.setCancelled(true);
 
-        if (e.getCurrentItem() == null || e.getCurrentItem().getType() == Material.AIR) return;
-
+        // 2. Pastikan hanya player yang bisa klik
+        if (!(e.getWhoClicked() instanceof Player))
+            return;
         Player p = (Player) e.getWhoClicked();
-        Material mat = e.getCurrentItem().getType();
 
-        // 2. LOGIC
-        if (mat == Material.EMERALD) {
-            p.performCommand("nacore reload");
-            p.closeInventory();
+        // 3. Block ALL interactions in GUI (top inventory dan shift-click dari bottom)
+        // Jika click di top inventory ATAU shift-click dari bottom ke top
+        if (e.getClickedInventory() == null)
+            return;
+
+        // Safety: Cancel semua jenis klik termasuk shift, number keys, dll
+        if (e.getClick().isShiftClick() || e.getClick().isKeyboardClick()) {
+            return; // Sudah di-cancel, langsung return
         }
-        else if (mat == Material.BEACON) {
-            p.performCommand("setspawn");
-            p.closeInventory();
-        }
-        else if (mat == Material.DIAMOND_CHESTPLATE) {
-            p.performCommand("gmc");
-            p.closeInventory();
-        }
-        else if (mat == Material.BARRIER) {
-            p.closeInventory();
-            p.playSound(p.getLocation(), Sound.UI_BUTTON_CLICK, 1f, 1f);
+
+        // 4. Khusus klik item di TOP inventory (GUI kita)
+        if (e.getClickedInventory().equals(e.getView().getTopInventory())) {
+            if (e.getCurrentItem() == null || e.getCurrentItem().getType() == Material.AIR)
+                return;
+
+            Material mat = e.getCurrentItem().getType();
+
+            // 5. LOGIC per Item
+            if (mat == Material.EMERALD) {
+                p.performCommand("nacore reload");
+                p.closeInventory();
+            } else if (mat == Material.BEACON) {
+                p.performCommand("setspawn");
+                p.closeInventory();
+            } else if (mat == Material.DIAMOND_CHESTPLATE) {
+                p.performCommand("gmc");
+                p.closeInventory();
+            } else if (mat == Material.BARRIER) {
+                p.closeInventory();
+                p.playSound(p.getLocation(), Sound.UI_BUTTON_CLICK, 1f, 1f);
+            }
         }
     }
 

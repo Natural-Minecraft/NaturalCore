@@ -13,7 +13,8 @@ import org.jetbrains.annotations.NotNull;
 public class PlayerUtilCommand implements CommandExecutor {
 
     @Override
-    public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, @NotNull String[] args) {
+    public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label,
+            @NotNull String[] args) {
 
         String cmdName = label.toLowerCase();
 
@@ -22,16 +23,28 @@ public class PlayerUtilCommand implements CommandExecutor {
         // Cek argumen jika admin ingin heal orang lain
         if (args.length > 0) {
             // Cek permission dulu sebelum memproses argumen
-            String permNode = "naturalsmp." + (cmdName.equals("fly") ? "fly" : cmdName.equals("heal") ? "heal" : "feed");
+            String permNode = "naturalsmp."
+                    + (cmdName.equals("fly") ? "fly" : cmdName.equals("heal") ? "heal" : "feed");
             if (sender.hasPermission(permNode + ".others")) {
                 Player t = Bukkit.getPlayer(args[0]);
-                if (t != null) target = t;
+                if (t != null)
+                    target = t;
             }
         }
 
         if (target == null) {
-            if (!(sender instanceof Player)) { sender.sendMessage("Console must specify player"); return true; }
-            // Jika target null tapi sender player, berarti target = diri sendiri
+            if (args.length > 0) {
+                // Modifikasi: Jangan fallback ke diri sendiri jika nama yang diketik salah
+                sender.sendMessage(ConfigUtils.getString("messages.player-not-found").replace("%player%", args[0]));
+                return true;
+            }
+
+            if (!(sender instanceof Player)) {
+                sender.sendMessage("Console must specify player");
+                return true;
+            }
+
+            // Jika tidak ada argumen, baru fallback ke sender
             target = (Player) sender;
         }
 
@@ -39,7 +52,8 @@ public class PlayerUtilCommand implements CommandExecutor {
 
         // --- HEAL ---
         if (cmdName.equals("heal")) {
-            if (!sender.hasPermission("naturalsmp.heal")) return noPerm(sender);
+            if (!sender.hasPermission("naturalsmp.heal"))
+                return noPerm(sender);
 
             // FIX HEAL LOGIC
             double maxHealth = 20.0;
@@ -55,14 +69,16 @@ public class PlayerUtilCommand implements CommandExecutor {
             target.playSound(target.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, 1f, 1f);
 
             if (!sender.equals(target)) {
-                sender.sendMessage(prefix + ConfigUtils.getString("messages.heal-other").replace("%target%", target.getName()));
+                sender.sendMessage(
+                        prefix + ConfigUtils.getString("messages.heal-other").replace("%target%", target.getName()));
             }
             return true;
         }
 
         // --- FEED ---
         if (cmdName.equals("feed")) {
-            if (!sender.hasPermission("naturalsmp.feed")) return noPerm(sender);
+            if (!sender.hasPermission("naturalsmp.feed"))
+                return noPerm(sender);
 
             target.setFoodLevel(20);
             target.setSaturation(20);
@@ -71,14 +87,16 @@ public class PlayerUtilCommand implements CommandExecutor {
             target.playSound(target.getLocation(), Sound.ENTITY_GENERIC_EAT, 1f, 1f);
 
             if (!sender.equals(target)) {
-                sender.sendMessage(prefix + ConfigUtils.getString("messages.feed-other").replace("%target%", target.getName()));
+                sender.sendMessage(
+                        prefix + ConfigUtils.getString("messages.feed-other").replace("%target%", target.getName()));
             }
             return true;
         }
 
         // --- FLY ---
         if (cmdName.equals("fly")) {
-            if (!sender.hasPermission("naturalsmp.fly")) return noPerm(sender);
+            if (!sender.hasPermission("naturalsmp.fly"))
+                return noPerm(sender);
 
             boolean flight = !target.getAllowFlight();
             target.setAllowFlight(flight);

@@ -12,7 +12,8 @@ import org.jetbrains.annotations.NotNull;
 public class MenuUtilCommand implements CommandExecutor {
 
     @Override
-    public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, @NotNull String[] args) {
+    public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label,
+            @NotNull String[] args) {
 
         if (!(sender instanceof Player)) {
             sender.sendMessage("Only Player");
@@ -22,10 +23,15 @@ public class MenuUtilCommand implements CommandExecutor {
 
         // --- /TRASH ---
         if (label.equalsIgnoreCase("trash")) {
-            // Trash biasanya tidak butuh permission, tapi kalau mau:
-            // if (!p.hasPermission("naturalsmp.trash")) ...
+            // Trash biasanya tidak butuh permission (semua orang bisa buang barang)
+            // Tapi jika ingin restrict, uncomment baris berikut:
+            // if (!p.hasPermission("naturalsmp.trash")) {
+            // p.sendMessage(ConfigUtils.getString("messages.no-permission"));
+            // return true;
+            // }
 
-            p.openInventory(Bukkit.createInventory(null, 36, ChatUtils.colorize("&cTrash Can (Items will be deleted)")));
+            p.openInventory(
+                    Bukkit.createInventory(null, 36, ChatUtils.colorize("&cTrash Can (Items will be deleted)")));
             return true;
         }
 
@@ -36,6 +42,17 @@ public class MenuUtilCommand implements CommandExecutor {
                 return true;
             }
             p.openWorkbench(null, true);
+            return true;
+        }
+
+        // --- /ANVIL ---
+        if (label.equalsIgnoreCase("anvil") || label.equalsIgnoreCase("av")) {
+            if (!p.hasPermission("naturalsmp.anvil")) {
+                p.sendMessage(ConfigUtils.getString("messages.no-permission"));
+                return true;
+            }
+            // Membuka Anvil Virtual (Bukan GUI custom, tapi native inventory)
+            p.openInventory(Bukkit.createInventory(null, org.bukkit.event.inventory.InventoryType.ANVIL));
             return true;
         }
 

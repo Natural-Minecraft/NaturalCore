@@ -214,6 +214,12 @@ commands:
   tpdeny:
     description: Deny
 
+  # --- EMOJI ---
+  emoji:
+    description: Lihat daftar emoji yang tersedia
+    aliases: [emojis, emoticon]
+    permission: naturalsmp.emoji.use
+
 permissions:
   naturalsmp.admin:
     default: op

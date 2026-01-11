@@ -31,7 +31,8 @@ public class NaturalCoreCommand implements CommandExecutor {
     }
 
     @Override
-    public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, @NotNull String[] args) {
+    public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label,
+            @NotNull String[] args) {
 
         // --- COMMAND UTAMA: /nacore (Buka GUI) ---
         if (args.length == 0) {
@@ -55,10 +56,17 @@ public class NaturalCoreCommand implements CommandExecutor {
 
         // --- RELOAD CONFIG ---
         if (sub.equals("reload")) {
-            if (!sender.hasPermission("naturalsmp.admin")) return noPerm(sender);
+            if (!sender.hasPermission("naturalsmp.admin"))
+                return noPerm(sender);
 
             plugin.reloadConfig();
             ConfigUtils.reload();
+
+            // Reload Emoji Registry
+            if (plugin.getEmojiManager() != null) {
+                plugin.getEmojiManager().loadEmojis();
+            }
+
             sender.sendMessage(ConfigUtils.getString("messages.reload-success"));
             return true;
         }

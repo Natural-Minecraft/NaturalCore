@@ -30,6 +30,8 @@ import id.naturalsmp.naturalcore.moderation.ModerationCommand;
 import id.naturalsmp.naturalcore.fun.FunCommand;
 import id.naturalsmp.naturalcore.fun.FunListener;
 import id.naturalsmp.naturalcore.general.RTPCommand;
+import id.naturalsmp.naturalcore.chat.EmojiManager;
+import id.naturalsmp.naturalcore.chat.EmojiCommand;
 import id.naturalsmp.naturalcore.chat.MessageManager;
 import id.naturalsmp.naturalcore.chat.PrivateMessageCommand;
 import id.naturalsmp.naturalcore.utility.WorldUtilCommand;
@@ -51,6 +53,7 @@ public final class NaturalCore extends JavaPlugin {
     private TeleportManager teleportManager;
     private MessageManager messageManager;
     private TraderManager traderManager;
+    private EmojiManager emojiManager;
 
     @Override
     public void onEnable() {
@@ -208,7 +211,12 @@ public final class NaturalCore extends JavaPlugin {
             getLogger().info("PlaceholderAPI ditemukan. Expansion terdaftar.");
         }
 
-        // 17. Messaging System (NEW)
+        // 17. Emoji System (NEW - Terinspirasi ChatEmojis)
+        this.emojiManager = new EmojiManager(this);
+        registerCmd("emoji", new EmojiCommand(this));
+        getLogger().info("Emoji System: ENABLED");
+
+        // 18. Messaging System
         getServer().getPluginManager().registerEvents(new ChatListener(this), this);
         this.messageManager = new MessageManager();
         PrivateMessageCommand pmCmd = new PrivateMessageCommand(this);
@@ -279,6 +287,10 @@ public final class NaturalCore extends JavaPlugin {
 
     public TraderManager getTraderManager() {
         return traderManager;
+    }
+
+    public EmojiManager getEmojiManager() {
+        return emojiManager;
     }
 
     // --- HELPER UNTUK MENCEGAH CRASH ---
