@@ -15,6 +15,13 @@ public class ImageUtils {
      * Now with memory-efficient scaling and palette conversion.
      */
     public static BufferedImage loadAndScale(File file, int blocksWidth, int blocksHeight) throws IOException {
+        // LIMIT CHECK: Prevent loading massive images into memory
+        // 50x50 maps is already a HUGE image (6400x6400 pixels)
+        if (blocksWidth * blocksHeight > 2500) {
+            throw new IOException("Image dimensions too large (" + blocksWidth + "x" + blocksHeight + "). " +
+                    "Maximum total maps allowed is 2500 for safety.");
+        }
+
         BufferedImage original = ImageIO.read(file);
         if (original == null)
             throw new IOException("Could not read image file: " + file.getName());
@@ -25,7 +32,11 @@ public class ImageUtils {
         // Scale image
         BufferedImage scaled = new BufferedImage(targetWidth, targetHeight, BufferedImage.TYPE_INT_ARGB);
         Graphics2D g2d = scaled.createGraphics();
-        g2d.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BICUBIC);
+
+        // Quality vs Performance balance
+        g2d.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
+        g2d.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_SPEED);
+
         g2d.drawImage(original, 0, 0, targetWidth, targetHeight, null);
         g2d.dispose();
 

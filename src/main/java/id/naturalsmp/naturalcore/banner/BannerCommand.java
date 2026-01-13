@@ -66,7 +66,8 @@ public class BannerCommand implements CommandExecutor, TabCompleter {
 
                 List<String> left = new ArrayList<>();
 
-                // PERBAIKAN: Gabungkan semua argumen dari index ke-3 sampai habis menjadi satu string
+                // PERBAIKAN: Gabungkan semua argumen dari index ke-3 sampai habis menjadi satu
+                // string
                 // Ini memungkinkan command seperti "[COMMAND] /spawn" dianggap satu kesatuan
                 if (args.length > 3) {
                     StringBuilder actionBuilder = new StringBuilder();
@@ -76,12 +77,14 @@ public class BannerCommand implements CommandExecutor, TabCompleter {
                     left.add(actionBuilder.toString().trim());
                 }
 
-                // Untuk "create", kita set Right Action kosong dulu. User bisa pakai /banner edit nanti.
+                // Untuk "create", kita set Right Action kosong dulu. User bisa pakai /banner
+                // edit nanti.
                 // Ini lebih aman daripada parsing spasi yang membingungkan.
                 List<String> right = new ArrayList<>();
 
                 manager.createBanner(name, image, p1, p2, face, left, right);
-                player.sendMessage(ChatUtils.colorize("&a&l[Banner] &fBanner '&e" + name + "&f' created successfully!"));
+                player.sendMessage(
+                        ChatUtils.colorize("&a&l[Banner] &fBanner '&e" + name + "&f' created successfully!"));
             }
             case "edit" -> {
                 if (args.length < 2) {
@@ -120,6 +123,15 @@ public class BannerCommand implements CommandExecutor, TabCompleter {
                 manager.deleteBanner(args[1]);
                 player.sendMessage(ChatUtils.colorize("&a&l[Banner] &fBanner '&e" + args[1] + "&f' deleted."));
             }
+            case "purge" -> {
+                if (!player.hasPermission("naturalsmp.admin.banner.purge")) {
+                    player.sendMessage(ConfigUtils.getString("messages.global.no-permission"));
+                    return true;
+                }
+                manager.purgeAllEntities();
+                player.sendMessage(ChatUtils.colorize(
+                        "&a&l[Banner] &fAll banner entities (including orphans) have been purged from the world!"));
+            }
             default -> sendHelp(player);
         }
 
@@ -131,7 +143,7 @@ public class BannerCommand implements CommandExecutor, TabCompleter {
             @NotNull String[] args) {
         List<String> suggestions = new ArrayList<>();
         if (args.length == 1) {
-            suggestions.addAll(Arrays.asList("wand", "create", "edit", "delete"));
+            suggestions.addAll(Arrays.asList("wand", "create", "edit", "delete", "purge"));
         } else if (args.length == 2) {
             if (args[0].equalsIgnoreCase("edit") || args[0].equalsIgnoreCase("delete")) {
                 suggestions.addAll(manager.getActiveBanners().keySet());
@@ -179,6 +191,7 @@ public class BannerCommand implements CommandExecutor, TabCompleter {
         p.sendMessage(ChatUtils.colorize("&e/banner create <name> <image> [leftAction] [rightAction]"));
         p.sendMessage(ChatUtils.colorize("&e/banner edit <name> <flags>"));
         p.sendMessage(ChatUtils.colorize("&e/banner delete <name>"));
+        p.sendMessage(ChatUtils.colorize("&e/banner purge &7- Purge all banner entities"));
         p.sendMessage(ChatUtils.colorize("&7Actions: [URL], [COMMAND], [CONSOLE]"));
     }
 }

@@ -33,45 +33,97 @@ public class NaturalCoreGUI implements Listener {
     }
 
     public void openGUI(Player p) {
-        // PERMISSION CHECK: Hanya Admin yang bisa buka GUI ini
         if (!p.hasPermission("naturalsmp.admin")) {
             p.sendMessage(ConfigUtils.getString("messages.global.no-permission"));
             return;
         }
 
-        // Buat Inventory 3 Row (27 Slot)
-        Inventory inv = Bukkit.createInventory(null, 27, ChatUtils.colorize(GUI_TITLE));
+        Inventory inv = Bukkit.createInventory(null, 54, ChatUtils.colorize(GUI_TITLE));
 
-        // --- FILLER (Kaca) ---
+        // --- FILLER ---
         ItemStack filler = createItem(Material.GRAY_STAINED_GLASS_PANE, " ");
-        for (int i = 0; i < 27; i++) {
+        for (int i = 0; i < 54; i++) {
             inv.setItem(i, filler);
         }
 
-        // --- ITEMS ---
+        // --- CATEGORY: CORE & SYSTEM ---
+        inv.setItem(4, createItem(Material.NETHER_STAR, "&6&lNATURAL CORE v1.6.2",
+                "&7Main core plugin untuk NaturalSMP.",
+                "&7Dokumentasi sistem administrator."));
 
-        // 1. Reload Config (Slot 11)
-        inv.setItem(11, createItem(Material.EMERALD, "&a&lReload Config", "&7Klik untuk reload config.yml"));
+        // Row 2: INFO BLOCKS
+        inv.setItem(10, createItem(Material.PAINTING, "&b&lBANNER SYSTEM (Display)",
+                "&fFitur Papan Informasi Interaktif.",
+                "",
+                "&ePerintah Utama:",
+                "&7/banner create <nama> <image.png>",
+                "&7/banner delete <nama>",
+                "&7/banner purge &c(Cleanup Hantu)",
+                "",
+                "&fTips: &7Gunakan &b//wand &7untuk select area.",
+                "&7Banner kini presisi dengan offset &b0.02&7."));
 
-        // 2. Set Spawn (Slot 13)
-        inv.setItem(13,
-                createItem(Material.BEACON, "&b&lSet Spawn", "&7Set lokasi spawn utama", "&7di posisi kamu berdiri."));
+        inv.setItem(12, createItem(Material.ENDER_PEARL, "&a&lRTP SYSTEM",
+                "&fFitur Random Teleportasi.",
+                "",
+                "&bDunia Terdaftar:",
+                "&7/rtp &8-> &f" + plugin.getConfig().getString("rtp.survival-world", "world"),
+                "&7/resource &8-> &f" + plugin.getConfig().getString("rtp.resource-world", "Resource"),
+                "",
+                "&fPermission: &7naturalsmp.resource"));
 
-        // 3. Creative Mode (Slot 15)
-        inv.setItem(15, createItem(Material.DIAMOND_CHESTPLATE, "&e&lCreative Mode", "&7Ubah gamemode ke Creative"));
+        inv.setItem(14, createItem(Material.GOLD_INGOT, "&e&lECONOMY & COINS",
+                "&fSistem Mata Uang Server.",
+                "",
+                "&bMata Uang:",
+                "&7- &6Vault (Rp) &7- Utama",
+                "&7- &eNaturalCoin (NC) &7- CoinsEngine",
+                "",
+                "&ePerintah:",
+                "&7/bal, /pay, /baltop, /setbal"));
 
-        // 4. Survival Mode (Slot 16 - Sebelahnya)
-        inv.setItem(16, createItem(Material.IRON_CHESTPLATE, "&7&lSurvival Mode",
-                "&7Ubah gamemode ke Survival")); // Opsional
+        inv.setItem(16, createItem(Material.CALIBRATED_SCULK_SENSOR, "&d&lSEASONS & WEATHER",
+                "&fSistem Musim & Suhu.",
+                "",
+                "&7- &f/season &7- Cek status",
+                "&7- &f/day, /night, /sun, /rain"));
 
-        // 5. Close (Slot 22)
-        inv.setItem(26, createItem(Material.BARRIER, "&c&lClose"));
+        // Row 3: OTHER INFO
+        inv.setItem(28, createItem(Material.WRITABLE_BOOK, "&f&lCHAT & EMOJI",
+                "&fSistem Komunikasi.",
+                "",
+                "&7- &f:smile:, :love:, dll",
+                "&7- &f/emoji &7- Daftar lengkap",
+                "&7- &f/msg, /reply &7- Private message"));
+
+        inv.setItem(30, createItem(Material.COMPASS, "&2&lWARP & HOME",
+                "&fSistem Navigasi.",
+                "",
+                "&7- &a/warp &7- Menu Warp",
+                "&7- &a/home &7- Menu Home",
+                "&7- &a/spawn &7- Ke Spawn"));
+
+        inv.setItem(32, createItem(Material.LEATHER_HELMET, "&d&lPLAYER PERKS",
+                "&fKemampuan Tambahan.",
+                "",
+                "&7- &f/fly, /hat, /nick, /repair",
+                "&7- &f/heal, /feed, /trash, /wb"));
+
+        inv.setItem(34, createItem(Material.IRON_DOOR, "&c&lMODERATION",
+                "&fAlat Pengawasan.",
+                "",
+                "&7- &f/vanish (v), /god, /whois",
+                "&7- &f/invsee, /endersee, /ec"));
+
+        // Bottom Row: ACTIONS
+        inv.setItem(48, createItem(Material.EMERALD, "&a&lRELOAD CONFIG", "&7Muat ulang config.yml & messages.yml"));
+        inv.setItem(49, createItem(Material.BEACON, "&b&lSET SPAWN", "&7Atur posisi spawn utama"));
+        inv.setItem(50, createItem(Material.DIAMOND_CHESTPLATE, "&e&lCREATIVE MODE", "&7Ubah gamemode ke Creative"));
+
+        inv.setItem(53, createItem(Material.BARRIER, "&c&lCLOSE"));
 
         p.openInventory(inv);
         p.playSound(p.getLocation(), Sound.BLOCK_NOTE_BLOCK_PLING, 1f, 1f);
-
-        // Register Listener SEMENTARA (Sebaiknya register di Main Class 1x saja)
-        // Tapi untuk fix cepat, pastikan listener ini terdaftar di NaturalCore.java
     }
 
     private ItemStack createItem(Material mat, String name, String... lore) {
@@ -132,15 +184,20 @@ public class NaturalCoreGUI implements Listener {
             if (mat == Material.EMERALD) {
                 p.performCommand("nacore reload");
                 p.closeInventory();
+                p.playSound(p.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, 1f, 1.5f);
             } else if (mat == Material.BEACON) {
                 p.performCommand("setspawn");
                 p.closeInventory();
+                p.playSound(p.getLocation(), Sound.BLOCK_BEACON_ACTIVATE, 1f, 1f);
             } else if (mat == Material.DIAMOND_CHESTPLATE) {
                 p.performCommand("gmc");
                 p.closeInventory();
             } else if (mat == Material.BARRIER) {
                 p.closeInventory();
                 p.playSound(p.getLocation(), Sound.UI_BUTTON_CLICK, 1f, 1f);
+            } else if (e.getSlot() >= 10 && e.getSlot() <= 40) {
+                // Clicking documentation items
+                p.playSound(p.getLocation(), Sound.ITEM_BOOK_PAGE_TURN, 1f, 1f);
             }
         }
     }

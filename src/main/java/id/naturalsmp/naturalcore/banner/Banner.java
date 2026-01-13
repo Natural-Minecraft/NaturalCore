@@ -2,7 +2,9 @@ package id.naturalsmp.naturalcore.banner;
 
 import org.bukkit.Location;
 import org.bukkit.block.BlockFace;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 public class Banner {
     private final String name;
@@ -14,8 +16,19 @@ public class Banner {
     private final List<String> leftClickActions;
     private final List<String> rightClickActions;
 
+    // NEW: Tracking for performance and persistence
+    private final List<UUID> entityUuids;
+    private final List<Integer> mapIds;
+
     public Banner(String name, String imageName, Location location, int width, int height, BlockFace face,
             List<String> leftClickActions, List<String> rightClickActions) {
+        this(name, imageName, location, width, height, face, leftClickActions, rightClickActions, new ArrayList<>(),
+                new ArrayList<>());
+    }
+
+    public Banner(String name, String imageName, Location location, int width, int height, BlockFace face,
+            List<String> leftClickActions, List<String> rightClickActions,
+            List<UUID> entityUuids, List<Integer> mapIds) {
         this.name = name;
         this.imageName = imageName;
         this.location = location;
@@ -24,6 +37,8 @@ public class Banner {
         this.face = face;
         this.leftClickActions = leftClickActions;
         this.rightClickActions = rightClickActions;
+        this.entityUuids = entityUuids != null ? entityUuids : new ArrayList<>();
+        this.mapIds = mapIds != null ? mapIds : new ArrayList<>();
     }
 
     public String getName() {
@@ -56,5 +71,13 @@ public class Banner {
 
     public List<String> getRightClickActions() {
         return rightClickActions;
+    }
+
+    public List<UUID> getEntityUuids() {
+        return entityUuids;
+    }
+
+    public List<Integer> getMapIds() {
+        return mapIds;
     }
 }

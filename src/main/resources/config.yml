@@ -1,7 +1,7 @@
 # ==========================================
 #      NATURAL CORE - CONFIGURATION
 # ==========================================
-config-version: 1.6
+config-version: 1.6.2
 
 # Catatan: Konfigurasi sekarang terpisah:
 # - config.yml     : Pengaturan utama (ini)
@@ -80,6 +80,13 @@ fun:
     - "world_the_end"
     - "Resources"
   warden-kill-xp: 500
+
+# ==========================================
+#              RTP SETTINGS
+# ==========================================
+rtp:
+  survival-world: "world"
+  resource-world: "Resource"
 
 settings:
   restart-alert-time: 10

@@ -269,6 +269,9 @@ public final class NaturalCore extends JavaPlugin {
         if (seasonManager != null) {
             seasonManager.saveData();
         }
+        if (bannerManager != null) {
+            bannerManager.saveAll();
+        }
     }
 
     // --- GETTERS ---
