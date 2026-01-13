@@ -6,7 +6,7 @@
 
     <groupId>id.naturalsmp</groupId>
     <artifactId>NaturalCore</artifactId>
-    <version>1.6-SNAPSHOT</version>
+    <version>1.6.1</version>
     <packaging>jar</packaging>
 
     <name>NaturalCore</name>

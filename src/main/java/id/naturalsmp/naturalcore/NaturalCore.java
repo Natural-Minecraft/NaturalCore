@@ -160,7 +160,9 @@ public final class NaturalCore extends JavaPlugin {
 
         // 13. Banner Module (Interactive Board)
         this.bannerManager = new BannerManager(this);
-        registerCmd("banner", new BannerCommand(bannerManager));
+        BannerCommand bannerCmd = new BannerCommand(bannerManager);
+        registerCmd("banner", bannerCmd);
+        getCommand("banner").setTabCompleter(bannerCmd);
         getServer().getPluginManager().registerEvents(new BannerListener(bannerManager), this);
         registerCmd("tpaccept", tpCmd);
         registerCmd("tpdeny", tpCmd);

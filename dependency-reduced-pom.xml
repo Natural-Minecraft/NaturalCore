@@ -4,7 +4,7 @@
   <groupId>id.naturalsmp</groupId>
   <artifactId>NaturalCore</artifactId>
   <name>NaturalCore</name>
-  <version>1.6-SNAPSHOT</version>
+  <version>1.6.1</version>
   <description>Core plugin NaturalSMP</description>
   <build>
     <resources>

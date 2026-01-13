@@ -3,6 +3,7 @@ package id.naturalsmp.naturalcore.banner;
 import id.naturalsmp.naturalcore.utils.ChatUtils;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.block.BlockFace;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Interaction;
 import org.bukkit.entity.Player;
@@ -24,6 +25,7 @@ public class BannerListener implements Listener {
     private final BannerManager manager;
     private static final Map<UUID, Location> pos1 = new HashMap<>();
     private static final Map<UUID, Location> pos2 = new HashMap<>();
+    private static final Map<UUID, BlockFace> face = new HashMap<>();
 
     public BannerListener(BannerManager manager) {
         this.manager = manager;
@@ -59,8 +61,9 @@ public class BannerListener implements Listener {
 
         if (event.getAction() == Action.LEFT_CLICK_BLOCK) {
             pos1.put(p.getUniqueId(), loc);
-            p.sendMessage(ChatUtils.colorize("&a&l[NaturalCore] &fPosition 1 set: &e" + loc.getBlockX() + ", "
-                    + loc.getBlockY() + ", " + loc.getBlockZ()));
+            face.put(p.getUniqueId(), event.getBlockFace());
+            p.sendMessage(ChatUtils.colorize("&a&l[NaturalCore] &fPosition 1 & Face set: &e" + loc.getBlockX() + ", "
+                    + loc.getBlockY() + ", " + loc.getBlockZ() + " (" + event.getBlockFace() + ")"));
         } else if (event.getAction() == Action.RIGHT_CLICK_BLOCK) {
             pos2.put(p.getUniqueId(), loc);
             p.sendMessage(ChatUtils.colorize("&a&l[NaturalCore] &fPosition 2 set: &e" + loc.getBlockX() + ", "
@@ -107,5 +110,9 @@ public class BannerListener implements Listener {
 
     public static Location getPos2(UUID uuid) {
         return pos2.get(uuid);
+    }
+
+    public static BlockFace getFace(UUID uuid) {
+        return face.get(uuid);
     }
 }

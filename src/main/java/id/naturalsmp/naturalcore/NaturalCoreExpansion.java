@@ -25,7 +25,7 @@ public class NaturalCoreExpansion extends PlaceholderExpansion {
 
     @Override
     public @NotNull String getVersion() {
-        return "1.6";
+        return plugin.getDescription().getVersion();
     }
 
     @Override
