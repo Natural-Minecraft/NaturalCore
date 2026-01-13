@@ -61,7 +61,7 @@ public class ChatListener implements Listener {
 
         // A. First Join
         if (!p.hasPlayedBefore()) {
-            String firstMsg = ConfigUtils.getString("messages.first-join-message");
+            String firstMsg = ConfigUtils.getString("messages.social.first-join-message");
             if (!firstMsg.equalsIgnoreCase("none")) {
                 int count = Bukkit.getOfflinePlayers().length;
                 // ChatUtils.formatMessage otomatis mengubah %displayname%
@@ -71,7 +71,7 @@ public class ChatListener implements Listener {
         }
         // B. Join Biasa
         else {
-            String joinMsg = ConfigUtils.getString("messages.join-message");
+            String joinMsg = ConfigUtils.getString("messages.social.join-message");
             if (joinMsg.equalsIgnoreCase("none")) {
                 e.setJoinMessage(null);
             } else {
@@ -81,7 +81,7 @@ public class ChatListener implements Listener {
         }
 
         // C. MOTD
-        for (String line : ConfigUtils.getStringList("messages.motd")) {
+        for (String line : ConfigUtils.getStringList("messages.social.motd")) {
             p.sendMessage(ChatUtils.formatMessage(p, line));
         }
     }
@@ -89,7 +89,7 @@ public class ChatListener implements Listener {
     // 3. QUIT MESSAGE
     @EventHandler(priority = EventPriority.HIGHEST)
     public void onQuit(PlayerQuitEvent e) {
-        String quitMsg = ConfigUtils.getString("messages.quit-message");
+        String quitMsg = ConfigUtils.getString("messages.social.quit-message");
         if (quitMsg.equalsIgnoreCase("none")) {
             e.setQuitMessage(null);
         } else {

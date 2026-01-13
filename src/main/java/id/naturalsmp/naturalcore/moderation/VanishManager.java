@@ -32,7 +32,8 @@ public class VanishManager {
                     online.hidePlayer(plugin, p);
                 }
             }
-            p.sendMessage(ConfigUtils.getString("prefix.moderation") + ConfigUtils.getString("messages.vanish-enabled"));
+            p.sendMessage(ConfigUtils.getString("prefix.moderation")
+                    + ConfigUtils.getString("messages.moderation.vanish-enabled"));
             p.sendTitle("", ChatUtils.colorize("&b&lVANISHED"), 0, 40, 10);
         } else {
             // MATIKAN VANISH
@@ -40,13 +41,15 @@ public class VanishManager {
             for (Player online : Bukkit.getOnlinePlayers()) {
                 online.showPlayer(plugin, p);
             }
-            p.sendMessage(ConfigUtils.getString("prefix.moderation") + ConfigUtils.getString("messages.vanish-disabled"));
+            p.sendMessage(ConfigUtils.getString("prefix.moderation")
+                    + ConfigUtils.getString("messages.moderation.vanish-disabled"));
         }
     }
 
     // Dipanggil saat ada player baru join
     public void hideVanishedFrom(Player newPlayer) {
-        // Jika player baru ini bukan admin, sembunyikan semua player yang sedang vanish dari dia
+        // Jika player baru ini bukan admin, sembunyikan semua player yang sedang vanish
+        // dari dia
         if (!newPlayer.hasPermission("naturalsmp.vanish.see")) {
             for (UUID uuid : vanishedPlayers) {
                 Player vanishedPlayer = Bukkit.getPlayer(uuid);

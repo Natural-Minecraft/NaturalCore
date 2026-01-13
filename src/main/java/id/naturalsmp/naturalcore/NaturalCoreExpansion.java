@@ -25,7 +25,7 @@ public class NaturalCoreExpansion extends PlaceholderExpansion {
 
     @Override
     public @NotNull String getVersion() {
-        return "1.5";
+        return "1.6";
     }
 
     @Override
@@ -35,7 +35,8 @@ public class NaturalCoreExpansion extends PlaceholderExpansion {
 
     @Override
     public String onRequest(OfflinePlayer player, @NotNull String params) {
-        if (player == null || !player.isOnline()) return "";
+        if (player == null || !player.isOnline())
+            return "";
 
         Player p = player.getPlayer();
 

@@ -30,14 +30,14 @@ public class EssentialPerksCommand implements CommandExecutor {
 
             ItemStack hand = p.getInventory().getItemInMainHand();
             if (hand == null || hand.getType() == Material.AIR) {
-                p.sendMessage(ConfigUtils.getString("messages.hat-fail"));
+                p.sendMessage(ConfigUtils.getString("messages.utils.hat-fail"));
                 return true;
             }
 
             ItemStack helmet = p.getInventory().getHelmet();
             p.getInventory().setHelmet(hand);
             p.getInventory().setItemInMainHand(helmet); // Tukar item
-            p.sendMessage(prefix + ConfigUtils.getString("messages.hat-success"));
+            p.sendMessage(prefix + ConfigUtils.getString("messages.utils.hat-success"));
             return true;
         }
 
@@ -53,7 +53,7 @@ public class EssentialPerksCommand implements CommandExecutor {
             }
 
             repairItem(item);
-            p.sendMessage(prefix + ConfigUtils.getString("messages.repair-success"));
+            p.sendMessage(prefix + ConfigUtils.getString("messages.utils.repair-success"));
             return true;
         }
 
@@ -70,12 +70,12 @@ public class EssentialPerksCommand implements CommandExecutor {
             if (args[0].equalsIgnoreCase("off") || args[0].equalsIgnoreCase("reset")) {
                 p.setDisplayName(p.getName());
                 // p.setPlayerListName(p.getName()); // Optional: ubah di tablist juga
-                p.sendMessage(prefix + ConfigUtils.getString("messages.nick-reset"));
+                p.sendMessage(prefix + ConfigUtils.getString("messages.utils.nick-reset"));
             } else {
                 String nick = ChatUtils.colorize(args[0]);
                 p.setDisplayName(nick); // Ini yang dipakai di chat %displayname%
                 // p.setPlayerListName(nick); // Optional
-                p.sendMessage(prefix + ConfigUtils.getString("messages.nick-set").replace("{nick}", nick));
+                p.sendMessage(prefix + ConfigUtils.getString("messages.utils.nick-set").replace("{nick}", nick));
             }
             return true;
         }
@@ -92,7 +92,7 @@ public class EssentialPerksCommand implements CommandExecutor {
     }
 
     private boolean noPerm(Player p) {
-        p.sendMessage(ConfigUtils.getString("messages.no-permission"));
+        p.sendMessage(ConfigUtils.getString("messages.global.no-permission"));
         return true;
     }
 }

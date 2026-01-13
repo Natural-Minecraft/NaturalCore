@@ -10,6 +10,8 @@ import id.naturalsmp.naturalcore.home.HomeManager;
 import id.naturalsmp.naturalcore.home.HomeCommand;
 import id.naturalsmp.naturalcore.spawn.SpawnCommand;
 import id.naturalsmp.naturalcore.spawn.SpawnManager;
+import id.naturalsmp.naturalcore.season.*;
+import id.naturalsmp.naturalcore.banner.*;
 import id.naturalsmp.naturalcore.teleport.TeleportManager;
 import id.naturalsmp.naturalcore.trader.TraderManager;
 import id.naturalsmp.naturalcore.trader.TraderCommand;
@@ -54,6 +56,8 @@ public final class NaturalCore extends JavaPlugin {
     private MessageManager messageManager;
     private TraderManager traderManager;
     private EmojiManager emojiManager;
+    private SeasonManager seasonManager;
+    private BannerManager bannerManager;
 
     @Override
     public void onEnable() {
@@ -148,6 +152,16 @@ public final class NaturalCore extends JavaPlugin {
         registerCmd("tphere", tpCmd);
         registerCmd("tpa", tpCmd);
         registerCmd("tpahere", tpCmd);
+
+        // 12. Seasons Module
+        this.seasonManager = new SeasonManager(this);
+        registerCmd("season", new SeasonCommand(seasonManager));
+        getServer().getPluginManager().registerEvents(new SeasonListener(seasonManager), this);
+
+        // 13. Banner Module (Interactive Board)
+        this.bannerManager = new BannerManager(this);
+        registerCmd("banner", new BannerCommand(bannerManager));
+        getServer().getPluginManager().registerEvents(new BannerListener(bannerManager), this);
         registerCmd("tpaccept", tpCmd);
         registerCmd("tpdeny", tpCmd);
 
@@ -250,6 +264,9 @@ public final class NaturalCore extends JavaPlugin {
         if (traderManager != null) {
             traderManager.despawnAll();
         }
+        if (seasonManager != null) {
+            seasonManager.saveData();
+        }
     }
 
     // --- GETTERS ---
@@ -291,6 +308,10 @@ public final class NaturalCore extends JavaPlugin {
 
     public EmojiManager getEmojiManager() {
         return emojiManager;
+    }
+
+    public SeasonManager getSeasonManager() {
+        return seasonManager;
     }
 
     // --- HELPER UNTUK MENCEGAH CRASH ---

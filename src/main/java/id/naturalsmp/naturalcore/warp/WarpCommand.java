@@ -2,6 +2,7 @@ package id.naturalsmp.naturalcore.warp;
 
 import id.naturalsmp.naturalcore.NaturalCore;
 import id.naturalsmp.naturalcore.utils.ChatUtils;
+import id.naturalsmp.naturalcore.utils.ConfigUtils;
 import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.command.Command;
@@ -29,7 +30,7 @@ public class WarpCommand implements CommandExecutor {
     public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label,
             @NotNull String[] args) {
         if (!(sender instanceof Player)) {
-            sender.sendMessage("Hanya player yang bisa menggunakan command ini.");
+            sender.sendMessage(ConfigUtils.getString("messages.global.only-player"));
             return true;
         }
         Player p = (Player) sender;
@@ -39,7 +40,7 @@ public class WarpCommand implements CommandExecutor {
         if (label.equalsIgnoreCase("warps")) {
             if (args.length > 0 && args[0].equalsIgnoreCase("edit")) {
                 if (!p.hasPermission("naturalsmp.admin"))
-                    return true;
+                    return noPerm(p);
                 gui.openGUI(p, true); // Editor Mode
             } else {
                 gui.openGUI(p, false); // Normal Mode
@@ -50,17 +51,17 @@ public class WarpCommand implements CommandExecutor {
         // 2. Command: /setwarp <nama>
         if (label.equalsIgnoreCase("setwarp")) {
             if (!p.hasPermission("naturalsmp.admin"))
-                return true;
+                return noPerm(p);
             if (args.length == 0) {
-                p.sendMessage(ChatUtils.colorize("&cUsage: /setwarp <nama>"));
+                p.sendMessage(ConfigUtils.getString("messages.global.usage").replace("%usage%", "/setwarp <nama>"));
                 return true;
             }
             if (wm.getWarp(args[0]) != null) {
-                p.sendMessage(ChatUtils.colorize("&cWarp '" + args[0] + "' sudah ada!"));
+                p.sendMessage(ConfigUtils.getString("messages.home.home-exist")); // Reuse or add warp specific
                 return true;
             }
             wm.createWarp(args[0], p.getLocation());
-            p.sendMessage(ChatUtils.colorize("&aWarp '&f" + args[0] + "&a' berhasil dibuat!"));
+            p.sendMessage(ConfigUtils.getString("messages.warp.warp-set").replace("%name%", args[0]));
             p.playSound(p.getLocation(), Sound.BLOCK_NOTE_BLOCK_PLING, 1f, 2f);
             return true;
         }
@@ -68,27 +69,27 @@ public class WarpCommand implements CommandExecutor {
         // 3. Command: /delwarp <nama>
         if (label.equalsIgnoreCase("delwarp")) {
             if (!p.hasPermission("naturalsmp.admin"))
-                return true;
+                return noPerm(p);
             if (args.length == 0)
                 return true;
             if (wm.getWarp(args[0]) == null) {
-                p.sendMessage(ChatUtils.colorize("&cWarp tidak ditemukan!"));
+                p.sendMessage(ConfigUtils.getString("messages.warp.warp-not-found").replace("%name%", args[0]));
                 return true;
             }
             wm.deleteWarp(args[0]);
-            p.sendMessage(ChatUtils.colorize("&cWarp '&f" + args[0] + "&c' telah dihapus."));
+            p.sendMessage(ConfigUtils.getString("messages.warp.warp-deleted").replace("%name%", args[0]));
             return true;
         }
 
         // 4. Command: /setwarpicon <nama> (Set icon ke item di tangan)
         if (label.equalsIgnoreCase("setwarpicon")) {
             if (!p.hasPermission("naturalsmp.admin"))
-                return true;
+                return noPerm(p);
             if (args.length == 0)
                 return true;
             Warp w = wm.getWarp(args[0]);
             if (w == null) {
-                p.sendMessage(ChatUtils.colorize("&cWarp tidak ditemukan!"));
+                p.sendMessage(ConfigUtils.getString("messages.warp.warp-not-found").replace("%name%", args[0]));
                 return true;
             }
             Material hand = p.getInventory().getItemInMainHand().getType();
@@ -96,7 +97,9 @@ public class WarpCommand implements CommandExecutor {
                 hand = Material.GRASS_BLOCK;
             w.setIcon(hand);
             wm.saveWarps();
-            p.sendMessage(ChatUtils.colorize("&aIcon warp '&f" + w.getId() + "&a' diubah menjadi " + hand.name()));
+            p.sendMessage(ConfigUtils.getString("messages.warp.warp-icon-set")
+                    .replace("%name%", w.getId())
+                    .replace("%icon%", hand.name()));
             return true;
         }
 
@@ -108,15 +111,25 @@ public class WarpCommand implements CommandExecutor {
             }
             Warp w = wm.getWarp(args[0]);
             if (w == null) {
-                p.sendMessage(ChatUtils.colorize("&cWarp '&f" + args[0] + "&c' tidak ditemukan!"));
+                p.sendMessage(ConfigUtils.getString("messages.warp.warp-not-found").replace("%name%", args[0]));
                 return true;
             }
             p.teleport(w.getLocation());
             p.playSound(p.getLocation(), Sound.ENTITY_ENDERMAN_TELEPORT, 1f, 1f);
-            p.sendTitle(ChatUtils.colorize(w.getDisplayName()), ChatUtils.colorize("&7Teleporting..."), 0, 20, 10);
+
+            String title = ConfigUtils.getString("messages.warp.teleporting-title")
+                    .replace("%displayname%", w.getDisplayName());
+            String subTitle = ConfigUtils.getString("messages.warp.teleporting-subtitle");
+
+            p.sendTitle(title, subTitle, 0, 20, 10);
             return true;
         }
 
+        return true;
+    }
+
+    private boolean noPerm(Player p) {
+        p.sendMessage(ConfigUtils.getString("messages.global.no-permission"));
         return true;
     }
 }

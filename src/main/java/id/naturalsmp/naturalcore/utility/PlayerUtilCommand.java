@@ -35,7 +35,8 @@ public class PlayerUtilCommand implements CommandExecutor {
         if (target == null) {
             if (args.length > 0) {
                 // Modifikasi: Jangan fallback ke diri sendiri jika nama yang diketik salah
-                sender.sendMessage(ConfigUtils.getString("messages.player-not-found").replace("%player%", args[0]));
+                sender.sendMessage(
+                        ConfigUtils.getString("messages.global.player-not-found").replace("%player%", args[0]));
                 return true;
             }
 
@@ -65,12 +66,13 @@ public class PlayerUtilCommand implements CommandExecutor {
             target.setSaturation(20);
             target.setFireTicks(0);
 
-            target.sendMessage(prefix + ConfigUtils.getString("messages.heal-success"));
+            target.sendMessage(prefix + ConfigUtils.getString("messages.essentials.heal-success"));
             target.playSound(target.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, 1f, 1f);
 
             if (!sender.equals(target)) {
                 sender.sendMessage(
-                        prefix + ConfigUtils.getString("messages.heal-other").replace("%target%", target.getName()));
+                        prefix + ConfigUtils.getString("messages.essentials.heal-other").replace("%target%",
+                                target.getName()));
             }
             return true;
         }
@@ -83,12 +85,13 @@ public class PlayerUtilCommand implements CommandExecutor {
             target.setFoodLevel(20);
             target.setSaturation(20);
 
-            target.sendMessage(prefix + ConfigUtils.getString("messages.feed-success"));
+            target.sendMessage(prefix + ConfigUtils.getString("messages.essentials.feed-success"));
             target.playSound(target.getLocation(), Sound.ENTITY_GENERIC_EAT, 1f, 1f);
 
             if (!sender.equals(target)) {
                 sender.sendMessage(
-                        prefix + ConfigUtils.getString("messages.feed-other").replace("%target%", target.getName()));
+                        prefix + ConfigUtils.getString("messages.essentials.feed-other").replace("%target%",
+                                target.getName()));
             }
             return true;
         }
@@ -102,12 +105,12 @@ public class PlayerUtilCommand implements CommandExecutor {
             target.setAllowFlight(flight);
 
             String status = flight ? "ENABLED" : "DISABLED";
-            String msgTarget = flight ? "messages.fly-enabled" : "messages.fly-disabled";
+            String msgTarget = flight ? "messages.essentials.fly-enabled" : "messages.essentials.fly-disabled";
 
             target.sendMessage(prefix + ConfigUtils.getString(msgTarget));
 
             if (!sender.equals(target)) {
-                sender.sendMessage(prefix + ConfigUtils.getString("messages.fly-other")
+                sender.sendMessage(prefix + ConfigUtils.getString("messages.essentials.fly-other")
                         .replace("%target%", target.getName())
                         .replace("%status%", status));
             }
@@ -118,7 +121,7 @@ public class PlayerUtilCommand implements CommandExecutor {
     }
 
     private boolean noPerm(CommandSender s) {
-        s.sendMessage(ConfigUtils.getString("messages.no-permission"));
+        s.sendMessage(ConfigUtils.getString("messages.global.no-permission"));
         return true;
     }
 }

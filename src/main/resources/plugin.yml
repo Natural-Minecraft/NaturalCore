@@ -1,5 +1,5 @@
 name: NaturalCore
-version: 1.5
+version: 1.6
 main: id.naturalsmp.naturalcore.NaturalCore
 api-version: 1.21
 author: NaturalSMP
@@ -220,6 +220,16 @@ commands:
     aliases: [emojis, emoticon]
     permission: naturalsmp.emoji.use
 
+  # --- SEASONS ---
+  season:
+    description: Season and temperature management
+    permission: naturalsmp.season.admin
+
+  # --- BANNERS ---
+  banner:
+    description: Interactive banners management (Interactive Board)
+    permission: naturalsmp.admin.banner
+
 permissions:
   naturalsmp.admin:
     default: op
@@ -228,6 +238,12 @@ permissions:
   naturalcs.restartalert:
     default: op
   naturalcs.broadcast:
+    default: op
+  naturalsmp.season.admin:
+    description: Control seasons and temperature
+    default: op
+  naturalsmp.admin.banner:
+    description: Create and manage interactive banners
     default: op
   naturalsmp.home.limit.*:
     description: Izin untuk semua jenis limit home

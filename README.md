@@ -1,27 +1,36 @@
-# 🍃 NaturalCore v1.5 (The Utility Update)
+# 🍃 NaturalCore v1.6 (The Interaction & Climate Update)
 
-![Version](https://img.shields.io/badge/version-1.5-green) ![Minecraft](https://img.shields.io/badge/minecraft-1.21+-blue) ![Java](https://img.shields.io/badge/java-21-orange)
+![Version](https://img.shields.io/badge/version-1.6-green) ![Minecraft](https://img.shields.io/badge/minecraft-1.21+-blue) ![Java](https://img.shields.io/badge/java-21-orange)
 
 **NaturalCore** adalah plugin "All-in-One" untuk server Minecraft Survival/SMP modern. Plugin ini menggantikan kebutuhan akan Essentials dengan solusi yang ringan, estetik, dan terintegrasi penuh.
 
-Versi **1.5** berfokus pada **Utilities & Modern Aesthetics**, menambahkan fitur pesan pribadi, pengaturan dunia, dan tampilan GUI yang lebih segar.
+Versi **1.6** menghadirkan pengalaman dunia yang lebih hidup dengan sistem **Musim (Seasons)** serta fitur visual **Interactive Banners** untuk dekorasi server yang fungsional.
 
 ---
 
-## ✨ Apa yang Baru di v1.5?
+## ✨ Apa yang Baru di v1.6?
 
+* **🍂 Dynamic Seasons:** Siklus 4 musim (Spring, Summer, Autumn, Winter) yang mengubah warna dunia (foliage/grass) secara otomatis.
+* **🌡️ Temperature System:** Suhu dinamis berbasis Celsius yang dipengaruhi oleh waktu, cuaca, dan lingkungan (api, lava, air).
+* **🖼️ Interactive Banners:** Pasang gambar kustom di dunia menggunakan Map & ItemDisplay. Mendukung klik aksi (Buka URL atau Jalankan Command).
+* **⚡ Modern Action Bar:** Tampilan informatif yang menggabungkan Status Musim, Suhu, dan **Mana AuraSkills** secara estetik.
 * **📨 Private Messaging:** Sistem `/msg` dan `/reply` dengan format modern.
-* **🎨 Hex Color Support:** Dukungan penuh warna Hex (`&#RRGGBB`) di chat dan config.
-* **🔨 Virtual Utilities:** Akses `/anvil`, `/trash`, dan `/craft` di mana saja.
 * **🏠 Home System V2:** Penyimpanan Home kini berbasis **UUID Flat-File** (Folder `homes/`), aman dari pergantian nama player.
-* **📖 Home GUI Pagination:** Tampilan GUI Home baru yang minimalis (9-slot) dengan dukungan halaman tak terbatas.
-* **🌤️ World Tools:** Kontrol waktu dan cuaca instan (`/day`, `/rain`, dll).
+* **🏠 Home GUI Pagination:** Tampilan GUI Home baru yang minimalis (9-slot) dengan dukungan halaman tak terbatas.
 
 ---
 
 ## 🛠️ Daftar Command & Permission
 
-### 📨 Chat & Social (New!)
+### 🌍 Interactive & Climate (New in v1.6!)
+| Command | Permission | Deskripsi |
+| :--- | :--- | :--- |
+| `/season set <nama>` | `naturalsmp.season.admin` | Ubah musim secara manual (Refresh visuals). |
+| `/banner wand` | `naturalsmp.admin.banner` | Ambil alat seleksi untuk pasang gambar. |
+| `/banner create <n> <img>` | `naturalsmp.admin.banner` | Pasang banner interaktif di area terseleksi. |
+| `/banner delete <nama>` | `naturalsmp.admin.banner` | Hapus banner yang sudah ada. |
+
+### 📨 Chat & Social
 | Command | Permission | Deskripsi |
 | :--- | :--- | :--- |
 | `/msg <player>` | - | Kirim pesan pribadi (Aliases: `/tell`, `/w`). |
@@ -87,11 +96,12 @@ Gunakan di Scoreboard/TAB:
 
 1.  **Stop Server**.
 2.  **Hapus folder `NaturalCore` lama** (Wajib jika upgrade dari v1.4 ke v1.5 karena perubahan struktur Home).
-3.  Masukkan `NaturalCore-1.5.jar`.
+3.  Masukkan `NaturalCore-1.6.jar`.
 4.  Pastikan plugin dependensi terinstall:
     * **Vault** (Wajib)
-    * **LuckPerms** (Recommended untuk Prefix)
-    * **PlaceholderAPI** (Opsional)
+    * **DecentHolograms** (Wajib - untuk beberapa fitur tampilan)
+    * **PlaceholderAPI** (Recommended - untuk Action Bar Mana)
+    * **Citizens** (Opsional - untuk NPC)
 5.  **Start Server**.
 
 ---

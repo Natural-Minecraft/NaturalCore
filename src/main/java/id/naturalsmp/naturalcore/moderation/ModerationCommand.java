@@ -26,27 +26,37 @@ public class ModerationCommand implements CommandExecutor {
     }
 
     @Override
-    public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, @NotNull String[] args) {
+    public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label,
+            @NotNull String[] args) {
 
         String cmd = label.toLowerCase();
         String prefix = ConfigUtils.getString("prefix.moderation");
 
         // --- 1. WHOIS (Info Player) ---
         if (cmd.equals("whois")) {
-            if (!sender.hasPermission("naturalsmp.whois")) return noPerm(sender);
-            if (args.length == 0) { sender.sendMessage(ChatUtils.colorize("&cUsage: /whois <player>")); return true; }
+            if (!sender.hasPermission("naturalsmp.whois"))
+                return noPerm(sender);
+            if (args.length == 0) {
+                sender.sendMessage(ChatUtils.colorize("&cUsage: /whois <player>"));
+                return true;
+            }
 
             Player t = Bukkit.getPlayer(args[0]);
-            if (t == null) { sender.sendMessage(ConfigUtils.getString("messages.player-not-found")); return true; }
+            if (t == null) {
+                sender.sendMessage(ConfigUtils.getString("messages.global.player-not-found"));
+                return true;
+            }
 
             sender.sendMessage(ChatUtils.colorize("&8&m----------------"));
             sender.sendMessage(ChatUtils.colorize("&6WHOIS: &e" + t.getName()));
             sender.sendMessage(ChatUtils.colorize("&7UUID: " + t.getUniqueId()));
-            sender.sendMessage(ChatUtils.colorize("&7IP: " + (t.getAddress() != null ? t.getAddress().getHostString() : "Unknown")));
+            sender.sendMessage(ChatUtils
+                    .colorize("&7IP: " + (t.getAddress() != null ? t.getAddress().getHostString() : "Unknown")));
             sender.sendMessage(ChatUtils.colorize("&7Gamemode: " + t.getGameMode()));
             sender.sendMessage(ChatUtils.colorize("&7GodMode: " + godPlayers.contains(t.getUniqueId())));
             sender.sendMessage(ChatUtils.colorize("&7Vanish: " + plugin.getVanishManager().isVanished(t)));
-            sender.sendMessage(ChatUtils.colorize("&7Health: " + (int)t.getHealth() + " / " + (int)t.getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue()));
+            sender.sendMessage(ChatUtils.colorize("&7Health: " + (int) t.getHealth() + " / "
+                    + (int) t.getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue()));
             sender.sendMessage(ChatUtils.colorize("&8&m----------------"));
             return true;
         }
@@ -59,23 +69,25 @@ public class ModerationCommand implements CommandExecutor {
 
         // --- 2. GOD MODE ---
         if (cmd.equals("god")) {
-            if (!p.hasPermission("naturalsmp.god")) return noPerm(p);
+            if (!p.hasPermission("naturalsmp.god"))
+                return noPerm(p);
 
             if (godPlayers.contains(p.getUniqueId())) {
                 godPlayers.remove(p.getUniqueId());
-                p.sendMessage(prefix + ConfigUtils.getString("messages.god-disabled"));
+                p.sendMessage(prefix + ConfigUtils.getString("messages.moderation.god-disabled"));
             } else {
                 godPlayers.add(p.getUniqueId());
                 p.setHealth(p.getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue());
                 p.setFoodLevel(20);
-                p.sendMessage(prefix + ConfigUtils.getString("messages.god-enabled"));
+                p.sendMessage(prefix + ConfigUtils.getString("messages.moderation.god-enabled"));
             }
             return true;
         }
 
         // --- 3. VANISH ---
         if (cmd.equals("vanish") || cmd.equals("v")) {
-            if (!p.hasPermission("naturalsmp.vanish")) return noPerm(p);
+            if (!p.hasPermission("naturalsmp.vanish"))
+                return noPerm(p);
 
             VanishManager vm = plugin.getVanishManager();
             // Toggle status (Kalau true jadi false, kalau false jadi true)
@@ -89,7 +101,7 @@ public class ModerationCommand implements CommandExecutor {
     }
 
     private boolean noPerm(CommandSender s) {
-        s.sendMessage(ConfigUtils.getString("messages.no-permission"));
+        s.sendMessage(ConfigUtils.getString("messages.global.no-permission"));
         return true;
     }
 }

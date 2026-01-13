@@ -97,9 +97,10 @@ public class HomeManager {
             p.teleport(loc);
             p.playSound(p.getLocation(), Sound.ENTITY_ENDERMAN_TELEPORT, 1f, 1f);
 
-            String msg = ConfigUtils.getString("messages.teleporting");
+            String msg = ConfigUtils.getString("messages.home.home-teleport");
             // Fallback jika message config belum ada
-            if (msg == null) msg = "&aTeleporting to &e%location%...";
+            if (msg == null)
+                msg = "&aTeleporting to &e%location%...";
 
             p.sendMessage(ChatUtils.colorize(ConfigUtils.getString("prefix.admin") + msg.replace("%location%", name)));
         } else {
@@ -109,16 +110,19 @@ public class HomeManager {
 
     // --- LIMITS ---
     public int getMaxHomes(Player p) {
-        if (p.hasPermission("naturalsmp.home.limit.unlimited")) return 999;
+        if (p.hasPermission("naturalsmp.home.limit.unlimited"))
+            return 999;
 
         ConfigurationSection limitSection = plugin.getConfig().getConfigurationSection("home.limits");
-        if (limitSection == null) return 2;
+        if (limitSection == null)
+            return 2;
 
         int highestLimit = 0;
         for (String rank : limitSection.getKeys(false)) {
             if (p.hasPermission("naturalsmp.home.limit." + rank)) {
                 int value = limitSection.getInt(rank);
-                if (value > highestLimit) highestLimit = value;
+                if (value > highestLimit)
+                    highestLimit = value;
             }
         }
         return highestLimit > 0 ? highestLimit : limitSection.getInt("default", 2);

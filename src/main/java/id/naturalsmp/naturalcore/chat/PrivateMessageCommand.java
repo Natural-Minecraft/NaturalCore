@@ -40,7 +40,7 @@ public class PrivateMessageCommand implements CommandExecutor {
 
             Player target = Bukkit.getPlayer(args[0]);
             if (target == null) {
-                p.sendMessage(ConfigUtils.getString("messages.player-not-found"));
+                p.sendMessage(ConfigUtils.getString("messages.global.player-not-found"));
                 return true;
             }
 
@@ -59,7 +59,7 @@ public class PrivateMessageCommand implements CommandExecutor {
 
             Player target = plugin.getMessageManager().getReplyTarget(p);
             if (target == null) {
-                p.sendMessage(ConfigUtils.getString("messages.msg-no-reply"));
+                p.sendMessage(ConfigUtils.getString("messages.utils.msg-no-reply"));
                 return true;
             }
 

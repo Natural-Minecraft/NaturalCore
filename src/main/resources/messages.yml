@@ -4,104 +4,182 @@
 # Semua pesan yang ditampilkan ke player
 
 # --- GLOBAL ---
-no-permission: "&c&l✘ &7Maaf, kamu tidak punya akses."
-reload-success: "&a&l✔ &7Konfigurasi berhasil dimuat ulang!"
-player-not-found: "&c&l✘ &7Pemain &f%player% &ctidak ditemukan/offline."
+global:
+  no-permission: "&c&l✘ &7Maaf, kamu tidak punya akses."
+  reload-success: "&a&l✔ &7Konfigurasi berhasil dimuat ulang!"
+  player-not-found: "&c&l✘ &7Pemain &f%player% &ctidak ditemukan/offline."
+  only-player: "&cPerintah ini hanya dapat digunakan oleh pemain!"
+  usage: "&cUsage: %usage%"
+
+# --- ADMIN MODULE ---
+admin:
+  kickall:
+    usage: "&cUsage: /kickall confirm <alasan>"
+    confirm-required: "&cSilahkan ketik &aConfirmation &csebelum reason"
+    success: "&aBerhasil meng-kick semua player!"
+    message-format: |-
+      &a&lNatural &6&lService
+      
+      &cMaaf, %kicker% telah melakukan kick
+      &7Reason: &c%reason%
+  broadcast:
+    usage: "&cSilahkan isi pesan broadcast!"
+    format: "&a&lBroadcast &b> &e%message%"
+  restart:
+    confirm-required: "&8&l| &cSilahkan ketik &aConfirmation &cterlebih dahulu"
+    warning-header: "&4&m&l---------=============---------"
+    warning-title: "                 &c&lWarning"
+    warning-body: |-
+       &cServer akan melakukan restart
+             &cdalam waktu &a10 &cdetik
+    warning-footer: "&4&m&l---------=============---------"
+    countdown-title: "&4&l! &c&lRestart &4&l!"
+    countdown-subtitle: "&c%time% Seconds"
+    saving-data: "&4Saving-data..."
+    kick-reason: |-
+      &a&lNaturalSMP &cRestart
+      
+      &bServer sedang melakukan restart! silahkan tunggu &e3 menit
 
 # --- SOCIAL ---
-join-message: "&8[&a+&8] &7%displayname%"
-quit-message: "&8[&c-&8] &7%displayname%"
-first-join-message: "&d&lNEW &8┃ &fWelcome &d%displayname% &7to the server! &e(#%count%)"
-
-motd:
-  - "&8&m--------------------------------"
-  - " &6&lWelcome to NaturalSMP!"
-  - " &7Selamat bermain, %player%!"
-  - "&8&m--------------------------------"
+social:
+  join-message: "&8[&a+&8] &7%displayname%"
+  quit-message: "&8[&c-&8] &7%displayname%"
+  first-join-message: "&d&lNEW &8┃ &fWelcome &d%displayname% &7to the server! &e(#%count%)"
+  motd:
+    - "&8&m--------------------------------"
+    - " &6&lWelcome to NaturalSMP!"
+    - " &7Selamat bermain, %player%!"
+    - "&8&m--------------------------------"
 
 # --- FUN ---
-gg-message: "&8[&b&lGG&8] &f%displayname% &7mengatakan &bGood Game!"
-noob-message: "&8[&c&lNOOB&8] &f%displayname% &7berteriak &cNOOB!"
-cooldown-msg: "&e&l⚠ &7Tunggu &c%time% detik &7lagi."
+fun:
+  gg-message: "&8[&b&lGG&8] &f%displayname% &7mengatakan &bGood Game!"
+  noob-message: "&8[&c&lNOOB&8] &f%displayname% &7berteriak &cNOOB!"
+  cooldown-msg: "&e&l⚠ &7Tunggu &c%time% detik &7lagi."
 
 # --- UTILITIES ---
-msg-no-reply: "&cTidak ada orang yang bisa dibalas."
-msg-player-only: "&cConsole tidak bisa melakukan ini."
-
-repair-success: "&e&l⚒ &7Item di tangan berhasil diperbaiki!"
-hat-success: "&a&l🎩 &7Item dipasang sebagai topi!"
-hat-fail: "&cPegang item dulu untuk dijadikan topi."
-
-nick-set: "&aNickname kamu diubah menjadi: &r{nick}"
-nick-reset: "&aNickname dikembalikan ke default."
-
-time-day: "&e&l☀ &7Waktu diubah menjadi &fSiang&7."
-time-night: "&9&l☾ &7Waktu diubah menjadi &fMalam&7."
-weather-sun: "&e&l☀ &7Cuaca cerah."
-weather-rain: "&9&l☂ &7Hujan turun."
+utils:
+  msg-no-reply: "&cTidak ada orang yang bisa dibalas."
+  msg-player-only: "&cConsole tidak bisa melakukan ini."
+  repair-success: "&e&l⚒ &7Item di tangan berhasil diperbaiki!"
+  hat-success: "&a&l🎩 &7Item dipasang sebagai topi!"
+  hat-fail: "&cPegang item dulu untuk dijadikan topi."
+  nick-set: "&aNickname kamu diubah menjadi: &r{nick}"
+  nick-reset: "&aNickname dikembalikan ke default."
+  time-day: "&e&l☀ &7Waktu diubah menjadi &fSiang&7."
+  time-night: "&9&l☾ &7Waktu diubah menjadi &fMalam&7."
+  weather-sun: "&e&l☀ &7Cuaca cerah."
+  weather-rain: "&9&l☂ &7Hujan turun."
 
 # --- RTP ---
-rtp-resource: "&aMenuju dunia Resource... &7(Mohon tunggu)"
-rtp-survival: "&aTeleportasi Random Survival..."
-rtp-already-here: "&cKamu sudah berada di dunia ini!"
+rtp:
+  resource: "&aMenuju dunia Resource... &7(Mohon tunggu)"
+  survival: "&aTeleportasi Random Survival..."
+  already-here: "&cKamu sudah berada di dunia ini!"
 
 # --- ESSENTIALS ---
-gamemode-changed: "&7Gamemode diubah ke &b%mode%&7."
-gamemode-changed-other: "&7Gamemode &f%target% &7diubah ke &b%mode%&7."
-
-fly-enabled: "&b&l✈ &7Flight mode &aENABLED&7."
-fly-disabled: "&b&l✈ &7Flight mode &cDISABLED&7."
-fly-other: "&b&l✈ &7Flight mode &f%target% &7telah &e%status%&7."
-
-heal-success: "&d&l❤ &7Kamu telah dipulihkan."
-heal-other: "&d&l❤ &7Telah memulihkan &f%target%&7."
-feed-success: "&6&l🍗 &7Rasa lapar dihilangkan."
-feed-other: "&6&l🍗 &7Telah memberi makan &f%target%&7."
-
-invsee-open: "&7Membuka inventory &f%target%&7."
-endersee-open: "&7Membuka enderchest &f%target%&7."
+essentials:
+  gamemode-changed: "&7Gamemode diubah ke &b%mode%&7."
+  gamemode-changed-other: "&7Gamemode &f%target% &7diubah ke &b%mode%&7."
+  fly-enabled: "&b&l✈ &7Flight mode &aENABLED&7."
+  fly-disabled: "&b&l✈ &7Flight mode &cDISABLED&7."
+  fly-other: "&b&l✈ &7Flight mode &f%target% &7telah &e%status%&7."
+  heal-success: "&d&l❤ &7Kamu telah dipulihkan."
+  heal-other: "&d&l❤ &7Telah memulihkan &f%target%&7."
+  feed-success: "&6&l🍗 &7Rasa lapar dihilangkan."
+  feed-other: "&6&l🍗 &7Telah memberi makan &f%target%&7."
+  invsee-open: "&7Membuka inventory &f%target%&7."
+  endersee-open: "&7Membuka enderchest &f%target%&7."
 
 # --- ECONOMY ---
-invalid-amount: "&cMasukan jumlah angka yang valid!"
-invalid-currency: "&cMata uang salah. Gunakan: &f%aliases%"
-balance-check: "&7Saldo &f%target%&7: &a%symbol% %amount%"
-balance-set: "&7Saldo &f%target% &7diatur menjadi &a%symbol% %amount%"
-balance-take: "&7Mengambil &a%symbol% %amount% &7dari &f%target%"
-pay-sent: "&7Kamu mengirim &a%symbol% %amount% &7ke &f%target%"
-pay-received: "&7Kamu menerima &a%symbol% %amount% &7dari &f%player%"
-pay-fail: "&cSaldo tidak cukup!"
-give-success-sender: "&7Berhasil mengirim &e%symbol% %amount% &7ke &f%target%&7."
-give-success-target: "&7Kamu menerima &e%symbol% %amount% &7dari Admin!"
+economy:
+  invalid-amount: "&cMasukan jumlah angka yang valid!"
+  invalid-currency: "&cMata uang salah. Gunakan: &f%aliases%"
+  balance-check: "&7Saldo &f%target%&7: &a%symbol% %amount%"
+  balance-set: "&7Saldo &f%target% &7diatur menjadi &a%symbol% %amount%"
+  balance-take: "&7Mengambil &a%symbol% %amount% &7dari &f%target%"
+  pay-sent: "&7Kamu mengirim &a%symbol% %amount% &7ke &f%target%"
+  pay-received: "&7Kamu menerima &a%symbol% %amount% &7dari &f%player%"
+  pay-fail: "&cSaldo tidak cukup!"
+  give-success-sender: "&7Berhasil mengirim &e%symbol% %amount% &7ke &f%target%&7."
+  give-success-target: "&7Kamu menerima &e%symbol% %amount% &7dari Admin!"
 
 # --- MODERATION ---
-god-enabled: "&aGod Mode &eAKTIF&a."
-god-disabled: "&cGod Mode &eNONAKTIF&c."
-vanish-enabled: "&aVanish &eAKTIF &7(Kamu sekarang menghilang)."
-vanish-disabled: "&cVanish &eNONAKTIF &7(Kamu terlihat kembali)."
+moderation:
+  god-enabled: "&aGod Mode &eAKTIF&a."
+  god-disabled: "&cGod Mode &eNONAKTIF&c."
+  vanish-enabled: "&aVanish &eAKTIF &7(Kamu sekarang menghilang)."
+  vanish-disabled: "&cVanish &eNONAKTIF &7(Kamu terlihat kembali)."
 
 # --- SPAWN ---
-spawn-set: "&aLokasi spawn utama berhasil diatur!"
-spawn-teleport: "&aBerhasil teleport ke Spawn!"
-spawn-not-set: "&cLokasi Spawn belum diatur oleh Admin!"
+spawn:
+  spawn-set: "&aLokasi spawn utama berhasil diatur!"
+  spawn-teleport: "&aBerhasil teleport ke Spawn!"
+  spawn-not-set: "&cLokasi Spawn belum diatur oleh Admin!"
 
 # --- HOME ---
-home-set: "&a&l✔ &7Home &f%name% &7berhasil dibuat!"
-home-teleport: "&7Teleport ke home &b%name%&7..."
-home-deleted: "&c&l🗑 &7Home &f%name% &7telah dihapus."
-home-not-found: "&c&l✘ &7Home &f%name% &7tidak ditemukan!"
-home-limit: "&c&l⚠ &7Limit home tercapai! &8(&f%current%&8/&c%max%&8)"
-home-list: "&7Daftar Home kamu: &f%homes%"
-home-exist: "&cHome dengan nama tersebut sudah ada!"
+home:
+  home-set: "&a&l✔ &7Home &f%name% &7berhasil dibuat!"
+  home-teleport: "&7Teleport ke home &b%name%&7..."
+  home-deleted: "&c&l🗑 &7Home &f%name% &7telah dihapus."
+  home-not-found: "&c&l✘ &7Home &f%name% &7tidak ditemukan!"
+  home-limit: "&c&l⚠ &7Limit home tercapai! &8(&f%current%&8/&c%max%&8)"
+  home-list: "&7Daftar Home kamu: &f%homes%"
+  list-empty: "&cKamu belum punya home! Gunakan /sethome <nama>"
+  home-exist: "&cHome dengan nama tersebut sudah ada!"
 
 # --- TELEPORT ---
-tp-success: "&7Teleportasi ke &f%target%&7."
-tphere-success: "&7Menarik &f%target% &7ke lokasimu."
-tpa-sent: "&7Permintaan teleport dikirim ke &f%target%&7."
-tpa-received: "&f%player% &7ingin teleport ke kamu."
-tpahere-received: "&f%player% &7ingin menarik kamu ke lokasinya."
-tpa-accept-sender: "&aPermintaan diterima! Teleportasi..."
-tpa-accept-target: "&aKamu menerima permintaan &f%player%&a."
-tpa-deny-sender: "&cPermintaan teleport ditolak oleh &f%target%&c."
-tpa-deny-target: "&cKamu menolak permintaan &f%player%&c."
-tpa-no-request: "&cTidak ada permintaan teleport yang aktif."
-tpa-timeout: "&cPermintaan teleport kadaluarsa."
+teleport:
+  tp-success: "&7Teleportasi ke &f%target%&7."
+  tphere-success: "&7Menarik &f%target% &7ke lokasimu."
+  tpa-sent: "&7Permintaan teleport dikirim ke &f%target%&7."
+  tpa-received: "&f%player% &7ingin teleport ke kamu."
+  tpahere-received: "&f%player% &7ingin menarik kamu ke lokasinya."
+  tpa-accept-sender: "&aPermintaan diterima! Teleportasi..."
+  tpa-accept-target: "&aKamu menerima permintaan &f%player%&a."
+  tpa-deny-sender: "&cPermintaan teleport ditolak oleh &f%target%&c."
+  tpa-deny-target: "&cKamu menolak permintaan &f%player%&c."
+  tpa-no-request: "&cTidak ada permintaan teleport yang aktif."
+  tpa-timeout: "&cPermintaan teleport kadaluarsa."
+  tp-move: "&aMemindahkan &e%target1% &ake &e%target2%"
+  tp-self: "&cTidak bisa teleport ke diri sendiri!"
+  tp-coords: "&7Teleportasi ke &f%x%, %y%, %z%&7."
+  tp-coords-other: "&7Memindahkan &f%target% &7ke &f%x%, %y%, %z%&7."
+
+# --- WARP ---
+warp:
+  warp-set: "&aWarp '&f%name%&a' berhasil dibuat!"
+  warp-deleted: "&cWarp '&f%name%&c' telah dihapus."
+  warp-not-found: "&cWarp '&f%name%&c' tidak ditemukan!"
+  warp-icon-set: "&aIcon warp '&f%name%&a' diubah menjadi %icon%"
+  teleporting-title: "%displayname%"
+  teleporting-subtitle: "&7Teleporting..."
+
+# --- GUI ---
+gui:
+  warp:
+    title: "&#252525◤ ᴡᴀʀᴘꜱ ᴍᴇɴᴜ ◥"
+    editor-title: "&c&lWARP EDITOR (Klik Kanan Hapus)"
+    item-lore:
+      - "&8%id%"
+      - ""
+      - "&7Warp ke %name%"
+      - ""
+      - "&a➥ &lKLIK UNTUK WARP"
+      - ""
+    item-editor-lore:
+      - "&8%id%"
+      - ""
+      - "&e&l[EDITOR MODE]"
+      - "&7Klik Kanan untuk &cHAPUS"
+  home:
+    title: "&#252525◤ ɴᴀᴛᴜʀᴀʟ ʜᴏᴍᴇ ◥"
+    item-name: "&a&l%name%"
+    item-lore:
+      - "&8%name%"
+      - ""
+      - "&7World: &f%world%"
+#      - "&7Coords: &f%x%, %y%, %z%"
+      - ""
+      - "&a➥ &lKLIK UNTUK TELEPORT"

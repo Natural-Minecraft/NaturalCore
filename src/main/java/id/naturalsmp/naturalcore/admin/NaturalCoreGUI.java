@@ -35,7 +35,7 @@ public class NaturalCoreGUI implements Listener {
     public void openGUI(Player p) {
         // PERMISSION CHECK: Hanya Admin yang bisa buka GUI ini
         if (!p.hasPermission("naturalsmp.admin")) {
-            p.sendMessage(ConfigUtils.getString("messages.no-permission"));
+            p.sendMessage(ConfigUtils.getString("messages.global.no-permission"));
             return;
         }
 
@@ -68,7 +68,7 @@ public class NaturalCoreGUI implements Listener {
         inv.setItem(26, createItem(Material.BARRIER, "&c&lClose"));
 
         p.openInventory(inv);
-        p.playSound(p.getLocation(), Sound.BLOCK_NOTE_BLOCK_PLLING, 1f, 1f);
+        p.playSound(p.getLocation(), Sound.BLOCK_NOTE_BLOCK_PLING, 1f, 1f);
 
         // Register Listener SEMENTARA (Sebaiknya register di Main Class 1x saja)
         // Tapi untuk fix cepat, pastikan listener ini terdaftar di NaturalCore.java

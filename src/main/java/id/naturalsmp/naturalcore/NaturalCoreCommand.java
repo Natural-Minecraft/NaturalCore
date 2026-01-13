@@ -67,7 +67,7 @@ public class NaturalCoreCommand implements CommandExecutor {
                 plugin.getEmojiManager().loadEmojis();
             }
 
-            sender.sendMessage(ConfigUtils.getString("messages.reload-success"));
+            sender.sendMessage(ConfigUtils.getString("messages.global.reload-success"));
             return true;
         }
 
@@ -102,7 +102,7 @@ public class NaturalCoreCommand implements CommandExecutor {
     }
 
     private boolean noPerm(CommandSender s) {
-        s.sendMessage(ConfigUtils.getString("messages.no-permission"));
+        s.sendMessage(ConfigUtils.getString("messages.global.no-permission"));
         return true;
     }
 }

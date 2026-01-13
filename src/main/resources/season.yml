@@ -1,0 +1,58 @@
+# --- NATURALCORE SEASONS ---
+# Fitur Musim, Suhu, dan Action Bar Estetik
+
+enabled: true
+
+# Durasi setiap musim dalam hari Minecraft (1 hari = 24.000 ticks)
+season-duration-days: 30
+
+current-season: SPRING
+current-day: 1
+
+# Pengaturan Setiap Musim
+# Ikon: Unicode character yang estetik
+seasons:
+  SPRING:
+    display-name: "&a&lMusim Semi"
+    icon: "🌸"
+    temp-base: 25.0
+    color: "#aaffaa" # Visual hint (informasi saja)
+  SUMMER:
+    display-name: "&6&lMusim Panas"
+    icon: "☀"
+    temp-base: 35.0
+  AUTUMN:
+    display-name: "&6&lMusim Gugur"
+    icon: "🍂"
+    temp-base: 20.0
+  WINTER:
+    display-name: "&b&lMusim Dingin"
+    icon: "❄"
+    temp-base: 5.0
+
+# Modifikasi Suhu Berdasarkan Lingkungan
+modifiers:
+  night: -10.0
+  noon: 5.0
+  rain: -3.0
+  storm: -5.0
+  underground: -4.0
+  near-fire: 20.0
+  near-lava: 50.0
+  in-water: -5.0
+
+# Pengaturan Action Bar
+action-bar:
+  enabled: true
+  # Format: %season_icon% %season_name% | %temp%°C | %mana_icon% %mana%/%max_mana%
+  format: "&6&l%icon% %name% &8| &e%temp%°C &8| &b&l⚡ &f%mana%&7/&b%max_mana%"
+
+# Pengaturan Visual (Warna Dunia / Biome)
+visuals:
+  enabled: true
+  # Biome yang dipinjam warnanya untuk setiap musim
+  biomes:
+    SPRING: "PLAINS"
+    SUMMER: "JUNGLE"
+    AUTUMN: "WOODED_BADLANDS"
+    WINTER: "SNOWY_PLAINS"

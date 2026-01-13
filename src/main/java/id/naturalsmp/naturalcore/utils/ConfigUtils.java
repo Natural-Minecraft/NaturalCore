@@ -19,6 +19,8 @@ public class ConfigUtils {
 
     private static FileConfiguration messagesConfig;
     private static File messagesFile;
+    private static FileConfiguration seasonConfig;
+    private static File seasonFile;
 
     // --- CONFIG.YML HELPERS ---
 
@@ -33,6 +35,15 @@ public class ConfigUtils {
             loadMessages();
         }
         return messagesConfig;
+    }
+
+    // --- SEASON.YML HELPERS ---
+
+    public static FileConfiguration getSeasonConfig() {
+        if (seasonConfig == null) {
+            loadSeason();
+        }
+        return seasonConfig;
     }
 
     /**
@@ -50,12 +61,22 @@ public class ConfigUtils {
         messagesConfig = YamlConfiguration.loadConfiguration(messagesFile);
     }
 
+    private static void loadSeason() {
+        NaturalCore plugin = NaturalCore.getInstance();
+        if (!new File(plugin.getDataFolder(), "season.yml").exists()) {
+            plugin.saveResource("season.yml", false);
+        }
+        seasonFile = new File(plugin.getDataFolder(), "season.yml");
+        seasonConfig = YamlConfiguration.loadConfiguration(seasonFile);
+    }
+
     /**
      * Reload semua konfigurasi
      */
     public static void reload() {
         NaturalCore.getInstance().reloadConfig();
         loadMessages(); // Reload messages.yml juga
+        loadSeason(); // Reload season.yml juga
     }
 
     // --- STRING GETTERS ---

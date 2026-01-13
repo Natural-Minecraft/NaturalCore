@@ -39,10 +39,11 @@ public class SpawnManager {
         String prefix = ConfigUtils.getString("prefix.spawn");
 
         // Jika null (lupa set di config), fallback ke admin
-        if (prefix == null) prefix = ConfigUtils.getString("prefix.admin");
+        if (prefix == null)
+            prefix = ConfigUtils.getString("prefix.admin");
 
         if (spawnLocation == null) {
-            p.sendMessage(prefix + ConfigUtils.getString("messages.spawn-not-set"));
+            p.sendMessage(prefix + ConfigUtils.getString("messages.spawn.spawn-not-set"));
             p.playSound(p.getLocation(), Sound.ENTITY_VILLAGER_NO, 1f, 1f);
             return;
         }
@@ -51,7 +52,7 @@ public class SpawnManager {
         p.playSound(p.getLocation(), Sound.ENTITY_ENDERMAN_TELEPORT, 1f, 1f);
         p.sendTitle(ChatUtils.colorize("&a&lSPAWN"), ChatUtils.colorize("&7Teleporting..."), 0, 20, 10);
 
-        p.sendMessage(prefix + ConfigUtils.getString("messages.spawn-teleport"));
+        p.sendMessage(prefix + ConfigUtils.getString("messages.spawn.spawn-teleport"));
     }
 
     // --- FILE HANDLING (spawn.yml) ---
@@ -86,7 +87,8 @@ public class SpawnManager {
     }
 
     private void saveSpawn() {
-        if (spawnLocation == null) return;
+        if (spawnLocation == null)
+            return;
 
         config.set("spawn.world", spawnLocation.getWorld().getName());
         config.set("spawn.x", spawnLocation.getX());

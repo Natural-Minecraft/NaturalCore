@@ -26,7 +26,7 @@ public class MenuUtilCommand implements CommandExecutor {
             // Trash biasanya tidak butuh permission (semua orang bisa buang barang)
             // Tapi jika ingin restrict, uncomment baris berikut:
             // if (!p.hasPermission("naturalsmp.trash")) {
-            // p.sendMessage(ConfigUtils.getString("messages.no-permission"));
+            // p.sendMessage(ConfigUtils.getString("messages.global.no-permission"));
             // return true;
             // }
 
@@ -38,7 +38,7 @@ public class MenuUtilCommand implements CommandExecutor {
         // --- /CRAFT ---
         if (label.equalsIgnoreCase("craft") || label.equalsIgnoreCase("wb")) {
             if (!p.hasPermission("naturalsmp.craft")) {
-                p.sendMessage(ConfigUtils.getString("messages.no-permission"));
+                p.sendMessage(ConfigUtils.getString("messages.global.no-permission"));
                 return true;
             }
             p.openWorkbench(null, true);
@@ -48,7 +48,7 @@ public class MenuUtilCommand implements CommandExecutor {
         // --- /ANVIL ---
         if (label.equalsIgnoreCase("anvil") || label.equalsIgnoreCase("av")) {
             if (!p.hasPermission("naturalsmp.anvil")) {
-                p.sendMessage(ConfigUtils.getString("messages.no-permission"));
+                p.sendMessage(ConfigUtils.getString("messages.global.no-permission"));
                 return true;
             }
             // Membuka Anvil Virtual (Bukan GUI custom, tapi native inventory)

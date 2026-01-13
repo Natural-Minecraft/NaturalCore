@@ -36,12 +36,13 @@ public class EconomyCommand implements CommandExecutor {
                 target = Bukkit.getPlayer(args[0]);
 
             if (target == null) {
-                sender.sendMessage(ConfigUtils.getString("messages.player-not-found").replace("%player%", args[0]));
+                sender.sendMessage(
+                        ConfigUtils.getString("messages.global.player-not-found").replace("%player%", args[0]));
                 return true;
             }
 
             double bal = eco.getBalance(target);
-            sender.sendMessage(prefix + ConfigUtils.getString("messages.balance-check")
+            sender.sendMessage(prefix + ConfigUtils.getString("messages.economy.balance-check")
                     .replace("%target%", target.getName())
                     .replace("%symbol%", symbol)
                     .replace("%amount%", ChatUtils.format(bal)));
@@ -53,12 +54,14 @@ public class EconomyCommand implements CommandExecutor {
             if (!sender.hasPermission("naturalsmp.economy.admin"))
                 return noPerm(sender);
             if (args.length < 2) {
-                sender.sendMessage(ChatUtils.colorize("&cUsage: /setbal <player> <amount>"));
+                sender.sendMessage(
+                        ConfigUtils.getString("messages.global.usage").replace("%usage%", "/setbal <player> <amount>"));
                 return true;
             }
             Player target = Bukkit.getPlayer(args[0]);
             if (target == null) {
-                sender.sendMessage(ConfigUtils.getString("messages.player-not-found").replace("%player%", args[0]));
+                sender.sendMessage(
+                        ConfigUtils.getString("messages.global.player-not-found").replace("%player%", args[0]));
                 return true;
             }
 
@@ -66,7 +69,7 @@ public class EconomyCommand implements CommandExecutor {
             try {
                 amount = Double.parseDouble(args[1]);
             } catch (Exception e) {
-                sender.sendMessage(ConfigUtils.getString("messages.invalid-amount"));
+                sender.sendMessage(ConfigUtils.getString("messages.economy.invalid-amount"));
                 return true;
             }
 
@@ -75,7 +78,7 @@ public class EconomyCommand implements CommandExecutor {
             eco.withdrawPlayer(target, current);
             eco.depositPlayer(target, amount);
 
-            sender.sendMessage(prefix + ConfigUtils.getString("messages.balance-set")
+            sender.sendMessage(prefix + ConfigUtils.getString("messages.economy.balance-set")
                     .replace("%target%", target.getName())
                     .replace("%symbol%", symbol)
                     .replace("%amount%", ChatUtils.format(amount)));
@@ -87,12 +90,14 @@ public class EconomyCommand implements CommandExecutor {
             if (!sender.hasPermission("naturalsmp.economy.admin"))
                 return noPerm(sender);
             if (args.length < 2) {
-                sender.sendMessage(ChatUtils.colorize("&cUsage: /takebal <player> <amount>"));
+                sender.sendMessage(ConfigUtils.getString("messages.global.usage").replace("%usage%",
+                        "/takebal <player> <amount>"));
                 return true;
             }
             Player target = Bukkit.getPlayer(args[0]);
             if (target == null) {
-                sender.sendMessage(ConfigUtils.getString("messages.player-not-found").replace("%player%", args[0]));
+                sender.sendMessage(
+                        ConfigUtils.getString("messages.global.player-not-found").replace("%player%", args[0]));
                 return true;
             }
 
@@ -100,13 +105,13 @@ public class EconomyCommand implements CommandExecutor {
             try {
                 amount = Double.parseDouble(args[1]);
             } catch (Exception e) {
-                sender.sendMessage(ConfigUtils.getString("messages.invalid-amount"));
+                sender.sendMessage(ConfigUtils.getString("messages.economy.invalid-amount"));
                 return true;
             }
 
             eco.withdrawPlayer(target, amount);
 
-            sender.sendMessage(prefix + ConfigUtils.getString("messages.balance-take")
+            sender.sendMessage(prefix + ConfigUtils.getString("messages.economy.balance-take")
                     .replace("%target%", target.getName())
                     .replace("%symbol%", symbol)
                     .replace("%amount%", ChatUtils.format(amount)));
@@ -119,12 +124,13 @@ public class EconomyCommand implements CommandExecutor {
                 return true;
             Player p = (Player) sender;
             if (args.length < 2) {
-                p.sendMessage(ChatUtils.colorize("&cUsage: /pay <player> <amount>"));
+                p.sendMessage(
+                        ConfigUtils.getString("messages.global.usage").replace("%usage%", "/pay <player> <amount>"));
                 return true;
             }
             Player target = Bukkit.getPlayer(args[0]);
             if (target == null || target.equals(p)) {
-                p.sendMessage(ConfigUtils.getString("messages.player-not-found").replace("%player%", args[0]));
+                p.sendMessage(ConfigUtils.getString("messages.global.player-not-found").replace("%player%", args[0]));
                 return true;
             }
 
@@ -132,22 +138,22 @@ public class EconomyCommand implements CommandExecutor {
             try {
                 amount = Double.parseDouble(args[1]);
             } catch (Exception e) {
-                p.sendMessage(ConfigUtils.getString("messages.invalid-amount"));
+                p.sendMessage(ConfigUtils.getString("messages.economy.invalid-amount"));
                 return true;
             }
 
             if (amount <= 0 || !eco.has(p, amount)) {
-                p.sendMessage(prefix + ConfigUtils.getString("messages.pay-fail"));
+                p.sendMessage(prefix + ConfigUtils.getString("messages.economy.pay-fail"));
                 return true;
             }
 
             eco.withdrawPlayer(p, amount);
             eco.depositPlayer(target, amount);
 
-            p.sendMessage(prefix + ConfigUtils.getString("messages.pay-sent")
+            p.sendMessage(prefix + ConfigUtils.getString("messages.economy.pay-sent")
                     .replace("%symbol%", symbol).replace("%amount%", ChatUtils.format(amount))
                     .replace("%target%", target.getName()));
-            target.sendMessage(prefix + ConfigUtils.getString("messages.pay-received")
+            target.sendMessage(prefix + ConfigUtils.getString("messages.economy.pay-received")
                     .replace("%symbol%", symbol).replace("%amount%", ChatUtils.format(amount))
                     .replace("%player%", p.getName()));
             return true;
@@ -157,7 +163,7 @@ public class EconomyCommand implements CommandExecutor {
     }
 
     private boolean noPerm(CommandSender s) {
-        s.sendMessage(ConfigUtils.getString("messages.no-permission"));
+        s.sendMessage(ConfigUtils.getString("messages.global.no-permission"));
         return true;
     }
 }

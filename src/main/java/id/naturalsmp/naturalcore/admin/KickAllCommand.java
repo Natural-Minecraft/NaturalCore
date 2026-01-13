@@ -1,6 +1,7 @@
 package id.naturalsmp.naturalcore.admin;
 
 import id.naturalsmp.naturalcore.utils.ChatUtils;
+import id.naturalsmp.naturalcore.utils.ConfigUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -11,18 +12,18 @@ import org.jetbrains.annotations.NotNull;
 public class KickAllCommand implements CommandExecutor {
 
     @Override
-    public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, @NotNull String[] args) {
+    public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label,
+            @NotNull String[] args) {
 
         // 1. Cek Permission (naturalcs.kickall)
         if (!sender.hasPermission("naturalcs.kickall")) {
-            sender.sendMessage(ChatUtils.colorize("&cNo perms"));
+            sender.sendMessage(ConfigUtils.getMessage("global.no-permission"));
             return true;
         }
 
         // 2. Cek Argumen (Minimal harus ada 'confirm' dan 'alasan')
-        // Usage: /kickall confirm <alasan>
         if (args.length < 2) {
-            sender.sendMessage(ChatUtils.colorize("&cUsage: /kickall confirm <alasan>"));
+            sender.sendMessage(ConfigUtils.getMessage("admin.kickall.usage"));
             return true;
         }
 
@@ -32,11 +33,11 @@ public class KickAllCommand implements CommandExecutor {
                 !confirm.equalsIgnoreCase("confirmation") &&
                 !confirm.equalsIgnoreCase("konfirmasi")) {
 
-            sender.sendMessage(ChatUtils.colorize("&cSilahkan ketik &aConfirmation &csebelum reason"));
+            sender.sendMessage(ConfigUtils.getMessage("admin.kickall.confirm-required"));
             return true;
         }
 
-        // 4. Gabungkan Alasan (args 1 sampai akhir)
+        // 4. Gabungkan Alasan
         StringBuilder reasonBuilder = new StringBuilder();
         for (int i = 1; i < args.length; i++) {
             reasonBuilder.append(args[i]).append(" ");
@@ -46,22 +47,23 @@ public class KickAllCommand implements CommandExecutor {
         // 5. Nama Penendang
         String kickerName = (sender instanceof Player) ? sender.getName() : "Console";
 
-        // 6. Format Pesan Kick (Sesuai Skript)
-        String kickMessage = ChatUtils.colorize(
-                "&a&lNatural &6&lService\n\n" +
-                        "&cMaaf, " + kickerName + " telah melakukan kick\n" +
-                        "&7Reason: &c" + reason
-        );
+        // 6. Format Pesan Kick
+        String kickFormat = ConfigUtils.getMessage("admin.kickall.message-format");
+        if (kickFormat == null) {
+            kickFormat = "&cMaaf, %kicker% telah melakukan kick\n&7Reason: &c%reason%";
+        }
+        String kickMessage = ChatUtils.colorize(kickFormat
+                .replace("%kicker%", kickerName)
+                .replace("%reason%", reason));
 
         // 7. Eksekusi Kick Loop
         for (Player onlinePlayer : Bukkit.getOnlinePlayers()) {
-            // Opsional: Jangan kick diri sendiri atau admin lain (Bisa ditambahkan logic disini)
-            if (onlinePlayer.equals(sender)) continue; // Jangan kick diri sendiri
-
+            if (onlinePlayer.equals(sender))
+                continue;
             onlinePlayer.kickPlayer(kickMessage);
         }
 
-        sender.sendMessage(ChatUtils.colorize("&aBerhasil meng-kick semua player!"));
+        sender.sendMessage(ConfigUtils.getMessage("admin.kickall.success"));
         return true;
     }
 }

@@ -2,6 +2,7 @@ package id.naturalsmp.naturalcore.home;
 
 import id.naturalsmp.naturalcore.NaturalCore;
 import id.naturalsmp.naturalcore.utils.ChatUtils;
+import id.naturalsmp.naturalcore.utils.ConfigUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -22,7 +23,7 @@ public class HomeGUI implements Listener {
 
     private final NaturalCore plugin;
     // Title menggunakan Hex Color sesuai request
-    private final String GUI_TITLE = "&#00AAFF&lɴᴀᴛᴜʀᴀʟ ʜᴏᴍᴇ";
+    private final String GUI_TITLE = ConfigUtils.getString("messages.gui.home.title");
 
     public HomeGUI(NaturalCore plugin) {
         this.plugin = plugin;
@@ -40,7 +41,7 @@ public class HomeGUI implements Listener {
 
         // Validasi jika kosong
         if (homes.isEmpty()) {
-            p.sendMessage(ChatUtils.colorize("&cKamu belum punya home! Gunakan /sethome <nama>"));
+            p.sendMessage(ConfigUtils.getString("messages.home.list-empty"));
             return;
         }
 
@@ -49,12 +50,14 @@ public class HomeGUI implements Listener {
         int totalPages = (int) Math.ceil((double) homes.size() / itemsPerPage);
 
         // Safety check page boundaries
-        if (page < 0) page = 0;
-        if (page >= totalPages) page = totalPages - 1;
+        if (page < 0)
+            page = 0;
+        if (page >= totalPages)
+            page = totalPages - 1;
 
         // 3. Setup Inventory 1 Row (9 Slot)
         // Kita tambahkan page number di title agar Listener bisa membacanya nanti
-        Inventory inv = Bukkit.createInventory(null, 9, ChatUtils.colorize(GUI_TITLE + " &8(" + (page + 1) + ")"));
+        Inventory inv = Bukkit.createInventory(null, 9, GUI_TITLE + ChatUtils.colorize(" &8(" + (page + 1) + ")"));
 
         // 4. Pasang Pembatas (Slot 1 & 7)
         ItemStack pane = new ItemStack(Material.GRAY_STAINED_GLASS_PANE);
@@ -109,14 +112,22 @@ public class HomeGUI implements Listener {
         ItemStack item = new ItemStack(Material.RED_BED);
         ItemMeta meta = item.getItemMeta();
         if (meta != null) {
-            meta.setDisplayName(ChatUtils.colorize("&a&l" + name)); // Nama Home hijau tebal
+            meta.setDisplayName(
+                    ConfigUtils.getString("messages.gui.home.item-name").replace("%name%", name));
+            String world = (loc.getWorld() != null) ? loc.getWorld().getName() : "unknown";
 
+            List<String> rawLore = ConfigUtils.getMessageList("gui.home.item-lore");
             List<String> lore = new ArrayList<>();
-            lore.add(ChatUtils.colorize("&7World: &f" + loc.getWorld().getName()));
-            lore.add(ChatUtils.colorize("&7Coords: &f" + loc.getBlockX() + ", " + loc.getBlockY() + ", " + loc.getBlockZ()));
-            lore.add("");
-            lore.add(ChatUtils.colorize("&eKlik untuk teleport!"));
-
+            if (rawLore != null) {
+                for (String s : rawLore) {
+                    lore.add(ChatUtils.colorize(s
+                            .replace("%name%", name)
+                            .replace("%world%", world)
+                            .replace("%x%", String.valueOf(loc.getBlockX()))
+                            .replace("%y%", String.valueOf(loc.getBlockY()))
+                            .replace("%z%", String.valueOf(loc.getBlockZ()))));
+                }
+            }
             meta.setLore(lore);
             item.setItemMeta(meta);
         }
@@ -141,14 +152,18 @@ public class HomeGUI implements Listener {
         String titleRaw = e.getView().getTitle();
         String titleClean = ChatUtils.stripColor(titleRaw);
 
-        // Cek apakah title mengandung "NATURAL HOME" (sesuai font estetik di atas yang kalau di strip jadi huruf kapital biasa/mirip)
+        // Cek apakah title mengandung "NATURAL HOME" (sesuai font estetik di atas yang
+        // kalau di strip jadi huruf kapital biasa/mirip)
         // Atau cek pakai method contains biasa kalau stripColor merusak font unicode
-        if (!titleRaw.contains("ɴᴀᴛᴜʀᴀʟ ʜᴏᴍᴇ")) return;
+        if (!titleRaw.contains("ɴᴀᴛᴜʀᴀʟ ʜᴏᴍᴇ"))
+            return;
 
         e.setCancelled(true); // Anti Maling
 
-        if (e.getCurrentItem() == null || e.getCurrentItem().getType() == Material.AIR) return;
-        if (e.getCurrentItem().getType() == Material.GRAY_STAINED_GLASS_PANE) return;
+        if (e.getCurrentItem() == null || e.getCurrentItem().getType() == Material.AIR)
+            return;
+        if (e.getCurrentItem().getType() == Material.GRAY_STAINED_GLASS_PANE)
+            return;
 
         Player p = (Player) e.getWhoClicked();
         int slot = e.getSlot();

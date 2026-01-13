@@ -13,11 +13,12 @@ import org.jetbrains.annotations.NotNull;
 public class GamemodeCommand implements CommandExecutor {
 
     @Override
-    public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, @NotNull String[] args) {
+    public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label,
+            @NotNull String[] args) {
 
         // Permission Check
         if (!sender.hasPermission("naturalsmp.gamemode")) {
-            sender.sendMessage(ConfigUtils.getString("messages.no-permission"));
+            sender.sendMessage(ConfigUtils.getString("messages.global.no-permission"));
             return true;
         }
 
@@ -28,10 +29,18 @@ public class GamemodeCommand implements CommandExecutor {
         String cmd = label.toLowerCase();
 
         switch (cmd) {
-            case "gmc": mode = GameMode.CREATIVE; break;
-            case "gms": mode = GameMode.SURVIVAL; break;
-            case "gma": mode = GameMode.ADVENTURE; break;
-            case "gmsp": mode = GameMode.SPECTATOR; break;
+            case "gmc":
+                mode = GameMode.CREATIVE;
+                break;
+            case "gms":
+                mode = GameMode.SURVIVAL;
+                break;
+            case "gma":
+                mode = GameMode.ADVENTURE;
+                break;
+            case "gmsp":
+                mode = GameMode.SPECTATOR;
+                break;
             case "gamemode":
             case "gm":
                 if (args.length == 0) {
@@ -44,7 +53,8 @@ public class GamemodeCommand implements CommandExecutor {
                     return true;
                 }
                 // Jika ada argumen kedua (/gm 1 Steve)
-                if (args.length > 1) target = Bukkit.getPlayer(args[1]);
+                if (args.length > 1)
+                    target = Bukkit.getPlayer(args[1]);
                 break;
         }
 
@@ -54,7 +64,7 @@ public class GamemodeCommand implements CommandExecutor {
         }
 
         if (target == null) {
-            sender.sendMessage(ConfigUtils.getString("messages.player-not-found").replace("%player%", "target"));
+            sender.sendMessage(ConfigUtils.getString("messages.global.player-not-found").replace("%player%", "target"));
             return true;
         }
 
@@ -63,21 +73,26 @@ public class GamemodeCommand implements CommandExecutor {
         String prefix = ConfigUtils.getString("prefix.admin");
 
         if (!sender.equals(target)) {
-            sender.sendMessage(prefix + ConfigUtils.getString("messages.gamemode-changed-other")
+            sender.sendMessage(prefix + ConfigUtils.getString("messages.essentials.gamemode-changed-other")
                     .replace("%target%", target.getName())
                     .replace("%mode%", mode.name()));
         }
-        target.sendMessage(prefix + ConfigUtils.getString("messages.gamemode-changed").replace("%mode%", mode.name()));
+        target.sendMessage(
+                prefix + ConfigUtils.getString("messages.essentials.gamemode-changed").replace("%mode%", mode.name()));
 
         return true;
     }
 
     private GameMode getGameMode(String arg) {
         arg = arg.toLowerCase();
-        if (arg.equals("0") || arg.startsWith("surv")) return GameMode.SURVIVAL;
-        if (arg.equals("1") || arg.startsWith("crea")) return GameMode.CREATIVE;
-        if (arg.equals("2") || arg.startsWith("adven")) return GameMode.ADVENTURE;
-        if (arg.equals("3") || arg.startsWith("spec")) return GameMode.SPECTATOR;
+        if (arg.equals("0") || arg.startsWith("surv"))
+            return GameMode.SURVIVAL;
+        if (arg.equals("1") || arg.startsWith("crea"))
+            return GameMode.CREATIVE;
+        if (arg.equals("2") || arg.startsWith("adven"))
+            return GameMode.ADVENTURE;
+        if (arg.equals("3") || arg.startsWith("spec"))
+            return GameMode.SPECTATOR;
         return null;
     }
 }

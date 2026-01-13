@@ -21,15 +21,18 @@ public class HomeCommand implements CommandExecutor {
     }
 
     @Override
-    public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, @NotNull String[] args) {
-        if (!(sender instanceof Player)) return true;
+    public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label,
+            @NotNull String[] args) {
+        if (!(sender instanceof Player))
+            return true;
         Player p = (Player) sender;
         String cmd = label.toLowerCase();
         String prefix = ConfigUtils.getString("prefix.admin");
 
         // --- SETHOME ---
         if (cmd.equals("sethome")) {
-            if (!p.hasPermission("naturalsmp.home.use")) return noPerm(p);
+            if (!p.hasPermission("naturalsmp.home.use"))
+                return noPerm(p);
 
             // Nama Home (Default "home" jika tidak diketik)
             String name = (args.length > 0) ? args[0] : "home";
@@ -40,7 +43,7 @@ public class HomeCommand implements CommandExecutor {
 
             // Jika belum punya home ini (home baru), tapi sudah limit -> Block
             if (!homeManager.hasHome(p, name) && current >= max) {
-                p.sendMessage(prefix + ConfigUtils.getString("messages.home-limit")
+                p.sendMessage(prefix + ConfigUtils.getString("messages.home.home-limit")
                         .replace("%current%", String.valueOf(current))
                         .replace("%max%", String.valueOf(max)));
                 return true;
@@ -50,7 +53,7 @@ public class HomeCommand implements CommandExecutor {
             homeManager.setHome(p, name, p.getLocation());
 
             // FIX: Support %home% DAN %name% agar config fleksibel
-            String msg = ConfigUtils.getString("messages.home-set")
+            String msg = ConfigUtils.getString("messages.home.home-set")
                     .replace("%home%", name)
                     .replace("%name%", name);
 
@@ -60,18 +63,19 @@ public class HomeCommand implements CommandExecutor {
 
         // --- DELHOME ---
         if (cmd.equals("delhome")) {
-            if (!p.hasPermission("naturalsmp.home.use")) return noPerm(p);
+            if (!p.hasPermission("naturalsmp.home.use"))
+                return noPerm(p);
 
             String name = (args.length > 0) ? args[0] : "home";
             if (!homeManager.hasHome(p, name)) {
-                p.sendMessage(prefix + ConfigUtils.getString("messages.home-not-found"));
+                p.sendMessage(prefix + ConfigUtils.getString("messages.home.home-not-found"));
                 return true;
             }
 
             homeManager.deleteHome(p, name);
 
             // FIX: Support %home% DAN %name%
-            String msg = ConfigUtils.getString("messages.home-deleted")
+            String msg = ConfigUtils.getString("messages.home.home-deleted")
                     .replace("%home%", name)
                     .replace("%name%", name);
 
@@ -81,20 +85,23 @@ public class HomeCommand implements CommandExecutor {
 
         // --- HOMES (LIST) ---
         if (cmd.equals("homes")) {
-            if (!p.hasPermission("naturalsmp.home.use")) return noPerm(p);
+            if (!p.hasPermission("naturalsmp.home.use"))
+                return noPerm(p);
 
             Set<String> list = homeManager.getHomes(p);
             if (list.isEmpty()) {
-                p.sendMessage(ChatUtils.colorize("&cKamu belum punya home."));
+                p.sendMessage(ConfigUtils.getString("messages.home.list-empty"));
             } else {
-                p.sendMessage(ChatUtils.colorize("&6Homes (" + list.size() + "): &f" + String.join(", ", list)));
+                p.sendMessage(ConfigUtils.getString("messages.home.home-list")
+                        .replace("%homes%", String.join(", ", list)));
             }
             return true;
         }
 
         // --- HOME (TP / GUI) ---
         if (cmd.equals("home")) {
-            if (!p.hasPermission("naturalsmp.home.use")) return noPerm(p);
+            if (!p.hasPermission("naturalsmp.home.use"))
+                return noPerm(p);
 
             // Jika ada argumen (/home nama), langsung TP
             if (args.length > 0) {
@@ -102,7 +109,7 @@ public class HomeCommand implements CommandExecutor {
                 if (homeManager.hasHome(p, name)) {
                     homeManager.teleportHome(p, name);
                 } else {
-                    p.sendMessage(prefix + ConfigUtils.getString("messages.home-not-found"));
+                    p.sendMessage(prefix + ConfigUtils.getString("messages.home.home-not-found"));
                 }
                 return true;
             }
@@ -116,7 +123,7 @@ public class HomeCommand implements CommandExecutor {
     }
 
     private boolean noPerm(Player p) {
-        p.sendMessage(ConfigUtils.getString("messages.no-permission"));
+        p.sendMessage(ConfigUtils.getString("messages.global.no-permission"));
         return true;
     }
 }

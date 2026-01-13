@@ -19,11 +19,12 @@ import java.util.List;
 public class GiveBalCommand implements CommandExecutor {
 
     @Override
-    public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, @NotNull String[] args) {
+    public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label,
+            @NotNull String[] args) {
 
         // 1. Cek Permission (Ambil pesan dari config)
         if (!sender.hasPermission("naturalcs.givebalance")) {
-            sender.sendMessage(ConfigUtils.getString("messages.no-permission"));
+            sender.sendMessage(ConfigUtils.getString("messages.global.no-permission"));
             return true;
         }
 
@@ -35,7 +36,7 @@ public class GiveBalCommand implements CommandExecutor {
         // 2. Cek Target
         Player target = Bukkit.getPlayer(args[0]);
         if (target == null) {
-            String msg = ConfigUtils.getString("messages.player-not-found");
+            String msg = ConfigUtils.getString("messages.global.player-not-found");
             sender.sendMessage(msg.replace("%player%", args[0]));
             return true;
         }
@@ -45,7 +46,7 @@ public class GiveBalCommand implements CommandExecutor {
         try {
             amount = Double.parseDouble(args[2]);
         } catch (NumberFormatException e) {
-            sender.sendMessage(ConfigUtils.getString("messages.invalid-amount"));
+            sender.sendMessage(ConfigUtils.getString("messages.economy.invalid-amount"));
             return true;
         }
 
@@ -92,7 +93,8 @@ public class GiveBalCommand implements CommandExecutor {
             Currency currency = CoinsEngineAPI.getCurrency(currencyId);
 
             if (currency == null) {
-                sender.sendMessage(ChatUtils.colorize("&cError: Currency ID '" + currencyId + "' tidak ditemukan di CoinsEngine!"));
+                sender.sendMessage(ChatUtils
+                        .colorize("&cError: Currency ID '" + currencyId + "' tidak ditemukan di CoinsEngine!"));
                 return true;
             }
 
@@ -106,7 +108,7 @@ public class GiveBalCommand implements CommandExecutor {
 
         // C. JIKA TIDAK ADA YANG COCOK
         else {
-            String msg = ConfigUtils.getString("messages.invalid-currency");
+            String msg = ConfigUtils.getString("messages.economy.invalid-currency");
             // Gabungkan semua alias buat kasih tau user
             String allAliases = String.join(", ", vaultAliases) + ", " + String.join(", ", ceAliases);
             sender.sendMessage(msg.replace("%aliases%", allAliases));
@@ -119,14 +121,14 @@ public class GiveBalCommand implements CommandExecutor {
         String prefix = ConfigUtils.getString("prefix.economy");
 
         // Pesan ke Pengirim
-        String senderMsg = ConfigUtils.getString("messages.give-success-sender")
+        String senderMsg = ConfigUtils.getString("messages.economy.give-success-sender")
                 .replace("%symbol%", symbol)
                 .replace("%amount%", String.valueOf(amount))
                 .replace("%target%", target.getName());
         sender.sendMessage(prefix + senderMsg);
 
         // Pesan ke Penerima
-        String targetMsg = ConfigUtils.getString("messages.give-success-target")
+        String targetMsg = ConfigUtils.getString("messages.economy.give-success-target")
                 .replace("%symbol%", symbol)
                 .replace("%amount%", String.valueOf(amount));
         target.sendMessage(prefix + targetMsg);
