@@ -49,8 +49,7 @@ public class BannerCommand implements CommandExecutor, TabCompleter {
             }
             case "create" -> {
                 if (args.length < 3) {
-                    player.sendMessage(ChatUtils
-                            .colorize("&cUsage: /banner create <name> <imageName> [leftAction] [rightAction]"));
+                    player.sendMessage(ChatUtils.colorize("&cUsage: /banner create <name> <imageName> [action]"));
                     return true;
                 }
                 String name = args[1];
@@ -66,16 +65,23 @@ public class BannerCommand implements CommandExecutor, TabCompleter {
                 }
 
                 List<String> left = new ArrayList<>();
+
+                // PERBAIKAN: Gabungkan semua argumen dari index ke-3 sampai habis menjadi satu string
+                // Ini memungkinkan command seperti "[COMMAND] /spawn" dianggap satu kesatuan
+                if (args.length > 3) {
+                    StringBuilder actionBuilder = new StringBuilder();
+                    for (int i = 3; i < args.length; i++) {
+                        actionBuilder.append(args[i]).append(" ");
+                    }
+                    left.add(actionBuilder.toString().trim());
+                }
+
+                // Untuk "create", kita set Right Action kosong dulu. User bisa pakai /banner edit nanti.
+                // Ini lebih aman daripada parsing spasi yang membingungkan.
                 List<String> right = new ArrayList<>();
 
-                if (args.length > 3)
-                    left.add(args[3]);
-                if (args.length > 4)
-                    right.add(args[4]);
-
                 manager.createBanner(name, image, p1, p2, face, left, right);
-                player.sendMessage(
-                        ChatUtils.colorize("&a&l[Banner] &fBanner '&e" + name + "&f' created successfully!"));
+                player.sendMessage(ChatUtils.colorize("&a&l[Banner] &fBanner '&e" + name + "&f' created successfully!"));
             }
             case "edit" -> {
                 if (args.length < 2) {

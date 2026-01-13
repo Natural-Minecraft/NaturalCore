@@ -71,7 +71,7 @@ public class BannerManager {
                 BufferedImage fullImage = ImageUtils.loadAndScale(imgFile, banner.getWidth(), banner.getHeight());
                 spawnBannerEntities(banner, fullImage);
             } catch (Exception e) {
-                e.printStackTrace();
+                plugin.getLogger().severe("Error loading banner " + banner.getName() + ": " + e.getMessage());
             }
         }
     }
@@ -84,6 +84,14 @@ public class BannerManager {
             return;
         }
 
+        // Memory Warning for massive images
+        if (imageFile.length() > 5 * 1024 * 1024) { // 5MB limit check
+            plugin.getLogger()
+                    .warning("Banner image '" + imageName + "' is quite large (" + (imageFile.length() / 1024 / 1024)
+                            + "MB). " +
+                            "This may cause server lag or memory issues if many are loaded.");
+        }
+
         int minX = Math.min(pos1.getBlockX(), pos2.getBlockX());
         int minY = Math.min(pos1.getBlockY(), pos2.getBlockY());
         int minZ = Math.min(pos1.getBlockZ(), pos2.getBlockZ());
@@ -94,17 +102,15 @@ public class BannerManager {
         int blocksWidth;
         int blocksHeight = (maxY - minY) + 1;
 
-        // Use the face to determine if selection is width-wise along X or Z
         if (face == BlockFace.NORTH || face == BlockFace.SOUTH) {
             blocksWidth = (maxX - minX) + 1;
         } else {
             blocksWidth = (maxZ - minZ) + 1;
         }
 
-        // Location correction based on face
         Location startLoc = new Location(pos1.getWorld(), minX, maxY, minZ);
         if (face == BlockFace.WEST)
-            startLoc = new Location(pos1.getWorld(), minX, maxY, minZ);
+            startLoc = new Location(pos1.getWorld(), minX, maxY, maxZ);
         if (face == BlockFace.EAST)
             startLoc = new Location(pos1.getWorld(), maxX, maxY, minZ);
         if (face == BlockFace.NORTH)
@@ -137,58 +143,82 @@ public class BannerManager {
             case NORTH -> {
                 yaw = 180;
                 dx = 1;
-                oz = -0.05;
-            }
+                oz = -0.01;
+            } // Slimmer offset
             case SOUTH -> {
                 yaw = 0;
                 dx = -1;
-                oz = 1.05;
+                oz = 1.01;
             }
             case EAST -> {
                 yaw = 270;
                 dz = 1;
-                ox = 1.05;
+                ox = 1.01;
             }
             case WEST -> {
                 yaw = 90;
                 dz = -1;
-                ox = -0.05;
+                ox = -0.01;
             }
             default -> {
             }
         }
 
         Location origin = banner.getLocation().clone().add(ox, 0.5, oz);
+        org.bukkit.World world = banner.getLocation().getWorld();
 
         for (int row = 0; row < banner.getHeight(); row++) {
             for (int col = 0; col < banner.getWidth(); col++) {
                 Location mapLoc = origin.clone().add(col * dx, -row, col * dz);
 
-                MapView view = Bukkit.createMap(banner.getLocation().getWorld());
-                renderMap(view, ImageUtils.getMapPart(fullImage, col, row));
+                MapView view = Bukkit.createMap(world);
 
-                ItemDisplay display = mapLoc.getWorld().spawn(mapLoc, ItemDisplay.class);
-                ItemStack mapItem = new ItemStack(Material.FILLED_MAP);
+                // PERBAIKAN VISUAL 1: Setting MapView agar statis
+                view.setTrackingPosition(false);
+                view.setUnlimitedTracking(false);
+                view.setCenterX(0);
+                view.setCenterZ(0);
+
+                byte[] mapData = ImageUtils.convertToMapColors(ImageUtils.getMapPart(fullImage, col, row));
+                renderMap(view, mapData);
+
+                ItemDisplay display = world.spawn(mapLoc, ItemDisplay.class);
+                ItemStack mapItem = new ItemStack(Material.FILLED_MAP); // Pastikan ini FILLED_MAP
                 MapMeta meta = (MapMeta) mapItem.getItemMeta();
-                meta.setMapView(view);
+                meta.setMapView(view); // Hubungkan view ke item
                 mapItem.setItemMeta(meta);
 
                 display.setItemStack(mapItem);
+                // ... (setting display lainnya sama) ...
                 display.setBrightness(new Display.Brightness(15, 15));
                 display.setRotation(yaw, 0);
                 display.addScoreboardTag("naturalbanner_entity_" + banner.getName());
             }
         }
 
-        // Interaction Hitbox
-        double halfW = (banner.getWidth() - 1) / 2.0;
-        double halfH = (banner.getHeight() - 1) / 2.0;
-        Location center = origin.clone().add(halfW * dx, -halfH, halfW * dz);
+        // Interaction Hitboxes (one for each block horizontally to handle orientation
+        // correctly)
+        // This solves the "Interaction is a square" issue.
+        for (int col = 0; col < banner.getWidth(); col++) {
+            double hH = (banner.getHeight() - 1) / 2.0;
+            Location colCenter = origin.clone().add(col * dx, -hH, col * dz);
 
-        Interaction interaction = center.getWorld().spawn(center, Interaction.class);
-        interaction.setInteractionWidth(banner.getWidth());
-        interaction.setInteractionHeight(banner.getHeight());
-        interaction.addScoreboardTag("naturalbanner_hitbox_" + banner.getName());
+            // Adjust offset to put hitbox SLIGHTLY in front of the banner
+            double hox = 0, hoz = 0;
+            if (face == BlockFace.NORTH)
+                hoz = -0.05;
+            else if (face == BlockFace.SOUTH)
+                hoz = 0.05;
+            else if (face == BlockFace.EAST)
+                hox = 0.05;
+            else if (face == BlockFace.WEST)
+                hox = -0.05;
+
+            Interaction interaction = world.spawn(colCenter.add(hox, 0, hoz), Interaction.class);
+            interaction.setInteractionWidth(1.0f); // 1 block wide
+            interaction.setInteractionHeight(banner.getHeight());
+            interaction.addScoreboardTag("naturalbanner_hitbox_" + banner.getName());
+        }
     }
 
     public void cleanupBannerEntities(String name) {
@@ -222,30 +252,53 @@ public class BannerManager {
 
     public void handleInteract(org.bukkit.entity.Player player, String bannerName, boolean isLeftClick) {
         Banner banner = activeBanners.get(bannerName);
-        if (banner == null)
-            return;
+        if (banner == null) return;
 
         List<String> actions = isLeftClick ? banner.getLeftClickActions() : banner.getRightClickActions();
         for (String action : actions) {
             String clean = action.trim();
+
             if (clean.startsWith("[URL]")) {
                 player.sendMessage(ChatUtils.colorize("&b&n" + clean.substring(5).trim()));
-            } else if (clean.startsWith("[COMMAND]")) {
-                Bukkit.dispatchCommand(player, clean.substring(9).trim().replace("%player%", player.getName()));
-            } else if (clean.startsWith("[CONSOLE]")) {
-                Bukkit.dispatchCommand(Bukkit.getConsoleSender(),
-                        clean.substring(9).trim().replace("%player%", player.getName()));
+            }
+            else if (clean.startsWith("[COMMAND]")) {
+                // PERBAIKAN CRASH: Cek apakah ada commandnya
+                String cmdToRun = clean.substring(9).trim().replace("%player%", player.getName());
+                if (!cmdToRun.isEmpty()) {
+                    Bukkit.dispatchCommand(player, cmdToRun);
+                }
+            }
+            else if (clean.startsWith("[CONSOLE]")) {
+                // PERBAIKAN CRASH: Cek apakah ada commandnya
+                String cmdToRun = clean.substring(9).trim().replace("%player%", player.getName());
+                if (!cmdToRun.isEmpty()) {
+                    Bukkit.dispatchCommand(Bukkit.getConsoleSender(), cmdToRun);
+                }
             }
         }
     }
 
-    private void renderMap(MapView view, BufferedImage imagePart) {
-        view.getRenderers().clear();
+    private void renderMap(MapView view, byte[] mapData) {
+        // Hapus renderer bawaan agar map bersih
+        for (MapRenderer renderer : view.getRenderers()) {
+            view.removeRenderer(renderer);
+        }
+
         view.addRenderer(new MapRenderer() {
+            // PERBAIKAN VISUAL 2: Hapus variable 'rendered' dan 'if (rendered) return'
+            // MapRenderer dipanggil saat packet dikirim ke player.
+            // Kita HARUS menggambar pixelnya setiap kali dipanggil, karena canvasnya
+            // bisa jadi bersih/baru untuk player yang berbeda.
+
             @Override
-            public void render(@NotNull MapView map, @NotNull MapCanvas canvas,
-                    @NotNull org.bukkit.entity.Player player) {
-                canvas.drawImage(0, 0, imagePart);
+            public void render(@NotNull MapView map, @NotNull MapCanvas canvas, @NotNull org.bukkit.entity.Player player) {
+                // Operasi setPixel ini sangat cepat (hanya array manipulation),
+                // jadi aman dijalankan berulang kali.
+                for (int y = 0; y < 128; y++) {
+                    for (int x = 0; x < 128; x++) {
+                        canvas.setPixel(x, y, mapData[y * 128 + x]);
+                    }
+                }
             }
         });
     }

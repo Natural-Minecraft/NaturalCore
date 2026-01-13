@@ -1,5 +1,6 @@
 package id.naturalsmp.naturalcore.banner;
 
+import org.bukkit.map.MapPalette;
 import javax.imageio.ImageIO;
 import java.awt.*;
 import java.awt.image.BufferedImage;
@@ -11,6 +12,7 @@ public class ImageUtils {
     /**
      * Loads an image and scales it to fit the specified dimensions (width * 128,
      * height * 128).
+     * Now with memory-efficient scaling and palette conversion.
      */
     public static BufferedImage loadAndScale(File file, int blocksWidth, int blocksHeight) throws IOException {
         BufferedImage original = ImageIO.read(file);
@@ -20,15 +22,34 @@ public class ImageUtils {
         int targetWidth = blocksWidth * 128;
         int targetHeight = blocksHeight * 128;
 
+        // Scale image
         BufferedImage scaled = new BufferedImage(targetWidth, targetHeight, BufferedImage.TYPE_INT_ARGB);
         Graphics2D g2d = scaled.createGraphics();
-
-        // Quality rendering hints
-        g2d.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
+        g2d.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BICUBIC);
         g2d.drawImage(original, 0, 0, targetWidth, targetHeight, null);
         g2d.dispose();
 
+        // Clean up original immediately
+        original.flush();
+
         return scaled;
+    }
+
+    /**
+     * Converts a 128x128 sub-image to a byte array using Minecraft's map palette.
+     * This is CRITICAL for performance.
+     */
+    @SuppressWarnings("deprecation")
+    public static byte[] convertToMapColors(BufferedImage part) {
+        byte[] colors = new byte[128 * 128];
+        for (int y = 0; y < 128; y++) {
+            for (int x = 0; x < 128; x++) {
+                int color = part.getRGB(x, y);
+                // MapPalette.matchColor is the standard way to find the closest MC color
+                colors[y * 128 + x] = MapPalette.matchColor(new Color(color, true));
+            }
+        }
+        return colors;
     }
 
     /**
