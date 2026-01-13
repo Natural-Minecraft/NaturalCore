@@ -81,13 +81,27 @@ public class BannerManager {
             return;
         }
 
-        try {
-            BufferedImage fullImage = ImageUtils.loadAndScale(imgFile, banner.getWidth(), banner.getHeight());
-            spawnBannerEntities(banner, fullImage);
-            plugin.getLogger().info("Banner '" + banner.getName() + "' visuals refreshed.");
-        } catch (Exception e) {
-            plugin.getLogger().severe("Error loading banner " + banner.getName() + ": " + e.getMessage());
-        }
+        // ASYNC TASK: Memproses gambar di background thread agar tidak menahan Server
+        // Main Thread (No Lag)
+        Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
+            try {
+                long start = System.currentTimeMillis();
+                BufferedImage fullImage = ImageUtils.loadAndScale(imgFile, banner.getWidth(), banner.getHeight());
+
+                // SYNC TASK: Kembali ke Main Thread untuk spawn entity (Wajib Sync)
+                Bukkit.getScheduler().runTask(plugin, () -> {
+                    // Safety check: pastikan banner masih ada dalam daftar aktif
+                    if (!activeBanners.containsKey(banner.getName()))
+                        return;
+
+                    spawnBannerEntities(banner, fullImage);
+                    long time = System.currentTimeMillis() - start;
+                    plugin.getLogger().info("Banner '" + banner.getName() + "' visuals refreshed in " + time + "ms.");
+                });
+            } catch (Exception e) {
+                plugin.getLogger().severe("Error loading banner " + banner.getName() + ": " + e.getMessage());
+            }
+        });
     }
 
     public void createBanner(String name, String imageName, Location pos1, Location pos2, BlockFace face,
@@ -135,44 +149,43 @@ public class BannerManager {
 
         BlockFace face = banner.getFace();
         double dx = 0, dz = 0;
-        double ox = 0.5, oz = 0.5; // Start at center of block face
-        float yaw = 0;
 
-        // FIXED ORIENTATION & OFFSET (0.02) to avoid "inside block" / z-fighting
         switch (face) {
             case NORTH -> {
-                yaw = 180;
                 dx = -1;
-                oz = -0.02;
             }
             case SOUTH -> {
-                yaw = 0;
                 dx = 1;
-                oz = 1.02;
             }
             case EAST -> {
-                yaw = 270;
                 dz = -1;
-                ox = 1.02;
             }
             case WEST -> {
-                yaw = 90;
                 dz = 1;
-                ox = -0.02;
             }
             default -> {
             }
         }
 
-        Location origin = banner.getLocation().clone().add(ox, 0.5, oz);
+        Location origin = banner.getLocation().clone();
         org.bukkit.World world = banner.getLocation().getWorld();
         if (world == null)
             return;
 
+        // SMART POP-OUT LOGIC:
+        // Jika origin (posisi spawn) adalah blok solid, geser 1 blok ke arah face.
+        if (origin.getBlock().getType().isSolid()) {
+            origin.add(face.getModX(), face.getModY(), face.getModZ());
+        }
+
         int mapIndex = 0;
         for (int row = 0; row < banner.getHeight(); row++) {
             for (int col = 0; col < banner.getWidth(); col++) {
+                // GlowItemFrame harus di tengah block (x.5, y.5, z.5) untuk attach benar
                 Location mapLoc = origin.clone().add(col * dx, -row, col * dz);
+
+                // Pastikan koordinat integer untuk spawn
+                Location spawnLoc = new Location(world, mapLoc.getBlockX(), mapLoc.getBlockY(), mapLoc.getBlockZ());
 
                 MapView view = null;
                 if (mapIndex < existingMapIds.size()) {
@@ -193,8 +206,10 @@ public class BannerManager {
                 byte[] mapData = ImageUtils.convertToMapColors(ImageUtils.getMapPart(fullImage, col, row));
                 renderMap(view, mapData);
 
-                // BACK TO ItemDisplay: Precision positioning + Scaling to fix "fit"
-                ItemDisplay display = world.spawn(mapLoc, ItemDisplay.class);
+                // --- GLOW ITEM FRAME (Native Map Rendering) ---
+                GlowItemFrame frame = world.spawn(spawnLoc, GlowItemFrame.class);
+                frame.setFacingDirection(face, true);
+
                 ItemStack mapItem = new ItemStack(Material.FILLED_MAP);
                 MapMeta meta = (MapMeta) mapItem.getItemMeta();
                 if (meta != null) {
@@ -202,20 +217,17 @@ public class BannerManager {
                     mapItem.setItemMeta(meta);
                 }
 
-                display.setItemStack(mapItem);
-                display.setBrightness(new Display.Brightness(15, 15));
-                display.setRotation(yaw, 0);
+                frame.setItem(mapItem);
+                frame.setInvisible(true); // Hanya gambar yang terlihat
+                frame.setFixed(true); // Tidak bisa dihancurkan/diputar player
 
-                // Scale slightly larger than 1.0 (1.01) to remove gaps between maps
-                Transformation trans = display.getTransformation();
-                display.setTransformation(new Transformation(
-                        trans.getTranslation(),
-                        trans.getLeftRotation(),
-                        new Vector3f(1.005f, 1.005f, 0.01f), // 1.005 to cover gaps, 0.01 thinness
-                        trans.getRightRotation()));
+                // Rotation hack agar tidak terbalik (tergantung face)
+                // ItemFrame otomatis handle rotasi map, tapi kadang perlu penyesuaian rotasi
+                // item di dalamnya.
+                // Default 0 biasanya sudah benar untuk map.
 
-                display.addScoreboardTag("naturalbanner_entity_" + banner.getName());
-                banner.getEntityUuids().add(display.getUniqueId());
+                frame.addScoreboardTag("naturalbanner_entity_" + banner.getName());
+                banner.getEntityUuids().add(frame.getUniqueId());
                 mapIndex++;
             }
         }
@@ -223,23 +235,26 @@ public class BannerManager {
         banner.getMapIds().clear();
         banner.getMapIds().addAll(newMapIds);
 
-        // Interaction Hitboxes
+        // Interaction Hitboxes (Tetap di depan frame)
         for (int col = 0; col < banner.getWidth(); col++) {
-            double baseY = banner.getLocation().getY() - banner.getHeight() + 0.5;
+            double baseY = origin.getBlockY() - banner.getHeight() + 1.0; // Base Y adjusted
             Location hitboxLoc = origin.clone().add(col * dx, 0, col * dz);
             hitboxLoc.setY(baseY);
 
-            // Hitbox is slightly in FRONT of the map to capture clicks
+            // Pop hitbox slightly forward (0.1) from the frame face
             double hox = 0, hoz = 0;
             if (face == BlockFace.NORTH)
-                hoz = -0.05;
+                hoz = -0.1;
             else if (face == BlockFace.SOUTH)
-                hoz = 0.05;
+                hoz = 1.1; // 1.0 block + 0.1 offset
             else if (face == BlockFace.EAST)
-                hox = 0.05;
+                hox = 1.1;
             else if (face == BlockFace.WEST)
-                hox = -0.05;
+                hox = -0.1;
 
+            // Adjust origin back to center for hitbox spawn if needed, but relative calc is
+            // safer
+            // Hitbox spawn location needs to be precise floating point
             Interaction interaction = world.spawn(hitboxLoc.add(hox, 0, hoz), Interaction.class);
             interaction.setInteractionWidth(1.0f);
             interaction.setInteractionHeight((float) banner.getHeight());
