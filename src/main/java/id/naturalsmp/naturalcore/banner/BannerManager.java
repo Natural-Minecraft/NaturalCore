@@ -189,7 +189,6 @@ public class BannerManager {
                 mapItem.setItemMeta(meta);
 
                 display.setItemStack(mapItem);
-                // ... (setting display lainnya sama) ...
                 display.setBrightness(new Display.Brightness(15, 15));
                 display.setRotation(yaw, 0);
                 display.addScoreboardTag("naturalbanner_entity_" + banner.getName());
@@ -279,26 +278,21 @@ public class BannerManager {
     }
 
     private void renderMap(MapView view, byte[] mapData) {
-        // Hapus renderer bawaan agar map bersih
-        for (MapRenderer renderer : view.getRenderers()) {
-            view.removeRenderer(renderer);
-        }
-
+        view.getRenderers().clear();
         view.addRenderer(new MapRenderer() {
-            // PERBAIKAN VISUAL 2: Hapus variable 'rendered' dan 'if (rendered) return'
-            // MapRenderer dipanggil saat packet dikirim ke player.
-            // Kita HARUS menggambar pixelnya setiap kali dipanggil, karena canvasnya
-            // bisa jadi bersih/baru untuk player yang berbeda.
+            private boolean rendered = false;
 
             @Override
-            public void render(@NotNull MapView map, @NotNull MapCanvas canvas, @NotNull org.bukkit.entity.Player player) {
-                // Operasi setPixel ini sangat cepat (hanya array manipulation),
-                // jadi aman dijalankan berulang kali.
+            public void render(@NotNull MapView map, @NotNull MapCanvas canvas,
+                    @NotNull org.bukkit.entity.Player player) {
+                if (rendered)
+                    return; // Only draw once per player session to save CPU
                 for (int y = 0; y < 128; y++) {
                     for (int x = 0; x < 128; x++) {
                         canvas.setPixel(x, y, mapData[y * 128 + x]);
                     }
                 }
+                rendered = true;
             }
         });
     }
