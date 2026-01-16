@@ -1,0 +1,38 @@
+tiers:
+  1:
+    id: "warrior_3"
+    display: "&8[Warrior III]"
+    suffix: " &8&lWAR I"
+    requirements:
+      money: 1000
+      mob_kills: 50
+    rewards:
+      command: "give %player% iron_ingot 5"
+  2:
+    id: "warrior_2"
+    display: "&8[Warrior II]"
+    suffix: " &8&lWAR II"
+    requirements:
+      money: 2500
+      mob_kills: 100
+  3:
+    id: "warrior_1"
+    display: "&8[Warrior I]"
+    suffix: " &8&lWAR I"
+    requirements:
+      money: 5000
+      mob_kills: 200
+  4:
+    id: "elite_3"
+    display: "&f[Elite III]"
+    suffix: " &f&lELT III"
+    requirements:
+      money: 10000
+      mob_kills: 500
+  5:
+    id: "mythic"
+    display: "&d[MYTHIC]"
+    suffix: " &d&lMYTHIC"
+    requirements:
+      money: 1000000
+      mob_kills: 5000

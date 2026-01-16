@@ -10,12 +10,12 @@ import id.naturalsmp.naturalcore.home.HomeManager;
 import id.naturalsmp.naturalcore.home.HomeCommand;
 import id.naturalsmp.naturalcore.spawn.SpawnCommand;
 import id.naturalsmp.naturalcore.spawn.SpawnManager;
+import id.naturalsmp.naturalcore.spawn.SpawnListener;
+import id.naturalsmp.naturalcore.chat.MentionListener;
 import id.naturalsmp.naturalcore.season.*;
 import id.naturalsmp.naturalcore.banner.*;
 import id.naturalsmp.naturalcore.teleport.TeleportManager;
-import id.naturalsmp.naturalcore.trader.TraderManager;
-import id.naturalsmp.naturalcore.trader.TraderCommand;
-import id.naturalsmp.naturalcore.trader.TraderListener;
+
 import id.naturalsmp.naturalcore.teleport.TeleportCommand;
 import id.naturalsmp.naturalcore.utils.ChatUtils;
 import id.naturalsmp.naturalcore.warp.WarpCommand;
@@ -29,8 +29,7 @@ import id.naturalsmp.naturalcore.economy.BaltopGUI;
 import id.naturalsmp.naturalcore.moderation.VanishManager;
 import id.naturalsmp.naturalcore.moderation.VanishListener;
 import id.naturalsmp.naturalcore.moderation.ModerationCommand;
-import id.naturalsmp.naturalcore.fun.FunCommand;
-import id.naturalsmp.naturalcore.fun.FunListener;
+
 import id.naturalsmp.naturalcore.general.RTPCommand;
 import id.naturalsmp.naturalcore.chat.EmojiManager;
 import id.naturalsmp.naturalcore.chat.EmojiCommand;
@@ -54,10 +53,15 @@ public final class NaturalCore extends JavaPlugin {
     private VanishManager vanishManager;
     private TeleportManager teleportManager;
     private MessageManager messageManager;
-    private TraderManager traderManager;
     private EmojiManager emojiManager;
     private SeasonManager seasonManager;
     private BannerManager bannerManager;
+    private id.naturalsmp.naturalcore.profile.ProfileManager profileManager;
+    private id.naturalsmp.naturalcore.profile.ProfileGUI profileGUI;
+    private id.naturalsmp.naturalcore.chat.tags.TagsManager tagsManager;
+    private id.naturalsmp.naturalcore.afk.AFKManager afkManager;
+    private id.naturalsmp.naturalcore.tier.TierManager tierManager;
+    private id.naturalsmp.naturalcore.tier.TierGUI tierGUI;
 
     @Override
     public void onEnable() {
@@ -68,6 +72,9 @@ public final class NaturalCore extends JavaPlugin {
 
         // 2. Setup Config
         saveDefaultConfig();
+
+        // Init Tags Manager (Needed for ChatListener)
+        this.tagsManager = new id.naturalsmp.naturalcore.chat.tags.TagsManager(this);
 
         // 3. Setup Vault (Economy & Chat)
         this.vaultManager = new VaultManager(this);
@@ -99,7 +106,9 @@ public final class NaturalCore extends JavaPlugin {
         this.spawnManager = new SpawnManager(this);
         SpawnCommand spawnCmd = new SpawnCommand(spawnManager);
         registerCmd("spawn", spawnCmd);
+        registerCmd("spawn", spawnCmd);
         registerCmd("setspawn", spawnCmd);
+        getServer().getPluginManager().registerEvents(new SpawnListener(this), this);
 
         // 6. Home Module
         this.homeManager = new HomeManager(this);
@@ -113,22 +122,9 @@ public final class NaturalCore extends JavaPlugin {
         registerCmd("homes", homeCmd);
 
         // 7. Fun Module
-        FunCommand funCmd = new FunCommand();
-        registerCmd("gg", funCmd);
-        registerCmd("noob", funCmd);
-        getServer().getPluginManager().registerEvents(new FunListener(), this);
+        // Fun Module removed (moved to NaturalFun)
 
-        // 9. Trader Module (Native)
-        if (getConfig().getBoolean("modules.trader", true)) {
-            this.traderManager = new TraderManager(this);
-            getCommand("traderadmin").setExecutor(new TraderCommand(traderManager));
-            getServer().getPluginManager().registerEvents(new TraderListener(traderManager), this);
-            // Spawn traders
-            traderManager.spawnAll();
-            getLogger().info("Trader Module: ENABLED");
-        } else {
-            getLogger().info("Trader Module: DISABLED");
-        }
+        // 9. Trader Module (Moved to NaturalFun)
 
         // 8. General / RTP
         RTPCommand rtpCmd = new RTPCommand();
@@ -232,8 +228,14 @@ public final class NaturalCore extends JavaPlugin {
         registerCmd("emoji", new EmojiCommand(this));
         getLogger().info("Emoji System: ENABLED");
 
+        // 17B. ChatColor System (v1.7)
+        this.chatColorManager = new id.naturalsmp.naturalcore.chat.ChatColorManager(this);
+        registerCmd("chatcolor", new id.naturalsmp.naturalcore.chat.ChatColorCommand(this));
+        getServer().getPluginManager().registerEvents(new id.naturalsmp.naturalcore.chat.ChatColorGUI(this), this);
+
         // 18. Messaging System
         getServer().getPluginManager().registerEvents(new ChatListener(this), this);
+        getServer().getPluginManager().registerEvents(new MentionListener(this), this);
         this.messageManager = new MessageManager();
         PrivateMessageCommand pmCmd = new PrivateMessageCommand(this);
         registerCmd("msg", pmCmd);
@@ -252,6 +254,37 @@ public final class NaturalCore extends JavaPlugin {
         registerCmd("repair", perksCmd);
         registerCmd("nick", perksCmd);
 
+        // 20. v1.7 Utilities
+        registerCmd("clean", new id.naturalsmp.naturalcore.utility.CleanCommand());
+        registerCmd("back", new id.naturalsmp.naturalcore.general.BackCommand(this));
+        registerCmd("otp", new id.naturalsmp.naturalcore.general.OfflineTPCommand(this));
+
+        // 21. Profile System (v1.8)
+        this.profileManager = new id.naturalsmp.naturalcore.profile.ProfileManager(this);
+        this.profileGUI = new id.naturalsmp.naturalcore.profile.ProfileGUI(this);
+        registerCmd("profile", new id.naturalsmp.naturalcore.profile.ProfileCommand(this));
+        getServer().getPluginManager().registerEvents(profileGUI, this);
+        getLogger().info("Profile System: ENABLED (CoinsEngine: " + profileManager.hasCoinsEngine() + ")");
+
+        // 22. Tags System (v1.8)
+        id.naturalsmp.naturalcore.chat.tags.TagsGUI tagsGUI = new id.naturalsmp.naturalcore.chat.tags.TagsGUI(this);
+        getServer().getPluginManager().registerEvents(tagsGUI, this);
+        registerCmd("tags", new id.naturalsmp.naturalcore.chat.tags.TagsCommand(this));
+
+        // 23. AFK System (v1.8)
+        this.afkManager = new id.naturalsmp.naturalcore.afk.AFKManager(this);
+        getServer().getPluginManager().registerEvents(new id.naturalsmp.naturalcore.afk.AFKListener(this), this);
+
+        // 24. Tier System (v1.8)
+        this.tierManager = new id.naturalsmp.naturalcore.tier.TierManager(this);
+        this.tierGUI = new id.naturalsmp.naturalcore.tier.TierGUI(this); // Listeners inside
+        getServer().getPluginManager().registerEvents(tierGUI, this);
+        getServer().getPluginManager().registerEvents(new id.naturalsmp.naturalcore.tier.TierTopGUI(this), this);
+        registerCmd("tier", new id.naturalsmp.naturalcore.tier.TierCommand(this));
+
+        getServer().getPluginManager().registerEvents(new id.naturalsmp.naturalcore.teleport.PlayerDeathListener(this),
+                this);
+
         // Selesai
         getLogger().info(
                 ChatUtils.colorize("&6&lNaturalCore v" + getDescription().getVersion() + " &asudah aktif sepenuhnya!"));
@@ -263,14 +296,15 @@ public final class NaturalCore extends JavaPlugin {
         if (warpManager != null) {
             warpManager.saveWarps();
         }
-        if (traderManager != null) {
-            traderManager.despawnAll();
-        }
+
         if (seasonManager != null) {
             seasonManager.saveData();
         }
         if (bannerManager != null) {
             bannerManager.saveAll();
+        }
+        if (afkManager != null) {
+            afkManager.cleanup();
         }
     }
 
@@ -307,16 +341,43 @@ public final class NaturalCore extends JavaPlugin {
         return messageManager;
     }
 
-    public TraderManager getTraderManager() {
-        return traderManager;
-    }
-
     public EmojiManager getEmojiManager() {
         return emojiManager;
     }
 
     public SeasonManager getSeasonManager() {
         return seasonManager;
+    }
+
+    public id.naturalsmp.naturalcore.profile.ProfileManager getProfileManager() {
+        return profileManager;
+    }
+
+    public id.naturalsmp.naturalcore.profile.ProfileGUI getProfileGUI() {
+        return profileGUI;
+    }
+
+    public id.naturalsmp.naturalcore.chat.tags.TagsManager getTagsManager() {
+        return tagsManager;
+    }
+
+    public id.naturalsmp.naturalcore.afk.AFKManager getAFKManager() {
+        return afkManager;
+    }
+
+    public id.naturalsmp.naturalcore.tier.TierManager getTierManager() {
+        return tierManager;
+    }
+
+    public id.naturalsmp.naturalcore.tier.TierGUI getTierGUI() {
+        return tierGUI;
+    }
+
+    // --- CHAT COLOR ---
+    private id.naturalsmp.naturalcore.chat.ChatColorManager chatColorManager;
+
+    public id.naturalsmp.naturalcore.chat.ChatColorManager getChatColorManager() {
+        return chatColorManager;
     }
 
     // --- HELPER UNTUK MENCEGAH CRASH ---

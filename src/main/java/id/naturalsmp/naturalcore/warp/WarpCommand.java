@@ -61,7 +61,9 @@ public class WarpCommand implements CommandExecutor {
                 return true;
             }
             wm.createWarp(args[0], p.getLocation());
-            p.sendMessage(ConfigUtils.getString("messages.warp.warp-set").replace("%name%", args[0]));
+            String prefix = ConfigUtils.getString("prefix.warp");
+            p.sendMessage(ChatUtils
+                    .colorize(prefix + ConfigUtils.getString("messages.warp.warp-set").replace("%name%", args[0])));
             p.playSound(p.getLocation(), Sound.BLOCK_NOTE_BLOCK_PLING, 1f, 2f);
             return true;
         }
@@ -73,11 +75,15 @@ public class WarpCommand implements CommandExecutor {
             if (args.length == 0)
                 return true;
             if (wm.getWarp(args[0]) == null) {
-                p.sendMessage(ConfigUtils.getString("messages.warp.warp-not-found").replace("%name%", args[0]));
+                String prefix = ConfigUtils.getString("prefix.warp");
+                p.sendMessage(ChatUtils.colorize(
+                        prefix + ConfigUtils.getString("messages.warp.warp-not-found").replace("%name%", args[0])));
                 return true;
             }
             wm.deleteWarp(args[0]);
-            p.sendMessage(ConfigUtils.getString("messages.warp.warp-deleted").replace("%name%", args[0]));
+            String prefix = ConfigUtils.getString("prefix.warp");
+            p.sendMessage(ChatUtils
+                    .colorize(prefix + ConfigUtils.getString("messages.warp.warp-deleted").replace("%name%", args[0])));
             return true;
         }
 
@@ -89,7 +95,9 @@ public class WarpCommand implements CommandExecutor {
                 return true;
             Warp w = wm.getWarp(args[0]);
             if (w == null) {
-                p.sendMessage(ConfigUtils.getString("messages.warp.warp-not-found").replace("%name%", args[0]));
+                String prefix = ConfigUtils.getString("prefix.warp");
+                p.sendMessage(ChatUtils.colorize(
+                        prefix + ConfigUtils.getString("messages.warp.warp-not-found").replace("%name%", args[0])));
                 return true;
             }
             Material hand = p.getInventory().getItemInMainHand().getType();
@@ -97,9 +105,10 @@ public class WarpCommand implements CommandExecutor {
                 hand = Material.GRASS_BLOCK;
             w.setIcon(hand);
             wm.saveWarps();
-            p.sendMessage(ConfigUtils.getString("messages.warp.warp-icon-set")
+            String prefix = ConfigUtils.getString("prefix.warp");
+            p.sendMessage(ChatUtils.colorize(prefix + ConfigUtils.getString("messages.warp.warp-icon-set")
                     .replace("%name%", w.getId())
-                    .replace("%icon%", hand.name()));
+                    .replace("%icon%", hand.name())));
             return true;
         }
 
@@ -111,7 +120,9 @@ public class WarpCommand implements CommandExecutor {
             }
             Warp w = wm.getWarp(args[0]);
             if (w == null) {
-                p.sendMessage(ConfigUtils.getString("messages.warp.warp-not-found").replace("%name%", args[0]));
+                String prefix = ConfigUtils.getString("prefix.warp");
+                p.sendMessage(ChatUtils.colorize(
+                        prefix + ConfigUtils.getString("messages.warp.warp-not-found").replace("%name%", args[0])));
                 return true;
             }
             p.teleport(w.getLocation());

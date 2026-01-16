@@ -102,7 +102,11 @@ public class HomeManager {
             if (msg == null)
                 msg = "&aTeleporting to &e%location%...";
 
-            p.sendMessage(ChatUtils.colorize(ConfigUtils.getString("prefix.admin") + msg.replace("%location%", name)));
+            String prefix = ConfigUtils.getString("prefix.home");
+            if (prefix == null)
+                prefix = ConfigUtils.getString("prefix.player");
+
+            p.sendMessage(ChatUtils.colorize(prefix + msg.replace("%location%", name)));
         } else {
             p.sendMessage(ChatUtils.colorize("&cHome &e" + name + " &ctidak ditemukan!"));
         }

@@ -21,7 +21,7 @@ public class EssentialPerksCommand implements CommandExecutor {
             return true;
         Player p = (Player) sender;
         String cmdName = command.getName().toLowerCase(); // FIX: Gunakan getName() agar alias terbaca
-        String prefix = ConfigUtils.getString("prefix.admin");
+        String prefix = ConfigUtils.getString("prefix.player");
 
         // --- HAT ---
         if (cmdName.equals("hat")) {
@@ -38,22 +38,24 @@ public class EssentialPerksCommand implements CommandExecutor {
             p.getInventory().setHelmet(hand);
             p.getInventory().setItemInMainHand(helmet); // Tukar item
             p.sendMessage(prefix + ConfigUtils.getString("messages.utils.hat-success"));
+            p.playSound(p.getLocation(), org.bukkit.Sound.ITEM_ARMOR_EQUIP_DIAMOND, 1f, 1f);
             return true;
         }
 
         // --- REPAIR ---
-        if (cmdName.equals("repair")) {
+        if (cmdName.equals("repair") || cmdName.equals("fix")) {
             if (!p.hasPermission("naturalsmp.repair"))
                 return noPerm(p);
 
             ItemStack item = p.getInventory().getItemInMainHand();
             if (item == null || item.getType() == Material.AIR) {
-                p.sendMessage(ChatUtils.colorize("&cPegang item yang mau direpair!"));
+                p.sendMessage(ChatUtils.colorize("&cPegang item yang mau diperbaiki!"));
                 return true;
             }
 
             repairItem(item);
             p.sendMessage(prefix + ConfigUtils.getString("messages.utils.repair-success"));
+            p.playSound(p.getLocation(), org.bukkit.Sound.BLOCK_ANVIL_USE, 1f, 1.2f);
             return true;
         }
 
@@ -69,13 +71,21 @@ public class EssentialPerksCommand implements CommandExecutor {
 
             if (args[0].equalsIgnoreCase("off") || args[0].equalsIgnoreCase("reset")) {
                 p.setDisplayName(p.getName());
-                // p.setPlayerListName(p.getName()); // Optional: ubah di tablist juga
+                p.setPlayerListName(p.getName());
                 p.sendMessage(prefix + ConfigUtils.getString("messages.utils.nick-reset"));
+                p.playSound(p.getLocation(), org.bukkit.Sound.UI_BUTTON_CLICK, 1f, 1f);
             } else {
-                String nick = ChatUtils.colorize(args[0]);
-                p.setDisplayName(nick); // Ini yang dipakai di chat %displayname%
-                // p.setPlayerListName(nick); // Optional
-                p.sendMessage(prefix + ConfigUtils.getString("messages.utils.nick-set").replace("{nick}", nick));
+                String nickRaw = args[0];
+                if (nickRaw.length() < 4) {
+                    p.sendMessage(ChatUtils.colorize(ConfigUtils.getString("messages.utils.nick-too-short")));
+                    p.playSound(p.getLocation(), org.bukkit.Sound.BLOCK_NOTE_BLOCK_BASS, 1f, 0.5f);
+                    return true;
+                }
+
+                String nick = ChatUtils.colorize(nickRaw);
+                p.setDisplayName(nick);
+                p.sendMessage(ChatUtils.colorize("&aNickname diubah menjadi: &r" + nick));
+                p.playSound(p.getLocation(), org.bukkit.Sound.ENTITY_PLAYER_LEVELUP, 1f, 1.5f);
             }
             return true;
         }

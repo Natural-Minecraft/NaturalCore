@@ -23,14 +23,16 @@ import java.util.stream.Collectors;
 public class BaltopGUI implements Listener {
 
     public void openGUI(Player p) {
-        Inventory inv = Bukkit.createInventory(null, 27, ChatUtils.colorize("&#00AAFF&lɴᴀᴛᴜʀᴀʟ ᴛᴏᴘ 10"));
+        Inventory inv = Bukkit.createInventory(null, 27,
+                ChatUtils.colorize(ConfigUtils.getString("messages.gui.baltop.title")));
 
         // Background Filler
         ItemStack filler = new ItemStack(Material.BLACK_STAINED_GLASS_PANE);
         ItemMeta fMeta = filler.getItemMeta();
         fMeta.setDisplayName(" ");
         filler.setItemMeta(fMeta);
-        for(int i=0; i<27; i++) inv.setItem(i, filler);
+        for (int i = 0; i < 27; i++)
+            inv.setItem(i, filler);
 
         // Async Calculation biar server gak lag
         Bukkit.getScheduler().runTaskAsynchronously(NaturalCore.getInstance(), () -> {
@@ -49,17 +51,30 @@ public class BaltopGUI implements Listener {
             Bukkit.getScheduler().runTask(NaturalCore.getInstance(), () -> {
                 int slot = 9; // Mulai baris ke-2
                 int rank = 1;
+                String symbol = ConfigUtils.getString("economy.vault.symbol");
 
                 for (OfflinePlayer op : top10) {
-                    if (slot >= 18) break; // Max slot
+                    if (slot >= 18)
+                        break; // Max slot
 
                     ItemStack head = new ItemStack(Material.PLAYER_HEAD);
                     SkullMeta meta = (SkullMeta) head.getItemMeta();
                     meta.setOwningPlayer(op);
-                    meta.setDisplayName(ChatUtils.colorize("&e#" + rank + " &f" + (op.getName() != null ? op.getName() : "Unknown")));
 
+                    String playerName = (op.getName() != null ? op.getName() : "Unknown");
+                    meta.setDisplayName(ChatUtils.colorize(ConfigUtils.getString("messages.gui.baltop.item-name")
+                            .replace("%rank%", String.valueOf(rank))
+                            .replace("%player%", playerName)));
+
+                    List<String> rawLore = ConfigUtils.getMessageList("gui.baltop.item-lore");
                     List<String> lore = new ArrayList<>();
-                    lore.add(ChatUtils.colorize("&7Balance: &a" + ConfigUtils.getString("economy.vault.symbol") + " " + String.format("%,.0f", eco.getBalance(op))));
+                    if (rawLore != null) {
+                        for (String s : rawLore) {
+                            lore.add(ChatUtils.colorize(s
+                                    .replace("%symbol%", symbol)
+                                    .replace("%amount%", String.format("%,.0f", eco.getBalance(op)))));
+                        }
+                    }
                     meta.setLore(lore);
 
                     head.setItemMeta(meta);
@@ -76,14 +91,14 @@ public class BaltopGUI implements Listener {
     // --- SECURITY ---
     @EventHandler
     public void onClick(InventoryClickEvent e) {
-        if (ChatUtils.stripColor(e.getView().getTitle()).contains("ɴᴀᴛᴜʀᴀʟ ᴛᴏᴘ")) {
+        if (ChatUtils.stripColor(e.getView().getTitle()).contains("ɴᴀᴛᴜʀᴀʟ")) {
             e.setCancelled(true);
         }
     }
 
     @EventHandler
     public void onDrag(InventoryDragEvent e) {
-        if (ChatUtils.stripColor(e.getView().getTitle()).contains("ɴᴀᴛᴜʀᴀʟ ᴛᴏᴘ")) {
+        if (ChatUtils.stripColor(e.getView().getTitle()).contains("ɴᴀᴛᴜʀᴀʟ")) {
             e.setCancelled(true);
         }
     }

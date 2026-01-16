@@ -30,17 +30,18 @@ public class PrivateMessageCommand implements CommandExecutor {
         }
         Player p = (Player) sender;
         String cmd = label.toLowerCase();
+        String prefix = ConfigUtils.getString("prefix.player");
 
         // --- COMMAND: /msg <player> <pesan> ---
         if (cmd.equals("msg") || cmd.equals("tell") || cmd.equals("w")) {
             if (args.length < 2) {
-                p.sendMessage(ChatUtils.colorize("&cUsage: /" + cmd + " <player> <message>"));
+                p.sendMessage(ChatUtils.colorize(prefix + "&cGunakan: /" + cmd + " <player> <message>"));
                 return true;
             }
 
             Player target = Bukkit.getPlayer(args[0]);
             if (target == null) {
-                p.sendMessage(ConfigUtils.getString("messages.global.player-not-found"));
+                p.sendMessage(ChatUtils.colorize(prefix + ConfigUtils.getString("messages.global.player-not-found")));
                 return true;
             }
 
@@ -53,13 +54,13 @@ public class PrivateMessageCommand implements CommandExecutor {
         // --- COMMAND: /reply atau /r ---
         if (cmd.equals("reply") || cmd.equals("r")) {
             if (args.length < 1) {
-                p.sendMessage(ChatUtils.colorize("&cUsage: /r <message>"));
+                p.sendMessage(ChatUtils.colorize(prefix + "&cGunakan: /r <message>"));
                 return true;
             }
 
             Player target = plugin.getMessageManager().getReplyTarget(p);
             if (target == null) {
-                p.sendMessage(ConfigUtils.getString("messages.utils.msg-no-reply"));
+                p.sendMessage(ChatUtils.colorize(prefix + ConfigUtils.getString("messages.utils.msg-no-reply")));
                 return true;
             }
 

@@ -76,7 +76,8 @@ public class WarpManager {
 
         // Ambil semua file di dalam folder 'warps'
         File[] files = warpFolder.listFiles();
-        if (files == null) return;
+        if (files == null)
+            return;
 
         for (File file : files) {
             // Cuma baca file yang akhiran .yml
@@ -127,7 +128,7 @@ public class WarpManager {
         }
     }
 
-    private void saveWarpToFile(Warp warp) {
+    public void saveWarpToFile(Warp warp) {
         File file = new File(warpFolder, warp.getId() + ".yml");
         YamlConfiguration config = new YamlConfiguration();
 

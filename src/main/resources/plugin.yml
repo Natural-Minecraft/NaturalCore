@@ -163,12 +163,6 @@ commands:
     description: Icon warp
     permission: naturalsmp.admin
 
-  # --- TRADER ---
-  traderadmin:
-    description: Admin trader configuration
-    usage: /traderadmin <create|remove|list|reload>
-    permission: naturalsmp.admin
-
   # --- SPAWN ---
   spawn:
     description: Ke spawn
@@ -192,10 +186,7 @@ commands:
     permission: naturalsmp.home.use
 
   # --- FUN & RTP ---
-  gg:
-    description: GG
-  noob:
-    description: Noob
+
   resource:
     description: RTP Resource
     aliases: [rsc]
@@ -230,6 +221,32 @@ commands:
     description: Interactive banners management (Interactive Board)
     permission: naturalsmp.admin.banner
 
+  # --- PROFILE ---
+  tags:
+    description: Koleksi Tag Chat
+  tier:
+    description: Sistem Ranking Natural Tier
+  profile:
+    description: Buka menu profil player
+    aliases: [p, stats]
+
+  # --- v1.7 COMMANDS ---
+  chatcolor:
+    description: Buka menu warna chat
+    aliases: [color, ccolor]
+    permission: naturalsmp.chat.color
+  clean:
+    description: Bersihkan inventory (kecuali armor)
+    aliases: [clear, ci]
+    permission: naturalsmp.clean
+  back:
+    description: Kembali ke lokasi kematian/tpa
+    permission: naturalsmp.back
+  otp:
+    description: Teleport ke player offline
+    aliases: [offlinetp]
+    permission: naturalsmp.otp
+
 permissions:
   naturalsmp.admin:
     default: op
@@ -252,4 +269,35 @@ permissions:
       naturalsmp.home.limit.unlimited: true
   naturalsmp.home.limit.unlimited:
     description: Izin untuk membuat home tanpa batas
+    default: op
+
+  # --- v1.7 Permissions ---
+  naturalsmp.clean:
+    description: Access to /clean
+    default: op
+  naturalsmp.back:
+    description: Access to /back
+    default: op
+  naturalsmp.otp:
+    description: Access to /otp
+    default: op
+  naturalsmp.trash:
+    description: Access to /trash
+    default: true
+  
+  # Chat Color Ranks
+  naturalsmp.chat.color:
+    description: Access to basic ChatColor
+    default: true
+  naturalsmp.color.vip:
+    description: Access to VIP colors
+    default: op
+  naturalsmp.color.mvp:
+    description: Access to MVP colors
+    default: op
+  naturalsmp.color.midi:
+    description: Access to Midi colors
+    default: op
+  naturalsmp.color.nature:
+    description: Access to ALL colors + fonts + styles
     default: op

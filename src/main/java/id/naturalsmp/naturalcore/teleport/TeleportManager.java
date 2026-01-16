@@ -22,8 +22,23 @@ public class TeleportManager {
     // Key: Penerima Request, Value: Tipe (true = tpa, false = tpahere)
     private final HashMap<UUID, Boolean> requestType = new HashMap<>();
 
+    // Back Mechanism
+    private final HashMap<UUID, org.bukkit.Location> lastLocations = new HashMap<>();
+
     public TeleportManager(NaturalCore plugin) {
         this.plugin = plugin;
+    }
+
+    public void setLastLocation(org.bukkit.entity.Player p) {
+        lastLocations.put(p.getUniqueId(), p.getLocation());
+    }
+
+    public org.bukkit.Location getLastLocation(org.bukkit.entity.Player p) {
+        return lastLocations.get(p.getUniqueId());
+    }
+
+    public org.bukkit.Location getLastLocation(UUID uuid) {
+        return lastLocations.get(uuid);
     }
 
     // --- LOGIC REQUEST ---
@@ -46,7 +61,8 @@ public class TeleportManager {
 
         // Hapus request otomatis setelah 60 detik
         Bukkit.getScheduler().runTaskLater(plugin, () -> {
-            if (tpaRequests.containsKey(target.getUniqueId()) && tpaRequests.get(target.getUniqueId()).equals(sender.getUniqueId())) {
+            if (tpaRequests.containsKey(target.getUniqueId())
+                    && tpaRequests.get(target.getUniqueId()).equals(sender.getUniqueId())) {
                 tpaRequests.remove(target.getUniqueId());
                 requestType.remove(target.getUniqueId());
                 // Opsional: Beritahu timeout
@@ -79,13 +95,15 @@ public class TeleportManager {
         if (isTpaHere) {
             // TPAHERE: Receiver ditarik ke Sender
             receiver.teleport(sender.getLocation());
-            receiver.sendMessage(prefix + ConfigUtils.getString("messages.tpa-accept-target").replace("%player%", sender.getName()));
+            receiver.sendMessage(
+                    prefix + ConfigUtils.getString("messages.tpa-accept-target").replace("%player%", sender.getName()));
             sender.sendMessage(prefix + ConfigUtils.getString("messages.tpa-accept-sender"));
         } else {
             // TPA: Sender pergi ke Receiver
             sender.teleport(receiver.getLocation());
             sender.sendMessage(prefix + ConfigUtils.getString("messages.tpa-accept-sender"));
-            receiver.sendMessage(prefix + ConfigUtils.getString("messages.tpa-accept-target").replace("%player%", sender.getName()));
+            receiver.sendMessage(
+                    prefix + ConfigUtils.getString("messages.tpa-accept-target").replace("%player%", sender.getName()));
         }
 
         sender.playSound(sender.getLocation(), Sound.ENTITY_ENDERMAN_TELEPORT, 1f, 1f);
@@ -106,10 +124,12 @@ public class TeleportManager {
         tpaRequests.remove(receiver.getUniqueId());
         requestType.remove(receiver.getUniqueId());
 
-        receiver.sendMessage(prefix + ConfigUtils.getString("messages.tpa-deny-target").replace("%player%", (sender != null ? sender.getName() : "Player")));
+        receiver.sendMessage(prefix + ConfigUtils.getString("messages.tpa-deny-target").replace("%player%",
+                (sender != null ? sender.getName() : "Player")));
 
         if (sender != null && sender.isOnline()) {
-            sender.sendMessage(prefix + ConfigUtils.getString("messages.tpa-deny-sender").replace("%target%", receiver.getName()));
+            sender.sendMessage(
+                    prefix + ConfigUtils.getString("messages.tpa-deny-sender").replace("%target%", receiver.getName()));
             sender.playSound(sender.getLocation(), Sound.ENTITY_VILLAGER_NO, 1f, 1f);
         }
     }

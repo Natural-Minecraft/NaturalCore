@@ -22,7 +22,7 @@ public class NaturalCoreGUI implements Listener {
 
     private final NaturalCore plugin;
     // Title Modern (Hex Color)
-    private final String GUI_TITLE = "&#00AAFF&lɴᴀᴛᴜʀᴀʟ &#55FF55&lᴀᴅᴍɪɴ";
+    private final String GUI_TITLE = ConfigUtils.getString("messages.gui.admin.title");
 
     public NaturalCoreGUI(NaturalCore plugin) {
         this.plugin = plugin;
@@ -47,7 +47,7 @@ public class NaturalCoreGUI implements Listener {
         }
 
         // --- CATEGORY: CORE & SYSTEM ---
-        inv.setItem(4, createItem(Material.NETHER_STAR, "&6&lNATURAL CORE v1.6.2",
+        inv.setItem(4, createItem(Material.NETHER_STAR, "&6&lNATURAL CORE v1.7.5",
                 "&7Main core plugin untuk NaturalSMP.",
                 "&7Dokumentasi sistem administrator."));
 
@@ -89,10 +89,11 @@ public class NaturalCoreGUI implements Listener {
                 "&7- &f/day, /night, /sun, /rain"));
 
         // Row 3: OTHER INFO
-        inv.setItem(28, createItem(Material.WRITABLE_BOOK, "&f&lCHAT & EMOJI",
+        inv.setItem(28, createItem(Material.WRITABLE_BOOK, "&f&lCHAT & COLORS & EMOJI",
                 "&fSistem Komunikasi.",
                 "",
                 "&7- &f:smile:, :love:, dll",
+                "&7- &f/chatcolor &7- Pilih Warna & Font",
                 "&7- &f/emoji &7- Daftar lengkap",
                 "&7- &f/msg, /reply &7- Private message"));
 
@@ -106,13 +107,15 @@ public class NaturalCoreGUI implements Listener {
         inv.setItem(32, createItem(Material.LEATHER_HELMET, "&d&lPLAYER PERKS",
                 "&fKemampuan Tambahan.",
                 "",
+                "&7- &f/back &7- Kembali ke lokasi mati",
                 "&7- &f/fly, /hat, /nick, /repair",
+                "&7- &f/clean &7- Bersihkan Inventory",
                 "&7- &f/heal, /feed, /trash, /wb"));
 
         inv.setItem(34, createItem(Material.IRON_DOOR, "&c&lMODERATION",
                 "&fAlat Pengawasan.",
                 "",
-                "&7- &f/vanish (v), /god, /whois",
+                "&7- &f/vanish (v), /god, /otp <player>",
                 "&7- &f/invsee, /endersee, /ec"));
 
         // Bottom Row: ACTIONS

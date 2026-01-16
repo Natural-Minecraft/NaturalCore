@@ -21,17 +21,18 @@ public class MenuUtilCommand implements CommandExecutor {
         }
         Player p = (Player) sender;
 
+        String prefix = ConfigUtils.getString("prefix.player");
         // --- /TRASH ---
         if (label.equalsIgnoreCase("trash")) {
-            // Trash biasanya tidak butuh permission (semua orang bisa buang barang)
-            // Tapi jika ingin restrict, uncomment baris berikut:
-            // if (!p.hasPermission("naturalsmp.trash")) {
-            // p.sendMessage(ConfigUtils.getString("messages.global.no-permission"));
-            // return true;
-            // }
+            if (!p.hasPermission("naturalsmp.trash")) {
+                p.sendMessage(ConfigUtils.getString("messages.global.no-permission"));
+                return true;
+            }
 
             p.openInventory(
                     Bukkit.createInventory(null, 36, ChatUtils.colorize("&cTrash Can (Items will be deleted)")));
+            p.sendMessage(ChatUtils.colorize(prefix + ConfigUtils.getString("messages.utils.trash-opened")));
+            p.playSound(p.getLocation(), org.bukkit.Sound.BLOCK_CHEST_OPEN, 1f, 1f);
             return true;
         }
 
@@ -42,6 +43,8 @@ public class MenuUtilCommand implements CommandExecutor {
                 return true;
             }
             p.openWorkbench(null, true);
+            p.sendMessage(ChatUtils.colorize(prefix + ConfigUtils.getString("messages.utils.craft-opened")));
+            p.playSound(p.getLocation(), org.bukkit.Sound.BLOCK_WOODEN_BUTTON_CLICK_ON, 1f, 1f);
             return true;
         }
 
@@ -53,6 +56,8 @@ public class MenuUtilCommand implements CommandExecutor {
             }
             // Membuka Anvil Virtual (Bukan GUI custom, tapi native inventory)
             p.openInventory(Bukkit.createInventory(null, org.bukkit.event.inventory.InventoryType.ANVIL));
+            p.sendMessage(ChatUtils.colorize(prefix + ConfigUtils.getString("messages.utils.anvil-opened")));
+            p.playSound(p.getLocation(), org.bukkit.Sound.BLOCK_ANVIL_USE, 1f, 1f); // Use with care, loud
             return true;
         }
 

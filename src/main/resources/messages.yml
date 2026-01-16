@@ -60,23 +60,45 @@ fun:
 
 # --- UTILITIES ---
 utils:
-  msg-no-reply: "&cTidak ada orang yang bisa dibalas."
-  msg-player-only: "&cConsole tidak bisa melakukan ini."
-  repair-success: "&e&l⚒ &7Item di tangan berhasil diperbaiki!"
-  hat-success: "&a&l🎩 &7Item dipasang sebagai topi!"
-  hat-fail: "&cPegang item dulu untuk dijadikan topi."
-  nick-set: "&aNickname kamu diubah menjadi: &r{nick}"
-  nick-reset: "&aNickname dikembalikan ke default."
-  time-day: "&e&l☀ &7Waktu diubah menjadi &fSiang&7."
-  time-night: "&9&l☾ &7Waktu diubah menjadi &fMalam&7."
-  weather-sun: "&e&l☀ &7Cuaca cerah."
-  weather-rain: "&9&l☂ &7Hujan turun."
+  msg-no-reply: "&#FFAA00&l❂ &7Tidak ada orang untuk &#FFAA00&lbalas&7."
+  msg-player-only: "&#FF5555&l❂ &cConsole tidak memiliki akses sosial."
+  repair-success: "&#55FF55&l⚒ &7Item berhasil diperbaiki menjadi &#55FF55&lGress&7!"
+  hat-success: "&#00AAFF&l🎩 &7Item sekarang terpasang sebagai &#00AAFF&lTopi&7."
+  hat-fail: "&#FF5555&l🎩 &7Pegang item untuk dijadikan &#FF5555&lTopi&7!"
+  nick-set: "&#55FF55&l✧ &7Nickname kamu kini: &r{nick}"
+  nick-reset: "&#AAAAAA&l✧ &7Nickname dikembalikan ke &#AAAAAA&ndefault&7."
+  nick-too-short: "&#FF5555&l⚠ &cNama terlalu pendek! Minimal 4 huruf."
+  time-day: "&#FFCC00&l☀ &7Waktu server disetel ke &#FFCC00&lSiang&7."
+  time-night: "&#5555FF&l☾ &7Waktu server disetel ke &#5555FF&lMalam&7."
+  weather-sun: "&#FFCC00&l☀ &7Cuaca sekarang berubah menjadi &#FFCC00&lCerah&7."
+  weather-rain: "&#55FFFF&l☂ &7Hujan mulai membasahi bumi..."
+  clean-success: "&#55FF55&l✨ &aInventory berhasil &#55FF55&lDibersihkan&7!"
+  chatcolor-locked: "&#FF5555&l🔒 &cKamu tidak memiliki izin untuk warna ini!"
+  chatcolor-style-locked: "&#FF5555&l🔒 &cMembutuhkan Rank &#55FF55&lNature&c!"
+  trash-opened: "&#FF5555&l🗑 &7Membuka &#FF5555&lTempat Sampah&7..."
+  craft-opened: "&#FFAA00&l⚒ &7Membuka &#FFAA00&lWorkbench Virtual&7..."
+  anvil-opened: "&#AAAAAA&l🔨 &7Membuka &#AAAAAA&lAnvil Virtual&7..."
+  back-success: "&#55FF55&l⚡ &7Berhasil kembali ke lokasi sebelumnya."
+  back-fail: "&#FF5555&l⚡ &cTidak ada lokasi teleportasi tersisa!"
+  otp-success: "&#00AAFF&l✈ &7Teleportasi ke &#00AAFF&l%player%&7."
+  otp-offline-cache: "&#00AAFF&l✈ &7Teleport ke lokasi terakhir &#00AAFF&l%player%&7."
+  otp-offline-bed: "&#00AAFF&l✈ &1Teleport ke Spawn Bed &#00AAFF&l%player%&7."
+  otp-fail: "&#FF5555&l✘ &cData lokasi &#f%player% &ctidak ditemukan!"
+  otp-usage: "&#FF5555&l⚠ &cGunakan: &#f/otp <player>"
+
+# --- DEATH MESSAGES ---
+death:
+  title: "      &#FF5555&l☠ &#FF0000&lK A M U   M A T I &#FF5555&l☠"
+  location: "      &#AAAAAA&l📍 &7Lokasi: &#FF5555%x%, %y%, %z%"
+  world: "      &#AAAAAA&l🌍 &7Dunia: &#FF5555%world%"
+  back-button: "          &#FFAA00&l⚡ &#FFCC00&l[ KEMBALI KE LOKASI ] &#FFAA00&l⚡"
+  back-hover: "&#FFCC00Klik untuk teleport ke lokasi kematian"
 
 # --- RTP ---
 rtp:
-  resource: "&aMenuju dunia Resource... &7(Mohon tunggu)"
-  survival: "&aTeleportasi Random Survival..."
-  already-here: "&cKamu sudah berada di dunia ini!"
+  resource: "&#55FF55&l❂ &7Menuju dunia &#55FF55Resource&7... &#8(Harap tunggu)"
+  survival: "&#55FF55&l❂ &7Teleportasi Random &#55FF55Survival&7..."
+  already-here: "&#FF5555&l⚠ &cKamu sudah berada di dunia ini!"
 
 # --- ESSENTIALS ---
 essentials:
@@ -159,27 +181,53 @@ warp:
 # --- GUI ---
 gui:
   warp:
-    title: "&#252525◤ ᴡᴀʀᴘꜱ ᴍᴇɴᴜ ◥"
+    title: "&#00AAFF&l❂ &#00AAFF&nɴᴀᴛᴜʀᴀʟ &#55FF55&lᴡᴀʀᴘꜱ &#55FF55&l❂"
     editor-title: "&c&lWARP EDITOR (Klik Kanan Hapus)"
     item-lore:
       - "&8%id%"
       - ""
-      - "&7Warp ke %name%"
+      - "&7Warp ke &#00AAFF%name%"
       - ""
-      - "&a➥ &lKLIK UNTUK WARP"
+      - "&#55FF55&l➥ KLIK UNTUK TELEPORT"
       - ""
-    item-editor-lore:
-      - "&8%id%"
-      - ""
-      - "&e&l[EDITOR MODE]"
-      - "&7Klik Kanan untuk &cHAPUS"
   home:
-    title: "&#252525◤ ɴᴀᴛᴜʀᴀʟ ʜᴏᴍᴇ ◥"
-    item-name: "&a&l%name%"
+    title: "&#00AAFF&l🏠 &#00AAFF&nɴᴀᴛᴜʀᴀʟ &#55FF55&lʜᴏᴍᴇꜱ &#55FF55&l🏠"
+    item-name: "&#00AAFF&l❂ &#f%name%"
     item-lore:
       - "&8%name%"
       - ""
-      - "&7World: &f%world%"
-#      - "&7Coords: &f%x%, %y%, %z%"
+      - "&7Dunia: &#55FF55%world%"
+      - "&7Koordinat: &#55FF55%x%, %y%, %z%"
       - ""
-      - "&a➥ &lKLIK UNTUK TELEPORT"
+      - "&#55FF55&l➥ KLIK UNTUK TELEPORT"
+  baltop:
+    title: "&#00AAFF&l❂ &#00AAFF&nɴᴀᴛᴜʀᴀʟ &#55FF55&lᴛᴏᴘ 10 &#55FF55&l❂"
+    item-name: "&#FFAA00&l#%rank% &#f%player%"
+    item-lore:
+      - ""
+      - "&7Saldo: &#55FF55%symbol% %amount%"
+      - ""
+  chatcolor:
+    title: "&#00AAFF&l🎨 &#00AAFF&nᴄʜᴀᴛ &#55FF55&lᴄᴏʟᴏʀ &#55FF55&l🎨"
+    locked-lore: "&#FF5555&l✘ &#FF5555Locked (Membutuhkan Rank)"
+    selected-lore: "&#55FF55&l✔ &#55FF55&lSELECTED"
+    click-select: "&#FFAA00&l➥ Klik untuk Memilih"
+    # Kategori Baru
+    category:
+      default: "&#AAAAAA&l⬛ &#AAAAAA&nᴅᴇꜰᴀᴜʟᴛ"
+      midi: "&#FF55FF&l❂ &#FF55FF&nᴍɪᴅɪ"
+      vip: "&#55FF55&l❂ &#55FF55&nᴠɪᴘ"
+      mvp: "&#00AAFF&l❂ &#00AAFF&nᴍᴠᴘ"
+      nature: "&#FFAA00&l❂ &#FFAA00&nɴᴀᴛᴜʀᴇ"
+    # Placeholder Icons (Bisa diisi ID ItemsAdder nanti)
+    icons:
+      midi: "PAPER"
+      midi-cmd: 1001
+      vip: "PAPER"
+      vip-cmd: 1002
+      mvp: "PAPER"
+      mvp-cmd: 1003
+      nature: "PAPER"
+      nature-cmd: 1004
+  admin:
+    title: "&#00AAFF&l⚙ &#00AAFF&nɴᴀᴄᴏʀᴇ &#55FF55&lᴀᴅᴍɪɴ &#55FF55&l⚙"

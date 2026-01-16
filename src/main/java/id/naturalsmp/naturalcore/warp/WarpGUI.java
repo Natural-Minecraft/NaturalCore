@@ -69,7 +69,8 @@ public class WarpGUI implements Listener {
         ItemMeta meta = item.getItemMeta();
 
         String titleCasedName = toTitleCase(w.getId());
-        meta.setDisplayName(ChatUtils.colorize("&a" + titleCasedName));
+        meta.setDisplayName(ChatUtils
+                .colorize(ConfigUtils.getString("messages.gui.home.item-name").replace("%name%", titleCasedName)));
 
         List<String> rawLore = isEditor
                 ? ConfigUtils.getMessageList("gui.warp.item-editor-lore")
@@ -197,9 +198,9 @@ public class WarpGUI implements Listener {
         Player p = (Player) e.getWhoClicked();
         String strippedTitle = ChatUtils.stripColor(e.getView().getTitle());
 
-        // FIX: Cek font estetik "ᴡᴀʀᴘꜱ" atau simbol unik "◤"
-        // Kita pakai simbol "◤" karena itu paling unik dan pasti ada di menu
-        if (strippedTitle.contains("◤") || strippedTitle.contains("WARP EDITOR")) {
+        // FIX: Cek font estetik atau simbol unik
+        if (strippedTitle.contains("ɴᴀᴛᴜʀᴀʟ") || strippedTitle.contains("WARP EDITOR")
+                || e.getView().getTitle().contains("❂")) {
 
             // CANCEL KLIK APAPUN DI GUI
             e.setCancelled(true);
@@ -226,11 +227,27 @@ public class WarpGUI implements Listener {
 
             // Mode Editor
             if (editorMode.containsKey(p.getUniqueId())) {
-                if (e.getClick().isRightClick()) {
+                // DELETE: Klik Kanan Biasa (Tanpa Shift) - Sesuai kode lama (line 230)
+                if (e.getClick().isRightClick() && !e.isShiftClick()) {
                     plugin.getWarpManager().deleteWarp(w.getId());
                     p.playSound(p.getLocation(), Sound.BLOCK_ANVIL_BREAK, 1f, 1f);
                     p.sendMessage(ChatUtils.colorize("&c&lWARP &8» &fWarp &c" + w.getId() + " &ftelah dihapus!"));
                     openGUI(p, true);
+                }
+                // UPDATE ICON: Shift + Klik Kanan
+                else if (e.isShiftClick() && e.getClick().isRightClick()) {
+                    ItemStack hand = p.getInventory().getItemInMainHand();
+                    if (hand == null || hand.getType() == Material.AIR) {
+                        p.sendMessage(ChatUtils.colorize("&cPegang item di tangan untuk menjadikannya icon!"));
+                        return;
+                    }
+                    w.setIcon(hand.getType());
+                    plugin.getWarpManager().saveWarpToFile(w);
+
+                    p.playSound(p.getLocation(), Sound.BLOCK_NOTE_BLOCK_PLING, 1f, 2f);
+                    p.sendMessage(ChatUtils.colorize("&a&lWARP &8» &fIcon warp &e" + w.getId() + " &fdiubah menjadi &b"
+                            + hand.getType().name()));
+                    openGUI(p, true); // Refresh GUI
                 }
                 return;
             }
@@ -248,8 +265,8 @@ public class WarpGUI implements Listener {
     @EventHandler
     public void onDrag(InventoryDragEvent e) {
         String strippedTitle = ChatUtils.stripColor(e.getView().getTitle());
-        // Fix: Cek font estetik
-        if (strippedTitle.contains("◤") || strippedTitle.contains("WARP EDITOR")) {
+        if (strippedTitle.contains("ɴᴀᴛᴜʀᴀʟ") || strippedTitle.contains("WARP EDITOR")
+                || e.getView().getTitle().contains("❂")) {
             e.setCancelled(true);
         }
     }

@@ -86,18 +86,30 @@ public class ConfigUtils {
      * Path yang dimulai dengan "messages." akan diambil dari messages.yml
      */
     public static String getString(String path) {
+        return getString(path, null);
+    }
+
+    /**
+     * Ambil string dengan nilai default
+     */
+    public static String getString(String path, String def) {
+        String result = null;
         // Jika path dimulai dengan "messages.", ambil dari messages.yml
         if (path.startsWith("messages.")) {
             String msgPath = path.substring(9); // Hilangkan prefix "messages."
-            if (!getMessages().contains(msgPath))
-                return null;
-            return ChatUtils.colorize(getMessages().getString(msgPath));
+            if (getMessages().contains(msgPath)) {
+                result = getMessages().getString(msgPath);
+            }
+        } else {
+            // Selain itu, ambil dari config.yml biasa
+            if (getConfig().contains(path)) {
+                result = getConfig().getString(path);
+            }
         }
 
-        // Selain itu, ambil dari config.yml biasa
-        if (!getConfig().contains(path))
-            return null;
-        return ChatUtils.colorize(getConfig().getString(path));
+        if (result == null)
+            return def;
+        return ChatUtils.colorize(result);
     }
 
     /**
@@ -117,6 +129,14 @@ public class ConfigUtils {
 
     public static boolean getBoolean(String path) {
         return getConfig().getBoolean(path);
+    }
+
+    public static int getInt(String path, int def) {
+        return getConfig().getInt(path, def);
+    }
+
+    public static boolean getBoolean(String path, boolean def) {
+        return getConfig().getBoolean(path, def);
     }
 
     public static List<String> getStringList(String path) {

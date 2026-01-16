@@ -1,7 +1,7 @@
 # ==========================================
 #      NATURAL CORE - CONFIGURATION
 # ==========================================
-config-version: 1.6.2
+config-version: 1.8.0
 
 # Catatan: Konfigurasi sekarang terpisah:
 # - config.yml     : Pengaturan utama (ini)
@@ -10,15 +10,16 @@ config-version: 1.6.2
 
 # --- BUTTON MODULES ---
 modules:
-  trader: true
+
 
 # --- PREFIX SETTINGS ---
 # Gunakan format Hex &#RRGGBB untuk warna modern
 prefix:
   admin: "&#00AAFF&lNatural&#55FF55&lCore &8» &f"
+  player: "&#00AAFF&lNatural&#55FF55&lSMP &8» &f"
   economy: "&#00AAFF&lNatural&#55FF55&lEco &8» &f"
   moderation: "&#00AAFF&lNatural&#55FF55&lMod &8» &f"
-  trader: "&#00AAFF&lNatural&#55FF55&lTrader &8» &f"
+
   spawn: "&#00AAFF&lNatural&#55FF55&lSpawn &8» &f"
   warp: "&#00AAFF&lNatural&#55FF55&lWarp &8» &f"
   home: "&#00AAFF&lNatural&#55FF55&lHome &8» &f"
@@ -40,6 +41,26 @@ chat:
   msg-format-receiver: "&8[&b{sender} &8→ &bme&8] &f{message}"
 
   allow-color: true
+  
+  # Sistem Mention
+  mention:
+    enabled: true
+    sound: "BLOCK_NOTE_BLOCK_PLING"
+    volume: 1.0
+    pitch: 2.0
+    color: "&e@" # Warna highlight nama yang dimention
+
+# ==========================================
+#              AFK SETTINGS
+# ==========================================
+afk:
+  enabled: true
+  timeout: 300 # Detik (5 Menit)
+  display-text: "&b💤 &7Sedang Bermimpi... &b💤"
+  title:
+    enabled: true
+    title: "&b&lYou are now AFK"
+    subtitle: "&7Move to resume..."
 
 # ==========================================
 #          PENGATURAN EKONOMI
@@ -69,19 +90,15 @@ home:
     admin: 100
 
 # ==========================================
-#           FUN & EXTRAS
+#             SPAWN SETTINGS
 # ==========================================
-fun:
-  cooldown: 30
+spawn:
   allowed-join-worlds:
     - "spawn"
     - "world"
     - "world_nether"
     - "world_the_end"
     - "Resources"
-  warden-kill-xp: 500
-
-# ==========================================
 #              RTP SETTINGS
 # ==========================================
 rtp:

@@ -18,7 +18,7 @@ public class WorldUtilCommand implements CommandExecutor {
         Player p = (Player) sender;
         World w = p.getWorld();
         String cmd = label.toLowerCase();
-        String prefix = ConfigUtils.getString("prefix.admin");
+        String prefix = ConfigUtils.getString("prefix.player");
 
         if (!p.hasPermission("naturalsmp.time")) {
             p.sendMessage(ConfigUtils.getString("messages.global.no-permission"));
