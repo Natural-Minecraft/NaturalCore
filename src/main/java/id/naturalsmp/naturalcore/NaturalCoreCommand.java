@@ -14,7 +14,9 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.Arrays;
 
-public class NaturalCoreCommand implements CommandExecutor {
+import org.bukkit.command.TabCompleter;
+
+public class NaturalCoreCommand implements CommandExecutor, TabCompleter {
 
     private final NaturalCore plugin;
 
@@ -97,6 +99,23 @@ public class NaturalCoreCommand implements CommandExecutor {
             return true;
         }
 
+        if (sub.equals("resetseason")) {
+            if (!sender.hasPermission("naturalsmp.admin")) {
+                return noPerm(sender);
+            }
+
+            if (args.length < 2 || !args[1].equalsIgnoreCase("confirm")) {
+                sender.sendMessage(ChatUtils.colorize(
+                        "&c&lWARNING! &7Perintah ini akan me-reset &650% Tier &7dan &650% AuraSkills &7seluruh player."));
+                sender.sendMessage(
+                        ChatUtils.colorize("&7Gunakan: &f/nacore resetseason confirm &7untuk mengeksekusi."));
+                return true;
+            }
+
+            plugin.getSeasonResetManager().performFullReset(sender);
+            return true;
+        }
+
         sender.sendMessage(ChatUtils.colorize("&cSub-command tidak ditemukan."));
         return true;
     }
@@ -104,5 +123,23 @@ public class NaturalCoreCommand implements CommandExecutor {
     private boolean noPerm(CommandSender s) {
         s.sendMessage(ConfigUtils.getString("messages.global.no-permission"));
         return true;
+    }
+
+    @Override
+    public java.util.List<String> onTabComplete(@NotNull CommandSender sender, @NotNull Command command,
+            @NotNull String alias, @NotNull String[] args) {
+        if (args.length == 1) {
+            return java.util.stream.Stream.of("reload", "version", "menu", "admin", "resetseason")
+                    .filter(s -> s.toLowerCase().startsWith(args[0].toLowerCase()))
+                    .collect(java.util.stream.Collectors.toList());
+        }
+
+        if (args.length == 2 && args[0].equalsIgnoreCase("resetseason")) {
+            if (sender.hasPermission("naturalsmp.admin")) {
+                return java.util.Collections.singletonList("confirm");
+            }
+        }
+
+        return java.util.Collections.emptyList();
     }
 }

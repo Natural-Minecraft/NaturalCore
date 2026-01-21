@@ -44,8 +44,20 @@ public class AFKManager {
             public void run() {
                 long now = System.currentTimeMillis();
                 for (Player p : Bukkit.getOnlinePlayers()) {
-                    if (isAFK(p))
-                        continue; // Sudah AFK
+                    boolean afk = isAFK(p);
+
+                    if (afk) {
+                        // Resend title to keep it persistent on screen (Aesthetic: S E D A N G A F K)
+                        if (ConfigUtils.getBoolean("afk.title.enabled", true)) {
+                            String title = ConfigUtils.getString("afk.title.title",
+                                    "&f&l✦ &b&lS E D A N G   A F K &f&l ✦");
+                            String sub = ConfigUtils.getString("afk.title.subtitle",
+                                    "&7(( Bergerak untuk kembali bermain ))");
+                            // 0 fade in, 40 stay (2s), 10 fade out. Resend every 1s (20 ticks).
+                            p.sendTitle(ChatUtils.colorize(title), ChatUtils.colorize(sub), 0, 40, 10);
+                        }
+                        continue;
+                    }
 
                     if (!lastActivity.containsKey(p.getUniqueId())) {
                         lastActivity.put(p.getUniqueId(), now);
@@ -80,7 +92,7 @@ public class AFKManager {
             // Bukkit.broadcastMessage(ChatUtils.colorize("&7* &e" + p.getName() + "
             // &7sekarang AFK."));
 
-            p.setPlayerListName(ChatUtils.colorize("&7&o" + p.getName() + " [AFK]"));
+            p.setPlayerListName(ChatUtils.colorize(p.getName() + " &8&l| &c&lAFK"));
             spawnIndicator(p);
 
             // Send Title
@@ -99,7 +111,7 @@ public class AFKManager {
 
             p.setPlayerListName(null); // Reset Tablist
             removeIndicator(p);
-
+            p.resetTitle(); // Clear persistent title
             p.sendMessage(ChatUtils.colorize("&aWelcome back!"));
         }
     }

@@ -22,7 +22,9 @@ import java.util.*;
  * /emoji - Tampilkan daftar emoji
  * /emoji reload - Reload emoji (admin only)
  */
-public class EmojiCommand implements CommandExecutor {
+import org.bukkit.command.TabCompleter;
+
+public class EmojiCommand implements CommandExecutor, TabCompleter {
 
     private final NaturalCore plugin;
     private static final int EMOJIS_PER_PAGE = 15;
@@ -56,17 +58,8 @@ public class EmojiCommand implements CommandExecutor {
             return true;
         }
 
-        // /emoji [page]
-        int page = 1;
-        if (args.length > 0) {
-            try {
-                page = Integer.parseInt(args[0]);
-            } catch (NumberFormatException ignored) {
-                // Bukan angka, gunakan halaman 1
-            }
-        }
-
-        showEmojiList(p, page);
+        // Open GUI
+        new EmojiGUI(plugin).openGUI(p);
         return true;
     }
 
@@ -160,5 +153,17 @@ public class EmojiCommand implements CommandExecutor {
             }
         }
         return "?";
+    }
+
+    @Override
+    public java.util.List<String> onTabComplete(@NotNull CommandSender sender, @NotNull Command command,
+            @NotNull String alias, @NotNull String[] args) {
+        if (args.length == 1) {
+            String arg = args[0].toLowerCase();
+            if (sender.hasPermission("naturalsmp.admin") && "reload".startsWith(arg)) {
+                return java.util.Collections.singletonList("reload");
+            }
+        }
+        return java.util.Collections.emptyList();
     }
 }

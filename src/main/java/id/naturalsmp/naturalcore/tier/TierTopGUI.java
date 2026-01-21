@@ -5,6 +5,7 @@ import id.naturalsmp.naturalcore.utils.ChatUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.OfflinePlayer;
+import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -29,7 +30,8 @@ public class TierTopGUI implements Listener {
     }
 
     public void openGUI(Player viewer) {
-        Inventory inv = Bukkit.createInventory(null, 54, ChatUtils.colorize("&8Top Global Season"));
+        viewer.playSound(viewer.getLocation(), Sound.ITEM_BOOK_PAGE_TURN, 1.0f, 1.5f); // Crisp sound
+        Inventory inv = Bukkit.createInventory(null, 54, ChatUtils.colorize("&8&l🏆 TOP GLOBAL SEASON 🏆"));
 
         // Get Top 10
         Map<String, Integer> top = tierManager.getTopPlayers(10);
@@ -49,11 +51,26 @@ public class TierTopGUI implements Listener {
             ItemStack head = new ItemStack(Material.PLAYER_HEAD);
             SkullMeta meta = (SkullMeta) head.getItemMeta();
             meta.setOwningPlayer(p);
-            meta.setDisplayName(ChatUtils.colorize("&e#" + rank + " &f" + p.getName()));
+
+            // Color code rank 1, 2, 3
+            String rankColor = "&f";
+            if (rank == 1)
+                rankColor = "&e&l🥇 #1";
+            else if (rank == 2)
+                rankColor = "&7&l🥈 #2";
+            else if (rank == 3)
+                rankColor = "&6&l🥉 #3";
+            else
+                rankColor = "&f#" + rank;
+
+            meta.setDisplayName(ChatUtils.colorize(rankColor + " &e" + p.getName()));
 
             List<String> lore = new ArrayList<>();
+            lore.add("");
             lore.add(ChatUtils.colorize("&7Rank: " + display));
             lore.add(ChatUtils.colorize("&7Level: &f" + level));
+            lore.add("");
+            lore.add(ChatUtils.colorize("&e&oSeason Champion Candidate?"));
             meta.setLore(lore);
             head.setItemMeta(meta);
 

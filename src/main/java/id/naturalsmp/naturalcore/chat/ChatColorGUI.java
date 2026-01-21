@@ -12,6 +12,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryDragEvent;
 import org.bukkit.inventory.Inventory;
+import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
@@ -28,7 +29,7 @@ public class ChatColorGUI implements Listener {
     }
 
     public void openGUI(Player p) {
-        Inventory inv = Bukkit.createInventory(null, 54, ChatUtils.colorize(GUI_TITLE));
+        Inventory inv = Bukkit.createInventory(new ChatColorHolder(), 54, ChatUtils.colorize(GUI_TITLE));
 
         // Filler
         ItemStack filler = createItem(Material.GRAY_STAINED_GLASS_PANE, " ");
@@ -190,10 +191,7 @@ public class ChatColorGUI implements Listener {
 
     @EventHandler
     public void onClick(InventoryClickEvent e) {
-        if (e.getView().getTitle() == null)
-            return;
-        if (!ChatUtils.stripColor(e.getView().getTitle()).equalsIgnoreCase("Chat Color")
-                && !e.getView().getTitle().contains("🎨"))
+        if (!(e.getInventory().getHolder() instanceof ChatColorHolder))
             return;
 
         e.setCancelled(true);
@@ -294,9 +292,15 @@ public class ChatColorGUI implements Listener {
 
     @EventHandler
     public void onDrag(InventoryDragEvent e) {
-        if (e.getView().getTitle() != null
-                && ChatUtils.stripColor(e.getView().getTitle()).equalsIgnoreCase("Chat Color")) {
+        if (e.getInventory().getHolder() instanceof ChatColorHolder) {
             e.setCancelled(true);
+        }
+    }
+
+    public static class ChatColorHolder implements InventoryHolder {
+        @Override
+        public Inventory getInventory() {
+            return null;
         }
     }
 }

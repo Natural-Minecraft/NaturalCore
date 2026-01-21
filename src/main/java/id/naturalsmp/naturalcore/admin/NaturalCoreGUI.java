@@ -38,95 +38,117 @@ public class NaturalCoreGUI implements Listener {
             return;
         }
 
-        Inventory inv = Bukkit.createInventory(null, 54, ChatUtils.colorize(GUI_TITLE));
+        Inventory inv = Bukkit.createInventory(null, 45, ChatUtils.colorize("&2&lNATURAL CORE &8| &2&lADMIN GUIDE"));
 
         // --- FILLER ---
         ItemStack filler = createItem(Material.GRAY_STAINED_GLASS_PANE, " ");
-        for (int i = 0; i < 54; i++) {
+        for (int i = 0; i < 45; i++) {
             inv.setItem(i, filler);
         }
 
-        // --- CATEGORY: CORE & SYSTEM ---
-        inv.setItem(4, createItem(Material.NETHER_STAR, "&6&lNATURAL CORE v1.7.5",
-                "&7Main core plugin untuk NaturalSMP.",
-                "&7Dokumentasi sistem administrator."));
+        // --- HEADER ---
+        inv.setItem(4, createItem(Material.WRITTEN_BOOK, "&a&lADMIN HANDBOOK",
+                "&7Panduan lengkap fitur & perintah",
+                "&7untuk Administrator NaturalSMP.",
+                "",
+                "&e&oHover item untuk melihat detail!"));
 
-        // Row 2: INFO BLOCKS
-        inv.setItem(10, createItem(Material.PAINTING, "&b&lBANNER SYSTEM (Display)",
-                "&fFitur Papan Informasi Interaktif.",
+        // Row 2: DOCUMENTATION
+        inv.setItem(19, createItem(Material.PAINTING, "&b&lBANNER SYSTEM",
+                "&7Fitur Custom Images/Gifs.",
                 "",
-                "&ePerintah Utama:",
-                "&7/banner create <nama> <image.png>",
-                "&7/banner delete <nama>",
-                "&7/banner purge &c(Cleanup Hantu)",
+                "&eCommands:",
+                "&f/banner create <name> <url>",
+                "&f/banner delete <name>",
+                "&f/banner list",
                 "",
-                "&fTips: &7Gunakan &b//wand &7untuk select area.",
-                "&7Banner kini presisi dengan offset &b0.02&7."));
+                "&aTips:",
+                "&7Gunakan &f//wand &7untuk area selection."));
 
-        inv.setItem(12, createItem(Material.ENDER_PEARL, "&a&lRTP SYSTEM",
-                "&fFitur Random Teleportasi.",
+        inv.setItem(20, createItem(Material.ENDER_PEARL, "&d&lRTP & WORLD SYSTEM",
+                "&7Sistem Teleportasi Random.",
                 "",
-                "&bDunia Terdaftar:",
-                "&7/rtp &8-> &f" + plugin.getConfig().getString("rtp.survival-world", "world"),
-                "&7/resource &8-> &f" + plugin.getConfig().getString("rtp.resource-world", "Resource"),
+                "&eCommands:",
+                "&f/rtp &7(Survival)",
+                "&f/resource &7(Resource World)",
                 "",
-                "&fPermission: &7naturalsmp.resource"));
+                "&aConfig:",
+                "&7Atur dunia tujuan di &fconfig.yml"));
 
-        inv.setItem(14, createItem(Material.GOLD_INGOT, "&e&lECONOMY & COINS",
-                "&fSistem Mata Uang Server.",
+        inv.setItem(21, createItem(Material.GOLD_INGOT, "&e&lECONOMY SYSTEM",
+                "&7Dual Economy: Vault & CoinsEngine.",
                 "",
-                "&bMata Uang:",
-                "&7- &6Vault (Rp) &7- Utama",
-                "&7- &eNaturalCoin (NC) &7- CoinsEngine",
+                "&eCommands:",
+                "&f/setbal <player> <amount>",
+                "&f/givebal <player> <amount>",
+                "&f/takebal <player> <amount>",
+                "&f/baltop",
                 "",
-                "&ePerintah:",
-                "&7/bal, /pay, /baltop, /setbal"));
+                "&aCurrency:",
+                "&fRp (Vault) &7& &fNC (Coins)"));
 
-        inv.setItem(16, createItem(Material.CALIBRATED_SCULK_SENSOR, "&d&lSEASONS & WEATHER",
-                "&fSistem Musim & Suhu.",
+        inv.setItem(22, createItem(Material.EXPERIENCE_BOTTLE, "&6&lRANK & TIER SYSTEM",
+                "&7Progresi Level Pemain.",
                 "",
-                "&7- &f/season &7- Cek status",
-                "&7- &f/day, /night, /sun, /rain"));
-
-        // Row 3: OTHER INFO
-        inv.setItem(28, createItem(Material.WRITABLE_BOOK, "&f&lCHAT & COLORS & EMOJI",
-                "&fSistem Komunikasi.",
+                "&eCommands:",
+                "&f/tier &7(Main GUI)",
+                "&f/tier top &7(Leaderboard)",
                 "",
-                "&7- &f:smile:, :love:, dll",
-                "&7- &f/chatcolor &7- Pilih Warna & Font",
-                "&7- &f/emoji &7- Daftar lengkap",
-                "&7- &f/msg, /reply &7- Private message"));
+                "&aData:",
+                "&7Disimpan di &ftiers.yml &7dan &fplayer_tiers.yml"));
 
-        inv.setItem(30, createItem(Material.COMPASS, "&2&lWARP & HOME",
-                "&fSistem Navigasi.",
+        inv.setItem(23, createItem(Material.CLOCK, "&b&lSEASON & TIME",
+                "&7Sistem Musim & Waktu Realtime.",
                 "",
-                "&7- &a/warp &7- Menu Warp",
-                "&7- &a/home &7- Menu Home",
-                "&7- &a/spawn &7- Ke Spawn"));
-
-        inv.setItem(32, createItem(Material.LEATHER_HELMET, "&d&lPLAYER PERKS",
-                "&fKemampuan Tambahan.",
+                "&eCommands:",
+                "&f/season set <season>",
+                "&f/day, /night, /noon",
+                "&f/sun, /rain, /storm",
                 "",
-                "&7- &f/back &7- Kembali ke lokasi mati",
-                "&7- &f/fly, /hat, /nick, /repair",
-                "&7- &f/clean &7- Bersihkan Inventory",
-                "&7- &f/heal, /feed, /trash, /wb"));
+                "&aFeatures:",
+                "&7Visual biome change & Temperature scaling."));
 
-        inv.setItem(34, createItem(Material.IRON_DOOR, "&c&lMODERATION",
-                "&fAlat Pengawasan.",
+        inv.setItem(24, createItem(Material.NAME_TAG, "&c&lCHAT & TAGS",
+                "&7Sistem Chat Modern.",
                 "",
-                "&7- &f/vanish (v), /god, /otp <player>",
-                "&7- &f/invsee, /endersee, /ec"));
+                "&eFeatures:",
+                "&fCustom Formatting (LuckPerms)",
+                "&fRGB/Gradient Support",
+                "&fInteractive Tags & Menus",
+                "&fEmoji System (/emoji)",
+                "&fMention System (@Player)"));
 
-        // Bottom Row: ACTIONS
-        inv.setItem(48, createItem(Material.EMERALD, "&a&lRELOAD CONFIG", "&7Muat ulang config.yml & messages.yml"));
-        inv.setItem(49, createItem(Material.BEACON, "&b&lSET SPAWN", "&7Atur posisi spawn utama"));
-        inv.setItem(50, createItem(Material.DIAMOND_CHESTPLATE, "&e&lCREATIVE MODE", "&7Ubah gamemode ke Creative"));
+        inv.setItem(25, createItem(Material.IRON_CHESTPLATE, "&3&lMODERATION TOOLS",
+                "&7Alat Bantu Staff.",
+                "",
+                "&eCommands:",
+                "&f/god &7- Invulnerable",
+                "&f/vanish &7- Invisible",
+                "&f/invsee <player>",
+                "&f/endersee <player>",
+                "&f/tphere <player>",
+                "&f/otp <player> &7(Offline TP)"));
 
-        inv.setItem(53, createItem(Material.BARRIER, "&c&lCLOSE"));
+        // Row 3: UTILITIES & ACTIONS
+        inv.setItem(39, createItem(Material.REPEATING_COMMAND_BLOCK, "&c&lACTION: RELOAD",
+                "&7Reload semua file konfigurasi.",
+                "&7Gunakan jika ada perubahan di .yml",
+                "",
+                "&eKlik untuk Reload!"));
+
+        inv.setItem(41, createItem(Material.TARGET, "&a&lSPAWN MANAGEMENT",
+                "&7Panduan Spawn.",
+                "",
+                "&eCommand:",
+                "&f/setspawn &7(Set lokasi spawn)",
+                "&f/spawn &7(Teleport ke spawn)",
+                "",
+                "&cNote: Spawn sangat krucial!"));
+
+        inv.setItem(40, createItem(Material.BARRIER, "&c&lCLOSE GUIDE", "&7Tutup menu ini."));
 
         p.openInventory(inv);
-        p.playSound(p.getLocation(), Sound.BLOCK_NOTE_BLOCK_PLING, 1f, 1f);
+        p.playSound(p.getLocation(), Sound.ITEM_BOOK_PAGE_TURN, 1f, 1f);
     }
 
     private ItemStack createItem(Material mat, String name, String... lore) {
@@ -144,75 +166,48 @@ public class NaturalCoreGUI implements Listener {
         return item;
     }
 
-    // --- EVENT LISTENER ---
-    // Pastikan class ini di-register di NaturalCore.java:
-    // getServer().getPluginManager().registerEvents(new NaturalCoreGUI(this),
-    // this);
-
     @EventHandler
     public void onClick(InventoryClickEvent e) {
-        // Cek Title (Strip Color biar aman)
         String title = ChatUtils.stripColor(e.getView().getTitle());
-        String expected = ChatUtils.stripColor(GUI_TITLE);
+        String expected = "NATURAL CORE | ADMIN GUIDE";
 
         if (!title.equals(expected))
             return;
 
-        // 1. CANCEL EVENT - SEMUA INTERAKSI (Anti Steal)
         e.setCancelled(true);
 
-        // 2. Pastikan hanya player yang bisa klik
         if (!(e.getWhoClicked() instanceof Player))
             return;
         Player p = (Player) e.getWhoClicked();
 
-        // 3. Block ALL interactions in GUI (top inventory dan shift-click dari bottom)
-        // Jika click di top inventory ATAU shift-click dari bottom ke top
-        if (e.getClickedInventory() == null)
+        if (e.getClickedInventory() == null || !e.getClickedInventory().equals(e.getView().getTopInventory()))
             return;
 
-        // Safety: Cancel semua jenis klik termasuk shift, number keys, dll
-        if (e.getClick().isShiftClick() || e.getClick().isKeyboardClick()) {
-            return; // Sudah di-cancel, langsung return
-        }
+        if (e.getCurrentItem() == null || e.getCurrentItem().getType() == Material.AIR)
+            return;
 
-        // 4. Khusus klik item di TOP inventory (GUI kita)
-        if (e.getClickedInventory().equals(e.getView().getTopInventory())) {
-            if (e.getCurrentItem() == null || e.getCurrentItem().getType() == Material.AIR)
-                return;
+        Material mat = e.getCurrentItem().getType();
 
-            Material mat = e.getCurrentItem().getType();
-
-            // 5. LOGIC per Item
-            if (mat == Material.EMERALD) {
-                p.performCommand("nacore reload");
-                p.closeInventory();
-                p.playSound(p.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, 1f, 1.5f);
-            } else if (mat == Material.BEACON) {
-                p.performCommand("setspawn");
-                p.closeInventory();
-                p.playSound(p.getLocation(), Sound.BLOCK_BEACON_ACTIVATE, 1f, 1f);
-            } else if (mat == Material.DIAMOND_CHESTPLATE) {
-                p.performCommand("gmc");
-                p.closeInventory();
-            } else if (mat == Material.BARRIER) {
-                p.closeInventory();
-                p.playSound(p.getLocation(), Sound.UI_BUTTON_CLICK, 1f, 1f);
-            } else if (e.getSlot() >= 10 && e.getSlot() <= 40) {
-                // Clicking documentation items
-                p.playSound(p.getLocation(), Sound.ITEM_BOOK_PAGE_TURN, 1f, 1f);
-            }
+        // Actions
+        if (mat == Material.REPEATING_COMMAND_BLOCK) {
+            // Reload action kept as convenience
+            p.performCommand("nacore reload");
+            p.closeInventory();
+            p.playSound(p.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, 1f, 1.5f);
+        } else if (mat == Material.BARRIER) {
+            p.closeInventory();
+            p.playSound(p.getLocation(), Sound.UI_BUTTON_CLICK, 1f, 1f);
+        } else {
+            // General "Read" sound for documentation items
+            p.playSound(p.getLocation(), Sound.UI_BUTTON_CLICK, 0.3f, 2f);
         }
     }
 
-    // 3. HANDLE DRAG EVENT (Anti Steal saat nge-drag item)
     @EventHandler
     public void onDrag(InventoryDragEvent e) {
         String title = ChatUtils.stripColor(e.getView().getTitle());
-        String expected = ChatUtils.stripColor(GUI_TITLE);
-
-        if (title.equals(expected)) {
+        String expected = "NATURAL CORE | ADMIN GUIDE";
+        if (title.equals(expected))
             e.setCancelled(true);
-        }
     }
 }

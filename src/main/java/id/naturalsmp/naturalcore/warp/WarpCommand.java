@@ -15,7 +15,9 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-public class WarpCommand implements CommandExecutor {
+import org.bukkit.command.TabCompleter;
+
+public class WarpCommand implements CommandExecutor, TabCompleter {
 
     private final NaturalCore plugin;
     private final WarpGUI gui;
@@ -142,5 +144,31 @@ public class WarpCommand implements CommandExecutor {
     private boolean noPerm(Player p) {
         p.sendMessage(ConfigUtils.getString("messages.global.no-permission"));
         return true;
+    }
+
+    @Override
+    public java.util.List<String> onTabComplete(@NotNull CommandSender sender, @NotNull Command command,
+            @NotNull String alias, @NotNull String[] args) {
+        if (args.length == 1) {
+            String cmd = command.getName().toLowerCase();
+            WarpManager wm = plugin.getWarpManager();
+
+            if (cmd.equals("warp") || cmd.equals("delwarp") || cmd.equals("setwarpicon")) {
+                List<String> suggestions = new ArrayList<>();
+                for (Warp w : wm.getWarps()) {
+                    suggestions.add(w.getId());
+                }
+                return suggestions.stream()
+                        .filter(s -> s.toLowerCase().startsWith(args[0].toLowerCase()))
+                        .collect(java.util.stream.Collectors.toList());
+            }
+
+            if (cmd.equals("warps")) {
+                if ("edit".startsWith(args[0].toLowerCase()) && sender.hasPermission("naturalsmp.admin")) {
+                    return java.util.Collections.singletonList("edit");
+                }
+            }
+        }
+        return java.util.Collections.emptyList();
     }
 }

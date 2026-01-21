@@ -13,6 +13,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryDragEvent;
 import org.bukkit.inventory.Inventory;
+import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
@@ -56,8 +57,8 @@ public class HomeGUI implements Listener {
             page = totalPages - 1;
 
         // 3. Setup Inventory 1 Row (9 Slot)
-        // Kita tambahkan page number di title agar Listener bisa membacanya nanti
-        Inventory inv = Bukkit.createInventory(null, 9, GUI_TITLE + ChatUtils.colorize(" &8(" + (page + 1) + ")"));
+        Inventory inv = Bukkit.createInventory(new HomeHolder(), 9,
+                ChatUtils.colorize(GUI_TITLE + " &8(" + (page + 1) + ")"));
 
         // 4. Pasang Pembatas (Slot 1 & 7)
         ItemStack pane = new ItemStack(Material.GRAY_STAINED_GLASS_PANE);
@@ -148,14 +149,7 @@ public class HomeGUI implements Listener {
 
     @EventHandler
     public void onClick(InventoryClickEvent e) {
-        // Ambil Title dan Strip Color biar aman saat compare
-        String titleRaw = e.getView().getTitle();
-        String titleClean = ChatUtils.stripColor(titleRaw);
-
-        // Cek apakah title mengandung "NATURAL HOME" (sesuai font estetik di atas yang
-        // kalau di strip jadi huruf kapital biasa/mirip)
-        // Atau cek pakai method contains biasa kalau stripColor merusak font unicode
-        if (!titleRaw.contains("ɴᴀᴛᴜʀᴀʟ ʜᴏᴍᴇ"))
+        if (!(e.getInventory().getHolder() instanceof HomeHolder))
             return;
 
         e.setCancelled(true); // Anti Maling
@@ -167,6 +161,7 @@ public class HomeGUI implements Listener {
 
         Player p = (Player) e.getWhoClicked();
         int slot = e.getSlot();
+        String titleClean = ChatUtils.stripColor(e.getView().getTitle());
 
         // Parse halaman saat ini dari Title "Natural Home (1)" -> ambil angka 1
         int currentPage = 0;
@@ -204,8 +199,15 @@ public class HomeGUI implements Listener {
 
     @EventHandler
     public void onDrag(InventoryDragEvent e) {
-        if (e.getView().getTitle().contains("ɴᴀᴛᴜʀᴀʟ ʜᴏᴍᴇ")) {
+        if (e.getInventory().getHolder() instanceof HomeHolder) {
             e.setCancelled(true);
+        }
+    }
+
+    public static class HomeHolder implements InventoryHolder {
+        @Override
+        public Inventory getInventory() {
+            return null;
         }
     }
 }

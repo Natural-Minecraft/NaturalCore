@@ -8,7 +8,9 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
-public class TierCommand implements CommandExecutor {
+import org.bukkit.command.TabCompleter;
+
+public class TierCommand implements CommandExecutor, TabCompleter {
 
     private final NaturalCore plugin;
 
@@ -33,5 +35,16 @@ public class TierCommand implements CommandExecutor {
 
         plugin.getTierGUI().openGUI(p);
         return true;
+    }
+
+    @Override
+    public java.util.List<String> onTabComplete(@NotNull CommandSender sender, @NotNull Command command,
+            @NotNull String alias, @NotNull String[] args) {
+        if (args.length == 1) {
+            if ("top".startsWith(args[0].toLowerCase())) {
+                return java.util.Collections.singletonList("top");
+            }
+        }
+        return java.util.Collections.emptyList();
     }
 }

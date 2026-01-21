@@ -29,7 +29,8 @@ public class TierGUI implements Listener {
     }
 
     public void openGUI(Player p) {
-        Inventory inv = Bukkit.createInventory(null, 27, ChatUtils.colorize("&8Natural Tier System"));
+        p.playSound(p.getLocation(), Sound.UI_BUTTON_CLICK, 0.5f, 1.2f); // Sound Effect Open
+        Inventory inv = Bukkit.createInventory(null, 27, ChatUtils.colorize("&8&lNatural Rank Progression"));
 
         Tier current = tierManager.getCurrentTier(p);
         Tier next = tierManager.getNextTier(p);
@@ -37,42 +38,58 @@ public class TierGUI implements Listener {
         // 1. Current Info (Slot 11)
         List<String> curLore = new ArrayList<>();
         if (current == null) {
-            curLore.add("&7Kamu belum memiliki Rank.");
+            curLore.add("&c&oError: Data not found."); // Should be Warrior 3 default now
         } else {
-            curLore.add("&7Rank saat ini: &f" + current.display);
-            curLore.add("&7Suffix: " + current.suffix);
+            curLore.add("&8&m------------------");
+            curLore.add("&7Rank saat ini:");
+            curLore.add(" " + current.display);
+            curLore.add("");
+            curLore.add("&7Suffix Chat:");
+            curLore.add(" " + current.suffix);
+            curLore.add("");
+            curLore.add("&e&oTeruslah grinding untuk");
+            curLore.add("&e&omencapai puncak!");
+            curLore.add("&8&m------------------");
         }
-        inv.setItem(11, createItem(Material.BOOK, "&a&lCurrent Info", curLore));
+        inv.setItem(11, createItem(Material.KNOWLEDGE_BOOK, "&b&lINFO RANK", curLore));
 
         // 2. Rank Up (Slot 15)
         if (next != null) {
             List<String> reqLore = new ArrayList<>();
-            reqLore.add("&7Next Rank: " + next.display);
+            reqLore.add("&7Next Target: " + next.display);
             reqLore.add("");
-            reqLore.add("&e&lRequirements:");
+            reqLore.add("&6&lSYARAT NAIK RANK:");
 
             // Cek Money
             double bal = plugin.getProfileManager().getVaultBalance(p);
             String colorMoney = (bal >= next.reqMoney) ? "&a✔" : "&c✘";
-            reqLore.add(colorMoney + " &7Money: &f" + next.reqMoney);
+            reqLore.add(" " + colorMoney + " &7Money: &e$" + (int) next.reqMoney);
 
             // Cek Kills
             int kills = p.getStatistic(Statistic.MOB_KILLS);
             String colorKills = (kills >= next.reqKills) ? "&a✔" : "&c✘";
-            reqLore.add(colorKills + " &7Mob Kills: &f" + kills + "/" + next.reqKills);
+            reqLore.add(" " + colorKills + " &7Mob Kills: &e" + kills + "/" + next.reqKills);
 
             reqLore.add("");
             if (tierManager.canRankUp(p)) {
-                reqLore.add("&a&lKLIK UNTUK RANK UP!");
+                reqLore.add("&a&l[ KLIK UNTUK RANK UP ]");
+                reqLore.add("&7Biaya uang akan otomatis");
+                reqLore.add("&7terpotong dari akunmu.");
             } else {
-                reqLore.add("&cSyarat belum terpenuhi.");
+                reqLore.add("&c&l[ BELUM TERPENUHI ]");
+                reqLore.add("&7Penuhi syarat di atas");
+                reqLore.add("&7untuk naik level.");
             }
 
-            Material iconStart = tierManager.canRankUp(p) ? Material.EXPERIENCE_BOTTLE : Material.BARRIER;
+            Material iconStart = tierManager.canRankUp(p) ? Material.EXPERIENCE_BOTTLE
+                    : Material.RED_STAINED_GLASS_PANE;
             inv.setItem(15, createItem(iconStart, "&6&lRANK UP", reqLore));
         } else {
-            inv.setItem(15, createItem(Material.NETHER_STAR, "&d&lMAX RANK", "&7Kamu sudah mencapai level tertinggi!",
-                    "&7Tunggu update selanjutnya."));
+            inv.setItem(15, createItem(Material.NETHER_STAR, "&d&lMYTHIC GLORY",
+                    "&7Kamu sudah mencapai level",
+                    "&7tertinggi di server ini!",
+                    "",
+                    "&e&lGGWP!"));
         }
 
         // Filler
@@ -118,7 +135,8 @@ public class TierGUI implements Listener {
                             .colorize("&a&lCONGRATS! &fKamu naik rank ke " + tierManager.getCurrentTier(p).display));
 
                     // Broadcast
-                    Bukkit.broadcastMessage(ChatUtils.colorize("&6&lTIER &8» &e" + p.getName()
+                    String prefix = id.naturalsmp.naturalcore.utils.ConfigUtils.getString("prefix.player");
+                    Bukkit.broadcastMessage(ChatUtils.colorize(prefix + "&e" + p.getName()
                             + " &ftelah naik rank menjadi " + tierManager.getCurrentTier(p).display));
 
                     p.closeInventory();

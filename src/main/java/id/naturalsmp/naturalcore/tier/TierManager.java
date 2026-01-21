@@ -79,8 +79,24 @@ public class TierManager {
 
     // --- API ---
 
+    public String getPlayerTierId(Player p) {
+        int level = getPlayerLevel(p);
+        Tier t = tierLevels.get(level);
+        return t != null ? t.display : "Unknown";
+    }
+
     public int getPlayerLevel(Player p) {
-        return playerTiers.getOrDefault(p.getUniqueId(), 0); // 0 = Unranked
+        // Default 1 (Warrior III) instead of 0
+        return playerTiers.getOrDefault(p.getUniqueId(), 1);
+    }
+
+    public void setPlayerLevel(UUID uuid, int level) {
+        playerTiers.put(uuid, level);
+        playerConfig.set(uuid.toString(), level);
+    }
+
+    public Map<UUID, Integer> getPlayerTiers() {
+        return playerTiers;
     }
 
     public Tier getTier(int level) {
@@ -97,7 +113,23 @@ public class TierManager {
 
     public String getPlayerSuffix(Player p) {
         Tier t = getCurrentTier(p);
-        return t != null ? ChatUtils.colorize(t.suffix) : "";
+        if (t == null)
+            return "";
+
+        // --- UNICODE SUFFIX STRATEGY ---
+        // We use the 'display' field from tiers.yml which already contains
+        // the direct Unicode symbols (e.g., ๝๰) mapped in ItemsAdder.
+        // This is more reliable than using :rank_: placeholders in a custom renderer.
+        if (t.display != null && !t.display.isEmpty()) {
+            return ChatUtils.colorize(" " + t.display);
+        }
+
+        // Fallback to manual suffix if display is empty
+        if (t.suffix != null && !t.suffix.isEmpty()) {
+            return ChatUtils.colorize(t.suffix);
+        }
+
+        return "";
     }
 
     public boolean canRankUp(Player p) {
@@ -139,6 +171,10 @@ public class TierManager {
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    public void savePlayerDataPublic() {
+        savePlayerData();
     }
 
     // --- LEADERBOARD ---

@@ -1,0 +1,148 @@
+info:
+  namespace: naturaltier
+font_images:
+  # --- TIER ICONS (\uE840 range) ---
+  rank_warrior:
+    permission: ""
+    show_in_gui: true
+    path: "tier/icons/warrior_icon.png"
+    symbol: "\uE840"
+    scale_ratio: 9
+    y_position: 8
+  rank_elite:
+    permission: ""
+    show_in_gui: true
+    path: "tier/icons/elite_icon.png"
+    symbol: "\uE841"
+    scale_ratio: 9
+    y_position: 8
+  rank_master:
+    permission: ""
+    show_in_gui: true
+    path: "tier/icons/master_icon.png"
+    symbol: "\uE842"
+    scale_ratio: 9
+    y_position: 8
+  rank_epic:
+    permission: ""
+    show_in_gui: true
+    path: "tier/icons/epic_icon.png"
+    symbol: "\uE843"
+    scale_ratio: 9
+    y_position: 8
+  rank_mythic:
+    permission: ""
+    show_in_gui: true
+    path: "tier/icons/mythic_icon.png"
+    symbol: "\uE844"
+    scale_ratio: 9
+    y_position: 8
+  rank_immortal:
+    permission: ""
+    show_in_gui: true
+    path: "tier/icons/immortal_icon.png"
+    symbol: "\uE845"
+    scale_ratio: 9
+    y_position: 8
+
+  # --- TIER BADGES (\uE850 range) ---
+  warrior_badge:
+    permission: ""
+    show_in_gui: true
+    path: "tier/badges/warrior_badge.png"
+    symbol: "\uE850"
+    scale_ratio: 9
+    y_position: 8
+  elite_badge:
+    permission: ""
+    show_in_gui: true
+    path: "tier/badges/elite_badge.png"
+    symbol: "\uE851"
+    scale_ratio: 18
+    y_position: 8
+  master_badge:
+    permission: ""
+    show_in_gui: true
+    path: "tier/badges/master_badge.png"
+    symbol: "\uE852"
+    scale_ratio: 18
+    y_position: 8
+  grandmaster_badge:
+    permission: ""
+    show_in_gui: true
+    path: "tier/badges/grandmaster_badge.png"
+    symbol: "\uE853"
+    scale_ratio: 24
+    y_position: 8
+  epic_badge:
+    permission: ""
+    show_in_gui: true
+    path: "tier/badges/epic_badge.png"
+    symbol: "\uE854"
+    scale_ratio: 18
+    y_position: 8
+  legend_badge:
+    permission: ""
+    show_in_gui: true
+    path: "tier/badges/legend_badge.png"
+    symbol: "\uE855"
+    scale_ratio: 20
+    y_position: 8
+  mythic_badge:
+    permission: ""
+    show_in_gui: true
+    path: "tier/badges/mythic_badge.png"
+    symbol: "\uE856"
+    scale_ratio: 20
+    y_position: 8
+  mythical_glory_badge:
+    permission: ""
+    show_in_gui: true
+    path: "tier/badges/mythical_glory_badge.png"
+    symbol: "\uE857"
+    scale_ratio: 28
+    y_position: 8
+  mythical_immortal_badge:
+    permission: ""
+    show_in_gui: true
+    path: "tier/badges/mythical_immortal_badge.png"
+    symbol: "\uE858"
+    scale_ratio: 32
+    y_position: 8
+
+  # --- TIER LEVELS (\uE860 range) ---
+  rank_lvl_1:
+    permission: ""
+    show_in_gui: true
+    path: "tier/levels/level_1.png"
+    symbol: "\uE861"
+    scale_ratio: 9
+    y_position: 8
+  rank_lvl_2:
+    permission: ""
+    show_in_gui: true
+    path: "tier/levels/level_2.png"
+    symbol: "\uE862"
+    scale_ratio: 9
+    y_position: 8
+  rank_lvl_3:
+    permission: ""
+    show_in_gui: true
+    path: "tier/levels/level_3.png"
+    symbol: "\uE863"
+    scale_ratio: 9
+    y_position: 8
+  rank_lvl_4:
+    permission: ""
+    show_in_gui: true
+    path: "tier/levels/level_4.png"
+    symbol: "\uE864"
+    scale_ratio: 9
+    y_position: 8
+  rank_lvl_5:
+    permission: ""
+    show_in_gui: true
+    path: "tier/levels/level_5.png"
+    symbol: "\uE865"
+    scale_ratio: 9
+    y_position: 8

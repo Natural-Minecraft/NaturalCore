@@ -4,6 +4,7 @@ import id.naturalsmp.naturalcore.NaturalCore;
 import id.naturalsmp.naturalcore.utils.ChatUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
+import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -27,56 +28,45 @@ public class TagsGUI implements Listener {
     }
 
     public void openGUI(Player p) {
+        p.playSound(p.getLocation(), org.bukkit.Sound.BLOCK_BARREL_OPEN, 1.0f, 0.8f);
         Inventory inv = Bukkit.createInventory(null, 54, ChatUtils.colorize("&8Chat Tags Collection"));
 
-        // Reset Button (Slot 49)
-        inv.setItem(49, createItem(Material.BARRIER, "&c&lReset Tag", "&7Hapus tag yang dipakai"));
+        String currentTag = tagsManager.getPlayerTag(p);
+        Map<String, String> tags = tagsManager.getAvailableTags();
 
         int slot = 0;
-        String currentTag = tagsManager.getPlayerTag(p);
 
-        for (Map.Entry<String, String> entry : tagsManager.getAvailableTags().entrySet()) {
-            if (slot >= 45)
-                break; // Limit 45 tags per page for now
+        // 1. Reset Button
+        ItemStack reset = createItem(Material.BARRIER, "&c&lReset Tag", "&7Hapus tag saat ini.");
+        inv.setItem(53, reset);
+
+        for (Map.Entry<String, String> entry : tags.entrySet()) {
+            if (slot >= 53)
+                break;
 
             String id = entry.getKey();
             String display = entry.getValue();
             boolean hasPerm = p.hasPermission("naturalsmp.tags." + id);
-            boolean isEquipped = currentTag.equals(display);
+            boolean isEquipped = id.equals(currentTag);
 
-            Material icon = hasPerm ? Material.NAME_TAG : Material.GRAY_DYE;
-            String name = hasPerm ? "&a&l" + id.toUpperCase() : "&c&l" + id.toUpperCase() + " (Locked)";
+            Material icon = hasPerm ? Material.NAME_TAG : Material.STRUCTURE_VOID;
+            String nameColor = hasPerm ? "&a" : "&c";
+            String status = isEquipped ? "&a&lEQUIPPED" : (hasPerm ? "&eClick to Equip" : "&cLocked");
 
             List<String> lore = new ArrayList<>();
             lore.add("&7Preview: " + display);
             lore.add("");
-            if (isEquipped) {
-                lore.add("&e&lEQUIPPED");
-                icon = Material.ENCHANTED_BOOK; // Highlight
-            } else if (hasPerm) {
-                lore.add("&eKlik untuk pakai!");
-            } else {
-                lore.add("&cKamu tidak memiliki tag ini.");
-            }
+            lore.add(status);
 
-            // NBT Tag ID hidden in lore or use NBT API if complex.
-            // For simplicity, we rely on checking logic or slot mapping if sorted, but map
-            // order is not guaranteed.
-            // Better: Store ID in Item Name hidden color codes or PersistentDataContainer.
-            // Since we don't carry PDC utils broadly yet, let's use the display name trick
-            // or just match by text (risky).
-            // Safer: Just iterate map again? No.
-            // Let's assume we can re-fetch by ID. We will put ID in hidden lore/name or
-            // just use logic.
-            // Simpelnya: Kita simpan ID di NBT via library NBTAPI yang sudah di-shade user
-            // (id.naturalsmp.naturalcore.utils.nbtapi).
-            // Tapi untuk cepat tanpa intip library user, kita pakai lore hidden string.
+            ItemStack item = createItem(icon, nameColor + id, lore.toArray(new String[0]));
 
-            ItemStack item = createItem(icon, name, lore.toArray(new String[0]));
-
-            // Simpan ID di item meta (LocalizedName) - Support 1.14+
+            // Store ID in ItemMeta
             ItemMeta meta = item.getItemMeta();
-            meta.setLocalizedName(id); // Storage key
+            meta.setLocalizedName(id);
+            if (isEquipped) {
+                meta.addEnchant(org.bukkit.enchantments.Enchantment.UNBREAKING, 1, true);
+                meta.addItemFlags(org.bukkit.inventory.ItemFlag.HIDE_ENCHANTS);
+            }
             item.setItemMeta(meta);
 
             inv.setItem(slot++, item);

@@ -16,6 +16,7 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
+import org.bukkit.inventory.InventoryHolder; // Wajib import
 import java.util.*;
 
 public class WarpGUI implements Listener {
@@ -29,12 +30,13 @@ public class WarpGUI implements Listener {
 
     @SuppressWarnings("deprecation")
     public void openGUI(Player player, boolean isEditor) {
-        // Title Estetik
+        // Title Estetik (Gradient Simulation)
         String title = isEditor
-                ? ConfigUtils.getString("messages.gui.warp.editor-title")
-                : ConfigUtils.getString("messages.gui.warp.title");
+                ? ChatUtils.colorize("&c&lWARP &4&lEDITOR &8| &7Admin Mode")
+                : ChatUtils.colorize(
+                        "&x&0&0&A&A&F&F&lN&x&1&1&B&B&F&F&la&x&2&2&C&C&F&F&lt&x&3&3&D&D&F&F&lu&x&4&4&E&E&F&F&lr&x&5&5&F&F&F&F&la&x&6&6&F&F&F&F&ll &x&7&7&F&F&F&F&lW&x&8&8&F&F&F&F&la&x&9&9&F&F&F&F&lr&x&A&A&F&F&F&F&lp&x&B&B&F&F&F&F&ls");
 
-        Inventory inv = Bukkit.createInventory(null, 54, title);
+        Inventory inv = Bukkit.createInventory(new WarpHolder(), 54, title);
 
         fillBorder(inv);
 
@@ -68,9 +70,11 @@ public class WarpGUI implements Listener {
         ItemStack item = new ItemStack(w.getIcon());
         ItemMeta meta = item.getItemMeta();
 
-        String titleCasedName = toTitleCase(w.getId());
-        meta.setDisplayName(ChatUtils
-                .colorize(ConfigUtils.getString("messages.gui.home.item-name").replace("%name%", titleCasedName)));
+        String cleanId = ChatUtils.stripColor(w.getId()); // Clean ID
+        String titleCasedName = toTitleCase(cleanId);
+
+        // Use clean name without weird formats
+        meta.setDisplayName(ChatUtils.colorize("&b&l" + titleCasedName));
 
         List<String> rawLore = isEditor
                 ? ConfigUtils.getMessageList("gui.warp.item-editor-lore")
@@ -80,7 +84,7 @@ public class WarpGUI implements Listener {
         if (rawLore != null) {
             for (String s : rawLore) {
                 lore.add(ChatUtils.colorize(s
-                        .replace("%id%", w.getId())
+                        .replace("%id%", cleanId)
                         .replace("%name%", titleCasedName)));
             }
         }
@@ -196,77 +200,72 @@ public class WarpGUI implements Listener {
         if (!(e.getWhoClicked() instanceof Player))
             return;
         Player p = (Player) e.getWhoClicked();
-        String strippedTitle = ChatUtils.stripColor(e.getView().getTitle());
+        // CHANGE: Use InventoryHolder instead of unreliable title check
+        if (!(e.getInventory().getHolder() instanceof WarpHolder))
+            return;
 
-        // FIX: Cek font estetik atau simbol unik
-        if (strippedTitle.contains("ɴᴀᴛᴜʀᴀʟ") || strippedTitle.contains("WARP EDITOR")
-                || e.getView().getTitle().contains("❂")) {
+        // CANCEL KLIK APAPUN DI GUI
+        e.setCancelled(true);
 
-            // CANCEL KLIK APAPUN DI GUI
-            e.setCancelled(true);
+        ItemStack clicked = e.getCurrentItem();
+        if (clicked == null || clicked.getType() == Material.AIR)
+            return;
+        if (clicked.getType() == Material.GRAY_STAINED_GLASS_PANE)
+            return;
 
-            ItemStack clicked = e.getCurrentItem();
-            if (clicked == null || clicked.getType() == Material.AIR)
-                return;
-            if (clicked.getType() == Material.GRAY_STAINED_GLASS_PANE)
-                return;
+        // Pastikan klik di Top Inventory
+        if (e.getClickedInventory() != e.getView().getTopInventory())
+            return;
 
-            // Pastikan klik di Top Inventory
-            if (e.getClickedInventory() != e.getView().getTopInventory())
-                return;
+        ItemMeta meta = clicked.getItemMeta();
+        if (!meta.hasLore() || meta.getLore().isEmpty())
+            return;
 
-            ItemMeta meta = clicked.getItemMeta();
-            if (!meta.hasLore() || meta.getLore().isEmpty())
-                return;
+        String warpId = ChatUtils.stripColor(meta.getLore().get(0));
+        Warp w = plugin.getWarpManager().getWarp(warpId);
 
-            String warpId = ChatUtils.stripColor(meta.getLore().get(0));
-            Warp w = plugin.getWarpManager().getWarp(warpId);
+        if (w == null)
+            return;
 
-            if (w == null)
-                return;
-
-            // Mode Editor
-            if (editorMode.containsKey(p.getUniqueId())) {
-                // DELETE: Klik Kanan Biasa (Tanpa Shift) - Sesuai kode lama (line 230)
-                if (e.getClick().isRightClick() && !e.isShiftClick()) {
-                    plugin.getWarpManager().deleteWarp(w.getId());
-                    p.playSound(p.getLocation(), Sound.BLOCK_ANVIL_BREAK, 1f, 1f);
-                    p.sendMessage(ChatUtils.colorize("&c&lWARP &8» &fWarp &c" + w.getId() + " &ftelah dihapus!"));
-                    openGUI(p, true);
-                }
-                // UPDATE ICON: Shift + Klik Kanan
-                else if (e.isShiftClick() && e.getClick().isRightClick()) {
-                    ItemStack hand = p.getInventory().getItemInMainHand();
-                    if (hand == null || hand.getType() == Material.AIR) {
-                        p.sendMessage(ChatUtils.colorize("&cPegang item di tangan untuk menjadikannya icon!"));
-                        return;
-                    }
-                    w.setIcon(hand.getType());
-                    plugin.getWarpManager().saveWarpToFile(w);
-
-                    p.playSound(p.getLocation(), Sound.BLOCK_NOTE_BLOCK_PLING, 1f, 2f);
-                    p.sendMessage(ChatUtils.colorize("&a&lWARP &8» &fIcon warp &e" + w.getId() + " &fdiubah menjadi &b"
-                            + hand.getType().name()));
-                    openGUI(p, true); // Refresh GUI
-                }
-                return;
+        // Mode Editor
+        if (editorMode.containsKey(p.getUniqueId())) {
+            // DELETE: Klik Kanan Biasa (Tanpa Shift) - Sesuai kode lama (line 230)
+            if (e.getClick().isRightClick() && !e.isShiftClick()) {
+                plugin.getWarpManager().deleteWarp(w.getId());
+                p.playSound(p.getLocation(), Sound.BLOCK_ANVIL_BREAK, 1f, 1f);
+                p.sendMessage(ChatUtils.colorize("&c&lWARP &8» &fWarp &c" + w.getId() + " &ftelah dihapus!"));
+                openGUI(p, true);
             }
+            // UPDATE ICON: Shift + Klik Kanan
+            else if (e.isShiftClick() && e.getClick().isRightClick()) {
+                ItemStack hand = p.getInventory().getItemInMainHand();
+                if (hand == null || hand.getType() == Material.AIR) {
+                    p.sendMessage(ChatUtils.colorize("&cPegang item di tangan untuk menjadikannya icon!"));
+                    return;
+                }
+                w.setIcon(hand.getType());
+                plugin.getWarpManager().saveWarpToFile(w);
 
-            // Mode Player
-            p.closeInventory();
-            p.teleport(w.getLocation());
-            p.playSound(p.getLocation(), Sound.ENTITY_ENDERMAN_TELEPORT, 1f, 1f);
-            p.sendTitle(ChatUtils.colorize("&a" + toTitleCase(w.getId())), ChatUtils.colorize("&7Teleporting..."), 0,
-                    20, 10);
+                p.playSound(p.getLocation(), Sound.BLOCK_NOTE_BLOCK_PLING, 1f, 2f);
+                p.sendMessage(ChatUtils.colorize("&a&lWARP &8» &fIcon warp &e" + w.getId() + " &fdiubah menjadi &b"
+                        + hand.getType().name()));
+                openGUI(p, true); // Refresh GUI
+            }
+            return;
         }
+
+        // Mode Player
+        p.closeInventory();
+        p.teleport(w.getLocation());
+        p.playSound(p.getLocation(), Sound.ENTITY_ENDERMAN_TELEPORT, 1f, 1f);
+        p.sendTitle(ChatUtils.colorize("&a" + toTitleCase(w.getId())), ChatUtils.colorize("&7Teleporting..."), 0,
+                20, 10);
     }
 
     // --- TAMBAHAN PENTING: DRAG EVENT ---
     @EventHandler
     public void onDrag(InventoryDragEvent e) {
-        String strippedTitle = ChatUtils.stripColor(e.getView().getTitle());
-        if (strippedTitle.contains("ɴᴀᴛᴜʀᴀʟ") || strippedTitle.contains("WARP EDITOR")
-                || e.getView().getTitle().contains("❂")) {
+        if (e.getInventory().getHolder() instanceof WarpHolder) {
             e.setCancelled(true);
         }
     }
@@ -274,5 +273,13 @@ public class WarpGUI implements Listener {
     @EventHandler
     public void onClose(InventoryCloseEvent e) {
         editorMode.remove(e.getPlayer().getUniqueId());
+    }
+
+    // --- INNER CLASS HOLDER ---
+    public static class WarpHolder implements InventoryHolder {
+        @Override
+        public Inventory getInventory() {
+            return null;
+        }
     }
 }

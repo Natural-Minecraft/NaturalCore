@@ -10,7 +10,9 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
-public class GamemodeCommand implements CommandExecutor {
+import org.bukkit.command.TabCompleter;
+
+public class GamemodeCommand implements CommandExecutor, TabCompleter {
 
     @Override
     public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label,
@@ -94,5 +96,32 @@ public class GamemodeCommand implements CommandExecutor {
         if (arg.equals("3") || arg.startsWith("spec"))
             return GameMode.SPECTATOR;
         return null;
+    }
+
+    @Override
+    public java.util.List<String> onTabComplete(@NotNull CommandSender sender, @NotNull Command command,
+            @NotNull String alias, @NotNull String[] args) {
+        String cmd = alias.toLowerCase();
+
+        // Shortcut commands: /gmc <player>
+        if (cmd.equals("gmc") || cmd.equals("gms") || cmd.equals("gma") || cmd.equals("gmsp")) {
+            if (args.length == 1) {
+                return null; // Return null to let Bukkit suggest player names
+            }
+            return java.util.Collections.emptyList();
+        }
+
+        // Standard command: /gm <mode> <player>
+        if (args.length == 1) {
+            return java.util.stream.Stream.of("survival", "creative", "adventure", "spectator", "0", "1", "2", "3")
+                    .filter(s -> s.startsWith(args[0].toLowerCase()))
+                    .collect(java.util.stream.Collectors.toList());
+        }
+
+        if (args.length == 2) {
+            return null; // Suggest players
+        }
+
+        return java.util.Collections.emptyList();
     }
 }

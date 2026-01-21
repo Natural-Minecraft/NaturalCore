@@ -20,7 +20,8 @@ public class ChatUtils {
      * Mengubah kode warna (&a, &l) dan Hex Color (&#RRGGBB) menjadi warna asli.
      */
     public static String colorize(String message) {
-        if (message == null || message.isEmpty()) return "";
+        if (message == null || message.isEmpty())
+            return "";
 
         Matcher matcher = HEX_PATTERN.matcher(message);
         StringBuilder buffer = new StringBuilder();
@@ -37,6 +38,16 @@ public class ChatUtils {
         }
 
         return ChatColor.translateAlternateColorCodes('&', matcher.appendTail(buffer).toString());
+    }
+
+    public static java.util.List<String> colorize(java.util.List<String> list) {
+        if (list == null)
+            return null;
+        java.util.List<String> colored = new java.util.ArrayList<>();
+        for (String s : list) {
+            colored.add(colorize(s));
+        }
+        return colored;
     }
 
     /**
@@ -58,7 +69,8 @@ public class ChatUtils {
      * Mengambil Prefix/Suffix dari Vault (LuckPerms).
      */
     public static String formatMessage(Player p, String message) {
-        if (message == null) return "";
+        if (message == null)
+            return "";
 
         String prefix = "";
         String suffix = "";
@@ -86,7 +98,7 @@ public class ChatUtils {
 
         // 3. Replace Placeholders
         // %displayname% -> [Owner] Steve [Ganteng]
-        // %player%      -> Steve (Nama Asli)
+        // %player% -> Steve (Nama Asli)
         String result = message
                 .replace("%displayname%", displayName)
                 .replace("%player%", p.getName());

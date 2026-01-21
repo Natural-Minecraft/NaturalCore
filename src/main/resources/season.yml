@@ -6,28 +6,28 @@ enabled: true
 # Durasi setiap musim dalam hari Minecraft (1 hari = 24.000 ticks)
 season-duration-days: 30
 
-current-season: SPRING
-current-day: 1
+current-season: SUMMER
+current-day: 29
 
 # Pengaturan Setiap Musim
 # Ikon: Unicode character yang estetik
 seasons:
   SPRING:
-    display-name: "&a&lMusim Semi"
-    icon: "🌸"
+    display-name: '&a&lMusim Semi'
+    icon: 🌸
     temp-base: 25.0
-    color: "#aaffaa" # Visual hint (informasi saja)
+    color: '#aaffaa' # Visual hint (informasi saja)
   SUMMER:
-    display-name: "&6&lMusim Panas"
-    icon: "☀"
+    display-name: '&6&lMusim Panas'
+    icon: ☀
     temp-base: 35.0
   AUTUMN:
-    display-name: "&6&lMusim Gugur"
-    icon: "🍂"
+    display-name: '&6&lMusim Gugur'
+    icon: 🍂
     temp-base: 20.0
   WINTER:
-    display-name: "&b&lMusim Dingin"
-    icon: "❄"
+    display-name: '&b&lMusim Dingin'
+    icon: ❄
     temp-base: 5.0
 
 # Modifikasi Suhu Berdasarkan Lingkungan
@@ -45,14 +45,14 @@ modifiers:
 action-bar:
   enabled: true
   # Format: %season_icon% %season_name% | %temp%°C | %mana_icon% %mana%/%max_mana%
-  format: "&6&l%icon% %name% &8| &e%temp%°C &8| &b&l⚡ &f%mana%&7/&b%max_mana%"
+  format: '&6&l%icon% %name% &8| &e%temp%°C &8| &b&l⚡ &f%auraskills_mana_int%&7/&b%auraskills_mana_max_int%'
 
 # Pengaturan Visual (Warna Dunia / Biome)
 visuals:
   enabled: true
   # Biome yang dipinjam warnanya untuk setiap musim
   biomes:
-    SPRING: "PLAINS"
-    SUMMER: "JUNGLE"
-    AUTUMN: "WOODED_BADLANDS"
-    WINTER: "SNOWY_PLAINS"
+    SPRING: PLAINS
+    SUMMER: JUNGLE
+    AUTUMN: WOODED_BADLANDS
+    WINTER: SNOWY_PLAINS

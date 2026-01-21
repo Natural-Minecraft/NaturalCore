@@ -1,0 +1,71 @@
+disabled-commands:
+  # --- Teleport & TPA ---
+  - tp
+  - tphere
+  - tpa
+  - tpahere
+  - tpaccept
+  - tpdeny
+  - back
+  
+  # --- Gamemode ---
+  - gamemode
+  - gm
+  - gmc
+  - gms
+  - gma
+  - gmsp
+  
+  # --- Messaging ---
+  - msg
+  - tell
+  - w
+  - whisper
+  - reply
+  - r
+  
+  # --- Utility & Perks ---
+  - fly
+  - heal
+  - feed
+  - hat
+  - repair
+  - fix
+  - nick
+  - nickname
+  - trash
+  - craft
+  - wb
+  - anvil
+  - av
+  - clean
+  - clear
+  - ci
+  
+  # --- Inventory & Enderchest ---
+  - invsee
+  - enderchest
+  - ec
+  - endersee
+  
+  # --- Warp, Spawn & Home ---
+  - spawn
+  - setspawn
+  - warp
+  - warps
+  - setwarp
+  - delwarp
+  - sethome
+  - delhome
+  - home
+  - homes
+  
+  # --- World & Economy ---
+  - day
+  - night
+  - sun
+  - rain
+  - balance
+  - bal
+  - money
+  - pay

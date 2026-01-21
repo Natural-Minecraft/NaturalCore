@@ -5,7 +5,7 @@ api-version: 1.21
 author: NaturalSMP
 description: Core plugin untuk NaturalSMP Server
 depend: [Vault, DecentHolograms]
-softdepend: [PlaceholderAPI, CoinsEngine]
+softdepend: [PlaceholderAPI, CoinsEngine, AuraSkills]
 
 # ==========================================
 # DAFTAR COMMANDS
@@ -246,6 +246,22 @@ commands:
     description: Teleport ke player offline
     aliases: [offlinetp]
     permission: naturalsmp.otp
+
+  chatview:
+    description: Internal command to view chat snapshots
+    permission: naturalsmp.chat.view
+
+  # --- v1.8.5 UTILITIES ---
+  menu:
+    description: Buka menu utama NaturalSMP
+  ptime:
+    description: Atur waktu personal player
+    permission: naturalsmp.ptime
+  pweather:
+    description: Atur cuaca personal player
+    permission: naturalsmp.pweather
+  start:
+    description: Menu awal pemilihan dunia (Survival/Resource/Dungeon)
 
 permissions:
   naturalsmp.admin:

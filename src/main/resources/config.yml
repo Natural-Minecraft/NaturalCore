@@ -51,6 +51,21 @@ chat:
     color: "&e@" # Warna highlight nama yang dimention
 
 # ==========================================
+# IN-GAME TIPS (Action Bar)
+# ==========================================
+tips:
+  enabled: true
+  interval: 300 # Detik (5 Menit)
+  duration: 4 # Detik (Waktu diam membaca)
+  sound: "BLOCK_NOTE_BLOCK_HAT" # Suara tik tik
+  list:
+    - "&e&lTIPS: &7Gunakan &f/rtp &7untuk mencari lahan survival yang aman!"
+    - "&e&lTIPS: &7Ajak temanmu bermain untuk membuat &fClan &7bersama!"
+    - "&e&lTIPS: &7Jangan lupa vote server setiap hari dengan &f/vote&7."
+    - "&e&lTIPS: &7Beli rank &bMVP &7untuk akses fitur &f/fly &7di lobby."
+    - "&e&lTIPS: &7Gunakan &f/profile &7untuk melihat statistikmu."
+
+# ==========================================
 #              AFK SETTINGS
 # ==========================================
 afk:

@@ -5,7 +5,7 @@
 
 # --- GLOBAL ---
 global:
-  no-permission: "&c&l✘ &7Maaf, kamu tidak punya akses."
+  no-permission: "&c&lNaturalSMP &8» &cMaaf, kamu tidak punya akses."
   reload-success: "&a&l✔ &7Konfigurasi berhasil dimuat ulang!"
   player-not-found: "&c&l✘ &7Pemain &f%player% &ctidak ditemukan/offline."
   only-player: "&cPerintah ini hanya dapat digunakan oleh pemain!"
@@ -85,6 +85,12 @@ utils:
   otp-offline-bed: "&#00AAFF&l✈ &1Teleport ke Spawn Bed &#00AAFF&l%player%&7."
   otp-fail: "&#FF5555&l✘ &cData lokasi &#f%player% &ctidak ditemukan!"
   otp-usage: "&#FF5555&l⚠ &cGunakan: &#f/otp <player>"
+  ptime:
+    success: "&#00AAFF&l❂ &7Waktu &f%target% &7diubah menjadi &#ffff55%time%&7."
+    reset: "&#00AAFF&l❂ &7Waktu &f%target% &7dikembalikan ke waktu server."
+  pweather:
+    success: "&#00AAFF&l❂ &7Cuaca &f%target% &7diubah menjadi &#ffff55%weather%&7."
+    reset: "&#00AAFF&l❂ &7Cuaca &f%target% &7dikembalikan ke cuaca server."
 
 # --- DEATH MESSAGES ---
 death:
@@ -181,17 +187,17 @@ warp:
 # --- GUI ---
 gui:
   warp:
-    title: "&#00AAFF&l❂ &#00AAFF&nɴᴀᴛᴜʀᴀʟ &#55FF55&lᴡᴀʀᴘꜱ &#55FF55&l❂"
+    title: "&#00AAFF❂ &#00AAFFɴᴀᴛᴜʀᴀʟ &#55FF55ᴡᴀʀᴘꜱ &#55FF55❂"
     editor-title: "&c&lWARP EDITOR (Klik Kanan Hapus)"
     item-lore:
       - "&8%id%"
       - ""
-      - "&7Warp ke &#00AAFF%name%"
+      - "&7Warp menuju &#00AAFF%name%"
       - ""
       - "&#55FF55&l➥ KLIK UNTUK TELEPORT"
       - ""
   home:
-    title: "&#00AAFF&l🏠 &#00AAFF&nɴᴀᴛᴜʀᴀʟ &#55FF55&lʜᴏᴍᴇꜱ &#55FF55&l🏠"
+    title: "&#00AAFF🏠 &#00AAFFɴᴀᴛᴜʀᴀʟ &#55FF55ʜᴏᴍᴇꜱ &#55FF55🏠"
     item-name: "&#00AAFF&l❂ &#f%name%"
     item-lore:
       - "&8%name%"
@@ -201,24 +207,24 @@ gui:
       - ""
       - "&#55FF55&l➥ KLIK UNTUK TELEPORT"
   baltop:
-    title: "&#00AAFF&l❂ &#00AAFF&nɴᴀᴛᴜʀᴀʟ &#55FF55&lᴛᴏᴘ 10 &#55FF55&l❂"
+    title: "&#00AAFF❂ &#00AAFFɴᴀᴛᴜʀᴀʟ &#55FF55ᴛᴏᴘ 10 &#55FF55❂"
     item-name: "&#FFAA00&l#%rank% &#f%player%"
     item-lore:
       - ""
       - "&7Saldo: &#55FF55%symbol% %amount%"
       - ""
   chatcolor:
-    title: "&#00AAFF&l🎨 &#00AAFF&nᴄʜᴀᴛ &#55FF55&lᴄᴏʟᴏʀ &#55FF55&l🎨"
+    title: "&#00AAFF🎨 &#00AAFFᴄʜᴀᴛ &#55FF55ᴄᴏʟᴏʀ &#55FF55🎨"
     locked-lore: "&#FF5555&l✘ &#FF5555Locked (Membutuhkan Rank)"
     selected-lore: "&#55FF55&l✔ &#55FF55&lSELECTED"
     click-select: "&#FFAA00&l➥ Klik untuk Memilih"
     # Kategori Baru
     category:
-      default: "&#AAAAAA&l⬛ &#AAAAAA&nᴅᴇꜰᴀᴜʟᴛ"
-      midi: "&#FF55FF&l❂ &#FF55FF&nᴍɪᴅɪ"
-      vip: "&#55FF55&l❂ &#55FF55&nᴠɪᴘ"
-      mvp: "&#00AAFF&l❂ &#00AAFF&nᴍᴠᴘ"
-      nature: "&#FFAA00&l❂ &#FFAA00&nɴᴀᴛᴜʀᴇ"
+      default: "&#AAAAAA⬛ &#AAAAAAᴅᴇꜰᴀᴜʟᴛ"
+      midi: "&#FF55FF❂ &#FF55FFᴍɪᴅɪ"
+      vip: "&#55FF55❂ &#55FF55ᴠɪᴘ"
+      mvp: "&#00AAFF❂ &#00AAFFᴍᴠᴘ"
+      nature: "&#FFAA00❂ &#FFAA00ɴᴀᴛᴜʀᴇ"
     # Placeholder Icons (Bisa diisi ID ItemsAdder nanti)
     icons:
       midi: "PAPER"
@@ -230,4 +236,8 @@ gui:
       nature: "PAPER"
       nature-cmd: 1004
   admin:
-    title: "&#00AAFF&l⚙ &#00AAFF&nɴᴀᴄᴏʀᴇ &#55FF55&lᴀᴅᴍɪɴ &#55FF55&l⚙"
+    title: "&#00AAFF⚙ &#00AAFFɴᴀᴄᴏʀᴇ &#55FF55ᴀᴅmin &#55FF55⚙"
+  menu:
+    title: "&#00AAFF❂ &#00AAFFɴᴀᴛᴜʀᴀʟ &#55FF55ᴍᴇɴᴜ &#55FF55❂"
+  start:
+    title: "&#00AAFF❂ &#00AAFFᴘɪʟɪʜ &#55FF55ᴅᴜɴɪᴀ &#55FF55❂"

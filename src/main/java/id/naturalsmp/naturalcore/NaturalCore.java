@@ -4,6 +4,8 @@ import id.naturalsmp.naturalcore.NaturalCoreCommand;
 import id.naturalsmp.naturalcore.NaturalCoreExpansion;
 import id.naturalsmp.naturalcore.admin.*;
 import id.naturalsmp.naturalcore.chat.ChatListener;
+import id.naturalsmp.naturalcore.chat.ChatTabCompleter;
+import id.naturalsmp.naturalcore.chat.ChatPreviewGUI;
 import id.naturalsmp.naturalcore.economy.VaultManager;
 import id.naturalsmp.naturalcore.home.HomeGUI;
 import id.naturalsmp.naturalcore.home.HomeManager;
@@ -14,6 +16,9 @@ import id.naturalsmp.naturalcore.spawn.SpawnListener;
 import id.naturalsmp.naturalcore.chat.MentionListener;
 import id.naturalsmp.naturalcore.season.*;
 import id.naturalsmp.naturalcore.banner.*;
+import id.naturalsmp.naturalcore.utility.EnvironmentCommand;
+import id.naturalsmp.naturalcore.utility.MenuCommand;
+import id.naturalsmp.naturalcore.general.StartCommand;
 import id.naturalsmp.naturalcore.teleport.TeleportManager;
 
 import id.naturalsmp.naturalcore.teleport.TeleportCommand;
@@ -62,6 +67,8 @@ public final class NaturalCore extends JavaPlugin {
     private id.naturalsmp.naturalcore.afk.AFKManager afkManager;
     private id.naturalsmp.naturalcore.tier.TierManager tierManager;
     private id.naturalsmp.naturalcore.tier.TierGUI tierGUI;
+    private id.naturalsmp.naturalcore.chat.ChatColorManager chatColorManager;
+    private id.naturalsmp.naturalcore.season.SeasonResetManager seasonResetManager;
 
     @Override
     public void onEnable() {
@@ -73,7 +80,8 @@ public final class NaturalCore extends JavaPlugin {
         // 2. Setup Config
         saveDefaultConfig();
 
-        // Init Tags Manager (Needed for ChatListener)
+        // Init Managers
+        this.seasonResetManager = new id.naturalsmp.naturalcore.season.SeasonResetManager(this);
         this.tagsManager = new id.naturalsmp.naturalcore.chat.tags.TagsManager(this);
 
         // 3. Setup Vault (Economy & Chat)
@@ -227,6 +235,8 @@ public final class NaturalCore extends JavaPlugin {
         this.emojiManager = new EmojiManager(this);
         registerCmd("emoji", new EmojiCommand(this));
         getLogger().info("Emoji System: ENABLED");
+        // Emoji GUI Register
+        getServer().getPluginManager().registerEvents(new id.naturalsmp.naturalcore.chat.EmojiGUI(this), this);
 
         // 17B. ChatColor System (v1.7)
         this.chatColorManager = new id.naturalsmp.naturalcore.chat.ChatColorManager(this);
@@ -235,7 +245,9 @@ public final class NaturalCore extends JavaPlugin {
 
         // 18. Messaging System
         getServer().getPluginManager().registerEvents(new ChatListener(this), this);
-        getServer().getPluginManager().registerEvents(new MentionListener(this), this);
+        // MentionListener is now integrated into ChatListener (Adventure API)
+        getServer().getPluginManager().registerEvents(new ChatTabCompleter(), this);
+        getServer().getPluginManager().registerEvents(new ChatPreviewGUI(), this);
         this.messageManager = new MessageManager();
         PrivateMessageCommand pmCmd = new PrivateMessageCommand(this);
         registerCmd("msg", pmCmd);
@@ -253,6 +265,13 @@ public final class NaturalCore extends JavaPlugin {
         registerCmd("hat", perksCmd);
         registerCmd("repair", perksCmd);
         registerCmd("nick", perksCmd);
+
+        // 19B. New Utility Commands (v1.8.5)
+        registerCmd("menu", new id.naturalsmp.naturalcore.utility.MenuCommand(this));
+        EnvironmentCommand envCmd = new EnvironmentCommand();
+        registerCmd("ptime", envCmd);
+        registerCmd("pweather", envCmd);
+        registerCmd("start", new id.naturalsmp.naturalcore.general.StartCommand(this));
 
         // 20. v1.7 Utilities
         registerCmd("clean", new id.naturalsmp.naturalcore.utility.CleanCommand());
@@ -281,6 +300,7 @@ public final class NaturalCore extends JavaPlugin {
         getServer().getPluginManager().registerEvents(tierGUI, this);
         getServer().getPluginManager().registerEvents(new id.naturalsmp.naturalcore.tier.TierTopGUI(this), this);
         registerCmd("tier", new id.naturalsmp.naturalcore.tier.TierCommand(this));
+        registerCmd("chatview", new id.naturalsmp.naturalcore.chat.ChatSnapshotCommand());
 
         getServer().getPluginManager().registerEvents(new id.naturalsmp.naturalcore.teleport.PlayerDeathListener(this),
                 this);
@@ -341,7 +361,7 @@ public final class NaturalCore extends JavaPlugin {
         return messageManager;
     }
 
-    public EmojiManager getEmojiManager() {
+    public id.naturalsmp.naturalcore.chat.EmojiManager getEmojiManager() {
         return emojiManager;
     }
 
@@ -373,8 +393,11 @@ public final class NaturalCore extends JavaPlugin {
         return tierGUI;
     }
 
+    public id.naturalsmp.naturalcore.season.SeasonResetManager getSeasonResetManager() {
+        return seasonResetManager;
+    }
+
     // --- CHAT COLOR ---
-    private id.naturalsmp.naturalcore.chat.ChatColorManager chatColorManager;
 
     public id.naturalsmp.naturalcore.chat.ChatColorManager getChatColorManager() {
         return chatColorManager;

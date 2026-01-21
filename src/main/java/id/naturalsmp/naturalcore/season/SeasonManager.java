@@ -28,15 +28,20 @@ public class SeasonManager {
 
     private final Map<UUID, Double> playerTemps = new HashMap<>();
 
+    private id.naturalsmp.naturalcore.utils.TipsManager tipsManager;
+
     public SeasonManager(NaturalCore plugin) {
         this.plugin = plugin;
         loadData();
+        this.tipsManager = new id.naturalsmp.naturalcore.utils.TipsManager(plugin); // Init Tips
         startTasks();
     }
 
     private void loadData() {
         FileConfiguration config = ConfigUtils.getSeasonConfig();
         this.enabled = config.getBoolean("enabled", true);
+        if (this.tipsManager != null)
+            tipsManager.reload(); // Reload tips too
         this.seasonDuration = config.getInt("season-duration-days", 7);
         this.currentDay = config.getInt("current-day", 1);
 
@@ -64,7 +69,6 @@ public class SeasonManager {
             return;
 
         // 1. Task per 1 menit (MC Day tracker)
-        // Minecraft day is 24000 ticks. We check roughly every minute (1200 ticks)
         new BukkitRunnable() {
             @Override
             public void run() {
@@ -72,20 +76,23 @@ public class SeasonManager {
             }
         }.runTaskTimer(plugin, 1200L, 1200L);
 
-        // 2. Action Bar & Temperature Task (Setiap 2 detik agar tidak lag)
+        // 2. Action Bar & Temperature Task (Dipercepat ke 2 Tick untuk Animasi)
         new BukkitRunnable() {
             @Override
             public void run() {
+                // Update Tips Logic
+                tipsManager.tick();
+
+                // Update Players
                 updateAllPlayers();
             }
-        }.runTaskTimer(plugin, 40L, 40L);
+        }.runTaskTimer(plugin, 2L, 2L); // 2 Ticks = Smooth Animation
     }
 
     private void checkDayCycle() {
         long fullTime = Bukkit.getWorlds().get(0).getFullTime();
         int day = (int) (fullTime / 24000);
 
-        // Jika hari di game berubah
         if (day > currentDay) {
             currentDay++;
             if (currentDay > seasonDuration) {
@@ -101,7 +108,6 @@ public class SeasonManager {
         Bukkit.broadcastMessage(ChatUtils.colorize("&6&l[NaturalSMP] &fMusim telah berganti menjadi "
                 + currentSeason.getIcon() + " &e" + currentSeason.name()));
 
-        // Update biomes for all loaded chunks if visuals enabled
         if (ConfigUtils.getSeasonConfig().getBoolean("visuals.enabled", true)) {
             refreshVisuals();
         }
@@ -120,10 +126,20 @@ public class SeasonManager {
 
     private void updateAllPlayers() {
         for (Player p : Bukkit.getOnlinePlayers()) {
-            double temp = calculateTemperature(p);
-            playerTemps.put(p.getUniqueId(), temp);
-            sendActionBar(p, temp);
-            handleTempEffects(p, temp);
+            // Note: Calc temp is somewhat heavy.
+            // Running every 2 ticks might be too much.
+            // Optimization: Only calc temp every 20 ticks, but update action bar every 2
+            // ticks.
+
+            if (Bukkit.getCurrentTick() % 40 == 0) { // Update data valid every 2s
+                double temp = calculateTemperature(p);
+                playerTemps.put(p.getUniqueId(), temp);
+                handleTempEffects(p, temp);
+            }
+
+            // Send Action Bar (Animation needs fast update)
+            Double cachedTemp = playerTemps.getOrDefault(p.getUniqueId(), 20.0);
+            sendActionBar(p, cachedTemp);
         }
     }
 
@@ -134,35 +150,28 @@ public class SeasonManager {
         Location loc = p.getLocation();
         long time = loc.getWorld().getTime();
 
-        // 1. Time Modifiers (0-12000 is day, 12000-24000 is night)
         if (time > 13000 && time < 23000) {
             base += config.getDouble("modifiers.night", -10.0);
         } else if (time > 4000 && time < 8000) {
             base += config.getDouble("modifiers.noon", 5.0);
         }
 
-        // 2. Weather
         if (loc.getWorld().hasStorm()) {
             base += config.getDouble("modifiers.storm", -5.0);
         }
 
-        // 3. Environment
         if (p.getEyeLocation().getBlock().getType() == Material.WATER) {
             base += config.getDouble("modifiers.in-water", -5.0);
         }
 
-        // Check surrounding for heat sources
-        boolean nearHeat = false;
         for (Block b : getNearbyBlocks(loc, 3)) {
             if (b.getType() == Material.FIRE || b.getType() == Material.CAMPFIRE
                     || b.getType() == Material.SOUL_CAMPFIRE) {
                 base += config.getDouble("modifiers.near-fire", 15.0);
-                nearHeat = true;
                 break;
             }
             if (b.getType() == Material.LAVA) {
                 base += config.getDouble("modifiers.near-lava", 40.0);
-                nearHeat = true;
                 break;
             }
         }
@@ -183,23 +192,27 @@ public class SeasonManager {
                         config.getString("seasons." + currentSeason.name() + ".display-name", currentSeason.name()))
                 .replace("%temp%", String.format("%.1f", temp));
 
-        // AuraSkills & PAPI
         if (Bukkit.getPluginManager().isPluginEnabled("PlaceholderAPI")) {
-            // Kita asumsikan user punya %auraskills_mana%
             msg = PlaceholderAPI.setPlaceholders(p, msg);
         } else {
-            // Fallback jika tidak ada PAPI
             msg = msg.replace("%mana%", "N/A").replace("%max_mana%", "N/A");
         }
 
-        p.sendActionBar(ChatUtils.colorize(msg));
+        // --- TIPS INTEGRATION ---
+        // Check if Tips Animation is active
+        String tipsOverride = tipsManager.getDisplay(msg);
+
+        if (tipsOverride != null) {
+            p.sendActionBar(ChatUtils.colorize(tipsOverride));
+        } else {
+            p.sendActionBar(ChatUtils.colorize(msg));
+        }
     }
 
     private void handleTempEffects(Player p, double temp) {
-        // Efek jika terlalu ekstrim
         if (temp < 0) {
             if (currentSeason == Season.WINTER && p.getLocation().getBlock().getType() == Material.WATER) {
-                p.damage(1.0); // Kedinginan di air saat winter
+                p.damage(1.0);
                 p.sendTitle("", ChatUtils.colorize("&b&lFREEZING!"), 0, 20, 10);
             }
         }
@@ -207,10 +220,14 @@ public class SeasonManager {
 
     private java.util.List<Block> getNearbyBlocks(Location loc, int radius) {
         java.util.List<Block> blocks = new java.util.ArrayList<>();
-        for (int x = -radius; x <= radius; x++) {
-            for (int y = -radius; y <= radius; y++) {
-                for (int z = -radius; z <= radius; z++) {
-                    blocks.add(loc.getBlock().getRelative(x, y, z));
+        int pX = loc.getBlockX();
+        int pY = loc.getBlockY();
+        int pZ = loc.getBlockZ();
+
+        for (int x = pX - radius; x <= pX + radius; x++) {
+            for (int y = pY - radius; y <= pY + radius; y++) {
+                for (int z = pZ - radius; z <= pZ + radius; z++) {
+                    blocks.add(loc.getWorld().getBlockAt(x, y, z));
                 }
             }
         }
@@ -235,7 +252,6 @@ public class SeasonManager {
                 }
             }
         } catch (Exception e) {
-            // Biome error
         }
     }
 

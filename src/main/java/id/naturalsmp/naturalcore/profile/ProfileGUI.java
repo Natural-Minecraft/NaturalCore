@@ -4,14 +4,18 @@ import id.naturalsmp.naturalcore.NaturalCore;
 import id.naturalsmp.naturalcore.utils.ChatUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
+import org.bukkit.OfflinePlayer;
+import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.Inventory;
+import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.SkullMeta;
+import org.bukkit.event.inventory.InventoryDragEvent;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -26,38 +30,44 @@ public class ProfileGUI implements Listener {
         this.profileManager = plugin.getProfileManager();
     }
 
-    public void openGUI(Player target, Player viewer) {
-        Inventory inv = Bukkit.createInventory(null, 54, ChatUtils.colorize("&8Profile: &2" + target.getName()));
+    public void openGUI(Player viewer, OfflinePlayer target) {
+        viewer.playSound(viewer.getLocation(), Sound.BLOCK_ENDER_CHEST_OPEN, 0.5f, 1.0f); // Sound Effect
 
-        // 1. Player Head (Slot 13 - Center Top)
+        Inventory inv = Bukkit.createInventory(new ProfileHolder(), 54,
+                ChatUtils.colorize("&#00AAFF❂ &#00AAFFᴘʀᴏꜰɪʟᴇ &#55FF55❂"));
+
+        // 1. Head Info (Slot 13)
         ItemStack head = new ItemStack(Material.PLAYER_HEAD);
         SkullMeta headMeta = (SkullMeta) head.getItemMeta();
         headMeta.setOwningPlayer(target);
         headMeta.setDisplayName(ChatUtils.colorize("&a&l" + target.getName()));
         List<String> headLore = new ArrayList<>();
-        headLore.add(ChatUtils.colorize("&7Rank: &fPlayer")); // Placeholder, nanti bisa ambil dari LuckPerms via Vault
-        headLore.add(ChatUtils.colorize("&7Joined: &e" + profileManager.getJoinDate(target)));
-        headLore.add("");
-        headLore.add(ChatUtils.colorize("&7Status: " + (target.isOnline() ? "&aOnline" : "&cOffline")));
-        headMeta.setLore(headLore);
+        headLore.add("&8&m------------------");
+        headLore.add(
+                "&7Rank: &f" + (plugin.getTierManager() != null ? plugin.getTierManager().getCurrentTier(viewer).display
+                        : "Loading...")); // Use viewer for now or fetch target rank properly
+        String status = target.isOnline() ? "&aOnline" : "&cOffline";
+        headLore.add("&7Status: " + status);
+        if (target.isOnline()) {
+            int ping = target.getPlayer().getPing();
+            headLore.add("&7Ping: &e" + ping + "ms");
+        }
+        headLore.add("&8&m------------------");
+        headMeta.setLore(ChatUtils.colorize(headLore));
         head.setItemMeta(headMeta);
         inv.setItem(13, head);
 
-        // 2. Stats (Slot 29, 30, 32, 33)
-        // KDR
-        inv.setItem(29, createItem(Material.DIAMOND_SWORD, "&c&lCombat Stats",
-                "&7Kills: &f" + profileManager.getMobKills(target) + " (Mobs)", // Sementara Mob Kills dulu
-                "&7Deaths: &f" + profileManager.getDeaths(target),
-                "&7KDR: &e" + profileManager.getKDR(target)));
+        // 2. Statistics (Slot 29)
+        List<String> statsLore = new ArrayList<>();
+        statsLore.add("");
+        statsLore.add("&f⚔ Marksman: &7" + profileManager.getKDR(target));
+        statsLore.add("&f☠ Deaths: &c" + profileManager.getDeaths(target));
+        statsLore.add("&f⌚ Playtime: &b" + profileManager.getPlaytimeFormatted(target));
+        statsLore.add("&f📅 Join: &e" + profileManager.getFirstJoin(target));
+        inv.setItem(29, createItem(Material.CLOCK, "&b&lSTATISTIK", statsLore.toArray(new String[0])));
 
-        // Playtime
-        inv.setItem(33, createItem(Material.CLOCK, "&e&lPlaytime",
-                "&7Total Online:",
-                "&f" + profileManager.getPlayTime(target)));
-
-        // 3. Economy (Slot 31 - Center Middle)
+        // 3. Economy (Slot 31)
         List<String> ecoLore = new ArrayList<>();
-        ecoLore.add("&7Dompet (Vault): &a" + profileManager.getFormattedVaultBalance(target));
         if (profileManager.hasCoinsEngine()) {
             ecoLore.add("&7NaturalCoin: &6" + profileManager.getCoinsEngineBalance(target) + " NC");
         } else {
@@ -65,7 +75,21 @@ public class ProfileGUI implements Listener {
         }
         inv.setItem(31, createItem(Material.GOLD_INGOT, "&6&lEconomy Stats", ecoLore.toArray(new String[0])));
 
-        // 4. Social Actions (Slot 48, 50) - Only if viewing others
+        // 4. AuraSkills (Slot 33)
+        if (profileManager.hasAuraSkills()) {
+            List<String> skillLore = new ArrayList<>();
+            skillLore.add("");
+            skillLore.add("&f⭐ Total Power: &b" + profileManager.getAuraSkillsPower(target));
+            skillLore.add("&f⛏ Mining: &eLvl " + profileManager.getAuraSkillsLevel(target, "mining"));
+            skillLore.add("&f⚔ Fighting: &eLvl " + profileManager.getAuraSkillsLevel(target, "fighting"));
+            skillLore.add("&f🌳 Foraging: &eLvl " + profileManager.getAuraSkillsLevel(target, "foraging"));
+            skillLore.add("&f🏹 Archery: &eLvl " + profileManager.getAuraSkillsLevel(target, "archery"));
+            skillLore.add("");
+            skillLore.add("&7Buka &b/skills &7untuk detail lanjut.");
+            inv.setItem(33, createItem(Material.EXPERIENCE_BOTTLE, "&b&lAURASKILLS", skillLore.toArray(new String[0])));
+        }
+
+        // 5. Social Actions (Slot 48, 50) - Only if viewing others
         if (!target.getUniqueId().equals(viewer.getUniqueId())) {
             inv.setItem(49, createItem(Material.PAPER, "&b&lSend Message", "&7Klik untuk kirim pesan"));
             // Bisa tambah add friend dll
@@ -97,7 +121,7 @@ public class ProfileGUI implements Listener {
 
     @EventHandler
     public void onClick(InventoryClickEvent e) {
-        if (e.getView().getTitle().startsWith(ChatUtils.colorize("&8Profile:"))) {
+        if (e.getInventory().getHolder() instanceof ProfileHolder) {
             e.setCancelled(true); // Prevent taking items
 
             if (e.getCurrentItem() == null)
@@ -105,6 +129,13 @@ public class ProfileGUI implements Listener {
 
             // Logic click bisa ditambah disini
             // Misal klik profile sendiri buka settings
+        }
+    }
+
+    public static class ProfileHolder implements InventoryHolder {
+        @Override
+        public Inventory getInventory() {
+            return null;
         }
     }
 }

@@ -1,38 +1,182 @@
 tiers:
+  # --- WARRIOR ---
   1:
     id: "warrior_3"
-    display: "&8[Warrior III]"
-    suffix: " &8&lWAR I"
+    display: "\uE850\uE863"
     requirements:
       money: 1000
-      mob_kills: 50
-    rewards:
-      command: "give %player% iron_ingot 5"
+      mob_kills: 1000
   2:
     id: "warrior_2"
-    display: "&8[Warrior II]"
-    suffix: " &8&lWAR II"
+    display: "\uE850\uE862"
     requirements:
       money: 2500
-      mob_kills: 100
+      mob_kills: 2500
   3:
     id: "warrior_1"
-    display: "&8[Warrior I]"
-    suffix: " &8&lWAR I"
+    display: "\uE850\uE861"
     requirements:
       money: 5000
-      mob_kills: 200
+      mob_kills: 5000
+
+  # --- ELITE ---
   4:
     id: "elite_3"
-    display: "&f[Elite III]"
-    suffix: " &f&lELT III"
+    display: "\uE851\uE863"
     requirements:
       money: 10000
-      mob_kills: 500
+      mob_kills: 10000
   5:
-    id: "mythic"
-    display: "&d[MYTHIC]"
-    suffix: " &d&lMYTHIC"
+    id: "elite_2"
+    display: "\uE851\uE862"
+    requirements:
+      money: 15000
+      mob_kills: 15000
+  6:
+    id: "elite_1"
+    display: "\uE851\uE861"
+    requirements:
+      money: 25000
+      mob_kills: 25000
+
+  # --- MASTER ---
+  7:
+    id: "master_4"
+    display: "\uE852\uE864"
+    requirements:
+      money: 40000
+      mob_kills: 40000
+  8:
+    id: "master_3"
+    display: "\uE852\uE863"
+    requirements:
+      money: 60000
+      mob_kills: 55000
+  9:
+    id: "master_2"
+    display: "\uE852\uE862"
+    requirements:
+      money: 80000
+      mob_kills: 75000
+  10:
+    id: "master_1"
+    display: "\uE852\uE861"
+    requirements:
+      money: 100000
+      mob_kills: 100000
+
+  # --- GRANDMASTER ---
+  11:
+    id: "gm_5"
+    display: "\uE853\uE865"
+    requirements:
+      money: 150000
+      mob_kills: 130000
+  12:
+    id: "gm_4"
+    display: "\uE853\uE864"
+    requirements:
+      money: 200000
+      mob_kills: 160000
+  13:
+    id: "gm_3"
+    display: "\uE853\uE863"
+    requirements:
+      money: 250000
+      mob_kills: 200000
+  14:
+    id: "gm_2"
+    display: "\uE853\uE862"
+    requirements:
+      money: 300000
+      mob_kills: 250000
+  15:
+    id: "gm_1"
+    display: "\uE853\uE861"
+    requirements:
+      money: 400000
+      mob_kills: 300000
+
+  # --- EPIC ---
+  16:
+    id: "epic_5"
+    display: "\uE854\uE865"
+    requirements:
+      money: 550000
+      mob_kills: 360000
+  17:
+    id: "epic_4"
+    display: "\uE854\uE864"
+    requirements:
+      money: 700000
+      mob_kills: 420000
+  18:
+    id: "epic_3"
+    display: "\uE854\uE863"
+    requirements:
+      money: 850000
+      mob_kills: 500000
+  19:
+    id: "epic_2"
+    display: "\uE854\uE862"
     requirements:
       money: 1000000
-      mob_kills: 5000
+      mob_kills: 580000
+  20:
+    id: "epic_1"
+    display: "\uE854\uE861"
+    requirements:
+      money: 1250000
+      mob_kills: 660000
+
+  # --- LEGEND ---
+  21:
+    id: "legend_5"
+    display: "\uE855\uE865"
+    requirements:
+      money: 1500000
+      mob_kills: 750000
+  22:
+    id: "legend_4"
+    display: "\uE855\uE864"
+    requirements:
+      money: 1750000
+      mob_kills: 850000
+  23:
+    id: "legend_3"
+    display: "\uE855\uE863"
+    requirements:
+      money: 2000000
+      mob_kills: 950000
+  24:
+    id: "legend_2"
+    display: "\uE855\uE862"
+    requirements:
+      money: 2500000
+      mob_kills: 1050000
+  25:
+    id: "legend_1"
+    display: "\uE855\uE861"
+    requirements:
+      money: 3000000
+      mob_kills: 1200000
+
+  # --- MYTHIC ---
+  26:
+    id: "mythic"
+    display: "\uE856"
+    requirements:
+      money: 5000000
+      mob_kills: 1350000
+  27:
+    id: "mythic_glory"
+    display: "\uE857"
+    requirements:
+      money: 10000000
+      mob_kills: 1500000
+  28:
+    id: "mythic_immortal"
+    display: "\uE858"
+    requirements:
+      money: 25000000
+      mob_kills: 2000000

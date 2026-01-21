@@ -8,7 +8,9 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
-public class ProfileCommand implements CommandExecutor {
+import org.bukkit.command.TabCompleter;
+
+public class ProfileCommand implements CommandExecutor, TabCompleter {
 
     private final NaturalCore plugin;
 
@@ -37,5 +39,12 @@ public class ProfileCommand implements CommandExecutor {
 
         plugin.getProfileGUI().openGUI(target, p);
         return true;
+    }
+
+    @Override
+    public java.util.List<String> onTabComplete(@NotNull CommandSender sender, @NotNull Command command,
+            @NotNull String alias, @NotNull String[] args) {
+        // Suggest players
+        return null;
     }
 }
