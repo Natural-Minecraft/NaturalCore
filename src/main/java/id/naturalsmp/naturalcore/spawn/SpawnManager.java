@@ -57,7 +57,7 @@ public class SpawnManager {
 
     // --- FILE HANDLING (spawn.yml) ---
 
-    private void loadSpawn() {
+    public void loadSpawn() {
         file = new File(plugin.getDataFolder(), "spawn.yml");
         if (!file.exists()) {
             try {

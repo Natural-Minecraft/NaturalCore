@@ -72,7 +72,7 @@ public class NaturalCoreGUI implements Listener {
                 "&7Visualisasi dinamis & Gifs.", "", "&f/banner create &7- Buat banner",
                 "&f/banner list &7- Daftar aktif"));
 
-        inv.setItem(21, createItem(Material.NETHER_PASSENGER_SADDLE, "&#FFAA00&lTELEPORTATION",
+        inv.setItem(21, createItem(Material.SADDLE, "&#FFAA00&lTELEPORTATION",
                 "&7Manajemen pergerakan player.", "", "&f/tp, /tpa, /back, /rtp"));
 
         inv.setItem(22, createItem(Material.GOLD_BLOCK, "&#FFD400&lECONOMY ENG",
