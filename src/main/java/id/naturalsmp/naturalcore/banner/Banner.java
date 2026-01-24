@@ -19,6 +19,7 @@ public class Banner {
     // NEW: Tracking for performance and persistence
     private final List<UUID> entityUuids;
     private final List<Integer> mapIds;
+    private final Map<Integer, byte[]> mapDataCache = new HashMap<>();
 
     public Banner(String name, String imageName, Location location, int width, int height, BlockFace face,
             List<String> leftClickActions, List<String> rightClickActions) {
@@ -79,5 +80,9 @@ public class Banner {
 
     public List<Integer> getMapIds() {
         return mapIds;
+    }
+
+    public Map<Integer, byte[]> getMapDataCache() {
+        return mapDataCache;
     }
 }

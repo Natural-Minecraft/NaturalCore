@@ -53,11 +53,21 @@ public class ImageUtils {
     @SuppressWarnings("deprecation")
     public static byte[] convertToMapColors(BufferedImage part) {
         byte[] colors = new byte[128 * 128];
+        Map<Integer, Byte> matchCache = new HashMap<>();
+
         for (int y = 0; y < 128; y++) {
             for (int x = 0; x < 128; x++) {
-                int color = part.getRGB(x, y);
-                // MapPalette.matchColor is the standard way to find the closest MC color
-                colors[y * 128 + x] = MapPalette.matchColor(new Color(color, true));
+                int rgb = part.getRGB(x, y);
+
+                // Cache lookup to bypass heavy MapPalette.matchColor
+                Byte cached = matchCache.get(rgb);
+                if (cached != null) {
+                    colors[y * 128 + x] = cached;
+                } else {
+                    byte matched = MapPalette.matchColor(new Color(rgb, true));
+                    matchCache.put(rgb, matched);
+                    colors[y * 128 + x] = matched;
+                }
             }
         }
         return colors;

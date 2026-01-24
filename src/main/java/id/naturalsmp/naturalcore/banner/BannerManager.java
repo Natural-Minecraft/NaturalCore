@@ -19,10 +19,8 @@ import org.bukkit.inventory.meta.MapMeta;
 import org.bukkit.map.MapCanvas;
 import org.bukkit.map.MapRenderer;
 import org.bukkit.map.MapView;
-import org.bukkit.util.Transformation;
+import org.bukkit.map.MapView;
 import org.jetbrains.annotations.NotNull;
-import org.joml.Quaternionf;
-import org.joml.Vector3f;
 
 import java.awt.image.BufferedImage;
 import java.io.File;
@@ -203,7 +201,13 @@ public class BannerManager {
                 view.setCenterX(0);
                 view.setCenterZ(0);
 
-                byte[] mapData = ImageUtils.convertToMapColors(ImageUtils.getMapPart(fullImage, col, row));
+                // Use Cached Data if available, otherwise calculate and cache
+                byte[] mapData = banner.getMapDataCache().get(mapIndex);
+                if (mapData == null) {
+                    mapData = ImageUtils.convertToMapColors(ImageUtils.getMapPart(fullImage, col, row));
+                    banner.getMapDataCache().put(mapIndex, mapData);
+                }
+
                 renderMap(view, mapData);
 
                 // --- GLOW ITEM FRAME (Native Map Rendering) ---
@@ -379,14 +383,22 @@ public class BannerManager {
     private void renderMap(MapView view, byte[] mapData) {
         view.getRenderers().clear();
         view.addRenderer(new MapRenderer() {
+            private final Set<UUID> renderedPlayers = new HashSet<>();
+
             @Override
             public void render(@NotNull MapView map, @NotNull MapCanvas canvas,
                     @NotNull org.bukkit.entity.Player player) {
+                // RENDER-ONCE LOGIC: Only draw pixels if this player hasn't seen it yet
+                if (renderedPlayers.contains(player.getUniqueId()))
+                    return;
+
                 for (int y = 0; y < 128; y++) {
                     for (int x = 0; x < 128; x++) {
                         canvas.setPixel(x, y, mapData[y * 128 + x]);
                     }
                 }
+
+                renderedPlayers.add(player.getUniqueId());
             }
         });
     }
