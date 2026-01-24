@@ -26,7 +26,7 @@ public class ChatColorManager {
         loadConfig();
     }
 
-    private void loadConfig() {
+    public void load() {
         file = new File(plugin.getDataFolder(), "chatcolor.yml");
         if (!file.exists()) {
             try {

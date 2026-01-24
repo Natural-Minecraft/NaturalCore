@@ -25,6 +25,10 @@ public class HUDManager implements Listener {
         startTask();
     }
 
+    public void reload() {
+        // No config to reload yet, but method required by NaturalCore
+    }
+
     private void startTask() {
         Bukkit.getScheduler().runTaskTimer(plugin, () -> {
             for (Player player : Bukkit.getOnlinePlayers()) {
