@@ -15,53 +15,67 @@ public class ChatTabCompleter implements Listener {
 
     @EventHandler
     public void onTabComplete(AsyncTabCompleteEvent event) {
-        // Only trigger for chat tab completion (not in commands usually, but chat is
-        // empty buffer)
-        // In Paper, AsyncTabCompleteEvent is fired for chat if nothing else handles it.
         String buffer = event.getBuffer();
 
-        // If buffer is empty or doesn't start with /, it's chat
-        if (!buffer.startsWith("/") && buffer.contains("@")) {
-            int lastAtIndex = buffer.lastIndexOf("@");
-            String search = buffer.substring(lastAtIndex + 1).toLowerCase();
+        // Skip if it's a command (starts with /)
+        if (buffer.startsWith("/"))
+            return;
 
-            // Only trigger if @ is at the start or preceded by a space
-            if (lastAtIndex > 0 && buffer.charAt(lastAtIndex - 1) != ' ')
-                return;
+        // Find the last '@'
+        int lastAtIndex = buffer.lastIndexOf("@");
+        if (lastAtIndex == -1)
+            return;
 
-            List<String> matches = Bukkit.getOnlinePlayers().stream()
-                    .map(Player::getName)
-                    .filter(name -> name.toLowerCase().startsWith(search))
-                    .map(name -> "@" + name)
-                    .collect(Collectors.toList());
+        // Check if @ is at start or preceded by space
+        if (lastAtIndex > 0 && buffer.charAt(lastAtIndex - 1) != ' ')
+            return;
 
-            if (!matches.isEmpty()) {
-                event.completions(matches.stream()
-                        .map(AsyncTabCompleteEvent.Completion::completion)
-                        .collect(Collectors.toList()));
-                event.setHandled(true);
-            }
+        String search = buffer.substring(lastAtIndex + 1).toLowerCase();
+
+        // Don't suggest if there's a space after @
+        if (search.contains(" "))
+            return;
+
+        List<String> matches = Bukkit.getOnlinePlayers().stream()
+                .map(Player::getName)
+                .filter(name -> name.toLowerCase().startsWith(search))
+                .map(name -> buffer.substring(0, lastAtIndex) + "@" + name) // Full string replacement
+                .collect(Collectors.toList());
+
+        if (!matches.isEmpty()) {
+            event.completions(matches.stream()
+                    .map(AsyncTabCompleteEvent.Completion::completion)
+                    .collect(Collectors.toList()));
+            event.setHandled(true);
         }
     }
 
     @EventHandler
     public void onSyncTabComplete(TabCompleteEvent event) {
         String buffer = event.getBuffer();
-        if (!buffer.startsWith("/") && buffer.contains("@")) {
-            int lastAtIndex = buffer.lastIndexOf("@");
-            String search = buffer.substring(lastAtIndex + 1).toLowerCase();
+        if (buffer.startsWith("/"))
+            return;
 
-            List<String> suggestions = Bukkit.getOnlinePlayers().stream()
-                    .map(Player::getName)
-                    .filter(name -> name.toLowerCase().startsWith(search))
-                    .map(name -> "@" + name)
-                    .collect(Collectors.toList());
+        int lastAtIndex = buffer.lastIndexOf("@");
+        if (lastAtIndex == -1)
+            return;
+        if (lastAtIndex > 0 && buffer.charAt(lastAtIndex - 1) != ' ')
+            return;
 
-            if (!suggestions.isEmpty()) {
-                List<String> current = new ArrayList<>(event.getCompletions());
-                current.addAll(suggestions);
-                event.setCompletions(current);
-            }
+        String search = buffer.substring(lastAtIndex + 1).toLowerCase();
+        if (search.contains(" "))
+            return;
+
+        List<String> suggestions = Bukkit.getOnlinePlayers().stream()
+                .map(Player::getName)
+                .filter(name -> name.toLowerCase().startsWith(search))
+                .map(name -> "@" + name)
+                .collect(Collectors.toList());
+
+        if (!suggestions.isEmpty()) {
+            List<String> current = new ArrayList<>(event.getCompletions());
+            current.addAll(suggestions);
+            event.setCompletions(current);
         }
     }
 }

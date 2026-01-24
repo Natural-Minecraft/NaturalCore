@@ -323,6 +323,20 @@ public final class NaturalCore extends JavaPlugin {
                 ChatUtils.colorize("&6&lNaturalCore v" + getDescription().getVersion() + " &asudah aktif sepenuhnya!"));
     }
 
+    public void reload() {
+        reloadConfig();
+        id.naturalsmp.naturalcore.utils.ConfigUtils.reload();
+        if (emojiManager != null)
+            emojiManager.loadEmojis();
+        if (tagsManager != null)
+            tagsManager.loadTags();
+        if (chatColorManager != null)
+            chatColorManager.load();
+        if (hudManager != null)
+            hudManager.reload();
+        getLogger().info(ChatUtils.colorize("&6&lNaturalCore &aReloaded successfully!"));
+    }
+
     @Override
     public void onDisable() {
         getLogger().info(ChatUtils.colorize("&c&lNaturalCore &idisabling..."));

@@ -173,3 +173,8 @@ list:
     char: "💩"
     triggers: [":poop:"]
     permission: "naturalsmp.emoji.poop"
+  
+  moyai:
+    char: "🗿"
+    triggers: [":moyai:", ":🗿:", "moyai"]
+    permission: ""
