@@ -26,20 +26,32 @@ public class BackCommand implements CommandExecutor {
             return true;
         Player p = (Player) sender;
 
-        if (!p.hasPermission("naturalsmp.back")) {
-            p.sendMessage(ConfigUtils.getString("messages.global.no-permission"));
-            return true;
+        String prefix = ConfigUtils.getString("prefix.player");
+        Location backLoc;
+
+        if (p.hasPermission("naturalsmp.back")) {
+            // VIP Permission: Can go back to any last location (Death or Teleport)
+            backLoc = plugin.getTeleportManager().getLastLocation(p);
+        } else {
+            // Default: Can ONLY go back to last DEATH location
+            backLoc = plugin.getTeleportManager().getLastDeathLocation(p);
+            if (backLoc == null) {
+                // Check if they have a generic last location but not death
+                // and explain they need permission
+                if (plugin.getTeleportManager().getLastLocation(p) != null) {
+                    p.sendMessage(ConfigUtils.getString("messages.global.no-permission"));
+                    return true;
+                }
+            }
         }
 
-        String prefix = ConfigUtils.getString("prefix.player");
-        Location lastLoc = plugin.getTeleportManager().getLastLocation(p);
-        if (lastLoc == null) {
+        if (backLoc == null) {
             p.sendMessage(ChatUtils.colorize(prefix + ConfigUtils.getString("messages.utils.back-fail")));
             p.playSound(p.getLocation(), Sound.BLOCK_NOTE_BLOCK_BASS, 1f, 0.5f);
             return true;
         }
 
-        p.teleport(lastLoc);
+        p.teleport(backLoc);
         p.sendMessage(ChatUtils.colorize(prefix + ConfigUtils.getString("messages.utils.back-success")));
         p.playSound(p.getLocation(), Sound.ENTITY_ENDERMAN_TELEPORT, 1f, 1f);
         return true;

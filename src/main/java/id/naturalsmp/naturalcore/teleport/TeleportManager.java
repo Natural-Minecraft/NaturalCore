@@ -24,6 +24,7 @@ public class TeleportManager {
 
     // Back Mechanism
     private final HashMap<UUID, org.bukkit.Location> lastLocations = new HashMap<>();
+    private final HashMap<UUID, org.bukkit.Location> lastDeathLocations = new HashMap<>();
 
     public TeleportManager(NaturalCore plugin) {
         this.plugin = plugin;
@@ -33,8 +34,20 @@ public class TeleportManager {
         lastLocations.put(p.getUniqueId(), p.getLocation());
     }
 
+    public void setLastDeathLocation(org.bukkit.entity.Player p) {
+        lastDeathLocations.put(p.getUniqueId(), p.getLocation());
+        // Death counts as a "Back" location for those with permission too, usually.
+        // But we keep them separate to distinguish logic.
+        // Optional: setLastLocation(p); // If we want death to override normal back for
+        // VIPs too immediately.
+    }
+
     public org.bukkit.Location getLastLocation(org.bukkit.entity.Player p) {
         return lastLocations.get(p.getUniqueId());
+    }
+
+    public org.bukkit.Location getLastDeathLocation(org.bukkit.entity.Player p) {
+        return lastDeathLocations.get(p.getUniqueId());
     }
 
     public org.bukkit.Location getLastLocation(UUID uuid) {

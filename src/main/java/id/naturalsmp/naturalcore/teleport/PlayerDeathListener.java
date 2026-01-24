@@ -27,6 +27,7 @@ public class PlayerDeathListener implements Listener {
 
         // 1. Save Location for /back
         plugin.getTeleportManager().setLastLocation(p);
+        plugin.getTeleportManager().setLastDeathLocation(p);
 
         // 2. Interactive Death Message
         // We do not cancel the default death message, but we send our own info.
