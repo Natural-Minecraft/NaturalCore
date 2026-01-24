@@ -26,7 +26,8 @@ import java.util.regex.Pattern;
 public class ChatListener implements Listener {
 
         private final NaturalCore plugin;
-        private final LegacyComponentSerializer legacy = LegacyComponentSerializer.legacyAmpersand();
+        private final LegacyComponentSerializer legacyAmpersand = LegacyComponentSerializer.legacyAmpersand();
+        private final LegacyComponentSerializer legacySection = LegacyComponentSerializer.legacySection();
 
         public ChatListener(NaturalCore plugin) {
                 this.plugin = plugin;
@@ -38,8 +39,10 @@ public class ChatListener implements Listener {
                         return;
 
                 Player player = event.getPlayer();
-                Component originalMessage = event.message();
-                String messageText = LegacyComponentSerializer.legacySection().serialize(originalMessage);
+
+                // Get the raw message as text. We use legacySection() because it's
+                // the most standard way to get text with current formatting.
+                String messageText = legacySection.serialize(event.message());
 
                 // 1. Colorize & Emoji Support (Legacy conversion for now)
                 if (player.hasPermission("naturalsmp.chat.color")) {
@@ -50,7 +53,8 @@ public class ChatListener implements Listener {
                         messageText = EmojiManager.getInstance().parseEmojis(player, messageText);
                 }
 
-                Component message = LegacyComponentSerializer.legacySection().deserialize(messageText);
+                // Convert back to Component
+                Component message = legacySection.deserialize(messageText);
 
                 // 2. Process Mentions
                 message = processMentions(player, message);
@@ -107,7 +111,6 @@ public class ChatListener implements Listener {
                 if (messageContains(message, "[item]")) {
                         ItemStack item = player.getInventory().getItemInMainHand();
                         if (item != null && item.getType() != Material.AIR) {
-                                Component itemComp = item.displayName().hoverEvent(item.asHoverEvent());
                                 UUID id = ChatSnapshotManager.createItemSnapshot(player.getName(), item);
                                 message = message.replaceText(TextReplacementConfig.builder()
                                                 .match(Pattern.compile("\\[item\\]"))
@@ -115,8 +118,7 @@ public class ChatListener implements Listener {
                                                                 blueBracket(
                                                                                 Component
                                                                                                 .text(ChatUtils
-                                                                                                                .stripColor(LegacyComponentSerializer
-                                                                                                                                .legacySection()
+                                                                                                                .stripColor(legacySection
                                                                                                                                 .serialize(item.displayName()))
                                                                                                                 .replace("[", "")
                                                                                                                 .replace("]", "")
@@ -247,7 +249,7 @@ public class ChatListener implements Listener {
         }
 
         private boolean messageContains(Component message, String search) {
-                return LegacyComponentSerializer.legacySection().serialize(message).contains(search);
+                return legacySection.serialize(message).contains(search);
         }
 
         private Component buildFinalFormat(Player player, Component processedMessage) {
@@ -277,11 +279,12 @@ public class ChatListener implements Listener {
                         prefix = plugin.getVaultManager().getChat().getPlayerPrefix(player);
                 }
 
-                Component playerPart = legacy.deserialize(ChatUtils.colorize(tag))
-                                .append(legacy.deserialize(ChatUtils.colorize(prefix)))
+                // USE LEGACY SECTION for colorized strings
+                Component playerPart = legacySection.deserialize(ChatUtils.colorize(tag))
+                                .append(legacySection.deserialize(ChatUtils.colorize(prefix)))
                                 .append(Component.text(player.getName()).hoverEvent(HoverEvent.showText(playerHover))
                                                 .color(NamedTextColor.WHITE))
-                                .append(legacy.deserialize(ChatUtils.colorize(tierSuffix)));
+                                .append(legacySection.deserialize(ChatUtils.colorize(tierSuffix)));
 
                 return playerPart.append(Component.text(" » ").color(NamedTextColor.DARK_GRAY))
                                 .append(processedMessage);
