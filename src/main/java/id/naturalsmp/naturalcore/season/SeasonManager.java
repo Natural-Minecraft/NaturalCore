@@ -38,7 +38,7 @@ public class SeasonManager {
         startTasks();
     }
 
-    private void loadData() {
+    public void loadData() {
         FileConfiguration config = ConfigUtils.getSeasonConfig();
         this.enabled = config.getBoolean("enabled", true);
         if (this.tipsManager != null)

@@ -137,22 +137,7 @@ public class NaturalCoreCommand implements CommandExecutor, TabCompleter {
     }
 
     private void performDeepReload(CommandSender sender) {
-        // 1. Core Config
-        plugin.reloadConfig();
-        ConfigUtils.reload();
-
-        // 2. Data Migration/Update (New keys)
-        id.naturalsmp.naturalcore.utils.ConfigUpdater.updateConfig(plugin, "config.yml");
-        id.naturalsmp.naturalcore.utils.ConfigUpdater.updateConfig(plugin, "messages.yml");
-
-        // 3. Module specific reloads
-        if (plugin.getEmojiManager() != null)
-            plugin.getEmojiManager().loadEmojis();
-        if (plugin.getWarpManager() != null)
-            plugin.getWarpManager().loadWarps();
-        if (plugin.getSpawnManager() != null)
-            plugin.getSpawnManager().loadSpawn();
-
+        plugin.reload();
         sender.sendMessage(ChatUtils.colorize("&aAll system configurations have been deep-refreshed!"));
     }
 
