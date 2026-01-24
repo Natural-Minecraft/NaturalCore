@@ -22,27 +22,21 @@ public class ChatTabCompleter implements Listener {
 
         // If buffer is empty or doesn't start with /, it's chat
         if (!buffer.startsWith("/") && buffer.contains("@")) {
-            // Find the last "@" token
             int lastAtIndex = buffer.lastIndexOf("@");
-            if (lastAtIndex == -1)
-                return;
-
             String search = buffer.substring(lastAtIndex + 1).toLowerCase();
 
-            // Get matching players
-            List<String> suggestions = Bukkit.getOnlinePlayers().stream()
+            // Only trigger if @ is at the start or preceded by a space
+            if (lastAtIndex > 0 && buffer.charAt(lastAtIndex - 1) != ' ')
+                return;
+
+            List<String> matches = Bukkit.getOnlinePlayers().stream()
                     .map(Player::getName)
                     .filter(name -> name.toLowerCase().startsWith(search))
                     .map(name -> "@" + name)
                     .collect(Collectors.toList());
 
-            if (!suggestions.isEmpty()) {
-                // Determine what to replace. We want to replace the part from "@" to end
-                // But AsyncTabCompleteEvent usually appends or replaces the "last word".
-                // In Paper chat, it's often the word being typed.
-
-                // If the event is already handled or has suggestions, we might want to append.
-                event.completions(suggestions.stream()
+            if (!matches.isEmpty()) {
+                event.completions(matches.stream()
                         .map(AsyncTabCompleteEvent.Completion::completion)
                         .collect(Collectors.toList()));
                 event.setHandled(true);

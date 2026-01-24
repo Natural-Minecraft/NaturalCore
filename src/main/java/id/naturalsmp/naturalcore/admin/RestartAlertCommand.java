@@ -39,7 +39,7 @@ public class RestartAlertCommand implements CommandExecutor {
 
         // --- SCHEDULER (TIMER) ---
         new BukkitRunnable() {
-            int timeLeft = 10;
+            int timeLeft = args.length > 0 ? Integer.parseInt(args[0]) : 10;
 
             @Override
             public void run() {

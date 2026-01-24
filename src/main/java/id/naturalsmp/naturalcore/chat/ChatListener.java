@@ -74,18 +74,26 @@ public class ChatListener implements Listener {
                         TextReplacementConfig config = TextReplacementConfig.builder()
                                         .match(Pattern.compile("(?i)" + Pattern.quote(mentionTag)))
                                         .replacement((result, builder) -> {
-                                                target.playSound(target.getLocation(), Sound.BLOCK_NOTE_BLOCK_PLING, 1f,
-                                                                2f);
-                                                target.sendActionBar(ChatUtils
-                                                                .colorize("&e" + sender.getName() + " mentions you!"));
+                                                // Premium Notifications
+                                                target.playSound(target.getLocation(),
+                                                                Sound.ENTITY_EXPERIENCE_ORB_PICKUP, 1f, 1f);
+                                                target.sendActionBar(ChatUtils.colorize(
+                                                                "&6&lTag! &e" + sender.getName() + " &7menyapa Anda!"));
+
+                                                target.sendTitle(
+                                                                ChatUtils.colorize("&6&lTAGGED!"),
+                                                                ChatUtils.colorize("&7Oleh &f" + sender.getName()),
+                                                                10, 40, 10);
 
                                                 return Component.text(mentionTag)
-                                                                .color(NamedTextColor.YELLOW)
+                                                                .color(NamedTextColor.GOLD)
                                                                 .hoverEvent(HoverEvent.showText(
                                                                                 Component.text("Ping: "
                                                                                                 + target.getPing()
-                                                                                                + "ms",
-                                                                                                NamedTextColor.GRAY)));
+                                                                                                + "ms\n§eKlik untuk kirim pesan pribadi!",
+                                                                                                NamedTextColor.GRAY)))
+                                                                .clickEvent(ClickEvent.suggestCommand(
+                                                                                "/msg " + target.getName() + " "));
                                         })
                                         .build();
 

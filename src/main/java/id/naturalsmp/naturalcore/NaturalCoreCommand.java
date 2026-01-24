@@ -36,88 +36,122 @@ public class NaturalCoreCommand implements CommandExecutor, TabCompleter {
     public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label,
             @NotNull String[] args) {
 
-        // --- COMMAND UTAMA: /nacore (Buka GUI) ---
         if (args.length == 0) {
             if (!(sender instanceof Player)) {
-                sender.sendMessage("Hanya player yang bisa membuka GUI.");
+                sender.sendMessage("Hanya player yang bisa menggunakan perintah ini.");
                 return true;
             }
             Player p = (Player) sender;
-
-            // 1. SECURITY CHECK: Cek Permission Admin
-            if (!p.hasPermission("naturalsmp.admin")) {
-                return noPerm(p);
+            if (p.hasPermission("naturalsmp.admin")) {
+                new NaturalCoreGUI(plugin).openGUI(p);
+            } else {
+                sender.sendMessage(ChatUtils.colorize("&6NaturalCore v" + plugin.getDescription().getVersion()));
+                sender.sendMessage(ChatUtils.colorize("&7Gunakan &e/nacore help &7untuk bantuan."));
             }
-
-            // 2. Open GUI
-            new NaturalCoreGUI(plugin).openGUI(p);
             return true;
         }
 
         String sub = args[0].toLowerCase();
 
-        // --- RELOAD CONFIG ---
-        if (sub.equals("reload")) {
+        // --- SUB: ADMIN (Cascading Admin Branch) ---
+        if (sub.equals("admin")) {
             if (!sender.hasPermission("naturalsmp.admin"))
                 return noPerm(sender);
-
-            plugin.reloadConfig();
-            ConfigUtils.reload();
-
-            // Reload Emoji Registry
-            if (plugin.getEmojiManager() != null) {
-                plugin.getEmojiManager().loadEmojis();
+            if (args.length < 2) {
+                sender.sendMessage(ChatUtils.colorize("&cUsage: /nacore admin <reload|resetseason|gui>"));
+                return true;
             }
+            String adminSub = args[1].toLowerCase();
+            String[] adminArgs = Arrays.copyOfRange(args, 2, args.length);
 
-            sender.sendMessage(ConfigUtils.getString("messages.global.reload-success"));
+            switch (adminSub) {
+                case "reload" -> {
+                    sender.sendMessage(ChatUtils.colorize("&6&lNaturalCore &8» &fRefreshing system..."));
+                    performDeepReload(sender);
+                }
+                case "resetseason" -> {
+                    if (adminArgs.length < 1 || !adminArgs[0].equalsIgnoreCase("confirm")) {
+                        sender.sendMessage(ChatUtils.colorize("&c&lWARNING! &7Reset 50% Tier & AuraSkills."));
+                        sender.sendMessage(ChatUtils.colorize("&7Gunakan: &f/nacore admin resetseason confirm"));
+                    } else {
+                        plugin.getSeasonResetManager().performFullReset(sender);
+                    }
+                }
+                case "gui" -> {
+                    if (sender instanceof Player p)
+                        new NaturalCoreGUI(plugin).openGUI(p);
+                }
+                default -> sender.sendMessage(ChatUtils.colorize("&cAdmin sub-command tidak ditemukan."));
+            }
             return true;
         }
 
-        if (sub.equals("version") || sub.equals("ver")) {
+        // --- GLOBAL RELOAD (Legacy Support) ---
+        if (sub.equals("reload")) {
+            if (!sender.hasPermission("naturalsmp.admin"))
+                return noPerm(sender);
+            performDeepReload(sender);
+            return true;
+        }
+
+        if (sub.equals("ver") || sub.equals("version")) {
             sender.sendMessage(ChatUtils.colorize("&6NaturalCore v" + plugin.getDescription().getVersion()));
             return true;
         }
 
-        // --- PROXY SUB-COMMANDS ---
-        String[] newArgs = Arrays.copyOfRange(args, 1, args.length);
+        // --- DYNAMIC PROXY DISPATCH ---
+        String[] proxyArgs = Arrays.copyOfRange(args, 1, args.length);
 
-        // Player Utils
-        if (sub.equals("heal") || sub.equals("feed") || sub.equals("fly")) {
-            playerUtil.onCommand(sender, command, sub, newArgs);
-            return true;
-        }
-
-        // Economy
-        if (sub.equals("setbal") || sub.equals("takebal") || sub.equals("bal") || sub.equals("pay")) {
-            economyUtil.onCommand(sender, command, sub, newArgs);
-            return true;
-        }
-
-        // Moderation
-        if (sub.equals("god") || sub.equals("vanish") || sub.equals("v") || sub.equals("whois")) {
-            modUtil.onCommand(sender, command, sub, newArgs);
-            return true;
-        }
-
-        if (sub.equals("resetseason")) {
-            if (!sender.hasPermission("naturalsmp.admin")) {
-                return noPerm(sender);
-            }
-
-            if (args.length < 2 || !args[1].equalsIgnoreCase("confirm")) {
-                sender.sendMessage(ChatUtils.colorize(
-                        "&c&lWARNING! &7Perintah ini akan me-reset &650% Tier &7dan &650% AuraSkills &7seluruh player."));
-                sender.sendMessage(
-                        ChatUtils.colorize("&7Gunakan: &f/nacore resetseason confirm &7untuk mengeksekusi."));
+        // List of all mapped commands to proxy
+        switch (sub) {
+            case "heal", "feed", "fly" -> {
+                playerUtil.onCommand(sender, command, sub, proxyArgs);
                 return true;
             }
-
-            plugin.getSeasonResetManager().performFullReset(sender);
-            return true;
+            case "bal", "pay", "setbal", "takebal" -> {
+                economyUtil.onCommand(sender, command, sub, proxyArgs);
+                return true;
+            }
+            case "god", "vanish", "v", "whois" -> {
+                modUtil.onCommand(sender, command, sub, proxyArgs);
+                return true;
+            }
+            case "spawn" -> {
+                new id.naturalsmp.naturalcore.spawn.SpawnCommand(plugin.getSpawnManager()).onCommand(sender, command,
+                        sub, proxyArgs);
+                return true;
+            }
+            case "home", "homes", "sethome", "delhome" -> {
+                // Note: Needs instance persistence if possible, but for proxying, creating new
+                // is usually fine or via plugin getter
+                new id.naturalsmp.naturalcore.home.HomeCommand(plugin.getHomeManager(),
+                        new id.naturalsmp.naturalcore.home.HomeGUI(plugin)).onCommand(sender, command, sub, proxyArgs);
+                return true;
+            }
         }
 
-        sender.sendMessage(ChatUtils.colorize("&cSub-command tidak ditemukan."));
+        sender.sendMessage(ChatUtils.colorize("&cSub-command tidak ditemukan. Cek /nacore help."));
         return true;
+    }
+
+    private void performDeepReload(CommandSender sender) {
+        // 1. Core Config
+        plugin.reloadConfig();
+        ConfigUtils.reload();
+
+        // 2. Data Migration/Update (New keys)
+        id.naturalsmp.naturalcore.utils.ConfigUpdater.updateConfig(plugin, "config.yml");
+        id.naturalsmp.naturalcore.utils.ConfigUpdater.updateConfig(plugin, "messages.yml");
+
+        // 3. Module specific reloads
+        if (plugin.getEmojiManager() != null)
+            plugin.getEmojiManager().loadEmojis();
+        if (plugin.getWarpManager() != null)
+            plugin.getWarpManager().loadWarps();
+        if (plugin.getSpawnManager() != null)
+            plugin.getSpawnManager().loadSpawn();
+
+        sender.sendMessage(ChatUtils.colorize("&aAll system configurations have been deep-refreshed!"));
     }
 
     private boolean noPerm(CommandSender s) {
@@ -128,16 +162,19 @@ public class NaturalCoreCommand implements CommandExecutor, TabCompleter {
     @Override
     public java.util.List<String> onTabComplete(@NotNull CommandSender sender, @NotNull Command command,
             @NotNull String alias, @NotNull String[] args) {
+
         if (args.length == 1) {
-            return java.util.stream.Stream.of("reload", "version", "menu", "admin", "resetseason")
-                    .filter(s -> s.toLowerCase().startsWith(args[0].toLowerCase()))
+            List<String> list = new ArrayList<>(
+                    Arrays.asList("admin", "version", "help", "spawn", "home", "bal", "vanish", "heal", "feed", "fly"));
+            if (sender.hasPermission("naturalsmp.admin"))
+                list.add("reload");
+            return list.stream().filter(s -> s.startsWith(args[0].toLowerCase()))
                     .collect(java.util.stream.Collectors.toList());
         }
 
-        if (args.length == 2 && args[0].equalsIgnoreCase("resetseason")) {
-            if (sender.hasPermission("naturalsmp.admin")) {
-                return java.util.Collections.singletonList("confirm");
-            }
+        if (args.length == 2 && args[0].equalsIgnoreCase("admin")) {
+            return Arrays.asList("reload", "resetseason", "gui").stream()
+                    .filter(s -> s.startsWith(args[1].toLowerCase())).collect(java.util.stream.Collectors.toList());
         }
 
         return java.util.Collections.emptyList();

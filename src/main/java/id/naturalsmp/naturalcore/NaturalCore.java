@@ -81,8 +81,10 @@ public final class NaturalCore extends JavaPlugin {
         // 1. Startup Log
         getLogger().info(ChatUtils.colorize("&6&lNaturalCore &aStarting up..."));
 
-        // 2. Setup Config
+        // 2. Setup Config & Migration
         saveDefaultConfig();
+        id.naturalsmp.naturalcore.utils.ConfigUpdater.updateConfig(this, "config.yml");
+        id.naturalsmp.naturalcore.utils.ConfigUpdater.updateConfig(this, "messages.yml");
 
         // Init Managers
         this.seasonResetManager = new id.naturalsmp.naturalcore.season.SeasonResetManager(this);
@@ -148,7 +150,10 @@ public final class NaturalCore extends JavaPlugin {
         NaturalCoreGUI adminGUI = new NaturalCoreGUI(this);
         getServer().getPluginManager().registerEvents(adminGUI, this);
 
-        registerCmd("nacore", new NaturalCoreCommand(this));
+        NaturalCoreCommand nacoreCmd = new NaturalCoreCommand(this);
+        registerCmd("nacore", nacoreCmd);
+        getCommand("nacore").setTabCompleter(nacoreCmd);
+
         registerCmd("kickall", new KickAllCommand());
         registerCmd("restartalert", new RestartAlertCommand());
         registerCmd("bc", new BroadcastCommand());

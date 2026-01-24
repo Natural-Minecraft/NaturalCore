@@ -38,117 +38,74 @@ public class NaturalCoreGUI implements Listener {
             return;
         }
 
-        Inventory inv = Bukkit.createInventory(null, 45, ChatUtils.colorize("&2&lNATURAL CORE &8| &2&lADMIN GUIDE"));
+        // Standard 54 slots (6 rows) for more "Large Dashboard" feel
+        Inventory inv = Bukkit.createInventory(null, 54, ChatUtils.colorize("&#00FFD4&lＮＡＴＵＲＡＬ &8| &#00D4FF&lＡＤＭＩＮ"));
 
-        // --- FILLER ---
-        ItemStack filler = createItem(Material.GRAY_STAINED_GLASS_PANE, " ");
-        for (int i = 0; i < 45; i++) {
-            inv.setItem(i, filler);
+        // --- GLASSMORPHISM FILLER (Frosted Border Effect) ---
+        ItemStack cyanGlass = createItem(Material.CYAN_STAINED_GLASS_PANE, " ");
+        ItemStack limeGlass = createItem(Material.LIME_STAINED_GLASS_PANE, " ");
+        ItemStack whiteGlass = createItem(Material.WHITE_STAINED_GLASS_PANE, " ");
+
+        // Top and Bottom Borders
+        for (int i = 0; i < 9; i++) {
+            inv.setItem(i, cyanGlass);
+            inv.setItem(45 + i, cyanGlass);
         }
+        // Side Accents
+        int[] accents = { 9, 17, 18, 26, 27, 35, 36, 44 };
+        for (int slot : accents)
+            inv.setItem(slot, limeGlass);
 
-        // --- HEADER ---
-        inv.setItem(4, createItem(Material.WRITTEN_BOOK, "&a&lADMIN HANDBOOK",
-                "&7Panduan lengkap fitur & perintah",
-                "&7untuk Administrator NaturalSMP.",
-                "",
-                "&e&oHover item untuk melihat detail!"));
+        // Inner Glass Highlights (Frosted look)
+        int[] frames = { 10, 16, 19, 25, 28, 34, 37, 43 };
+        for (int slot : frames)
+            inv.setItem(slot, whiteGlass);
 
-        // Row 2: DOCUMENTATION
-        inv.setItem(19, createItem(Material.PAINTING, "&b&lBANNER SYSTEM",
-                "&7Fitur Custom Images/Gifs.",
-                "",
-                "&eCommands:",
-                "&f/banner create <name> <url>",
-                "&f/banner delete <name>",
-                "&f/banner list",
-                "",
-                "&aTips:",
-                "&7Gunakan &f//wand &7untuk area selection."));
+        // --- CORE CATEGORIES (Premium Rows) ---
 
-        inv.setItem(20, createItem(Material.ENDER_PEARL, "&d&lRTP & WORLD SYSTEM",
-                "&7Sistem Teleportasi Random.",
-                "",
-                "&eCommands:",
-                "&f/rtp &7(Survival)",
-                "&f/resource &7(Resource World)",
-                "",
-                "&aConfig:",
-                "&7Atur dunia tujuan di &fconfig.yml"));
+        // Row 1: System Control
+        inv.setItem(13, createItem(Material.NETHER_STAR, "&#00FFD4&lSYSTEM CORE",
+                "&7Akses utama ke jantung server.", "", "&eKlik untuk panduan cepat!"));
 
-        inv.setItem(21, createItem(Material.GOLD_INGOT, "&e&lECONOMY SYSTEM",
-                "&7Dual Economy: Vault & CoinsEngine.",
-                "",
-                "&eCommands:",
-                "&f/setbal <player> <amount>",
-                "&f/givebal <player> <amount>",
-                "&f/takebal <player> <amount>",
-                "&f/baltop",
-                "",
-                "&aCurrency:",
-                "&fRp (Vault) &7& &fNC (Coins)"));
+        // Row 2: Features
+        inv.setItem(20, createItem(Material.DRAGON_BREATH, "&#FF00D4&lBANNER SYSTEM",
+                "&7Visualisasi dinamis & Gifs.", "", "&f/banner create &7- Buat banner",
+                "&f/banner list &7- Daftar aktif"));
 
-        inv.setItem(22, createItem(Material.EXPERIENCE_BOTTLE, "&6&lRANK & TIER SYSTEM",
-                "&7Progresi Level Pemain.",
-                "",
-                "&eCommands:",
-                "&f/tier &7(Main GUI)",
-                "&f/tier top &7(Leaderboard)",
-                "",
-                "&aData:",
-                "&7Disimpan di &ftiers.yml &7dan &fplayer_tiers.yml"));
+        inv.setItem(21, createItem(Material.NETHER_PASSENGER_SADDLE, "&#FFAA00&lTELEPORTATION",
+                "&7Manajemen pergerakan player.", "", "&f/tp, /tpa, /back, /rtp"));
 
-        inv.setItem(23, createItem(Material.CLOCK, "&b&lSEASON & TIME",
-                "&7Sistem Musim & Waktu Realtime.",
-                "",
-                "&eCommands:",
-                "&f/season set <season>",
-                "&f/day, /night, /noon",
-                "&f/sun, /rain, /storm",
-                "",
-                "&aFeatures:",
-                "&7Visual biome change & Temperature scaling."));
+        inv.setItem(22, createItem(Material.GOLD_BLOCK, "&#FFD400&lECONOMY ENG",
+                "&7Sistem finansial server.", "", "&fRp (Vault) & NC (Coins)",
+                "&7Gunakan &e/baltop &7untuk cek kaya."));
 
-        inv.setItem(24, createItem(Material.NAME_TAG, "&c&lCHAT & TAGS",
-                "&7Sistem Chat Modern.",
-                "",
-                "&eFeatures:",
-                "&fCustom Formatting (LuckPerms)",
-                "&fRGB/Gradient Support",
-                "&fInteractive Tags & Menus",
-                "&fEmoji System (/emoji)",
-                "&fMention System (@Player)"));
+        inv.setItem(23, createItem(Material.TRIDENT, "&#00D4FF&lRANK & TIERS",
+                "&7Leveling & Prestigasi pemain.", "", "&f/tier &7- Menu progress", "&f/tier top &7- Leaderboard"));
 
-        inv.setItem(25, createItem(Material.IRON_CHESTPLATE, "&3&lMODERATION TOOLS",
-                "&7Alat Bantu Staff.",
-                "",
-                "&eCommands:",
-                "&f/god &7- Invulnerable",
-                "&f/vanish &7- Invisible",
-                "&f/invsee <player>",
-                "&f/endersee <player>",
-                "&f/tphere <player>",
-                "&f/otp <player> &7(Offline TP)"));
+        inv.setItem(24, createItem(Material.DAYLIGHT_DETECTOR, "&#FFEE00&lSEASONS",
+                "&7Waktu & Atmosfer dunia.", "", "&f/season &7- Ganti musim", "&f/day &7- Set pagi"));
 
-        // Row 3: UTILITIES & ACTIONS
-        inv.setItem(39, createItem(Material.REPEATING_COMMAND_BLOCK, "&c&lACTION: RELOAD",
-                "&7Reload semua file konfigurasi.",
-                "&7Gunakan jika ada perubahan di .yml",
-                "",
-                "&eKlik untuk Reload!"));
+        // Row 3: Admin Tools
+        inv.setItem(29, createItem(Material.PAPER, "&#00FF00&lCHAT INTERACTIVE",
+                "&7Filter & Otomasi Chat.", "", "&fEmoji support, Tagging,", "&fHoverable Items & Meta."));
 
-        inv.setItem(41, createItem(Material.TARGET, "&a&lSPAWN MANAGEMENT",
-                "&7Panduan Spawn.",
-                "",
-                "&eCommand:",
-                "&f/setspawn &7(Set lokasi spawn)",
-                "&f/spawn &7(Teleport ke spawn)",
-                "",
-                "&cNote: Spawn sangat krucial!"));
+        inv.setItem(31, createItem(Material.NETHERITE_CHESTPLATE, "&#CC0000&lMODERATION",
+                "&7Penertiban & Investigasi.", "", "&f/v, /god, /invsee, /whois"));
 
-        inv.setItem(40, createItem(Material.BARRIER, "&c&lCLOSE GUIDE", "&7Tutup menu ini."));
+        inv.setItem(33, createItem(Material.TARGET, "&#FF4400&lSPAWN ADMIN",
+                "&7Manajemen titik awal.", "", "&f/setspawn &7- Krusial!", "&f/spawn &7- Uji coba."));
+
+        // Row 4: Final Actions
+        inv.setItem(48, createItem(Material.REDSTONE_BLOCK, "&#FF0000&lDEEP RELOAD",
+                "&c&lREFRESH SISTEM", "&7Memperbarui seluruh konfigurasi.", "&7Warps & Spawn akan diload ulang."));
+
+        inv.setItem(49, createItem(Material.BARRIER, "&c&lCLOSE MENU", "&7Kembali ke dunia."));
+
+        inv.setItem(50, createItem(Material.COMMAND_BLOCK, "&#FFBB00&lRESET SEASON",
+                "&c⚠ AKSI BERBAHAYA", "&7Reset Level & Kekayaan!", "&7Hanya gunakan di akhir season."));
 
         p.openInventory(inv);
-        p.playSound(p.getLocation(), Sound.ITEM_BOOK_PAGE_TURN, 1f, 1f);
+        p.playSound(p.getLocation(), Sound.BLOCK_AMETHYST_BLOCK_CHIME, 1f, 1f);
     }
 
     private ItemStack createItem(Material mat, String name, String... lore) {
@@ -169,9 +126,7 @@ public class NaturalCoreGUI implements Listener {
     @EventHandler
     public void onClick(InventoryClickEvent e) {
         String title = ChatUtils.stripColor(e.getView().getTitle());
-        String expected = "NATURAL CORE | ADMIN GUIDE";
-
-        if (!title.equals(expected))
+        if (!title.contains("NATURAL") || !title.contains("ADMIN"))
             return;
 
         e.setCancelled(true);
@@ -183,23 +138,40 @@ public class NaturalCoreGUI implements Listener {
         if (e.getClickedInventory() == null || !e.getClickedInventory().equals(e.getView().getTopInventory()))
             return;
 
-        if (e.getCurrentItem() == null || e.getCurrentItem().getType() == Material.AIR)
+        ItemStack item = e.getCurrentItem();
+        if (item == null || item.getType() == Material.AIR)
             return;
 
-        Material mat = e.getCurrentItem().getType();
+        Material mat = item.getType();
 
-        // Actions
-        if (mat == Material.REPEATING_COMMAND_BLOCK) {
-            // Reload action kept as convenience
-            p.performCommand("nacore reload");
-            p.closeInventory();
-            p.playSound(p.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, 1f, 1.5f);
-        } else if (mat == Material.BARRIER) {
-            p.closeInventory();
-            p.playSound(p.getLocation(), Sound.UI_BUTTON_CLICK, 1f, 1f);
-        } else {
-            // General "Read" sound for documentation items
-            p.playSound(p.getLocation(), Sound.UI_BUTTON_CLICK, 0.3f, 2f);
+        // New Interaction Logic
+        switch (mat) {
+            case REDSTONE_BLOCK -> { // Deep Reload
+                p.closeInventory();
+                p.performCommand("nacore admin reload");
+                p.playSound(p.getLocation(), Sound.BLOCK_BEACON_ACTIVATE, 1f, 2f);
+            }
+            case BARRIER -> { // Close
+                p.closeInventory();
+                p.playSound(p.getLocation(), Sound.UI_BUTTON_CLICK, 1f, 1f);
+            }
+            case COMMAND_BLOCK -> { // Reset Season
+                p.closeInventory();
+                p.sendMessage(ChatUtils.colorize(
+                        "&6&lNaturalCore &8» &7Gunakan &e/nacore admin resetseason confirm &7di chat untuk konfirmasi."));
+                p.playSound(p.getLocation(), Sound.BLOCK_ANVIL_LAND, 1f, 1f);
+            }
+            case NETHER_STAR -> { // Info
+                p.sendMessage(ChatUtils.colorize("&6&lNaturalCore &8» &7Anda sedang menggunakan sistem &fCore v"
+                        + plugin.getDescription().getVersion()));
+                p.playSound(p.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, 0.5f, 2f);
+            }
+            default -> {
+                // Secondary SFX for navigation items
+                if (mat.name().contains("GLASS_PANE"))
+                    return;
+                p.playSound(p.getLocation(), Sound.UI_BUTTON_CLICK, 0.4f, 1.5f);
+            }
         }
     }
 
