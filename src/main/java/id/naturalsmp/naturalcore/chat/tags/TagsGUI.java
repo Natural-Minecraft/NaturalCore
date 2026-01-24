@@ -60,9 +60,12 @@ public class TagsGUI implements Listener {
 
             ItemStack item = createItem(icon, nameColor + id, lore.toArray(new String[0]));
 
-            // Store ID in ItemMeta
+            // Store ID in PersistentDataContainer
             ItemMeta meta = item.getItemMeta();
-            meta.setLocalizedName(id);
+            org.bukkit.persistence.PersistentDataContainer pdc = meta.getPersistentDataContainer();
+            org.bukkit.NamespacedKey key = new org.bukkit.NamespacedKey(plugin, "tag_id");
+            pdc.set(key, org.bukkit.persistence.PersistentDataType.STRING, id);
+
             if (isEquipped) {
                 meta.addEnchant(org.bukkit.enchantments.Enchantment.UNBREAKING, 1, true);
                 meta.addItemFlags(org.bukkit.inventory.ItemFlag.HIDE_ENCHANTS);
@@ -105,16 +108,20 @@ public class TagsGUI implements Listener {
                 return;
             }
 
-            if (item.hasItemMeta() && item.getItemMeta().hasLocalizedName()) {
-                String id = item.getItemMeta().getLocalizedName();
+            if (item.hasItemMeta()) {
+                org.bukkit.persistence.PersistentDataContainer pdc = item.getItemMeta().getPersistentDataContainer();
+                org.bukkit.NamespacedKey key = new org.bukkit.NamespacedKey(plugin, "tag_id");
 
-                if (p.hasPermission("naturalsmp.tags." + id)) {
-                    tagsManager.setPlayerTag(p, id);
-                    p.sendMessage(ChatUtils.colorize("&aTag terpasang: " + tagsManager.getAvailableTags().get(id)));
-                    p.closeInventory();
-                } else {
-                    p.sendMessage(ChatUtils.colorize("&cKamu belum membuka tag ini!"));
-                    // Play sound fail
+                if (pdc.has(key, org.bukkit.persistence.PersistentDataType.STRING)) {
+                    String id = pdc.get(key, org.bukkit.persistence.PersistentDataType.STRING);
+
+                    if (p.hasPermission("naturalsmp.tags." + id)) {
+                        tagsManager.setPlayerTag(p, id);
+                        p.sendMessage(ChatUtils.colorize("&aTag terpasang: " + tagsManager.getAvailableTags().get(id)));
+                        p.closeInventory();
+                    } else {
+                        p.sendMessage(ChatUtils.colorize("&cKamu belum membuka tag ini!"));
+                    }
                 }
             }
         }

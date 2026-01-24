@@ -23,7 +23,7 @@ public class ChatColorManager {
 
     public ChatColorManager(NaturalCore plugin) {
         this.plugin = plugin;
-        loadConfig();
+        load();
     }
 
     public void load() {
