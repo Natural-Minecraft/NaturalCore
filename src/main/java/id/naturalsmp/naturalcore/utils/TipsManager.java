@@ -4,7 +4,6 @@ import id.naturalsmp.naturalcore.NaturalCore;
 import org.bukkit.Bukkit;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
-import org.bukkit.scheduler.BukkitRunnable;
 
 import java.util.List;
 import java.util.Random;
@@ -21,7 +20,6 @@ public class TipsManager {
     private TipState state = TipState.IDLE;
 
     private String currentTip = "";
-    private String pendingOldText = ""; // Text from Main Action Bar to animate out
 
     private int animationFrame = 0;
     private final int MAX_FRAMES = 20; // Length of transition
@@ -45,28 +43,25 @@ public class TipsManager {
         this.soundName = ConfigUtils.getString("tips.sound", "BLOCK_NOTE_BLOCK_HAT");
     }
 
-    // Called by SeasonManager Loop every tick (or 2 ticks)
     public void tick() {
         long now = System.currentTimeMillis();
 
         if (state == TipState.IDLE) {
             if (now - lastRun > intervalHooks) {
-                // Trigger Start
                 if (!tips.isEmpty()) {
                     currentTip = tips.get(new Random().nextInt(tips.size()));
                     state = TipState.SLIDING_IN;
                     animationFrame = 0;
-                    lastRun = now; // Reset timer
+                    lastRun = now;
                 }
             }
         } else if (state == TipState.SLIDING_IN) {
             animationFrame++;
             if (animationFrame % 2 == 0)
-                playSound(); // Tik tik effect
-
+                playSound();
             if (animationFrame >= MAX_FRAMES) {
                 state = TipState.STATIC;
-                animationFrame = 0; // Use as timer for Static
+                animationFrame = 0;
             }
         } else if (state == TipState.STATIC) {
             animationFrame++;
@@ -78,7 +73,6 @@ public class TipsManager {
             animationFrame++;
             if (animationFrame % 2 == 0)
                 playSound();
-
             if (animationFrame >= MAX_FRAMES) {
                 state = TipState.IDLE;
                 animationFrame = 0;
@@ -92,12 +86,10 @@ public class TipsManager {
             for (Player p : Bukkit.getOnlinePlayers()) {
                 p.playSound(p.getLocation(), s, 0.5f, 2.0f);
             }
-        } catch (IllegalArgumentException ignored) {
+        } catch (Exception ignored) {
         }
     }
 
-    // Returns NULL if should show Normal Bar
-    // Returns String if should show Tip/Animation
     public String getDisplay(String mainBarText) {
         if (state == TipState.IDLE)
             return null;
@@ -106,41 +98,24 @@ public class TipsManager {
         String cleanTip = ChatUtils.colorize(currentTip);
 
         if (state == TipState.SLIDING_IN) {
-            // Main slides Left (substring), Tip slides In from Right
-            // Logic: Cut first N chars of Main, show first N chars of Tip?
-            // Or "Push":
-            // Main: "Season Info" (11 chars). Frame 1: "ason Info" ...
-            // Tip: "Tips..."
-
-            // Simplification: We merge them with spacers.
-            // "ason Info" + " " + "T"
-
             float progress = (float) animationFrame / MAX_FRAMES;
-
-            // Cut Main
             int cutLen = (int) (cleanMain.length() * progress);
-            String partMain = (cutLen < cleanMain.length()) ? cleanMain.substring(cutLen) : "";
-
-            // Revealing Tip
             int revealLen = (int) (cleanTip.length() * progress);
-            String partTip = cleanTip.substring(0, Math.min(revealLen, cleanTip.length()));
+
+            String partMain = ChatUtils.colorAwareSubstring(cleanMain, cutLen, cleanMain.length());
+            String partTip = ChatUtils.colorAwareSubstring(cleanTip, 0, revealLen);
 
             return partMain + "     " + partTip;
 
         } else if (state == TipState.STATIC) {
             return cleanTip;
         } else if (state == TipState.SLIDING_OUT) {
-            // Tip slides Left, Main slides In from Right
-
             float progress = (float) animationFrame / MAX_FRAMES;
-
-            // Cut Tip
             int cutLen = (int) (cleanTip.length() * progress);
-            String partTip = (cutLen < cleanTip.length()) ? cleanTip.substring(cutLen) : "";
-
-            // Reveal Main
             int revealLen = (int) (cleanMain.length() * progress);
-            String partMain = cleanMain.substring(0, Math.min(revealLen, cleanMain.length()));
+
+            String partTip = ChatUtils.colorAwareSubstring(cleanTip, cutLen, cleanTip.length());
+            String partMain = ChatUtils.colorAwareSubstring(cleanMain, 0, revealLen);
 
             return partTip + "     " + partMain;
         }

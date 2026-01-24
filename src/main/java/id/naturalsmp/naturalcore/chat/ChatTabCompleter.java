@@ -9,6 +9,7 @@ import org.bukkit.event.Listener;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
+import org.bukkit.event.server.TabCompleteEvent;
 
 public class ChatTabCompleter implements Listener {
 
@@ -45,6 +46,27 @@ public class ChatTabCompleter implements Listener {
                         .map(AsyncTabCompleteEvent.Completion::completion)
                         .collect(Collectors.toList()));
                 event.setHandled(true);
+            }
+        }
+    }
+
+    @EventHandler
+    public void onSyncTabComplete(TabCompleteEvent event) {
+        String buffer = event.getBuffer();
+        if (!buffer.startsWith("/") && buffer.contains("@")) {
+            int lastAtIndex = buffer.lastIndexOf("@");
+            String search = buffer.substring(lastAtIndex + 1).toLowerCase();
+
+            List<String> suggestions = Bukkit.getOnlinePlayers().stream()
+                    .map(Player::getName)
+                    .filter(name -> name.toLowerCase().startsWith(search))
+                    .map(name -> "@" + name)
+                    .collect(Collectors.toList());
+
+            if (!suggestions.isEmpty()) {
+                List<String> current = new ArrayList<>(event.getCompletions());
+                current.addAll(suggestions);
+                event.setCompletions(current);
             }
         }
     }

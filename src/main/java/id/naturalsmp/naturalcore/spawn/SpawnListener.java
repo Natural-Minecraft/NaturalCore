@@ -26,9 +26,10 @@ public class SpawnListener implements Listener {
         // Kita pindah ke section 'spawn.allowed-join-worlds' agar lebih rapi
         List<String> allowed = ConfigUtils.getStringList("spawn.allowed-join-worlds");
 
-        // Jika world saat ini TIDAK ada di daftar allowed
+        // Jika world saat ini TIDAK ada di daftar allowed ATAU player baru pertama kali
+        // join
         // (Misal logout di dungeon/minigame world yang sudah unlaoded)
-        if (!allowed.contains(currentWorld)) {
+        if (!e.getPlayer().hasPlayedBefore() || !allowed.contains(currentWorld)) {
             // Teleport ke spawn utama
             plugin.getSpawnManager().teleport(p);
 

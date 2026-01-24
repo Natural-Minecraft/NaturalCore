@@ -2,40 +2,52 @@ package id.naturalsmp.naturalcore.chat;
 
 import id.naturalsmp.naturalcore.utils.ChatUtils;
 import org.bukkit.Bukkit;
-import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.event.inventory.InventoryDragEvent;
 import org.bukkit.inventory.Inventory;
-import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.InventoryHolder;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.UUID;
 
-public class ChatPreviewGUI implements Listener {
+public class ChatPreviewGUI implements Listener, InventoryHolder {
 
-    public static void openSnapshot(Player viewer, UUID snapshotId, boolean isEnder) {
-        Inventory snapshot = isEnder ? ChatSnapshotManager.getEnderSnapshot(snapshotId)
-                : ChatSnapshotManager.getInventorySnapshot(snapshotId);
+    public static void openSnapshot(Player viewer, UUID snapshotId) {
+        ChatSnapshotManager.SnapshotData data = ChatSnapshotManager.getSnapshot(snapshotId);
 
-        if (snapshot == null) {
+        if (data == null) {
             viewer.sendMessage(ChatUtils.colorize("&cSnapshot ini sudah kadaluarsa (Expired)."));
             return;
         }
 
-        // Create a copy to prevent modification of the snapshot
-        Inventory gui = Bukkit.createInventory(null, snapshot.getSize(),
-                snapshot.getHolder() != null ? snapshot.getHolder().toString() : "Preview");
+        Inventory snapshot = data.inventory;
+        String title = data.title;
+
+        // Create a copy with our holder to prevent interaction
+        Inventory gui = Bukkit.createInventory(new ChatPreviewGUI(), snapshot.getSize(), title);
         gui.setContents(snapshot.getContents());
 
         viewer.openInventory(gui);
     }
 
+    @Override
+    public @NotNull Inventory getInventory() {
+        return null; // Not needed
+    }
+
     @EventHandler
     public void onInventoryClick(InventoryClickEvent event) {
-        String title = event.getView().getTitle();
-        if (title.contains("'s Inventory") || title.contains("'s Enderchest")) {
-            // Cancel all interaction in preview
+        if (event.getInventory().getHolder() instanceof ChatPreviewGUI) {
+            event.setCancelled(true);
+        }
+    }
+
+    @EventHandler
+    public void onInventoryDrag(InventoryDragEvent event) {
+        if (event.getInventory().getHolder() instanceof ChatPreviewGUI) {
             event.setCancelled(true);
         }
     }

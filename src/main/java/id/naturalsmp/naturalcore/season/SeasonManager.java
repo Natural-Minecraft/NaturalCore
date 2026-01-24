@@ -27,6 +27,7 @@ public class SeasonManager {
     private boolean enabled;
 
     private final Map<UUID, Double> playerTemps = new HashMap<>();
+    private int temperatureTickCounter = 0;
 
     private id.naturalsmp.naturalcore.utils.TipsManager tipsManager;
 
@@ -84,6 +85,7 @@ public class SeasonManager {
                 tipsManager.tick();
 
                 // Update Players
+                temperatureTickCounter++;
                 updateAllPlayers();
             }
         }.runTaskTimer(plugin, 2L, 2L); // 2 Ticks = Smooth Animation
@@ -125,21 +127,18 @@ public class SeasonManager {
     }
 
     private void updateAllPlayers() {
-        for (Player p : Bukkit.getOnlinePlayers()) {
-            // Note: Calc temp is somewhat heavy.
-            // Running every 2 ticks might be too much.
-            // Optimization: Only calc temp every 20 ticks, but update action bar every 2
-            // ticks.
+        boolean recalculate = (temperatureTickCounter % 10 == 0); // Every 20 ticks (1s)
 
-            if (Bukkit.getCurrentTick() % 40 == 0) { // Update data valid every 2s
+        for (Player p : Bukkit.getOnlinePlayers()) {
+            if (recalculate) {
                 double temp = calculateTemperature(p);
                 playerTemps.put(p.getUniqueId(), temp);
                 handleTempEffects(p, temp);
             }
 
-            // Send Action Bar (Animation needs fast update)
-            Double cachedTemp = playerTemps.getOrDefault(p.getUniqueId(), 20.0);
-            sendActionBar(p, cachedTemp);
+            // [REMOVED] Logic moved to centralized HUDManager
+            // Double cachedTemp = playerTemps.getOrDefault(p.getUniqueId(), 20.0);
+            // sendActionBar(p, cachedTemp);
         }
     }
 
@@ -158,13 +157,20 @@ public class SeasonManager {
 
         if (loc.getWorld().hasStorm()) {
             base += config.getDouble("modifiers.storm", -5.0);
+        } else if (loc.getWorld().isThundering() || loc.getWorld().hasStorm()) { // Handle rain too
+            base += config.getDouble("modifiers.rain", -3.0);
         }
 
-        if (p.getEyeLocation().getBlock().getType() == Material.WATER) {
+        if (p.getLocation().getBlockY() < 60) {
+            base += config.getDouble("modifiers.underground", -4.0);
+        }
+
+        if (p.getLocation().getBlock().getType() == Material.WATER
+                || p.getEyeLocation().getBlock().getType() == Material.WATER) {
             base += config.getDouble("modifiers.in-water", -5.0);
         }
 
-        for (Block b : getNearbyBlocks(loc, 3)) {
+        for (Block b : getNearbyBlocks(loc, 2)) {
             if (b.getType() == Material.FIRE || b.getType() == Material.CAMPFIRE
                     || b.getType() == Material.SOUL_CAMPFIRE) {
                 base += config.getDouble("modifiers.near-fire", 15.0);
@@ -179,11 +185,12 @@ public class SeasonManager {
         return base;
     }
 
-    private void sendActionBar(Player p, double temp) {
+    public String getTemperatureActionBar(Player p) {
+        Double temp = playerTemps.getOrDefault(p.getUniqueId(), 20.0);
         FileConfiguration config = ConfigUtils.getSeasonConfig();
         String format = config.getString("action-bar.format");
         if (format == null)
-            return;
+            return null;
 
         // Custom placeholders
         String msg = format
@@ -199,14 +206,8 @@ public class SeasonManager {
         }
 
         // --- TIPS INTEGRATION ---
-        // Check if Tips Animation is active
         String tipsOverride = tipsManager.getDisplay(msg);
-
-        if (tipsOverride != null) {
-            p.sendActionBar(ChatUtils.colorize(tipsOverride));
-        } else {
-            p.sendActionBar(ChatUtils.colorize(msg));
-        }
+        return (tipsOverride != null) ? tipsOverride : msg;
     }
 
     private void handleTempEffects(Player p, double temp) {

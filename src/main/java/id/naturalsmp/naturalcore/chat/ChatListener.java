@@ -100,8 +100,7 @@ public class ChatListener implements Listener {
                         ItemStack item = player.getInventory().getItemInMainHand();
                         if (item != null && item.getType() != Material.AIR) {
                                 Component itemComp = item.displayName().hoverEvent(item.asHoverEvent());
-                                UUID id = ChatSnapshotManager.createInventorySnapshot(player.getName() + "'s Item",
-                                                new ItemStack[] { item }); // Simple snapshot
+                                UUID id = ChatSnapshotManager.createItemSnapshot(player.getName(), item);
                                 message = message.replaceText(TextReplacementConfig.builder()
                                                 .match(Pattern.compile("\\[item\\]"))
                                                 .replacement(
@@ -111,6 +110,8 @@ public class ChatListener implements Listener {
                                                                                                                 .stripColor(LegacyComponentSerializer
                                                                                                                                 .legacySection()
                                                                                                                                 .serialize(item.displayName()))
+                                                                                                                .replace("[", "")
+                                                                                                                .replace("]", "")
                                                                                                                 + " x"
                                                                                                                 + item.getAmount())
                                                                                                 .color(NamedTextColor.YELLOW)
@@ -118,15 +119,14 @@ public class ChatListener implements Listener {
                                                                                                 .clickEvent(ClickEvent
                                                                                                                 .runCommand("/chatview "
                                                                                                                                 + id
-                                                                                                                                + " inv"))))
+                                                                                                                                + " item"))))
                                                 .build());
                         }
                 }
 
                 // [inv]
                 if (messageContains(message, "[inv]")) {
-                        UUID id = ChatSnapshotManager.createInventorySnapshot(player.getName(),
-                                        player.getInventory().getContents());
+                        UUID id = ChatSnapshotManager.createInventorySnapshot(player);
                         message = message.replaceText(TextReplacementConfig.builder()
                                         .match(Pattern.compile("\\[inv\\]"))
                                         .replacement(blueBracket(Component.text("Inventory")
@@ -233,9 +233,9 @@ public class ChatListener implements Listener {
         }
 
         private Component blueBracket(Component inner) {
-                return Component.text("[").color(NamedTextColor.BLUE)
+                return Component.text("[").color(NamedTextColor.AQUA)
                                 .append(inner)
-                                .append(Component.text("]").color(NamedTextColor.BLUE));
+                                .append(Component.text("]").color(NamedTextColor.AQUA));
         }
 
         private boolean messageContains(Component message, String search) {

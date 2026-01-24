@@ -106,4 +106,36 @@ public class ChatUtils {
         // 4. Colorize hasil akhirnya
         return colorize(result);
     }
+
+    /**
+     * Ambil substring dengan tetap mempertahankan kode warna sebelumnya.
+     * Sangat berguna untuk animasi sliding text.
+     */
+    public static String colorAwareSubstring(String input, int start, int end) {
+        if (input == null || input.isEmpty())
+            return "";
+
+        // Safety bounds
+        int safeStart = Math.min(input.length(), Math.max(0, start));
+        int safeEnd = Math.min(input.length(), Math.max(safeStart, end));
+
+        // Jika start di tengah-tengah '§e', majukan sedikit agar tidak pecah
+        if (safeStart > 0 && input.charAt(safeStart - 1) == ChatColor.COLOR_CHAR) {
+            safeStart--;
+        }
+
+        String sub = input.substring(safeStart, safeEnd);
+        String lastColors = org.bukkit.ChatColor.getLastColors(input.substring(0, safeStart));
+
+        return lastColors + sub;
+    }
+
+    /**
+     * Menghitung panjang string tanpa menghitung kode warna.
+     */
+    public static int getVisualLength(String input) {
+        if (input == null)
+            return 0;
+        return ChatColor.stripColor(input).length();
+    }
 }

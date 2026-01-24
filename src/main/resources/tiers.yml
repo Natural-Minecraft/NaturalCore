@@ -2,19 +2,19 @@ tiers:
   # --- WARRIOR ---
   1:
     id: "warrior_3"
-    display: "\uE850\uE863"
+    display: "&#FF9B00ᴡ&#EF9300ᴀ&#DF8B00ʀ&#CF8300ʀ&#BF7C00ɪ&#AE7400ᴏ&#9E6C00ʀ &#7E5C001"
     requirements:
       money: 1000
       mob_kills: 1000
   2:
     id: "warrior_2"
-    display: "\uE850\uE862"
+    display: "&#FF9B00ᴡ&#F89800ᴀ&#F19400ʀ&#EA9100ʀ&#E28D00ɪ&#DB8A00ᴏ&#D48600ʀ &#C67F002"
     requirements:
       money: 2500
       mob_kills: 2500
   3:
     id: "warrior_1"
-    display: "\uE850\uE861"
+    display: "&#B77800ᴡ&#B07500ᴀ&#A97100ʀ&#A26E00ʀ&#9B6A00ɪ&#946700ᴏ&#8C6300ʀ &#7E5C003"
     requirements:
       money: 5000
       mob_kills: 5000

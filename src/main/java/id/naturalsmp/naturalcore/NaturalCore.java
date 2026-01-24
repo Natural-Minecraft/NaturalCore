@@ -14,6 +14,8 @@ import id.naturalsmp.naturalcore.spawn.SpawnCommand;
 import id.naturalsmp.naturalcore.spawn.SpawnManager;
 import id.naturalsmp.naturalcore.spawn.SpawnListener;
 import id.naturalsmp.naturalcore.chat.MentionListener;
+import id.naturalsmp.naturalcore.chat.GlobalNotificationListener;
+import id.naturalsmp.naturalcore.listeners.GuiSoundListener;
 import id.naturalsmp.naturalcore.season.*;
 import id.naturalsmp.naturalcore.banner.*;
 import id.naturalsmp.naturalcore.utility.EnvironmentCommand;
@@ -22,6 +24,7 @@ import id.naturalsmp.naturalcore.general.StartCommand;
 import id.naturalsmp.naturalcore.teleport.TeleportManager;
 
 import id.naturalsmp.naturalcore.teleport.TeleportCommand;
+import id.naturalsmp.naturalcore.teleport.TeleportListener;
 import id.naturalsmp.naturalcore.utils.ChatUtils;
 import id.naturalsmp.naturalcore.warp.WarpCommand;
 import id.naturalsmp.naturalcore.warp.WarpManager;
@@ -69,6 +72,7 @@ public final class NaturalCore extends JavaPlugin {
     private id.naturalsmp.naturalcore.tier.TierGUI tierGUI;
     private id.naturalsmp.naturalcore.chat.ChatColorManager chatColorManager;
     private id.naturalsmp.naturalcore.season.SeasonResetManager seasonResetManager;
+    private id.naturalsmp.naturalcore.hud.HUDManager hudManager;
 
     @Override
     public void onEnable() {
@@ -248,6 +252,9 @@ public final class NaturalCore extends JavaPlugin {
         // MentionListener is now integrated into ChatListener (Adventure API)
         getServer().getPluginManager().registerEvents(new ChatTabCompleter(), this);
         getServer().getPluginManager().registerEvents(new ChatPreviewGUI(), this);
+        getServer().getPluginManager().registerEvents(new GlobalNotificationListener(this), this);
+        getServer().getPluginManager().registerEvents(new GuiSoundListener(), this);
+        this.hudManager = new id.naturalsmp.naturalcore.hud.HUDManager(this);
         this.messageManager = new MessageManager();
         PrivateMessageCommand pmCmd = new PrivateMessageCommand(this);
         registerCmd("msg", pmCmd);
@@ -304,6 +311,7 @@ public final class NaturalCore extends JavaPlugin {
 
         getServer().getPluginManager().registerEvents(new id.naturalsmp.naturalcore.teleport.PlayerDeathListener(this),
                 this);
+        getServer().getPluginManager().registerEvents(new TeleportListener(this), this);
 
         // Selesai
         getLogger().info(

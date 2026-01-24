@@ -21,8 +21,7 @@ public class ChatSnapshotCommand implements CommandExecutor {
         Player player = (Player) sender;
         try {
             UUID id = UUID.fromString(args[0]);
-            boolean isEnder = args[1].equalsIgnoreCase("ender");
-            ChatPreviewGUI.openSnapshot(player, id, isEnder);
+            ChatPreviewGUI.openSnapshot(player, id);
         } catch (IllegalArgumentException e) {
             // Invalid UUID
         }

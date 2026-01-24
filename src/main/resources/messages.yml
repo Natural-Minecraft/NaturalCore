@@ -97,8 +97,23 @@ death:
   title: "      &#FF5555&l☠ &#FF0000&lK A M U   M A T I &#FF5555&l☠"
   location: "      &#AAAAAA&l📍 &7Lokasi: &#FF5555%x%, %y%, %z%"
   world: "      &#AAAAAA&l🌍 &7Dunia: &#FF5555%world%"
-  back-button: "          &#FFAA00&l⚡ &#FFCC00&l[ KEMBALI KE LOKASI ] &#FFAA00&l⚡"
-  back-hover: "&#FFCC00Klik untuk teleport ke lokasi kematian"
+  back-button: "          &6&l⚡ &e&l[ KEMBALI KE LOKASI ] &6&l⚡"
+  back-hover: "&eKlik untuk teleport ke lokasi kematian"
+
+# --- NOTIFICATIONS (Aesthetic) ---
+notifications:
+  death:
+    - "&8[&c&l☠&8] &7%player% &fakhirnya tumbang oleh alam."
+    - "&8[&c&l☠&8] &7%player% &fterlalu asik bermain dengan ajal."
+    - "&8[&c&l☠&8] &7%player% &flupa caranya bernafas."
+    - "&8[&c&l☠&8] &7%player% &ftewas mengenaskan."
+  kill:
+    - "&8[&6&l⚔&8] &b%killer% &7mengakhiri riwayat &e%victim%&7."
+    - "&8[&6&l⚔&8] &b%killer% &7mengirim &e%victim% &7kembali ke spawn!"
+    - "&8[&6&l⚔&8] &b%killer% &7membuktikan kekuatannya pada &e%victim%&7."
+  achievement:
+    - "&8[&a&l✦&8] &b%player% &7telah meraih pencapaian: &e%achievement%&7!"
+    - "&8[&a&l✦&8] &b%player% &7baru saja mencatat sejarah: &e%achievement%&7!"
 
 # --- RTP ---
 rtp:

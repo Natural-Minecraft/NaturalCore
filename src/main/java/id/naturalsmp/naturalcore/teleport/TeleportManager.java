@@ -50,10 +50,11 @@ public class TeleportManager {
 
         // Pesan ke Pengirim
         String prefix = ConfigUtils.getString("prefix.teleport");
-        sender.sendMessage(prefix + ConfigUtils.getString("messages.tpa-sent").replace("%target%", target.getName()));
+        sender.sendMessage(
+                prefix + ConfigUtils.getString("messages.teleport.tpa-sent").replace("%target%", target.getName()));
 
         // Pesan ke Penerima (DENGAN TOMBOL KLIK)
-        String msgKey = isTpaHere ? "messages.tpahere-received" : "messages.tpa-received";
+        String msgKey = isTpaHere ? "messages.teleport.tpahere-received" : "messages.teleport.tpa-received";
         target.sendMessage(prefix + ConfigUtils.getString(msgKey).replace("%player%", sender.getName()));
 
         sendClickableButtons(target);
@@ -74,7 +75,7 @@ public class TeleportManager {
         String prefix = ConfigUtils.getString("prefix.teleport");
 
         if (!tpaRequests.containsKey(receiver.getUniqueId())) {
-            receiver.sendMessage(prefix + ConfigUtils.getString("messages.tpa-no-request"));
+            receiver.sendMessage(prefix + ConfigUtils.getString("messages.teleport.tpa-no-request"));
             return;
         }
 
@@ -96,14 +97,16 @@ public class TeleportManager {
             // TPAHERE: Receiver ditarik ke Sender
             receiver.teleport(sender.getLocation());
             receiver.sendMessage(
-                    prefix + ConfigUtils.getString("messages.tpa-accept-target").replace("%player%", sender.getName()));
-            sender.sendMessage(prefix + ConfigUtils.getString("messages.tpa-accept-sender"));
+                    prefix + ConfigUtils.getString("messages.teleport.tpa-accept-target").replace("%player%",
+                            sender.getName()));
+            sender.sendMessage(prefix + ConfigUtils.getString("messages.teleport.tpa-accept-sender"));
         } else {
             // TPA: Sender pergi ke Receiver
             sender.teleport(receiver.getLocation());
-            sender.sendMessage(prefix + ConfigUtils.getString("messages.tpa-accept-sender"));
+            sender.sendMessage(prefix + ConfigUtils.getString("messages.teleport.tpa-accept-sender"));
             receiver.sendMessage(
-                    prefix + ConfigUtils.getString("messages.tpa-accept-target").replace("%player%", sender.getName()));
+                    prefix + ConfigUtils.getString("messages.teleport.tpa-accept-target").replace("%player%",
+                            sender.getName()));
         }
 
         sender.playSound(sender.getLocation(), Sound.ENTITY_ENDERMAN_TELEPORT, 1f, 1f);
@@ -124,12 +127,13 @@ public class TeleportManager {
         tpaRequests.remove(receiver.getUniqueId());
         requestType.remove(receiver.getUniqueId());
 
-        receiver.sendMessage(prefix + ConfigUtils.getString("messages.tpa-deny-target").replace("%player%",
+        receiver.sendMessage(prefix + ConfigUtils.getString("messages.teleport.tpa-deny-target").replace("%player%",
                 (sender != null ? sender.getName() : "Player")));
 
         if (sender != null && sender.isOnline()) {
             sender.sendMessage(
-                    prefix + ConfigUtils.getString("messages.tpa-deny-sender").replace("%target%", receiver.getName()));
+                    prefix + ConfigUtils.getString("messages.teleport.tpa-deny-sender").replace("%target%",
+                            receiver.getName()));
             sender.playSound(sender.getLocation(), Sound.ENTITY_VILLAGER_NO, 1f, 1f);
         }
     }

@@ -300,6 +300,9 @@ permissions:
   naturalsmp.trash:
     description: Access to /trash
     default: true
+  naturalsmp.chat.view:
+    description: Access to chat item/inv preview
+    default: true
   
   # Chat Color Ranks
   naturalsmp.chat.color:
