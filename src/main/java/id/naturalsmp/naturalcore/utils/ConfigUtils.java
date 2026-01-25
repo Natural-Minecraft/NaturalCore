@@ -40,7 +40,14 @@ public class ConfigUtils {
     }
 
     // --- SEASON.YML HELPERS ---
+    public static FileConfiguration getSeasonConfig() {
+        if (seasonConfig == null) {
+            loadSeason();
+        }
+        return seasonConfig;
+    }
 
+    // --- DISABLED COMMANDS HELPERS ---
     public static FileConfiguration getDisabledCommandsConfig() {
         if (disabledCommandsConfig == null) {
             loadDisabledCommands();
