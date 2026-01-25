@@ -22,6 +22,10 @@ commands:
     description: Alert restart
     aliases: [ra]
     permission: naturalcs.restartalert
+  restartcancel:
+    description: Batalkan alert restart
+    aliases: [rc]
+    permission: naturalcs.restartalert
   bc:
     description: Broadcast
     aliases: [broadcast]

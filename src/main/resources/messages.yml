@@ -29,19 +29,23 @@ admin:
     shout-format: "&a&lShout &b> &e%message%"
   restart:
     confirm-required: "&8&l| &cSilahkan ketik &aConfirmation &cterlebih dahulu"
-    warning-header: "&4&m&l---------=============---------"
-    warning-title: "                 &c&lWarning"
+    warning-header: "&#ff0000&m&l---------=============---------"
+    warning-title: "                 <gradient:#ff0000:#ff8c00><b>WARNING</b></gradient>"
     warning-body: |-
-       &cServer akan melakukan restart
-             &cdalam waktu &a10 &cdetik
-    warning-footer: "&4&m&l---------=============---------"
-    countdown-title: "&4&l! &c&lRestart &4&l!"
-    countdown-subtitle: "&c%time% Seconds"
-    saving-data: "&4Saving-data..."
+       <center>&cServer akan melakukan restart otomatis</center>
+             <center>&cdalam waktu &a%time% &cdetik</center>
+    warning-footer: "&#ff0000&m&l---------=============---------"
+    countdown-title: "<gradient:#ff0000:#ff8c00><b>! RESTART !</b></gradient>"
+    countdown-subtitle: "&fServer restart dalam &e%time% &fdetik"
+    saving-data: "&#ffaa00&l💾 SAVING DATA..."
+    bossbar-title: "<gradient:#00ff00:#ff0000><b>Sistem Restart Otomatis</b></gradient> &7- &f%time%s"
     kick-reason: |-
-      &a&lNaturalSMP &cRestart
+      &a&lNaturalSMP &8» <gradient:#ff0000:#ff8c00><b>RESTART</b></gradient>
       
-      &bServer sedang melakukan restart! silahkan tunggu &e3 menit
+      &7Server sedang melakukan pemeliharaan rutin.
+      &7Silahkan coba kembali dalam &e3-5 menit&7.
+      
+      &8» &bdiscord.gg/naturalsmp
 
 # --- SOCIAL ---
 social:

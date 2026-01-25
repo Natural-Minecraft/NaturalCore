@@ -156,6 +156,7 @@ public final class NaturalCore extends JavaPlugin {
 
         registerCmd("kickall", new KickAllCommand());
         registerCmd("restartalert", new RestartAlertCommand());
+        registerCmd("restartcancel", new RestartCancelCommand());
         BroadcastCommand bcCmd = new BroadcastCommand();
         registerCmd("bc", bcCmd);
         registerCmd("bcworld", bcCmd);
