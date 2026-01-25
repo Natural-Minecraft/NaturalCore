@@ -176,5 +176,33 @@ list:
   
   moyai:
     char: "🗿"
-    triggers: [":moyai:", ":🗿:", "moyai"]
+    triggers: [":moyai:", "moyai"]
+    permission: ""
+  sob:
+    char: "😭"
+    triggers: [":sob:", ":cry2:"]
+    permission: ""
+  rofl:
+    char: "🤣"
+    triggers: [":rofl:"]
+    permission: ""
+  rolling_eyes:
+    char: "🙄"
+    triggers: [":rolling_eyes:", ":roll:"]
+    permission: ""
+  facepalm:
+    char: "🤦"
+    triggers: [":facepalm:"]
+    permission: ""
+  thinking:
+    char: "🤔"
+    triggers: [":thinking:", ":hmm:"]
+    permission: ""
+  exploding_head:
+    char: "🤯"
+    triggers: [":mindblown:", ":exploding_head:"]
+    permission: ""
+  partying_face:
+    char: "🥳"
+    triggers: [":party:", ":partying_face:"]
     permission: ""

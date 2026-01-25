@@ -169,6 +169,9 @@ public final class NaturalCore extends JavaPlugin {
         registerCmd("kill", adminCtrl);
         getServer().getPluginManager().registerEvents(new FreezeListener(adminCtrl), this);
 
+        getServer().getPluginManager()
+                .registerEvents(new id.naturalsmp.naturalcore.listeners.CommandDisablerListener(this), this);
+
         // 11. Teleport Module
         this.teleportManager = new TeleportManager(this);
         TeleportCommand tpCmd = new TeleportCommand(teleportManager);

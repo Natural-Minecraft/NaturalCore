@@ -101,9 +101,6 @@ public class NaturalCoreGUI implements Listener {
 
         inv.setItem(49, createItem(Material.BARRIER, "&c&lCLOSE MENU", "&7Kembali ke dunia."));
 
-        inv.setItem(50, createItem(Material.COMMAND_BLOCK, "&#FFBB00&lRESET SEASON",
-                "&c⚠ AKSI BERBAHAYA", "&7Reset Level & Kekayaan!", "&7Hanya gunakan di akhir season."));
-
         p.openInventory(inv);
         p.playSound(p.getLocation(), Sound.BLOCK_AMETHYST_BLOCK_CHIME, 1f, 1f);
     }
@@ -125,17 +122,21 @@ public class NaturalCoreGUI implements Listener {
 
     @EventHandler
     public void onClick(InventoryClickEvent e) {
+        if (e.getClickedInventory() == null)
+            return;
+
         String title = ChatUtils.stripColor(e.getView().getTitle());
         if (!title.contains("NATURAL") || !title.contains("ADMIN"))
             return;
 
+        // Force cancel all clicks in this GUI to prevent theft
         e.setCancelled(true);
 
         if (!(e.getWhoClicked() instanceof Player))
             return;
         Player p = (Player) e.getWhoClicked();
 
-        if (e.getClickedInventory() == null || !e.getClickedInventory().equals(e.getView().getTopInventory()))
+        if (!e.getClickedInventory().equals(e.getView().getTopInventory()))
             return;
 
         ItemStack item = e.getCurrentItem();

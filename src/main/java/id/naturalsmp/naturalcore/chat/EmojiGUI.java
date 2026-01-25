@@ -28,37 +28,61 @@ public class EmojiGUI implements Listener {
     }
 
     public void openGUI(Player p) {
-        p.playSound(p.getLocation(), Sound.BLOCK_ENDER_CHEST_OPEN, 1.0f, 1.2f);
-        Inventory inv = Bukkit.createInventory(null, 54, ChatUtils.colorize("&8&lKoleksi Emoji Chat"));
+        p.playSound(p.getLocation(), Sound.BLOCK_AMETHYST_BLOCK_CHIME, 1.0f, 1.0f);
+        Inventory inv = Bukkit.createInventory(null, 54, ChatUtils.colorize("&#00FFD4&lＮＡＴＵＲＡＬ &8| &#FF00D4&lＥＭＯＪＩＳ"));
 
-        int slot = 0;
+        // --- GLASSMORPHISM BORDER ---
+        ItemStack glass = createItem(Material.PINK_STAINED_GLASS_PANE, " ", new ArrayList<>(), "");
+        ItemStack glass2 = createItem(Material.MAGENTA_STAINED_GLASS_PANE, " ", new ArrayList<>(), "");
+
+        for (int i = 0; i < 9; i++) {
+            inv.setItem(i, glass);
+            inv.setItem(45 + i, glass);
+        }
+        for (int i = 0; i < 6; i++) {
+            inv.setItem(i * 9, glass2);
+            inv.setItem(i * 9 + 8, glass2);
+        }
+
+        // --- EMOJI CONTENT SLOTS (Inner 7x4) ---
+        int[] contentSlots = {
+                10, 11, 12, 13, 14, 15, 16,
+                19, 20, 21, 22, 23, 24, 25,
+                28, 29, 30, 31, 32, 33, 34,
+                37, 38, 39, 40, 41, 42, 43
+        };
+
+        int slotIdx = 0;
         for (Map.Entry<String, EmojiManager.EmojiData> entry : emojiManager.getEmojiRegistry().entrySet()) {
-            if (slot >= 54)
-                break; // Limit page 1 for now
+            if (slotIdx >= contentSlots.length)
+                break;
 
             String trigger = entry.getKey();
             EmojiManager.EmojiData data = entry.getValue();
 
-            // Check Perm
             boolean unlocked = !data.hasPermission() || p.hasPermission(data.getPermission());
 
-            Material icon = unlocked ? Material.PAPER : Material.MAP;
-            String name = unlocked ? "&a&l" + data.getCharacter() : "&c&lLOCKED";
+            Material icon = unlocked ? Material.PAPER : Material.BARRIER;
+            String name = unlocked ? "&#FF00D4&l" + data.getCharacter() : "&c&l🔒 LOCKED";
 
             List<String> lore = new ArrayList<>();
             lore.add("");
-            lore.add("&7Trigger: &e" + trigger);
-            lore.add("&7Permission: " + (data.hasPermission() ? data.getPermission() : "&aNone"));
+            lore.add("&7Shortcut: &e" + trigger);
             lore.add("");
             if (unlocked) {
-                lore.add("&eKlik untuk preview di chat");
+                lore.add("&#00FFD4&l➥ KLIK UNTUK KIRIM");
             } else {
-                lore.add("&cKamu belum membuka emoji ini.");
+                lore.add("&cDibutuhkan: &7" + data.getPermission());
+                lore.add("&7Ajak admin untuk info lebih lanjut!");
             }
 
-            inv.setItem(slot, createItem(icon, name, lore, trigger));
-            slot++;
+            inv.setItem(contentSlots[slotIdx], createItem(icon, name, lore, trigger));
+            slotIdx++;
         }
+
+        // Info Button
+        inv.setItem(49, createItem(Material.BOOK, "&#00FFD4&lCARA PAKAI",
+                List.of("", "&7Cukup ketik &e:trigger: &7di chat", "&7atau klik emoji di menu ini!", ""), ""));
 
         p.openInventory(inv);
     }
@@ -80,7 +104,8 @@ public class EmojiGUI implements Listener {
 
     @EventHandler
     public void onClick(InventoryClickEvent e) {
-        if (e.getView().getTitle().equals(ChatUtils.colorize("&8&lKoleksi Emoji Chat"))) {
+        String title = ChatUtils.stripColor(e.getView().getTitle());
+        if (title.contains("NATURAL") && title.contains("EMOJI")) {
             e.setCancelled(true);
 
             if (e.getCurrentItem() == null || e.getCurrentItem().getType() == Material.AIR)
