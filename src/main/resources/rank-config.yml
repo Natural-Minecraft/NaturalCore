@@ -7,16 +7,88 @@
 
 # --- DEFAULT (SEMUA PLAYER) ---
 naturalsmp.default:
+  prefix: " "
   weight: 0
   permissions:
     - naturalsmp.help
     - naturalsmp.list
     - naturalsmp.info
+    - naturalsmp.tpa
     - naturalsmp.spawn
+    - naturalsmp.home.use
+    - naturalsmp.home.limit.default
+    - naturaldungeon.party
+    - naturaldungeon.dungeon
+    - excellentshop.chestshop.create
+    - excellentshop.auction.command.unclaimed
+    - excellentshop.auction.command.selling
+    - excellentshop.auction.command.sell
+    - excellentshop.auction.command.open
+    - excellentshop.auction.command.history
+    - excellentshop.auction.command.expired
+    - bankplus.open
+    - bankplus.use
+    - emf.user
+    - emf.use_rod
+    - emf.top
+    - emf.toggle
+    - emf.shop
+    - emf.next
+    - emf.journal
+    - emf.help
+    - emf.gui
+    - emf.applybaits
+    - redprotect.command.addadmin
+    - redprotect.command.addleader
+    - redprotect.command.addmember
+    - redprotect.command.blocklimit
+    - redprotect.command.border
+    - redprotect.command.can-purge
+    - redprotect.command.claim
+    - redprotect.command.claimlimit
+    - redprotect.command.delete
+    - redprotect.command.deltp
+    - redprotect.command.expand-vert
+    - redprotect.command.flag
+    - redprotect.command.help
+    - redprotect.command.info
+    - redprotect.command.infowand
+    - redprotect.command.kick
+    - redprotect.command.laccept
+    - redprotect.command.ldeny
+    - redprotect.command.list
+    - redprotect.command.list-areas
+    - redprotect.command.near
+    - redprotect.command.priority
+    - redprotect.command.purge-limit
+    - redprotect.command.regen
+    - redprotect.command.regenall
+    - redprotect.command.removeadmin
+    - redprotect.command.removeall
+    - redprotect.command.removeleader
+    - redprotect.command.removemember
+    - redprotect.command.rename
+    - redprotect.command.select-we
+    - redprotect.command.settp
+    - redprotect.command.start
+    - redprotect.command.teleport
+    - redprotect.command.user
+    - redprotect.command.wand
+    - redprotect.command.welcome
+    - veinminer.blocks
+    - veinminer.settings
+    - veinminer.toggle
+    - voicechat.speak
+    - voicechat.listen
+    - voicechat.groups
+  disabled-perms:
+    - bukkit.command.plugins
+    - excellentshop.auction.listing
+    - naturalsmp.back
 
 # --- MIDI RANK ---
 naturalsmp.midi:
-  prefix: "&#00AAFF&l[ MIDI ] &f"
+  prefix: " "
   weight: 100
   permissions:
     - naturalsmp.enderchest
@@ -27,7 +99,7 @@ naturalsmp.midi:
 
 # --- VIP RANK ---
 naturalsmp.vip:
-  prefix: "&#55FF55&l[ VIP ] &f"
+  prefix: " "
   weight: 200
   permissions:
     - naturalsmp.hat
@@ -39,7 +111,7 @@ naturalsmp.vip:
 
 # --- MVP RANK ---
 naturalsmp.mvp:
-  prefix: "&#FFFF55&l[ MVP ] &f"
+  prefix: " "
   weight: 300
   permissions:
     - naturalsmp.fly
@@ -52,7 +124,7 @@ naturalsmp.mvp:
 
 # --- NATURE RANK ---
 naturalsmp.nature:
-  prefix: "<gradient:#00AAFF:#55FF55><b>[ NATURE ]</b></gradient> &f"
+  prefix: " "
   weight: 400
   permissions:
     - naturalsmp.priority
@@ -62,7 +134,7 @@ naturalsmp.nature:
 
 # --- ADMIN ---
 naturalsmp.admin:
-  prefix: "&#FF5555&l[ ADMIN ] &f"
+  prefix: " "
   weight: 1000
   permissions:
     - naturalsmp.*

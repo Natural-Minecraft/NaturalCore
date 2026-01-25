@@ -52,6 +52,7 @@ public class PermissionManager {
             rank.suffix = section.getString("suffix");
             rank.weight = section.getInt("weight", 0);
             rank.permissions = section.getStringList("permissions");
+            rank.disabledPermissions = section.getStringList("disabled-perms");
             rank.inheritance = section.getStringList("inheritance");
 
             ranks.put(key, rank);
@@ -66,9 +67,14 @@ public class PermissionManager {
             Bukkit.getPluginManager().addPermission(perm);
         }
 
-        // Set children permissions
+        // Set children permissions (True)
         for (String child : rank.permissions) {
             perm.getChildren().put(child, true);
+        }
+
+        // Set disabled permissions (False)
+        for (String disabled : rank.disabledPermissions) {
+            perm.getChildren().put(disabled, false);
         }
 
         perm.recalculatePermissibles();
@@ -91,12 +97,31 @@ public class PermissionManager {
                     : rank.permission;
 
             lp.getGroupManager().modifyGroup(groupName, group -> {
-                // Clear existing prefixes/weights of the same priority or just add new
+                // Metadata
                 if (rank.prefix != null) {
-                    group.data().add(PrefixNode.builder(rank.prefix, rank.weight).build());
+                    group.data().add(PrefixNode.builder(rank.prefix).priority(rank.weight).build());
                 }
 
                 group.data().add(WeightNode.builder(rank.weight).build());
+
+                // Allowed Permissions
+                for (String p : rank.permissions) {
+                    group.data().add(Node.builder(p).value(true).build());
+                }
+
+                // Disabled Permissions (Negated nodes)
+                if (rank.disabledPermissions != null) {
+                    for (String p : rank.disabledPermissions) {
+                        group.data().add(Node.builder(p).value(false).build());
+                    }
+                }
+
+                // Disabled Permissions (Negated nodes)
+                if (rank.disabledPermissions != null) {
+                    for (String p : rank.disabledPermissions) {
+                        group.data().add(Node.builder(p).value(false).build());
+                    }
+                }
 
                 // Add inheritance
                 if (rank.inheritance != null) {
@@ -119,6 +144,7 @@ public class PermissionManager {
         String suffix;
         int weight;
         List<String> permissions;
+        List<String> disabledPermissions;
         List<String> inheritance;
     }
 }
