@@ -99,7 +99,7 @@ public class PermissionManager {
             lp.getGroupManager().modifyGroup(groupName, group -> {
                 // Metadata
                 if (rank.prefix != null) {
-                    group.data().add(PrefixNode.builder(rank.prefix).priority(rank.weight).build());
+                    group.data().add(PrefixNode.builder(rank.prefix, rank.weight).build());
                 }
 
                 group.data().add(WeightNode.builder(rank.weight).build());
@@ -107,13 +107,6 @@ public class PermissionManager {
                 // Allowed Permissions
                 for (String p : rank.permissions) {
                     group.data().add(Node.builder(p).value(true).build());
-                }
-
-                // Disabled Permissions (Negated nodes)
-                if (rank.disabledPermissions != null) {
-                    for (String p : rank.disabledPermissions) {
-                        group.data().add(Node.builder(p).value(false).build());
-                    }
                 }
 
                 // Disabled Permissions (Negated nodes)
