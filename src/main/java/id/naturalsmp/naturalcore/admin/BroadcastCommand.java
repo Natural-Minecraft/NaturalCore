@@ -48,14 +48,26 @@ public class BroadcastCommand implements CommandExecutor {
         // --- LOGIKA COMMAND ---
         if (args.length > 0) {
             String message = String.join(" ", args);
+            String cmd = label.toLowerCase();
 
-            String format = ConfigUtils.getMessage("admin.broadcast.format");
+            String formatKey = cmd.contains("world") ? "admin.broadcast.world-format" : "admin.broadcast.format";
+            String format = ConfigUtils.getMessage(formatKey);
             if (format == null)
-                format = "&a&lBroadcast &b> &e%message%";
+                format = cmd.contains("world") ? "&a&lWorld-BC &b> &e%message%" : "&a&lBroadcast &b> &e%message%";
 
-            Bukkit.broadcastMessage("");
-            Bukkit.broadcastMessage(ChatUtils.colorize(format.replace("%message%", message)));
-            Bukkit.broadcastMessage("");
+            String coloredMsg = ChatUtils.colorize(format.replace("%message%", message));
+
+            if (cmd.contains("world") && sender instanceof Player p) {
+                p.getWorld().getPlayers().forEach(player -> {
+                    player.sendMessage("");
+                    player.sendMessage(coloredMsg);
+                    player.sendMessage("");
+                });
+            } else {
+                Bukkit.broadcastMessage("");
+                Bukkit.broadcastMessage(coloredMsg);
+                Bukkit.broadcastMessage("");
+            }
         } else {
             sender.sendMessage(ConfigUtils.getMessage("admin.broadcast.usage"));
         }

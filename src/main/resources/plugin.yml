@@ -163,8 +163,63 @@ commands:
     permission: naturalsmp.lag
   info:
     description: Info server
-    aliases: [about, news]
+    aliases: [about, news, ifo, inform]
     permission: naturalsmp.info
+  help:
+    description: NaturalCore Help
+    permission: naturalsmp.help
+
+  # --- ITEM EDITOR ---
+  give:
+    description: Give item
+    aliases: [i]
+    permission: naturalsmp.give
+  itemname:
+    description: Rename item
+    aliases: [iname, name]
+    permission: naturalsmp.itemname
+  lore:
+    description: Edit item lore
+    aliases: [ilore, itemlore]
+    permission: naturalsmp.lore
+
+  lore:
+    description: Edit item lore
+    aliases: [ilore, itemlore]
+    permission: naturalsmp.lore
+
+  # --- FUN ---
+  fireball:
+    description: Tembakkan fireball
+    permission: naturalsmp.fun.fireball
+  firework:
+    description: Luncurkan kembang api
+    permission: naturalsmp.fun.firework
+  jumpto:
+    description: Teleport ke lokasi yang dilihat
+    aliases: [j]
+    permission: naturalsmp.jumpto
+
+  # --- CHAT & BROADCAST ---
+  bcworld:
+    description: Broadcast ke world saat ini
+    aliases: [broadcastworld]
+    permission: naturalsmp.broadcast.world
+  shout:
+    description: Kirim pesan shout global
+    permission: naturalsmp.shout
+  sudo:
+    description: Paksa player menjalankan command/chat
+    permission: naturalsmp.sudo
+
+  # --- MODERATION (MODERN) ---
+  freeze:
+    description: Bekukan player
+    aliases: [ice]
+    permission: naturalsmp.freeze
+  kill:
+    description: Bunuh player instan
+    permission: naturalsmp.kill
 
   # --- WARP ---
   warp:

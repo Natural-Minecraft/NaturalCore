@@ -156,7 +156,18 @@ public final class NaturalCore extends JavaPlugin {
 
         registerCmd("kickall", new KickAllCommand());
         registerCmd("restartalert", new RestartAlertCommand());
-        registerCmd("bc", new BroadcastCommand());
+        BroadcastCommand bcCmd = new BroadcastCommand();
+        registerCmd("bc", bcCmd);
+        registerCmd("bcworld", bcCmd);
+
+        AdvancedChatCommand advChat = new AdvancedChatCommand();
+        registerCmd("shout", advChat);
+        registerCmd("sudo", advChat);
+
+        AdminControlCommand adminCtrl = new AdminControlCommand(this);
+        registerCmd("freeze", adminCtrl);
+        registerCmd("kill", adminCtrl);
+        getServer().getPluginManager().registerEvents(new FreezeListener(adminCtrl), this);
 
         // 11. Teleport Module
         this.teleportManager = new TeleportManager(this);
@@ -205,6 +216,20 @@ public final class NaturalCore extends JavaPlugin {
         registerCmd("list", infoCmd);
         registerCmd("lag", infoCmd);
         registerCmd("info", infoCmd);
+        registerCmd("help", infoCmd);
+
+        // B3. Item Management (New)
+        id.naturalsmp.naturalcore.general.ItemBuilderCommand itemCmd = new id.naturalsmp.naturalcore.general.ItemBuilderCommand(
+                this);
+        registerCmd("give", itemCmd);
+        registerCmd("itemname", itemCmd);
+        registerCmd("lore", itemCmd);
+
+        // B4. Fun Modules (New)
+        id.naturalsmp.naturalcore.general.FunCommand funCmd = new id.naturalsmp.naturalcore.general.FunCommand(this);
+        registerCmd("fireball", funCmd);
+        registerCmd("firework", funCmd);
+        registerCmd("jumpto", funCmd);
 
         // C. Utility (Player)
         PlayerUtilCommand playerUtil = new PlayerUtilCommand();

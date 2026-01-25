@@ -36,8 +36,30 @@ public class ServerInfoCommand implements CommandExecutor {
             case "info", "about" -> {
                 return showServerInfo(sender);
             }
+            case "help" -> {
+                return showHelp(sender);
+            }
         }
         return false;
+    }
+
+    private boolean showHelp(CommandSender sender) {
+        sender.sendMessage("");
+        sender.sendMessage(ChatUtils.colorize(
+                "   &#00AAFF&lɴ&#55FF55&lᴀ&#AAFF55&lᴛ&#FFFF55&lᴜ&#FFAA00&lʀ&#FF5555&lᴀ&#FF55FF&lʟ &#00AAFF&lᴄ&#55FF55&lᴏ&#AAFF55&lʀ&#FFFF55&lᴇ &7- Command Guide"));
+        sender.sendMessage("");
+        sender.sendMessage(ChatUtils.colorize(" &8» &f/gm [mode] &7- Ganti gamemode"));
+        sender.sendMessage(ChatUtils.colorize(" &8» &f/list &7- Daftar player online"));
+        sender.sendMessage(ChatUtils.colorize(" &8» &f/lag &7- Cek performa server"));
+        sender.sendMessage(ChatUtils.colorize(" &8» &f/itemname &7- Ubah nama item"));
+        sender.sendMessage(ChatUtils.colorize(" &8» &f/lore &7- Ubah lore item"));
+        sender.sendMessage(ChatUtils.colorize(" &8» &f/shout &7- Berteriak global"));
+        sender.sendMessage(ChatUtils.colorize(" &8» &f/bcworld &7- Broadcast ke world"));
+        sender.sendMessage(ChatUtils.colorize(" &8» &f/freeze &7- Bekukan player"));
+        sender.sendMessage("");
+        sender.sendMessage(ChatUtils.colorize(" &7Type &b/nacore &7for admin tools."));
+        sender.sendMessage("");
+        return true;
     }
 
     // --- /list ---
