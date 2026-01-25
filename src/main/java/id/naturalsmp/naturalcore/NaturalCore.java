@@ -20,7 +20,7 @@ import id.naturalsmp.naturalcore.season.*;
 import id.naturalsmp.naturalcore.banner.*;
 import id.naturalsmp.naturalcore.utility.EnvironmentCommand;
 import id.naturalsmp.naturalcore.utility.MenuCommand;
-import id.naturalsmp.naturalcore.general.StartCommand;
+import id.naturalsmp.naturalcore.general.*;
 import id.naturalsmp.naturalcore.teleport.TeleportManager;
 
 import id.naturalsmp.naturalcore.teleport.TeleportCommand;
@@ -211,22 +211,20 @@ public final class NaturalCore extends JavaPlugin {
         registerCmd("endersee", invCmd); // Admin (/endersee)
 
         // B2. Server Info Modules (New)
-        id.naturalsmp.naturalcore.general.ServerInfoCommand infoCmd = new id.naturalsmp.naturalcore.general.ServerInfoCommand(
-                this);
+        ServerInfoCommand infoCmd = new ServerInfoCommand(this);
         registerCmd("list", infoCmd);
         registerCmd("lag", infoCmd);
         registerCmd("info", infoCmd);
         registerCmd("help", infoCmd);
 
         // B3. Item Management (New)
-        id.naturalsmp.naturalcore.general.ItemBuilderCommand itemCmd = new id.naturalsmp.naturalcore.general.ItemBuilderCommand(
-                this);
+        ItemBuilderCommand itemCmd = new ItemBuilderCommand(this);
         registerCmd("give", itemCmd);
         registerCmd("itemname", itemCmd);
         registerCmd("lore", itemCmd);
 
         // B4. Fun Modules (New)
-        id.naturalsmp.naturalcore.general.FunCommand funCmd = new id.naturalsmp.naturalcore.general.FunCommand(this);
+        FunCommand funCmd = new FunCommand(this);
         registerCmd("fireball", funCmd);
         registerCmd("firework", funCmd);
         registerCmd("jumpto", funCmd);
