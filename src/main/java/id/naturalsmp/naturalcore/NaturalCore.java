@@ -170,6 +170,11 @@ public final class NaturalCore extends JavaPlugin {
         // Plugin Messaging
         getServer().getMessenger().registerOutgoingPluginChannel(this, "natural:main");
 
+        // 11. Ranks Module
+        id.naturalsmp.naturalcore.admin.RankGUI rankGUI = new id.naturalsmp.naturalcore.admin.RankGUI(this);
+        getServer().getPluginManager().registerEvents(rankGUI, this);
+        registerCmd("ranks", new id.naturalsmp.naturalcore.admin.RankCommand(rankGUI));
+
         BroadcastCommand bcCmd = new BroadcastCommand();
         registerCmd("bc", bcCmd);
         registerCmd("bcworld", bcCmd);

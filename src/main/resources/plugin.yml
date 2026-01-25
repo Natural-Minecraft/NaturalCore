@@ -22,6 +22,9 @@ commands:
     description: Alert restart
     aliases: [ra]
     permission: naturalcs.restartalert
+  ranks:
+    description: Lihat daftar rank premium
+    aliases: [rank, rk]
   restart:
     description: Restart server dengan alert premium
     permission: naturalcs.restartalert

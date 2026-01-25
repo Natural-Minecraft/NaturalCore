@@ -54,7 +54,7 @@ admin:
       &7Server sedang dalam tahap perbaikan/update.
       &7Hanya staf yang diizinkan masuk saat ini.
       
-      &8» &bhttpsdc.naturalsmp.my.id
+      &8» &bhttps://dc.naturalsmp.my.id/
     bossbar-title: "<gradient:#FFAA00:#FFFF55><b>Mode Maintenance Aktif</b></gradient>"
 
 # --- SOCIAL ---
@@ -288,3 +288,66 @@ item-edit:
   lore-set: "&#55FF55&l⚔ &7Lore baris %line% diubah."
   lore-cleared: "&#FF5555&l⚔ &7Semua lore dihapus."
   give-success: "&#55FF55&l🎁 &7Memberikan &e%amount%x %item% &7kepada &f%player%&7."
+
+# --- RANKS GUI ---
+ranks:
+  gui-title: "&#00FFD4&lＮＡＴＵＲＡＬ &8| &#FFAA00&lＲＡＮＫＳ"
+  midi:
+    name: "&#00AAFF&l[ MIDI ]"
+    lore:
+      - "&8&m------------------------"
+      - "&7Rank pemula dengan fitur esensial."
+      - ""
+      - "&fFitur Utama:"
+      - " &8» &b5x &7Sethome Slots"
+      - " &8» &b/ec &7Akses Enderchest"
+      - " &8» &b/back &7Kembali ke lokasi mati"
+      - " &8» &bMIDI Kit &7(Bulanan)"
+      - " &8» &bBlue Chat Color"
+      - "&8&m------------------------"
+      - "&#00FFD4&l➥ KLIK UNTUK INFO LENGKAP"
+  vip:
+    name: "&#55FF55&l[ VIP ]"
+    lore:
+      - "&8&m------------------------"
+      - "&7Rank menengah untuk player aktif."
+      - ""
+      - "&fFitur Utama:"
+      - " &8» &a15x &7Sethome Slots"
+      - " &8» &a/hat &7Pakai item di kepala"
+      - " &8» &a/trash &7Buang item instan"
+      - " &8» &aResource World &7Access"
+      - " &8» &aGreen Chat Color"
+      - " &8» &fSemua fitur &bMIDI"
+      - "&8&m------------------------"
+      - "&#00FFD4&l➥ KLIK UNTUK INFO LENGKAP"
+  mvp:
+    name: "&#FFFF55&l[ MVP ]"
+    lore:
+      - "&8&m------------------------"
+      - "&7Rank profesional untuk builder."
+      - ""
+      - "&fFitur Utama:"
+      - " &8» &e30x &7Sethome Slots"
+      - " &8» &e/fly &7Akses Terbang"
+      - " &8» &e/craft & &e/av &7Virtual Tables"
+      - " &8» &eRedProtect &7Extra blocks"
+      - " &8» &eYellow Chat Color"
+      - " &8» &fSemua fitur &aVIP"
+      - "&8&m------------------------"
+      - "&#00FFD4&l➥ KLIK UNTUK INFO LENGKAP"
+  nature:
+    name: "<gradient:#00AAFF:#55FF55><b>[ NATURE ]</b></gradient>"
+    lore:
+      - "&8&m------------------------"
+      - "&7Rank tertinggi, penguasa alam."
+      - ""
+      - "&fFitur Utama:"
+      - " &8» <gradient:#00AAFF:#55FF55>50x</gradient> &7Sethome Slots"
+      - " &8» <gradient:#00AAFF:#55FF55>Priority</gradient> &7Server Join"
+      - " &8» <gradient:#00AAFF:#55FF55>No Cooldown</gradient> &7TPA"
+      - " &8» <gradient:#00AAFF:#55FF55>Immunity</gradient> &7Extreme Temperature"
+      - " &8» <gradient:#00AAFF:#55FF55>RedProtect</gradient> &7God Region"
+      - " &8» &fSemua fitur &eMVP"
+      - "&8&m------------------------"
+      - "&#00FFD4&l➥ KLIK UNTUK INFO LENGKAP"
