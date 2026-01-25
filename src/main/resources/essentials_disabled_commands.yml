@@ -7,22 +7,46 @@ disabled-commands:
   - tpaccept
   - tpdeny
   - back
+  - back
+  - otp
+  - offlinetp
   
   # --- Gamemode ---
   - gamemode
   - gm
+  - creative
   - gmc
+  - creativemode
+  - survival
   - gms
+  - survivalmode
+  - adventure
   - gma
+  - adventuremode
+  - spectator
   - gmsp
+  - spec
   
-  # --- Messaging ---
+  # --- Messaging & Chat ---
   - msg
   - tell
   - w
   - whisper
   - reply
   - r
+  - shout
+  - sudo
+  
+  # --- Broadcast ---
+  - bc
+  - broadcast
+  - bcworld
+  - broadcastworld
+  - restartalert
+  - ra
+  - restart
+  - restartcancel
+  - rc
   
   # --- Utility & Perks ---
   - fly
@@ -41,11 +65,18 @@ disabled-commands:
   - clean
   - clear
   - ci
+  - chatcolor
+  - color
+  - ccolor
+  - ptime
+  - pweather
   
   # --- Inventory & Enderchest ---
+  - invsee
   - enderchest
   - ec
   - endersee
+  - ecsee
   
   # --- Warp, Spawn & Home ---
   - spawn
@@ -54,6 +85,7 @@ disabled-commands:
   - warps
   - setwarp
   - delwarp
+  - setwarpicon
   - sethome
   - delhome
   - home
@@ -68,3 +100,62 @@ disabled-commands:
   - bal
   - money
   - pay
+  - givebal
+  - setbal
+  
+  # --- Server Info ---
+  - list
+  - who
+  - plist
+  - online
+  - playerlist
+  - lag
+  - tps
+  - mem
+  - memory
+  - uptime
+  - info
+  - about
+  - news
+  - ifo
+  - inform
+  - help
+  
+  # --- Item Editor ---
+  - give
+  - i
+  - itemname
+  - iname
+  - name
+  - lore
+  - ilore
+  - itemlore
+  
+  # --- Fun & Actions ---
+  - fireball
+  - firework
+  - jumpto
+  - j
+  
+  # --- Moderation ---
+  - god
+  - vanish
+  - v
+  - whois
+  - freeze
+  - ice
+  - kill
+  
+  # --- System ---
+  - nacore
+  - banner
+  - season
+  - emoji
+  - emojis
+  - emoticon
+  - tags
+  - tier
+  - profile
+  - p
+  - stats
+  - start
