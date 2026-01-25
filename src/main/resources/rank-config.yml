@@ -1,0 +1,71 @@
+# ==========================================
+#     NATURAL CORE - RANK PERMISSIONS
+# ==========================================
+# Di LuckPerms, anda cukup memberikan 1 permission kunci.
+# Plugin akan otomatis mendaftarkan semua sub-permission di bawahnya.
+# Metadata (prefix, weight, dll) bisa di-sync otomatis ke LuckPerms.
+
+# --- DEFAULT (SEMUA PLAYER) ---
+naturalsmp.default:
+  weight: 0
+  permissions:
+    - naturalsmp.help
+    - naturalsmp.list
+    - naturalsmp.info
+    - naturalsmp.spawn
+
+# --- MIDI RANK ---
+naturalsmp.midi:
+  prefix: "&#00AAFF&l[ MIDI ] &f"
+  weight: 100
+  permissions:
+    - naturalsmp.enderchest
+    - naturalsmp.back
+    - naturalsmp.emoji.unlimited
+  inheritance:
+    - naturalsmp.default
+
+# --- VIP RANK ---
+naturalsmp.vip:
+  prefix: "&#55FF55&l[ VIP ] &f"
+  weight: 200
+  permissions:
+    - naturalsmp.hat
+    - naturalsmp.trash
+    - naturalsmp.resource
+    - naturalsmp.nick
+  inheritance:
+    - naturalsmp.midi
+
+# --- MVP RANK ---
+naturalsmp.mvp:
+  prefix: "&#FFFF55&l[ MVP ] &f"
+  weight: 300
+  permissions:
+    - naturalsmp.fly
+    - naturalsmp.craft
+    - naturalsmp.anvil
+    - naturalsmp.ptime
+    - naturalsmp.pweather
+  inheritance:
+    - naturalsmp.vip
+
+# --- NATURE RANK ---
+naturalsmp.nature:
+  prefix: "<gradient:#00AAFF:#55FF55><b>[ NATURE ]</b></gradient> &f"
+  weight: 400
+  permissions:
+    - naturalsmp.priority
+    - naturalsmp.temperature.immune
+  inheritance:
+    - naturalsmp.mvp
+
+# --- ADMIN ---
+naturalsmp.admin:
+  prefix: "&#FF5555&l[ ADMIN ] &f"
+  weight: 1000
+  permissions:
+    - naturalsmp.*
+    - "*"
+  inheritance:
+    - naturalsmp.nature

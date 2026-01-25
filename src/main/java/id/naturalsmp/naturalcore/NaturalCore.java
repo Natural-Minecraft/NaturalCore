@@ -74,6 +74,7 @@ public final class NaturalCore extends JavaPlugin {
     private id.naturalsmp.naturalcore.season.SeasonResetManager seasonResetManager;
     private id.naturalsmp.naturalcore.hud.HUDManager hudManager;
     private id.naturalsmp.naturalcore.maintenance.MaintenanceManager maintenanceManager;
+    private id.naturalsmp.naturalcore.permissions.PermissionManager permissionManager;
 
     @Override
     public void onEnable() {
@@ -174,6 +175,9 @@ public final class NaturalCore extends JavaPlugin {
         id.naturalsmp.naturalcore.admin.RankGUI rankGUI = new id.naturalsmp.naturalcore.admin.RankGUI(this);
         getServer().getPluginManager().registerEvents(rankGUI, this);
         registerCmd("ranks", new id.naturalsmp.naturalcore.admin.RankCommand(rankGUI));
+
+        // 12. Permissions Module
+        this.permissionManager = new id.naturalsmp.naturalcore.permissions.PermissionManager(this);
 
         BroadcastCommand bcCmd = new BroadcastCommand();
         registerCmd("bc", bcCmd);
@@ -495,6 +499,14 @@ public final class NaturalCore extends JavaPlugin {
 
     public id.naturalsmp.naturalcore.chat.ChatColorManager getChatColorManager() {
         return chatColorManager;
+    }
+
+    public id.naturalsmp.naturalcore.permissions.PermissionManager getPermissionManager() {
+        return permissionManager;
+    }
+
+    public id.naturalsmp.naturalcore.maintenance.MaintenanceManager getMaintenanceManager() {
+        return maintenanceManager;
     }
 
     // --- HELPER UNTUK MENCEGAH CRASH ---

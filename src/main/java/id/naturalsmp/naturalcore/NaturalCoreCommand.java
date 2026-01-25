@@ -71,6 +71,11 @@ public class NaturalCoreCommand implements CommandExecutor, TabCompleter {
                     sender.sendMessage(ChatUtils.colorize("&6&lNaturalCore &8» &fRefreshing system..."));
                     performDeepReload(sender);
                 }
+                case "ranksync" -> {
+                    sender.sendMessage(ChatUtils.colorize("&6&lPermissions &8» &fSyncing to LuckPerms..."));
+                    plugin.getPermissionManager().syncToLuckPerms();
+                    sender.sendMessage(ChatUtils.colorize("&6&lPermissions &8» &aSync complete! 🔑"));
+                }
                 case "resetseason" -> {
                     if (adminArgs.length < 1 || !adminArgs[0].equalsIgnoreCase("confirm")) {
                         sender.sendMessage(ChatUtils.colorize("&c&lWARNING! &7Reset 50% Tier & AuraSkills."));
@@ -160,7 +165,7 @@ public class NaturalCoreCommand implements CommandExecutor, TabCompleter {
         }
 
         if (args.length == 2 && args[0].equalsIgnoreCase("admin")) {
-            return Arrays.asList("reload", "resetseason", "gui").stream()
+            return Arrays.asList("reload", "resetseason", "ranksync", "gui").stream()
                     .filter(s -> s.startsWith(args[1].toLowerCase())).collect(java.util.stream.Collectors.toList());
         }
 
