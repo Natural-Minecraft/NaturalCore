@@ -26,18 +26,20 @@ public class RestartAlertCommand implements CommandExecutor {
             return true;
         }
 
-        if (args.length < 1) {
+        int seconds = 30; // Default to 30 seconds
+        if (args.length >= 1) {
+            try {
+                seconds = Integer.parseInt(args[0]);
+            } catch (NumberFormatException e) {
+                sender.sendMessage(ChatUtils.colorize("&cError: Waktu harus berupa angka (detik)."));
+                return true;
+            }
+        } else if (label.equalsIgnoreCase("restartalert")) {
+            // Only require confirmation if using the long command without args
             sender.sendMessage(ConfigUtils.getMessage("admin.restart.confirm-required"));
             return true;
         }
-
-        int seconds;
-        try {
-            seconds = Integer.parseInt(args[0]);
-        } catch (NumberFormatException e) {
-            sender.sendMessage(ChatUtils.colorize("&cError: Waktu harus berupa angka (detik)."));
-            return true;
-        }
+        // If label is 'restart' and no args, it defaults to 30s.
 
         if (currentTask != null) {
             sender.sendMessage(

@@ -22,6 +22,9 @@ commands:
     description: Alert restart
     aliases: [ra]
     permission: naturalcs.restartalert
+  restart:
+    description: Restart server dengan alert premium
+    permission: naturalcs.restartalert
   restartcancel:
     description: Batalkan alert restart
     aliases: [rc]
