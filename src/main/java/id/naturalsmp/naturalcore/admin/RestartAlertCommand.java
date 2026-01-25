@@ -72,9 +72,10 @@ public class RestartAlertCommand implements CommandExecutor {
         Bukkit.getOnlinePlayers().forEach(bossBar::addPlayer);
 
         // --- SCHEDULER ---
+        final int finalSeconds = seconds;
         currentTask = new BukkitRunnable() {
-            int timeLeft = seconds;
-            final double initialTime = seconds;
+            int timeLeft = finalSeconds;
+            final double initialTime = finalSeconds;
 
             @Override
             public void run() {
