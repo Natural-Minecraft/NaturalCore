@@ -96,18 +96,22 @@ commands:
     description: Gamemode
     aliases: [gm]
     permission: naturalsmp.gamemode
-  gmc:
-    description: Creative
-    permission: naturalsmp.gamemode
-  gms:
-    description: Survival
-    permission: naturalsmp.gamemode
-  gma:
-    description: Adventure
-    permission: naturalsmp.gamemode
-  gmsp:
-    description: Spectator
-    permission: naturalsmp.gamemode
+  creative:
+    description: Mode Creative
+    aliases: [gmc, creativemode]
+    permission: naturalsmp.gamemode.creative
+  survival:
+    description: Mode Survival
+    aliases: [gms, survivalmode]
+    permission: naturalsmp.gamemode.survival
+  adventure:
+    description: Mode Adventure
+    aliases: [gma, adventuremode]
+    permission: naturalsmp.gamemode.adventure
+  spectator:
+    description: Mode Spectator
+    aliases: [gmsp, spec]
+    permission: naturalsmp.gamemode.spectator
 
   fly:
     description: Terbang
@@ -147,6 +151,20 @@ commands:
   whois:
     description: Info player
     permission: naturalsmp.whois
+
+  # --- SERVER INFO ---
+  list:
+    description: List player online
+    aliases: [who, plist, online, playerlist]
+    permission: naturalsmp.list
+  lag:
+    description: Cek performa server
+    aliases: [tps, mem, memory, uptime]
+    permission: naturalsmp.lag
+  info:
+    description: Info server
+    aliases: [about, news]
+    permission: naturalsmp.info
 
   # --- WARP ---
   warp:

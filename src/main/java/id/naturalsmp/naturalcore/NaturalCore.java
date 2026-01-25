@@ -188,12 +188,23 @@ public final class NaturalCore extends JavaPlugin {
         registerCmd("gms", gmCmd);
         registerCmd("gma", gmCmd);
         registerCmd("gmsp", gmCmd);
+        registerCmd("creative", gmCmd);
+        registerCmd("survival", gmCmd);
+        registerCmd("adventure", gmCmd);
+        registerCmd("spectator", gmCmd);
 
         // B. Inventory (Update: Split Self vs Admin)
         InventoryCommand invCmd = new InventoryCommand();
         registerCmd("invsee", invCmd);
         registerCmd("enderchest", invCmd); // Self (/ec)
         registerCmd("endersee", invCmd); // Admin (/endersee)
+
+        // B2. Server Info Modules (New)
+        id.naturalsmp.naturalcore.general.ServerInfoCommand infoCmd = new id.naturalsmp.naturalcore.general.ServerInfoCommand(
+                this);
+        registerCmd("list", infoCmd);
+        registerCmd("lag", infoCmd);
+        registerCmd("info", infoCmd);
 
         // C. Utility (Player)
         PlayerUtilCommand playerUtil = new PlayerUtilCommand();

@@ -18,82 +18,110 @@ public class GamemodeCommand implements CommandExecutor, TabCompleter {
     public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label,
             @NotNull String[] args) {
 
-        // Permission Check
-        if (!sender.hasPermission("naturalsmp.gamemode")) {
-            sender.sendMessage(ConfigUtils.getString("messages.global.no-permission"));
-            return true;
+        if (!(sender instanceof Player)) {
+            // Allow console to use /gm <mode> <player>
+            if (args.length < 2) {
+                sender.sendMessage("Usage: /gm <mode> <player>");
+                return true;
+            }
         }
 
         GameMode mode = null;
-        Player target = (sender instanceof Player) ? (Player) sender : null;
+        Player target;
 
-        // 1. Deteksi Command (/gmc, /gms, dll)
+        // 1. Detect Command & Mode
         String cmd = label.toLowerCase();
 
-        switch (cmd) {
-            case "gmc":
-                mode = GameMode.CREATIVE;
-                break;
-            case "gms":
-                mode = GameMode.SURVIVAL;
-                break;
-            case "gma":
-                mode = GameMode.ADVENTURE;
-                break;
-            case "gmsp":
-                mode = GameMode.SPECTATOR;
-                break;
-            case "gamemode":
-            case "gm":
-                if (args.length == 0) {
-                    sender.sendMessage(ChatUtils.colorize("&cUsage: /gm <0/1/2/3> [player]"));
-                    return true;
-                }
-                mode = getGameMode(args[0]);
-                if (mode == null) {
-                    sender.sendMessage(ChatUtils.colorize("&cMode tidak valid!"));
-                    return true;
-                }
-                // Jika ada argumen kedua (/gm 1 Steve)
-                if (args.length > 1)
-                    target = Bukkit.getPlayer(args[1]);
-                break;
-        }
+        // Direct Shortcuts
+        if (cmd.equals("gmc") || cmd.startsWith("creative"))
+            mode = GameMode.CREATIVE;
+        else if (cmd.equals("gms") || cmd.startsWith("survival"))
+            mode = GameMode.SURVIVAL;
+        else if (cmd.equals("gma") || cmd.startsWith("adventure"))
+            mode = GameMode.ADVENTURE;
+        else if (cmd.equals("gmsp") || cmd.startsWith("spec"))
+            mode = GameMode.SPECTATOR;
 
-        // Cek target untuk shortcut (/gmc Steve)
-        if (target == null && args.length > 0) {
-            target = Bukkit.getPlayer(args[0]);
+        // Argument parsing
+        if (mode != null) {
+            // Case: /gmc [player]
+            if (args.length > 0) {
+                target = Bukkit.getPlayer(args[0]);
+            } else if (sender instanceof Player) {
+                target = (Player) sender;
+            } else {
+                sender.sendMessage("Console must specify a player.");
+                return true;
+            }
+        } else {
+            // Case: /gm <mode> [player]
+            if (args.length < 1) {
+                sender.sendMessage(ChatUtils.colorize("&cUsage: /gamemode <mode> [player]"));
+                return true;
+            }
+            mode = getGameMode(args[0]);
+            if (mode == null) {
+                sender.sendMessage(ChatUtils.colorize("&cInvalid gamemode. Use 0, 1, 2, 3 or name."));
+                return true;
+            }
+
+            if (args.length > 1) {
+                target = Bukkit.getPlayer(args[1]);
+            } else if (sender instanceof Player) {
+                target = (Player) sender;
+            } else {
+                sender.sendMessage("Console must specify a player.");
+                return true;
+            }
         }
 
         if (target == null) {
-            sender.sendMessage(ConfigUtils.getString("messages.global.player-not-found").replace("%player%", "target"));
+            sender.sendMessage(ConfigUtils.getString("messages.global.player-not-found").replace("%player%",
+                    args.length > 0 ? args[args.length - 1] : "target"));
             return true;
         }
 
-        // 2. Eksekusi
+        // 2. Permission Checks
+        // Self
+        if (sender.equals(target)) {
+            if (!sender.hasPermission("naturalsmp.gamemode")
+                    && !sender.hasPermission("naturalsmp.gamemode." + mode.name().toLowerCase())) {
+                sender.sendMessage(ConfigUtils.getString("messages.global.no-permission"));
+                return true;
+            }
+        } else {
+            // Other
+            if (!sender.hasPermission("naturalsmp.gamemode.others")) {
+                sender.sendMessage(ConfigUtils.getString("messages.global.no-permission"));
+                return true;
+            }
+        }
+
+        // 3. Execution
         target.setGameMode(mode);
         String prefix = ConfigUtils.getString("prefix.admin");
+
+        target.sendMessage(prefix + ConfigUtils.getString("messages.essentials.gamemode-changed")
+                .replace("%mode%", ChatUtils.colorize("&e" + mode.name())));
 
         if (!sender.equals(target)) {
             sender.sendMessage(prefix + ConfigUtils.getString("messages.essentials.gamemode-changed-other")
                     .replace("%target%", target.getName())
-                    .replace("%mode%", mode.name()));
+                    .replace("%mode%", ChatUtils.colorize("&e" + mode.name())));
         }
-        target.sendMessage(
-                prefix + ConfigUtils.getString("messages.essentials.gamemode-changed").replace("%mode%", mode.name()));
 
         return true;
     }
 
     private GameMode getGameMode(String arg) {
         arg = arg.toLowerCase();
-        if (arg.equals("0") || arg.startsWith("surv"))
+        if (arg.equals("0") || arg.startsWith("surv") || arg.equalsIgnoreCase("s"))
             return GameMode.SURVIVAL;
-        if (arg.equals("1") || arg.startsWith("crea"))
+        if (arg.equals("1") || arg.startsWith("crea") || arg.equalsIgnoreCase("c"))
             return GameMode.CREATIVE;
-        if (arg.equals("2") || arg.startsWith("adven"))
+        if (arg.equals("2") || arg.startsWith("adven") || arg.equalsIgnoreCase("a"))
             return GameMode.ADVENTURE;
-        if (arg.equals("3") || arg.startsWith("spec"))
+        if (arg.equals("3") || arg.startsWith("spec") || arg.equalsIgnoreCase("sp"))
             return GameMode.SPECTATOR;
         return null;
     }

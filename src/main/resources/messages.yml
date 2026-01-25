@@ -256,3 +256,8 @@ gui:
     title: "&#00AAFF❂ &#00AAFFɴᴀᴛᴜʀᴀʟ &#55FF55ᴍᴇɴᴜ &#55FF55❂"
   start:
     title: "&#00AAFF❂ &#00AAFFᴘɪʟɪʜ &#55FF55ᴅᴜɴɪᴀ &#55FF55❂"
+
+# --- ESSENTIALS ---
+essentials:
+  gamemode-changed: "&#55FF55&l🎮 &7Gamemode kamu diubah ke %mode%&7."
+  gamemode-changed-other: "&#55FF55&l🎮 &7Gamemode &f%target% &7diubah ke %mode%&7."
