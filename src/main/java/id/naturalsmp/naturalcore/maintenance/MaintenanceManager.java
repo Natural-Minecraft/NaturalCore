@@ -1,0 +1,132 @@
+package id.naturalsmp.naturalcore.maintenance;
+
+import id.naturalsmp.naturalcore.NaturalCore;
+import id.naturalsmp.naturalcore.utils.ChatUtils;
+import id.naturalsmp.naturalcore.utils.ConfigUtils;
+import org.bukkit.Bukkit;
+import org.bukkit.Sound;
+import org.bukkit.entity.Player;
+import org.bukkit.scheduler.BukkitRunnable;
+
+import java.io.ByteArrayOutputStream;
+import java.io.DataOutputStream;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+
+public class MaintenanceManager {
+
+    private final NaturalCore plugin;
+    private boolean active = false;
+    private BukkitRunnable currentTask;
+    private final List<String> whitelistedPlayers = new ArrayList<>();
+
+    public MaintenanceManager(NaturalCore plugin) {
+        this.plugin = plugin;
+        loadData();
+    }
+
+    public void scheduleMaintenance(int seconds) {
+        if (currentTask != null)
+            return;
+
+        currentTask = new BukkitRunnable() {
+            int timeLeft = seconds;
+
+            @Override
+            public void run() {
+                if (timeLeft <= 0) {
+                    setMaintenance(true);
+                    this.cancel();
+                    currentTask = null;
+                    return;
+                }
+
+                if (timeLeft <= 10 || timeLeft % 10 == 0) {
+                    broadcastCountdown(timeLeft);
+                }
+
+                timeLeft--;
+            }
+        };
+        currentTask.runTaskTimer(plugin, 0L, 20L);
+    }
+
+    private void broadcastCountdown(int seconds) {
+        String msg = ConfigUtils.getString("messages.admin.maintenance.countdown")
+                .replace("%time%", String.valueOf(seconds));
+        Bukkit.broadcastMessage(ChatUtils.colorize(msg));
+
+        for (Player p : Bukkit.getOnlinePlayers()) {
+            p.playSound(p.getLocation(), Sound.BLOCK_NOTE_BLOCK_PLING, 1f, 1f);
+        }
+    }
+
+    public void setMaintenance(boolean active) {
+        this.active = active;
+        saveData();
+
+        // Notify Velocity
+        sendProxyUpdate();
+
+        if (active) {
+            String kickReason = ConfigUtils.getString("messages.admin.maintenance.kick-reason");
+            for (Player p : Bukkit.getOnlinePlayers()) {
+                if (!p.hasPermission("naturalsmp.maintenance.bypass")) {
+                    p.kickPlayer(ChatUtils.colorize(kickReason));
+                }
+            }
+            Bukkit.broadcastMessage(ChatUtils.colorize("&6&lMaintenance &8» &aMode Maintenance telah AKTIF."));
+        } else {
+            Bukkit.broadcastMessage(ChatUtils.colorize("&6&lMaintenance &8» &cMode Maintenance telah NONAKTIF."));
+        }
+    }
+
+    public boolean isActive() {
+        return active;
+    }
+
+    public void addWhitelist(String playerName) {
+        if (!whitelistedPlayers.contains(playerName.toLowerCase())) {
+            whitelistedPlayers.add(playerName.toLowerCase());
+            saveData();
+        }
+    }
+
+    public boolean isWhitelisted(String playerName) {
+        return whitelistedPlayers.contains(playerName.toLowerCase());
+    }
+
+    private void loadData() {
+        active = plugin.getConfig().getBoolean("maintenance.active", false);
+        whitelistedPlayers.addAll(plugin.getConfig().getStringList("maintenance.whitelist"));
+    }
+
+    private void saveData() {
+        plugin.getConfig().set("maintenance.active", active);
+        plugin.getConfig().set("maintenance.whitelist", whitelistedPlayers);
+        plugin.saveConfig();
+    }
+
+    public void sendProxyUpdate() {
+        ByteArrayOutputStream b = new ByteArrayOutputStream();
+        DataOutputStream out = new DataOutputStream(b);
+        try {
+            out.writeUTF("Maintenance");
+            out.writeBoolean(active);
+
+            // Whitelist sync
+            out.writeInt(whitelistedPlayers.size());
+            for (String pName : whitelistedPlayers) {
+                out.writeUTF(pName);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        Player p = Bukkit.getOnlinePlayers().stream().findFirst().orElse(null);
+        if (p != null) {
+            p.sendPluginMessage(plugin, "natural:main", b.toByteArray());
+        }
+    }
+}

@@ -46,6 +46,16 @@ admin:
       &7Silahkan coba kembali dalam &e3-5 menit&7.
       
       &8» &bdiscord.gg/naturalsmp
+  maintenance:
+    countdown: "&6&lMaintenance &8» &7Server akan masuk ke mode maintenance dalam &e%time%&7 detik."
+    kick-reason: |-
+      &6&lNaturalSMP &8» <gradient:#FFAA00:#FFFF55><b>MAINTENANCE</b></gradient>
+      
+      &7Server sedang dalam tahap perbaikan/update.
+      &7Hanya staf yang diizinkan masuk saat ini.
+      
+      &8» &bhttpsdc.naturalsmp.my.id
+    bossbar-title: "<gradient:#FFAA00:#FFFF55><b>Mode Maintenance Aktif</b></gradient>"
 
 # --- SOCIAL ---
 social:

@@ -73,6 +73,7 @@ public final class NaturalCore extends JavaPlugin {
     private id.naturalsmp.naturalcore.chat.ChatColorManager chatColorManager;
     private id.naturalsmp.naturalcore.season.SeasonResetManager seasonResetManager;
     private id.naturalsmp.naturalcore.hud.HUDManager hudManager;
+    private id.naturalsmp.naturalcore.maintenance.MaintenanceManager maintenanceManager;
 
     @Override
     public void onEnable() {
@@ -159,6 +160,16 @@ public final class NaturalCore extends JavaPlugin {
         registerCmd("restartalert", new RestartAlertCommand());
         registerCmd("restart", new RestartAlertCommand());
         registerCmd("restartcancel", new RestartCancelCommand());
+
+        // 10. Maintenance Module
+        this.maintenanceManager = new id.naturalsmp.naturalcore.maintenance.MaintenanceManager(this);
+        registerCmd("maintenance", new id.naturalsmp.naturalcore.maintenance.MaintenanceCommand(maintenanceManager));
+        getServer().getPluginManager().registerEvents(
+                new id.naturalsmp.naturalcore.maintenance.MaintenanceListener(maintenanceManager), this);
+
+        // Plugin Messaging
+        getServer().getMessenger().registerOutgoingPluginChannel(this, "natural:main");
+
         BroadcastCommand bcCmd = new BroadcastCommand();
         registerCmd("bc", bcCmd);
         registerCmd("bcworld", bcCmd);
