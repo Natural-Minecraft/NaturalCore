@@ -85,6 +85,7 @@ public final class NaturalCore extends JavaPlugin {
         saveDefaultConfig();
         id.naturalsmp.naturalcore.utils.ConfigUpdater.updateConfig(this, "config.yml");
         id.naturalsmp.naturalcore.utils.ConfigUpdater.updateConfig(this, "messages.yml");
+        id.naturalsmp.naturalcore.utils.ConfigUpdater.updateConfig(this, "essentials_disabled_commands.yml");
 
         // Init Managers
         this.seasonResetManager = new id.naturalsmp.naturalcore.season.SeasonResetManager(this);

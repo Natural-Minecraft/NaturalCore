@@ -21,6 +21,8 @@ public class ConfigUtils {
     private static File messagesFile;
     private static FileConfiguration seasonConfig;
     private static File seasonFile;
+    private static FileConfiguration disabledCommandsConfig;
+    private static File disabledCommandsFile;
 
     // --- CONFIG.YML HELPERS ---
 
@@ -39,11 +41,11 @@ public class ConfigUtils {
 
     // --- SEASON.YML HELPERS ---
 
-    public static FileConfiguration getSeasonConfig() {
-        if (seasonConfig == null) {
-            loadSeason();
+    public static FileConfiguration getDisabledCommandsConfig() {
+        if (disabledCommandsConfig == null) {
+            loadDisabledCommands();
         }
-        return seasonConfig;
+        return disabledCommandsConfig;
     }
 
     /**
@@ -70,6 +72,15 @@ public class ConfigUtils {
         seasonConfig = YamlConfiguration.loadConfiguration(seasonFile);
     }
 
+    private static void loadDisabledCommands() {
+        NaturalCore plugin = NaturalCore.getInstance();
+        if (!new File(plugin.getDataFolder(), "essentials_disabled_commands.yml").exists()) {
+            plugin.saveResource("essentials_disabled_commands.yml", false);
+        }
+        disabledCommandsFile = new File(plugin.getDataFolder(), "essentials_disabled_commands.yml");
+        disabledCommandsConfig = YamlConfiguration.loadConfiguration(disabledCommandsFile);
+    }
+
     /**
      * Reload semua konfigurasi
      */
@@ -77,6 +88,7 @@ public class ConfigUtils {
         NaturalCore.getInstance().reloadConfig();
         loadMessages(); // Reload messages.yml juga
         loadSeason(); // Reload season.yml juga
+        loadDisabledCommands(); // Reload disabled commands juga
     }
 
     // --- STRING GETTERS ---

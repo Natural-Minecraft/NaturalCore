@@ -10,8 +10,6 @@ config-version: 1.8.0
 
 # --- BUTTON MODULES ---
 modules:
-  # List commands to disable completely (e.g., - "gamemode", - "heal")
-  disabled-commands: []
 
 
 # --- PREFIX SETTINGS ---

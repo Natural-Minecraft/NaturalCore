@@ -23,7 +23,7 @@ public class CommandDisablerListener implements Listener {
         if (e.getPlayer().hasPermission("naturalsmp.admin"))
             return;
 
-        List<String> disabled = plugin.getConfig().getStringList("modules.disabled-commands");
+        List<String> disabled = ConfigUtils.getDisabledCommandsConfig().getStringList("disabled-commands");
         if (disabled == null || disabled.isEmpty())
             return;
 
