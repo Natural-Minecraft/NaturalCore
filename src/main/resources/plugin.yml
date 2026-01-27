@@ -32,6 +32,10 @@ commands:
     description: Batalkan alert restart
     aliases: [rc]
     permission: naturalcs.restartalert
+  maintenance:
+    description: Mode maintenance
+    aliases: [mt]
+    permission: naturalsmp.maintenance.command
   bc:
     description: Broadcast
     aliases: [broadcast]

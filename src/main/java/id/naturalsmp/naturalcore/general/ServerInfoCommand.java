@@ -73,7 +73,7 @@ public class ServerInfoCommand implements CommandExecutor {
         sender.sendMessage(ChatUtils.colorize("&8&m----------------------------------------"));
 
         String playerList = Bukkit.getOnlinePlayers().stream()
-                .map(Player::getName) // TODO: Use DisplayName/Prefix later
+                .map(p -> ChatUtils.formatMessage(p, "%displayname%"))
                 .collect(Collectors.joining("&7, &f"));
 
         if (online > 0) {
