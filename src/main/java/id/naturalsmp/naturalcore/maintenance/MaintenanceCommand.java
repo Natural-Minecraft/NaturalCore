@@ -47,6 +47,11 @@ public class MaintenanceCommand implements CommandExecutor {
                 sender.sendMessage(
                         ChatUtils.colorize("&6&lMaintenance &8» &7Mode Maintenance telah &cNonaiktifkan&7."));
             }
+            case "add" -> {
+                if (args.length < 2) {
+                    sender.sendMessage(ChatUtils.colorize("&cUsage: /maintenance add <player>"));
+                    return true;
+                }
                 manager.addWhitelist(args[1]);
                 sender.sendMessage(ChatUtils
                         .colorize("&6&lMaintenance &8» &7Player &e" + args[1] + " &7telah ditambahkan ke whitelist."));
@@ -67,7 +72,7 @@ public class MaintenanceCommand implements CommandExecutor {
             default -> sendUsage(sender);
         }
 
-    return true;
+        return true;
 
     }
 
