@@ -184,7 +184,7 @@ public final class NaturalCore extends JavaPlugin {
                 if (subChannel.equalsIgnoreCase("Maintenance")) {
                     boolean active = in.readBoolean();
                     if (maintenanceManager != null) {
-                        maintenanceManager.setActive(active);
+                        maintenanceManager.setMaintenance(active);
                         // Whitelist sync could also be done here if needed
                     }
                 }
