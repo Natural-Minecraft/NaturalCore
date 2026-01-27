@@ -47,14 +47,18 @@ public class MaintenanceCommand implements CommandExecutor {
                 sender.sendMessage(
                         ChatUtils.colorize("&6&lMaintenance &8» &7Mode Maintenance telah &cNonaiktifkan&7."));
             }
-            case "add" -> {
-                if (args.length < 2) {
-                    sender.sendMessage(ChatUtils.colorize("&cUsage: /maintenance add <player>"));
-                    return true;
-                }
                 manager.addWhitelist(args[1]);
                 sender.sendMessage(ChatUtils
                         .colorize("&6&lMaintenance &8» &7Player &e" + args[1] + " &7telah ditambahkan ke whitelist."));
+            }
+            case "remove" -> {
+                if (args.length < 2) {
+                    sender.sendMessage(ChatUtils.colorize("&cUsage: /maintenance remove <player>"));
+                    return true;
+                }
+                manager.removeWhitelist(args[1]);
+                sender.sendMessage(ChatUtils
+                        .colorize("&6&lMaintenance &8» &7Player &e" + args[1] + " &7telah dihapus dari whitelist."));
             }
             case "status" -> {
                 String status = manager.isActive() ? "&aAKTIF" : "&cNONAKTIF";
@@ -63,7 +67,8 @@ public class MaintenanceCommand implements CommandExecutor {
             default -> sendUsage(sender);
         }
 
-        return true;
+    return true;
+
     }
 
     private void sendUsage(CommandSender sender) {
@@ -73,6 +78,7 @@ public class MaintenanceCommand implements CommandExecutor {
         sender.sendMessage(ChatUtils.colorize(" &8» &e/maintenance on [detik] &7- Mulai maintenance"));
         sender.sendMessage(ChatUtils.colorize(" &8» &e/maintenance off &7- Matikan maintenance"));
         sender.sendMessage(ChatUtils.colorize(" &8» &e/maintenance add <player> &7- Bypass maintenance"));
+        sender.sendMessage(ChatUtils.colorize(" &8» &e/maintenance remove <player> &7- Hapus bypass"));
         sender.sendMessage(ChatUtils.colorize(" &8» &e/maintenance status &7- Cek status"));
         sender.sendMessage(ChatUtils.colorize("&8&l&m---------------------------------"));
     }

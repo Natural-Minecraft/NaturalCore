@@ -129,10 +129,8 @@ public class NaturalCoreCommand implements CommandExecutor, TabCompleter {
                 return true;
             }
             case "home", "homes", "sethome", "delhome" -> {
-                // Note: Needs instance persistence if possible, but for proxying, creating new
-                // is usually fine or via plugin getter
                 new id.naturalsmp.naturalcore.home.HomeCommand(plugin.getHomeManager(),
-                        new id.naturalsmp.naturalcore.home.HomeGUI(plugin)).onCommand(sender, command, sub, proxyArgs);
+                        plugin.getHomeGUI()).onCommand(sender, command, sub, proxyArgs);
                 return true;
             }
         }

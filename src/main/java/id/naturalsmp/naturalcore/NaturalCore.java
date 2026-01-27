@@ -1,7 +1,5 @@
 package id.naturalsmp.naturalcore;
 
-import id.naturalsmp.naturalcore.NaturalCoreCommand;
-import id.naturalsmp.naturalcore.NaturalCoreExpansion;
 import id.naturalsmp.naturalcore.admin.*;
 import id.naturalsmp.naturalcore.chat.ChatListener;
 import id.naturalsmp.naturalcore.chat.ChatTabCompleter;
@@ -13,13 +11,13 @@ import id.naturalsmp.naturalcore.home.HomeCommand;
 import id.naturalsmp.naturalcore.spawn.SpawnCommand;
 import id.naturalsmp.naturalcore.spawn.SpawnManager;
 import id.naturalsmp.naturalcore.spawn.SpawnListener;
-import id.naturalsmp.naturalcore.chat.MentionListener;
+
 import id.naturalsmp.naturalcore.chat.GlobalNotificationListener;
 import id.naturalsmp.naturalcore.listeners.GuiSoundListener;
 import id.naturalsmp.naturalcore.season.*;
 import id.naturalsmp.naturalcore.banner.*;
 import id.naturalsmp.naturalcore.utility.EnvironmentCommand;
-import id.naturalsmp.naturalcore.utility.MenuCommand;
+
 import id.naturalsmp.naturalcore.general.*;
 import id.naturalsmp.naturalcore.teleport.TeleportManager;
 
@@ -68,6 +66,7 @@ public final class NaturalCore extends JavaPlugin {
     private BannerManager bannerManager;
     private id.naturalsmp.naturalcore.profile.ProfileManager profileManager;
     private id.naturalsmp.naturalcore.profile.ProfileGUI profileGUI;
+    private id.naturalsmp.naturalcore.home.HomeGUI homeGUI;
     private id.naturalsmp.naturalcore.chat.tags.TagsManager tagsManager;
     private id.naturalsmp.naturalcore.afk.AFKManager afkManager;
     private id.naturalsmp.naturalcore.tier.TierManager tierManager;
@@ -77,6 +76,7 @@ public final class NaturalCore extends JavaPlugin {
     private id.naturalsmp.naturalcore.hud.HUDManager hudManager;
     private id.naturalsmp.naturalcore.maintenance.MaintenanceManager maintenanceManager;
     private id.naturalsmp.naturalcore.permissions.PermissionManager permissionManager;
+    private id.naturalsmp.naturalcore.utility.CleanManager cleanManager;
 
     @Override
     public void onEnable() {
@@ -131,7 +131,7 @@ public final class NaturalCore extends JavaPlugin {
 
         // 6. Home Module
         this.homeManager = new HomeManager(this);
-        HomeGUI homeGUI = new HomeGUI(this);
+        this.homeGUI = new HomeGUI(this);
         getServer().getPluginManager().registerEvents(homeGUI, this);
 
         HomeCommand homeCmd = new HomeCommand(homeManager, homeGUI);
@@ -368,7 +368,8 @@ public final class NaturalCore extends JavaPlugin {
         registerCmd("start", new id.naturalsmp.naturalcore.general.StartCommand(this));
 
         // 20. v1.7 Utilities
-        registerCmd("clean", new id.naturalsmp.naturalcore.utility.CleanCommand());
+        this.cleanManager = new id.naturalsmp.naturalcore.utility.CleanManager(this);
+        registerCmd("clean", new id.naturalsmp.naturalcore.utility.CleanCommand(this));
         registerCmd("back", new id.naturalsmp.naturalcore.general.BackCommand(this));
         registerCmd("otp", new id.naturalsmp.naturalcore.general.OfflineTPCommand(this));
 
@@ -502,6 +503,10 @@ public final class NaturalCore extends JavaPlugin {
         return profileGUI;
     }
 
+    public id.naturalsmp.naturalcore.home.HomeGUI getHomeGUI() {
+        return homeGUI;
+    }
+
     public id.naturalsmp.naturalcore.chat.tags.TagsManager getTagsManager() {
         return tagsManager;
     }
@@ -534,6 +539,10 @@ public final class NaturalCore extends JavaPlugin {
 
     public id.naturalsmp.naturalcore.maintenance.MaintenanceManager getMaintenanceManager() {
         return maintenanceManager;
+    }
+
+    public id.naturalsmp.naturalcore.utility.CleanManager getCleanManager() {
+        return cleanManager;
     }
 
     // --- HELPER UNTUK MENCEGAH CRASH ---

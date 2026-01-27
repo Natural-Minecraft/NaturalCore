@@ -131,13 +131,17 @@ public class PermissionManager {
         plugin.getLogger().info("Successfully synced rank-config.yml metadata to LuckPerms! 🔑💎");
     }
 
+    public Map<String, RankConfig> getRanks() {
+        return ranks;
+    }
+
     public static class RankConfig {
-        String permission;
-        String prefix;
-        String suffix;
-        int weight;
-        List<String> permissions;
-        List<String> disabledPermissions;
-        List<String> inheritance;
+        public String permission;
+        public String prefix;
+        public String suffix;
+        public int weight;
+        public List<String> permissions;
+        public List<String> disabledPermissions;
+        public List<String> inheritance;
     }
 }

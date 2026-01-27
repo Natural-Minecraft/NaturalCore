@@ -1,5 +1,6 @@
 package id.naturalsmp.naturalcore.utility;
 
+import id.naturalsmp.naturalcore.NaturalCore;
 import id.naturalsmp.naturalcore.utils.ChatUtils;
 import id.naturalsmp.naturalcore.utils.ConfigUtils;
 import org.bukkit.Sound;
@@ -12,9 +13,26 @@ import org.jetbrains.annotations.NotNull;
 
 public class CleanCommand implements CommandExecutor {
 
+    private final NaturalCore plugin;
+
+    public CleanCommand(NaturalCore plugin) {
+        this.plugin = plugin;
+    }
+
     @Override
     public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label,
             @NotNull String[] args) {
+
+        if (args.length > 0 && args[0].equalsIgnoreCase("ground")) {
+            if (!sender.hasPermission("naturalsmp.admin")) {
+                sender.sendMessage(ConfigUtils.getString("messages.global.no-permission"));
+                return true;
+            }
+            plugin.getCleanManager().startGlobalClean(10);
+            sender.sendMessage(ChatUtils.colorize("&6&lNaturalCore &8» &7Memulai pembersihan item global..."));
+            return true;
+        }
+
         if (!(sender instanceof Player))
             return true;
         Player p = (Player) sender;

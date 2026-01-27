@@ -90,6 +90,14 @@ public class MaintenanceManager {
         if (!whitelistedPlayers.contains(playerName.toLowerCase())) {
             whitelistedPlayers.add(playerName.toLowerCase());
             saveData();
+            sendProxyUpdate();
+        }
+    }
+
+    public void removeWhitelist(String playerName) {
+        if (whitelistedPlayers.remove(playerName.toLowerCase())) {
+            saveData();
+            sendProxyUpdate();
         }
     }
 

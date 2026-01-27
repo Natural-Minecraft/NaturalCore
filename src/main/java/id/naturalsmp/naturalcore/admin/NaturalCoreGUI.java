@@ -12,8 +12,10 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryDragEvent;
 import org.bukkit.inventory.Inventory;
+import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -21,15 +23,9 @@ import java.util.List;
 public class NaturalCoreGUI implements Listener {
 
     private final NaturalCore plugin;
-    // Title Modern (Hex Color)
-    private final String GUI_TITLE = ConfigUtils.getString("messages.gui.admin.title");
 
     public NaturalCoreGUI(NaturalCore plugin) {
         this.plugin = plugin;
-        // Register Listener Otomatis saat GUI dibuat (Hati-hati duplikat listener jika
-        // sering new)
-        // Cara yang lebih aman: Daftarkan listener 1x di Main Class, tapi untuk
-        // simplifikasi kita pakai static check atau register di sini
     }
 
     public void openGUI(Player p) {
@@ -39,7 +35,8 @@ public class NaturalCoreGUI implements Listener {
         }
 
         // Standard 54 slots (6 rows) for more "Large Dashboard" feel
-        Inventory inv = Bukkit.createInventory(null, 54, ChatUtils.colorize("&#00FFD4&lＮＡＴＵＲＡＬ &8| &#00D4FF&lＡＤＭＩＮ"));
+        Inventory inv = Bukkit.createInventory(new AdminHolder(), 54,
+                ChatUtils.colorize("&#00FFD4&lＮＡＴＵＲＡＬ &8| &#00D4FF&lＡＤＭＩＮ"));
 
         // --- GLASSMORPHISM FILLER (Frosted Border Effect) ---
         ItemStack cyanGlass = createItem(Material.CYAN_STAINED_GLASS_PANE, " ");
@@ -122,21 +119,15 @@ public class NaturalCoreGUI implements Listener {
 
     @EventHandler
     public void onClick(InventoryClickEvent e) {
-        if (e.getClickedInventory() == null)
+        if (!(e.getInventory().getHolder() instanceof AdminHolder))
             return;
 
-        String title = ChatUtils.stripColor(e.getView().getTitle());
-        if (!title.contains("NATURAL") || !title.contains("ADMIN"))
-            return;
-
-        // Force cancel all clicks in this GUI to prevent theft
         e.setCancelled(true);
 
-        if (!(e.getWhoClicked() instanceof Player))
+        if (!(e.getWhoClicked() instanceof Player p))
             return;
-        Player p = (Player) e.getWhoClicked();
 
-        if (!e.getClickedInventory().equals(e.getView().getTopInventory()))
+        if (e.getClickedInventory() == null || !e.getClickedInventory().equals(e.getView().getTopInventory()))
             return;
 
         ItemStack item = e.getCurrentItem();
@@ -178,9 +169,14 @@ public class NaturalCoreGUI implements Listener {
 
     @EventHandler
     public void onDrag(InventoryDragEvent e) {
-        String title = ChatUtils.stripColor(e.getView().getTitle());
-        String expected = "NATURAL CORE | ADMIN GUIDE";
-        if (title.equals(expected))
+        if (e.getInventory().getHolder() instanceof AdminHolder)
             e.setCancelled(true);
+    }
+
+    public static class AdminHolder implements InventoryHolder {
+        @Override
+        public @NotNull Inventory getInventory() {
+            return null;
+        }
     }
 }

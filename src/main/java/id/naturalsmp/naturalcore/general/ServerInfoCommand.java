@@ -64,7 +64,6 @@ public class ServerInfoCommand implements CommandExecutor {
 
     // --- /list ---
     private boolean showOnlinePlayers(CommandSender sender) {
-        // Simple list implementation (Future: Sort by Rank from Vault/LuckPerms)
         int online = Bukkit.getOnlinePlayers().size();
         int max = Bukkit.getMaxPlayers();
 
@@ -72,7 +71,19 @@ public class ServerInfoCommand implements CommandExecutor {
         sender.sendMessage(ChatUtils.colorize(" &6&lONLINE PLAYERS &7(" + online + "/" + max + ")"));
         sender.sendMessage(ChatUtils.colorize("&8&m----------------------------------------"));
 
-        String playerList = Bukkit.getOnlinePlayers().stream()
+        // Sort by Weight from rank-config.yml
+        Map<String, id.naturalsmp.naturalcore.permissions.PermissionManager.RankConfig> ranks = plugin
+                .getPermissionManager().getRanks();
+
+        List<Player> sortedPlayers = Bukkit.getOnlinePlayers().stream()
+                .sorted((p1, p2) -> {
+                    int w1 = getPlayerWeight(p1, ranks);
+                    int w2 = getPlayerWeight(p2, ranks);
+                    return Integer.compare(w2, w1); // Higher weight first
+                })
+                .collect(Collectors.toList());
+
+        String playerList = sortedPlayers.stream()
                 .map(p -> ChatUtils.formatMessage(p, "%displayname%"))
                 .collect(Collectors.joining("&7, &f"));
 
@@ -83,6 +94,18 @@ public class ServerInfoCommand implements CommandExecutor {
         }
         sender.sendMessage(ChatUtils.colorize("&8&m----------------------------------------"));
         return true;
+    }
+
+    private int getPlayerWeight(Player p,
+            Map<String, id.naturalsmp.naturalcore.permissions.PermissionManager.RankConfig> ranks) {
+        int maxWeight = 0;
+        for (Map.Entry<String, id.naturalsmp.naturalcore.permissions.PermissionManager.RankConfig> entry : ranks
+                .entrySet()) {
+            if (p.hasPermission(entry.getKey())) {
+                maxWeight = Math.max(maxWeight, entry.getValue().weight);
+            }
+        }
+        return maxWeight;
     }
 
     // --- /lag & /tps ---
