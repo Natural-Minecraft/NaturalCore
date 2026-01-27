@@ -75,6 +75,8 @@ naturalsmp.default:
     - redprotect.command.user
     - redprotect.command.wand
     - redprotect.command.welcome
+    - redprotect.limits.blocks.10000
+    - redprotect.limits.claim.5
     - veinminer.blocks
     - veinminer.settings
     - veinminer.toggle
@@ -94,6 +96,8 @@ naturalsmp.midi:
     - naturalsmp.enderchest
     - naturalsmp.back
     - naturalsmp.emoji.unlimited
+    - redprotect.limits.blocks.25000
+    - redprotect.limits.claim.10
   inheritance:
     - naturalsmp.default
 
@@ -106,6 +110,8 @@ naturalsmp.vip:
     - naturalsmp.trash
     - naturalsmp.resource
     - naturalsmp.nick
+    - redprotect.limits.blocks.50000
+    - redprotect.limits.claim.20
   inheritance:
     - naturalsmp.midi
 
@@ -119,6 +125,8 @@ naturalsmp.mvp:
     - naturalsmp.anvil
     - naturalsmp.ptime
     - naturalsmp.pweather
+    - redprotect.limits.blocks.150000
+    - redprotect.limits.claim.40
   inheritance:
     - naturalsmp.vip
 
@@ -129,6 +137,8 @@ naturalsmp.nature:
   permissions:
     - naturalsmp.priority
     - naturalsmp.temperature.immune
+    - redprotect.limits.blocks.500000
+    - redprotect.limits.claim.80
   inheritance:
     - naturalsmp.mvp
 
