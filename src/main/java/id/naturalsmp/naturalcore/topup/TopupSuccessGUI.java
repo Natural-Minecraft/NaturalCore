@@ -1,0 +1,113 @@
+package id.naturalsmp.naturalcore.topup;
+
+import id.naturalsmp.naturalcore.NaturalCore;
+import id.naturalsmp.naturalcore.utils.ChatUtils;
+import org.bukkit.Bukkit;
+import org.bukkit.Material;
+import org.bukkit.Sound;
+import org.bukkit.entity.Player;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.Listener;
+import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.inventory.Inventory;
+import org.bukkit.inventory.InventoryHolder;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
+
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.List;
+
+public class TopupSuccessGUI implements Listener {
+
+    private final NaturalCore plugin;
+
+    public TopupSuccessGUI(NaturalCore plugin) {
+        this.plugin = plugin;
+    }
+
+    public void openGUI(Player player, double amount, String transactionId) {
+        // Aesthetic Title (Standard NaturalSMP Style)
+        String title = ChatUtils.colorize("&#FFFF00❂ &#FFFF00ᴛᴏᴘᴜᴘ ʙᴇʀʜᴀꜱɪʟ &#FFFF00❂");
+        Inventory inv = Bukkit.createInventory(new TopupHolder(), 27, title);
+
+        // Standard Fillers
+        ItemStack filler = createItem(Material.BLACK_STAINED_GLASS_PANE, " ");
+        ItemStack accent = createItem(Material.YELLOW_STAINED_GLASS_PANE, " ");
+        
+        // Fill border with a pattern
+        for (int i = 0; i < 27; i++) {
+            if (i < 9 || i > 17 || i % 9 == 0 || i % 9 == 8) {
+                inv.setItem(i, accent);
+            } else {
+                inv.setItem(i, filler);
+            }
+        }
+
+        // Center Piece - The Reward
+        DateTimeFormatter dtf = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
+        String date = dtf.format(LocalDateTime.now());
+
+        inv.setItem(13, createItem(Material.SUNFLOWER, "&#FFFF00&lTOPUP BERHASIL!", 
+                "&8&m------------------",
+                "&7Terima kasih, &#55FF55&l" + player.getName() + "&7!",
+                "&7Dukunganmu sangat berarti bagi kami.",
+                "",
+                "&#FFAA00&lDETAIL TRANSAKSI:",
+                "&7• Item: &fNaturalCoins",
+                "&7• Jumlah: &6" + amount + " NC",
+                "&7• ID: &e#" + transactionId,
+                "&7• Waktu: &7" + date,
+                "",
+                "&#55FF55&l✔ SUDAH MASUK KE DOMPET",
+                "&8&m------------------"));
+
+        // Side Info - Tips
+        inv.setItem(11, createItem(Material.NETHER_STAR, "&#00AAFF&lPREMIUM SUPPORT", 
+                "&7Gunakan koinmu di &b/shop &7atau", 
+                "&7untuk fitur premium lainnya.",
+                "",
+                "&7Setiap dukungan membantu",
+                "&7server tetap online."));
+
+        inv.setItem(15, createItem(Material.PAPER, "&#FF55FF&lVIRTUAL RECEIPT", 
+                "&7Struk digital ini disimpan", 
+                "&7sebagai bukti transaksi sah.",
+                "",
+                "&7Screenshot ini sebagai",
+                "&7kenang-kenangan!"));
+
+        player.openInventory(inv);
+        
+        // Premium Effects
+        player.playSound(player.getLocation(), Sound.UI_TOAST_CHALLENGE_COMPLETE, 1.0f, 1.2f);
+        player.playSound(player.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, 0.4f, 0.8f);
+        player.playSound(player.getLocation(), Sound.ENTITY_FIREWORK_ROCKET_LAUNCH, 0.3f, 1.0f);
+    }
+
+    private ItemStack createItem(Material mat, String name, String... lore) {
+        ItemStack item = new ItemStack(mat);
+        ItemMeta meta = item.getItemMeta();
+        if (meta != null) {
+            meta.setDisplayName(ChatUtils.colorize(name));
+            List<String> l = new ArrayList<>();
+            for (String s : lore) l.add(ChatUtils.colorize(s));
+            meta.setLore(l);
+            item.setItemMeta(meta);
+        }
+        return item;
+    }
+
+    @EventHandler
+    public void onClick(InventoryClickEvent e) {
+        if (e.getInventory().getHolder() instanceof TopupHolder) {
+            e.setCancelled(true);
+        }
+    }
+
+    public static class TopupHolder implements InventoryHolder {
+        @Override
+        public Inventory getInventory() { return null; }
+    }
+}

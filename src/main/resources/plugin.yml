@@ -48,6 +48,10 @@ commands:
     aliases: [ecsee]
     permission: naturalsmp.endersee
 
+  topupnotification:
+    description: Trigger TopUp success GUI and notification
+    permission: naturalsmp.admin
+
   # --- MESSAGING ---
   msg:
     description: Kirim pesan pribadi
