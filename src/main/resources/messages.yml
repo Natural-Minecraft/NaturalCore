@@ -111,6 +111,14 @@ utils:
     success: "&#00AAFF&l❂ &7Cuaca &f%target% &7diubah menjadi &#ffff55%weather%&7."
     reset: "&#00AAFF&l❂ &7Cuaca &f%target% &7dikembalikan ke cuaca server."
 
+  lagg:
+    cleanup-start: "&#FF5555&l❂ &7Memulai pembersihan item global..."
+    cleanup-complete: "&#55FF55&l✔ CLEANUP COMPLETE &7(Removed %count% items)"
+    warning-minute: "&#FFAA00&l⚠ &7Pembersihan item dalam &e%time% &7menit."
+    warning-second: "&#FFAA00&l⚠ &7Pembersihan item dalam &e%time% &7detik."
+    action-bar:
+      countdown: "&#FF5555&l%scroll% &fCLEARING ITEMS IN &#FF5555&l%time%s &f%scroll%"
+
 # --- DEATH MESSAGES ---
 death:
   title: "      &#FF5555&l☠ &#FF0000&lK A M U   M A T I &#FF5555&l☠"

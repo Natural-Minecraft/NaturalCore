@@ -26,6 +26,65 @@ prefix:
   teleport: "&#00AAFF&lNatural&#55FF55&lTeleport &8» &f"
 
 # ==========================================
+#          NATURAL LAGG SETTINGS
+# ==========================================
+lagg:
+  enabled: true
+
+  # Scheduled Auto-Removal (ClearLag-style)
+  auto-removal:
+    enabled: true
+    interval: 300 # Detik (5 menit default)
+    warning-times: [60, 30, 10, 5, 3, 2, 1] # Detik sebelum clear, kirim warning
+
+  # Mob Stacking / Merging
+  merging:
+    enabled: true
+    threshold: 5
+    radius: 2.0
+    # Mob yang TIDAK digabungkan
+    blacklist:
+      - VILLAGER
+      - IRON_GOLEM
+      - WITHER
+      - ENDER_DRAGON
+      - ELDER_GUARDIAN
+
+  # Item Cleanup Filter
+  cleanup:
+    default-duration: 10
+    # Item yang TIDAK dihapus saat /clean ground
+    item-whitelist:
+      - DIAMOND
+      - NETHERITE_INGOT
+      - NETHERITE_SCRAP
+      - ENCHANTED_BOOK
+      - ELYTRA
+      - TOTEM_OF_UNDYING
+      - BEACON
+      - NETHER_STAR
+      - SHULKER_BOX
+    # Hapus juga item death drops? (false = lindungi)
+    remove-death-drops: false
+
+  # Per-chunk Entity Limiter
+  chunk-limiter:
+    enabled: true
+    max-entities-per-chunk: 50
+    check-interval: 60 # Detik
+
+  # Low TPS Optimizer
+  optimizer:
+    tps-threshold: 10.0
+    check-interval: 30
+
+  # Worlds yang dikecualikan
+  excluded-worlds:
+    - "dungeon"
+    - "dungeon_forest_cave"
+    - "world_the_end"
+
+# ==========================================
 #           CHAT & SOCIAL SYSTEM
 # ==========================================
 chat:
