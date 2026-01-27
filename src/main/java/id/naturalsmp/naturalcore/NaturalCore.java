@@ -45,6 +45,8 @@ import id.naturalsmp.naturalcore.chat.MessageManager;
 import id.naturalsmp.naturalcore.chat.PrivateMessageCommand;
 import id.naturalsmp.naturalcore.utility.WorldUtilCommand;
 import id.naturalsmp.naturalcore.utility.EssentialPerksCommand;
+import id.naturalsmp.naturalcore.topup.TopupSuccessGUI;
+import id.naturalsmp.naturalcore.topup.TopupCommand;
 
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -397,6 +399,11 @@ public final class NaturalCore extends JavaPlugin {
         getServer().getPluginManager().registerEvents(new id.naturalsmp.naturalcore.teleport.PlayerDeathListener(this),
                 this);
         getServer().getPluginManager().registerEvents(new TeleportListener(this), this);
+
+        // 25. TopUp Notification Module
+        TopupSuccessGUI topupGUI = new TopupSuccessGUI(this);
+        getServer().getPluginManager().registerEvents(topupGUI, this);
+        registerCmd("topupnotification", new TopupCommand(this, topupGUI));
 
         // Selesai
         getLogger().info(
