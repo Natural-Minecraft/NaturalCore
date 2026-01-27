@@ -413,8 +413,6 @@ public final class NaturalCore extends JavaPlugin {
         // 23. AFK System (v1.8)
         this.afkManager = new id.naturalsmp.naturalcore.afk.AFKManager(this);
         getServer().getPluginManager().registerEvents(new id.naturalsmp.naturalcore.afk.AFKListener(this), this);
-        getServer().getPluginManager().registerEvents(new id.naturalsmp.naturalcore.admin.AdminPreventionListener(),
-                this);
         getServer().getPluginManager().registerEvents(new id.naturalsmp.naturalcore.staff.StaffListener(this), this);
         getServer().getPluginManager().registerEvents(new id.naturalsmp.naturalcore.staff.StaffToolListener(this),
                 this);
