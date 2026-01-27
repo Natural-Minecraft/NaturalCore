@@ -544,4 +544,9 @@ public final class NaturalCore extends JavaPlugin {
             getLogger().warning("SKIPPING COMMAND: '" + name + "' (Tidak ditemukan di plugin.yml, tapi server aman)");
         }
     }
+
+    public void saveDungeonStats(java.util.UUID uuid, String dungeon, String difficulty, long time, String party) {
+        getLogger().info(ChatUtils.colorize("&a[DungeonStats] &fPlayer &e" + uuid + " &ffinished &6" + dungeon + " &7("
+                + difficulty + ") &fin &b" + (time / 1000) + "s&f. Party: " + party));
+    }
 }
