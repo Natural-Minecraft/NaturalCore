@@ -99,9 +99,10 @@ home:
   # Format permission: naturalsmp.home.limit.<group>
   limits:
     default: 3
-    vip: 5
-    mvp: 15
-    nature: 30
+    midi: 5
+    vip: 10
+    mvp: 30
+    nature: 50
     admin: 100
 
 # ==========================================

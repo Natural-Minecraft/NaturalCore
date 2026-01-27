@@ -128,9 +128,10 @@ Akses warna chat berdasarkan permission.
 ### 🏠 Home Limits
 Batas jumlah sethome per player.
 *   `naturalsmp.home.limit.default` : Max 3 Home (Default)
-*   `naturalsmp.home.limit.vip` : Max 5 Home
-*   `naturalsmp.home.limit.mvp` : Max 15 Home
-*   `naturalsmp.home.limit.nature` : Max 30 Home
+*   `naturalsmp.home.limit.midi` : Max 5 Home
+*   `naturalsmp.home.limit.vip` : Max 15 Home
+*   `naturalsmp.home.limit.mvp` : Max 30 Home
+*   `naturalsmp.home.limit.nature` : Max 50 Home
 *   `naturalsmp.home.limit.admin` : Max 100 Home
 *   `naturalsmp.home.limit.unlimited` : Unlimited Home
 
