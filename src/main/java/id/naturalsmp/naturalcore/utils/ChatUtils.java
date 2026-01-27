@@ -57,14 +57,21 @@ public class ChatUtils {
         if (message == null || message.isEmpty())
             return net.kyori.adventure.text.Component.empty();
 
+        net.kyori.adventure.text.Component component;
         // Jika mengandung < (MiniMessage)
         if (message.contains("<")) {
-            return MINI_MESSAGE.deserialize(message);
+            component = MINI_MESSAGE.deserialize(message);
+        } else {
+            // Fallback ke legacy colorization lalu ke component
+            component = net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer.legacySection()
+                    .deserialize(colorize(message).replace("&", "§"));
         }
 
-        // Fallback ke legacy colorization lalu ke component
+        // Flatten component to legacy for maximum compatibility (prevents
+        // DecoderException in Login stage)
         return net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer.legacySection()
-                .deserialize(colorize(message).replace("&", "§"));
+                .deserialize(net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer.legacySection()
+                        .serialize(component));
     }
 
     public static java.util.List<String> colorize(java.util.List<String> list) {
