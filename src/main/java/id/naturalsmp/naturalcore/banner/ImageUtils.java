@@ -53,7 +53,6 @@ public class ImageUtils {
      * This is CRITICAL for performance.
      */
     @SuppressWarnings("deprecation")
-    @SuppressWarnings("deprecation")
     public static byte[] convertToMapColors(BufferedImage part) {
         byte[] colors = new byte[128 * 128];
         Map<Integer, Byte> matchCache = new HashMap<>();
