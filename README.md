@@ -4,31 +4,24 @@ Plugin inti (core) premium untuk server **NaturalSMP**, mengelola modul Ekonomi,
 
 ## ✨ Fitur Baru v1.9 (The "Experience" Update)
 
-### ❂ Central Menu (`/menu`)
-Hub navigasi pusat dengan tampilan gradient premium untuk memudahkan akses ke semua fitur utama (Profile, Warps, Homes, Shop, ChatColor, dll).
+### 🧹 NaturalLagg (New Optimizer)
+Sistem pembersih item dan mob yang lebih cerdas dan estetik.
+*   **Smart Mob Merging**: Otomatis menggabungkan mob yang menumpuk (misal: `Chicken x50`) dengan hologram di atasnya. Mengurangi lag entity cramming.
+*   **Prioritized Action Bar**: Animasi scrolling "sliding" saat pembersihan terjadi. Bar Mana/Suhu akan bergeser untuk menampilkan hitung mundur ClearLagg.
+*   **Low-TPS Unloader**: Otomatis unload chunk kosong jika TPS drop di bawah 10.0.
 
-### ❂ Start Selection (`/start`)
-GUI 9x1 khusus untuk pemain baru memilih dunia awal petualangan (**Survival**, **Dungeon**, atau **Resource**).
+### � TopUp Notification System
+Fitur bagi owner/admin untuk mensimulasikan dan mengirim notifikasi donasi.
+*   **GUI & Broadcast**: Tampilan GUI "Pembayaran Berhasil" dan broadcast global yang meriah.
+*   **Admin Tools**: Tombol khusus di `/nacore admin` untuk simulasi cepat.
 
-### 🌦️ Personal Environment (`/ptime` & `/pweather`)
-Kontrol penuh atas waktu dan cuaca di layar masing-masing pemain tanpa mempengaruhi server-side.
-*   **Pesan Estetik**: Menggunakan format prefix `&#00AAFF❂` yang sudah dipoles.
-*   **Akses**: `/ptime <time>`, `/pweather <sun/rain>`.
+### �️ Environment & Seasons
+*   **Musim & Suhu**: Suhu tubuh pemain berubah berdasarkan bioma, waktu (Pagi/Malam/Hujan), dan kedekatan dengan api/air.
+*   **Personal Time/Weather**: Pemain dapat mengatur waktu/cuaca di client-side saja (`/ptime`, `/pweather`).
 
-### 👤 Enhanced Profile GUI
-Dashboard personal kini terintegrasi dengan plugin **AuraSkills**.
-*   **AuraSkills Display**: Menampilkan **Total Power** dan level skill utama (Mining, Fighting, Foraging, Archery).
-*   **Akses**: `/profile` atau `/profile <player>`.
-
-### 🏆 Natural Tier System (Ranking)
-Sistem progresi level ala Game MOBA (Warrior -> Mythic).
-*   **Grinding Based**: Naik rank dengan memenuhi syarat **Money** & **Mob Kills**.
-*   **Suffix Prestige**: Rank otomatis muncul di chat (misal: `[VIP] Dimas [Warrior I]: Halo`).
-*   **Leaderboard**: GUI Top Global Seasons (`/tier top`) menggunakan kepala player asli.
-
-### 💤 Modern AFK System
-*   **Visual Indikator**: Hologram (TextDisplay) **"💤 Sedang Bermimpi... 💤"** muncul di atas kepala player saat AFK.
-*   **Tablist Status**: Nama di tablist berubah jadi abu-abu.
+### 🏆 Natural Tier & Ranks
+*   **Dynamic Rank GUI**: Menu `/ranks` kini otomatis menyesuaikan dengan `rank-config.yml`.
+*   **Sorted Player List**: Daftar `/list` otomatis mengurutkan pemain berdasarkan ranking (Admin -> MVP -> Member).
 
 ---
 
@@ -88,6 +81,7 @@ Sistem progresi level ala Game MOBA (Warrior -> Mythic).
 | `/givebal` | - | Admin give money | `naturalcs.givebalance` |
 | `/takebal` | - | Admin take money | `naturalsmp.economy.admin` |
 | `/setbal` | - | Admin set money | `naturalsmp.economy.admin` |
+| `/topupnotification`| - | Trigger notifikasi topup | `naturalsmp.admin` |
 
 ### 🛠️ Utilities & Perks
 | Command | Aliases | Description | Permission |
@@ -98,6 +92,7 @@ Sistem progresi level ala Game MOBA (Warrior -> Mythic).
 | `/heal` | - | Isi HP & Hunger | `naturalsmp.heal` |
 | `/repair` | `fix` | Perbaiki item di tangan | `naturalsmp.repair` |
 | `/clean` | `ci` | Bersihkan inventory (Safe) | `naturalsmp.clean` |
+| `/clean ground` | - | Bersihkan item di tanah (Admin) | `naturalsmp.admin` |
 | `/craft` | `wb` | Buka Workbench virtual | `naturalsmp.craft` |
 | `/anvil` | `av` | Buka Anvil virtual | `naturalsmp.anvil` |
 | `/enderchest` | `ec` | Buka Enderchest virtual | `naturalsmp.enderchest` |
@@ -116,6 +111,7 @@ Sistem progresi level ala Game MOBA (Warrior -> Mythic).
 | `/bc` | `broadcast` | Kirim pengumuman | `naturalcs.broadcast` |
 | `/season` | - | Atur musim/suhu (Season) | `naturalsmp.season.admin` |
 | `/banner` | - | Atur Interactive Board | `naturalsmp.admin.banner` |
+| `/maintenance` | `mt` | Kontrol Mode Maintenance | `naturalsmp.maintenance.admin` |
 
 ---
 
@@ -147,6 +143,7 @@ Batas jumlah sethome per player.
 *   `messages.yml`: Pusat kustomisasi pesan.
 *   `chatcolor.yml` & `chatemojis.yml`: Modul Chat.
 *   `banners/`: Data Interactive Boards.
+*   `rank-config.yml`: Konfigurasi Rank dan Permission Sync.
 
 ---
 **© 2026 NaturalSMP Development Team**
