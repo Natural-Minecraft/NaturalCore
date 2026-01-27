@@ -96,6 +96,8 @@ naturalsmp.midi:
     - naturalsmp.enderchest
     - naturalsmp.back
     - naturalsmp.emoji.unlimited
+    - naturalsmp.color.midi
+    - naturalsmp.home.limit.midi
     - redprotect.limits.blocks.25000
     - redprotect.limits.claim.10
   inheritance:
@@ -110,6 +112,8 @@ naturalsmp.vip:
     - naturalsmp.trash
     - naturalsmp.resource
     - naturalsmp.nick
+    - naturalsmp.color.vip
+    - naturalsmp.home.limit.vip
     - redprotect.limits.blocks.50000
     - redprotect.limits.claim.20
   inheritance:
@@ -125,6 +129,8 @@ naturalsmp.mvp:
     - naturalsmp.anvil
     - naturalsmp.ptime
     - naturalsmp.pweather
+    - naturalsmp.color.mvp
+    - naturalsmp.home.limit.mvp
     - redprotect.limits.blocks.150000
     - redprotect.limits.claim.40
   inheritance:
@@ -137,6 +143,8 @@ naturalsmp.nature:
   permissions:
     - naturalsmp.priority
     - naturalsmp.temperature.immune
+    - naturalsmp.color.nature
+    - naturalsmp.home.limit.nature
     - redprotect.limits.blocks.500000
     - redprotect.limits.claim.80
   inheritance:
