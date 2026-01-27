@@ -2,7 +2,6 @@ package id.naturalsmp.naturalcore.general;
 
 import id.naturalsmp.naturalcore.NaturalCore;
 import id.naturalsmp.naturalcore.utils.ChatUtils;
-import id.naturalsmp.naturalcore.utils.ConfigUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -144,11 +143,11 @@ public class ServerInfoCommand implements CommandExecutor {
     private boolean showServerInfo(CommandSender sender) {
         // Reads from config in future
         sender.sendMessage(ChatUtils.colorize("&8&m----------------------------------------"));
-        sender.sendMessage(ChatUtils.colorize(" &a&lNaturalSMP &7- Season 1"));
+        sender.sendMessage(ChatUtils.colorize(" &a&lNaturalSMP &bReborn"));
         sender.sendMessage(ChatUtils.colorize("&8&m----------------------------------------"));
         sender.sendMessage(ChatUtils.colorize(" &7Version: &f" + plugin.getDescription().getVersion()));
         sender.sendMessage(ChatUtils.colorize(" &7Authors: &fNaturalSMP Team"));
-        sender.sendMessage(ChatUtils.colorize(" &7Website: &bstore.naturalsmp.id"));
+        sender.sendMessage(ChatUtils.colorize(" &7Website: &bwww.naturalsmp.my.id"));
         sender.sendMessage(ChatUtils.colorize("&8&m----------------------------------------"));
         return true;
     }

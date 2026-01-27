@@ -76,7 +76,16 @@ public final class NaturalCore extends JavaPlugin {
     private id.naturalsmp.naturalcore.hud.HUDManager hudManager;
     private id.naturalsmp.naturalcore.maintenance.MaintenanceManager maintenanceManager;
     private id.naturalsmp.naturalcore.permissions.PermissionManager permissionManager;
+    private id.naturalsmp.naturalcore.staff.StaffManager staffManager;
+    private id.naturalsmp.naturalcore.staff.StaffGUI staffGUI;
     private id.naturalsmp.naturalcore.utility.NaturalLaggManager laggManager;
+    private id.naturalsmp.naturalcore.utility.ServerHealthManager healthManager;
+    private id.naturalsmp.naturalcore.utility.ServerStatusGUI statusGUI;
+    private id.naturalsmp.naturalcore.trade.TradeManager tradeManager;
+    private id.naturalsmp.naturalcore.trade.TradeGUI tradeGUI;
+    private id.naturalsmp.naturalcore.combat.CombatManager combatManager;
+    private id.naturalsmp.naturalcore.playtime.PlaytimeManager playtimeManager;
+    private id.naturalsmp.naturalcore.announcement.BroadcastManager broadcastManager;
 
     @Override
     public void onEnable() {
@@ -369,7 +378,23 @@ public final class NaturalCore extends JavaPlugin {
 
         // 20. v1.7 Utilities
         this.laggManager = new id.naturalsmp.naturalcore.utility.NaturalLaggManager(this);
+        this.staffManager = new id.naturalsmp.naturalcore.staff.StaffManager(this);
+        this.staffGUI = new id.naturalsmp.naturalcore.staff.StaffGUI(this);
+        this.healthManager = new id.naturalsmp.naturalcore.utility.ServerHealthManager(this);
+        this.statusGUI = new id.naturalsmp.naturalcore.utility.ServerStatusGUI(this);
+        this.tradeManager = new id.naturalsmp.naturalcore.trade.TradeManager(this);
+        this.tradeGUI = new id.naturalsmp.naturalcore.trade.TradeGUI(this);
+        this.combatManager = new id.naturalsmp.naturalcore.combat.CombatManager(this);
+        this.playtimeManager = new id.naturalsmp.naturalcore.playtime.PlaytimeManager(this);
+        this.broadcastManager = new id.naturalsmp.naturalcore.announcement.BroadcastManager(this);
+
         registerCmd("clean", new id.naturalsmp.naturalcore.utility.CleanCommand(this));
+        registerCmd("staffmode", new id.naturalsmp.naturalcore.staff.StaffModeCommand(this));
+        registerCmd("sc", new id.naturalsmp.naturalcore.staff.StaffChatCommand(this));
+        registerCmd("staffchat", new id.naturalsmp.naturalcore.staff.StaffChatCommand(this));
+        registerCmd("staff", new id.naturalsmp.naturalcore.staff.StaffCommand(this, staffGUI));
+        registerCmd("trade", new id.naturalsmp.naturalcore.trade.TradeCommand(this));
+        registerCmd("playtime", new id.naturalsmp.naturalcore.playtime.PlaytimeCommand(this));
         registerCmd("back", new id.naturalsmp.naturalcore.general.BackCommand(this));
         registerCmd("otp", new id.naturalsmp.naturalcore.general.OfflineTPCommand(this));
 
@@ -388,6 +413,12 @@ public final class NaturalCore extends JavaPlugin {
         // 23. AFK System (v1.8)
         this.afkManager = new id.naturalsmp.naturalcore.afk.AFKManager(this);
         getServer().getPluginManager().registerEvents(new id.naturalsmp.naturalcore.afk.AFKListener(this), this);
+        getServer().getPluginManager().registerEvents(new id.naturalsmp.naturalcore.admin.AdminPreventionListener(),
+                this);
+        getServer().getPluginManager().registerEvents(new id.naturalsmp.naturalcore.staff.StaffListener(this), this);
+        getServer().getPluginManager().registerEvents(new id.naturalsmp.naturalcore.staff.StaffToolListener(this),
+                this);
+        getServer().getPluginManager().registerEvents(new id.naturalsmp.naturalcore.combat.CombatListener(this), this);
 
         // 24. Tier System (v1.8)
         this.tierManager = new id.naturalsmp.naturalcore.tier.TierManager(this);
@@ -521,6 +552,30 @@ public final class NaturalCore extends JavaPlugin {
         return tierManager;
     }
 
+    public id.naturalsmp.naturalcore.utility.ServerStatusGUI getStatusGUI() {
+        return statusGUI;
+    }
+
+    public id.naturalsmp.naturalcore.trade.TradeManager getTradeManager() {
+        return tradeManager;
+    }
+
+    public id.naturalsmp.naturalcore.trade.TradeGUI getTradeGUI() {
+        return tradeGUI;
+    }
+
+    public id.naturalsmp.naturalcore.combat.CombatManager getCombatManager() {
+        return combatManager;
+    }
+
+    public id.naturalsmp.naturalcore.playtime.PlaytimeManager getPlaytimeManager() {
+        return playtimeManager;
+    }
+
+    public id.naturalsmp.naturalcore.announcement.BroadcastManager getBroadcastManager() {
+        return broadcastManager;
+    }
+
     public id.naturalsmp.naturalcore.tier.TierGUI getTierGUI() {
         return tierGUI;
     }
@@ -545,6 +600,14 @@ public final class NaturalCore extends JavaPlugin {
 
     public id.naturalsmp.naturalcore.utility.NaturalLaggManager getLaggManager() {
         return laggManager;
+    }
+
+    public id.naturalsmp.naturalcore.staff.StaffManager getStaffManager() {
+        return staffManager;
+    }
+
+    public id.naturalsmp.naturalcore.utility.ServerHealthManager getHealthManager() {
+        return healthManager;
     }
 
     // --- HELPER UNTUK MENCEGAH CRASH ---

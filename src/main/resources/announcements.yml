@@ -1,0 +1,12 @@
+settings:
+  prefix: "&#6CCAFE&lINFO &8┃ &f"
+  interval: 300 # Seconds (5 minutes)
+  randomize: true
+
+messages:
+  - "Gunakan &e/menu &funtuk akses cepat ke seluruh fitur NaturalSMP!"
+  - "Jangan lewatkan &6&lEVENT SEASON &fsetiap akhir pekan."
+  - "Server ini menggunakan &bNaturalCore Premium &funtuk performa terbaik."
+  - "Butuh bantuan? Gunakan &a/help &fatau hubungi Staff melalui Discord."
+  - "Kamu bisa berdagang dengan aman menggunakan &d/trade &fke player lain."
+  - "Upgrade rank kamu di &e&nstore.naturalsmp.id&f untuk fitur eksklusif!"

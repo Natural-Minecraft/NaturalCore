@@ -238,6 +238,25 @@ commands:
   kill:
     description: Bunuh player instan
     permission: naturalsmp.kill
+  
+  # --- STAFF SUITE (v2.0) ---
+  staffmode:
+    description: Masuk ke mode staff
+    aliases: [sm]
+    permission: naturalsmp.staff
+  staffchat:
+    description: Channel chat rahasia staff
+    aliases: [sc]
+    permission: naturalsmp.staff
+  staff:
+    description: Buka Dashboard Staff
+    permission: naturalsmp.staff
+  trade:
+    description: Bertukar item dengan player lain secara aman
+    aliases: [tukar]
+  playtime:
+    description: Lihat waktu bermain dan hadiah milestone
+    aliases: [pt]
 
   # --- WARP ---
   warp:
@@ -416,4 +435,9 @@ permissions:
     default: op
   naturalsmp.color.nature:
     description: Access to ALL colors + fonts + styles
+    default: op
+
+  # --- Staff Permissions ---
+  naturalsmp.staff:
+    description: Izin untuk mengakses fitur staff (StaffMode, StaffChat, Vanish)
     default: op
