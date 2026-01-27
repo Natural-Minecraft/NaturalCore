@@ -86,6 +86,9 @@ public class NaturalCoreGUI implements Listener {
         inv.setItem(29, createItem(Material.PAPER, "&#00FF00&lCHAT INTERACTIVE",
                 "&7Filter & Otomasi Chat.", "", "&fEmoji support, Tagging,", "&fHoverable Items & Meta."));
 
+        inv.setItem(30, createItem(Material.DIAMOND, "&#FFFF00&lTOPUP NOTIFICATION",
+                "&7Kirimkan notifikasi topup.", "", "&eKlik untuk simulasikan ke diri sendiri."));
+
         inv.setItem(31, createItem(Material.NETHERITE_CHESTPLATE, "&#CC0000&lMODERATION",
                 "&7Penertiban & Investigasi.", "", "&f/v, /god, /invsee, /whois"));
 
@@ -146,6 +149,11 @@ public class NaturalCoreGUI implements Listener {
             case BARRIER -> { // Close
                 p.closeInventory();
                 p.playSound(p.getLocation(), Sound.UI_BUTTON_CLICK, 1f, 1f);
+            }
+            case DIAMOND -> { // Topup Test
+                p.closeInventory();
+                p.performCommand("topupnotification " + p.getName() + " 50000 TEST-ID");
+                p.playSound(p.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, 1f, 1f);
             }
             case COMMAND_BLOCK -> { // Reset Season
                 p.closeInventory();

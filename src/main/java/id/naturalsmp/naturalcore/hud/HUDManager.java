@@ -58,34 +58,38 @@ public class HUDManager implements Listener {
     }
 
     private void updateHUD(Player player) {
+        // 1. Get Base HUD (Season + Mana + Tips)
+        String baseHUD = plugin.getSeasonManager().getTemperatureActionBar(player);
+
+        // 2. ClearLagg Override (High Priority with Transition)
+        String laggHUD = plugin.getLaggManager().getDisplay(baseHUD);
+
         String finalMessage = "";
 
-        // 1. Priority: Combat Info
-        CombatInfo ci = combatTracker.get(player.getUniqueId());
-        if (ci != null && System.currentTimeMillis() - ci.lastHit < 4000) { // 4s Fade out
-            if (ci.entity.isValid() && !ci.entity.isDead()) {
-                double hp = ci.entity.getHealth();
-                double max = ci.entity.getMaxHealth();
-                int percent = (int) ((hp / max) * 100);
-                String heartStr = getHearts(hp, max);
-                finalMessage = ChatUtils
-                        .colorize("&8[&f" + ci.entity.getName() + "&8] " + heartStr + " &7" + percent + "%");
+        if (laggHUD != null) {
+            finalMessage = laggHUD;
+        } else {
+            // 3. Combat Info Priority
+            CombatInfo ci = combatTracker.get(player.getUniqueId());
+            if (ci != null && System.currentTimeMillis() - ci.lastHit < 4000) { // 4s Fade out
+                if (ci.entity.isValid() && !ci.entity.isDead()) {
+                    double hp = ci.entity.getHealth();
+                    double max = ci.entity.getMaxHealth();
+                    int percent = (int) ((hp / max) * 100);
+                    String heartStr = getHearts(hp, max);
+                    finalMessage = ChatUtils
+                            .colorize("&8[&f" + ci.entity.getName() + "&8] " + heartStr + " &7" + percent + "%");
+                }
+            }
+
+            // 4. Fallback to Base HUD
+            if (finalMessage.isEmpty()) {
+                finalMessage = baseHUD;
             }
         }
 
-        // 2. Priority: Environment (Temperature) if not in combat or as secondary?
-        // Let's stick to priority: if combat is active, show ONLY combat.
-        // If not combat, show Temp / Tips.
-        if (finalMessage.isEmpty()) {
-            String tempBar = plugin.getSeasonManager().getTemperatureActionBar(player);
-
-            // 3. Priority: Tips (handled inside SeasonManager/TipsManager currently)
-            // We'll let SeasonManager provide the Final Env+Tips combination.
-            finalMessage = tempBar;
-        }
-
         if (finalMessage != null && !finalMessage.isEmpty()) {
-            player.sendActionBar(ChatUtils.colorize(finalMessage));
+            player.sendActionBar(ChatUtils.toComponent(finalMessage));
         }
     }
 

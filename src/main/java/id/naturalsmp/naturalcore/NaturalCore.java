@@ -76,7 +76,7 @@ public final class NaturalCore extends JavaPlugin {
     private id.naturalsmp.naturalcore.hud.HUDManager hudManager;
     private id.naturalsmp.naturalcore.maintenance.MaintenanceManager maintenanceManager;
     private id.naturalsmp.naturalcore.permissions.PermissionManager permissionManager;
-    private id.naturalsmp.naturalcore.utility.CleanManager cleanManager;
+    private id.naturalsmp.naturalcore.utility.NaturalLaggManager laggManager;
 
     @Override
     public void onEnable() {
@@ -368,7 +368,7 @@ public final class NaturalCore extends JavaPlugin {
         registerCmd("start", new id.naturalsmp.naturalcore.general.StartCommand(this));
 
         // 20. v1.7 Utilities
-        this.cleanManager = new id.naturalsmp.naturalcore.utility.CleanManager(this);
+        this.laggManager = new id.naturalsmp.naturalcore.utility.NaturalLaggManager(this);
         registerCmd("clean", new id.naturalsmp.naturalcore.utility.CleanCommand(this));
         registerCmd("back", new id.naturalsmp.naturalcore.general.BackCommand(this));
         registerCmd("otp", new id.naturalsmp.naturalcore.general.OfflineTPCommand(this));
@@ -541,8 +541,8 @@ public final class NaturalCore extends JavaPlugin {
         return maintenanceManager;
     }
 
-    public id.naturalsmp.naturalcore.utility.CleanManager getCleanManager() {
-        return cleanManager;
+    public id.naturalsmp.naturalcore.utility.NaturalLaggManager getLaggManager() {
+        return laggManager;
     }
 
     // --- HELPER UNTUK MENCEGAH CRASH ---

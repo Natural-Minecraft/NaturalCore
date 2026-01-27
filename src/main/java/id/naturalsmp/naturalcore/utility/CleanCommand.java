@@ -28,7 +28,7 @@ public class CleanCommand implements CommandExecutor {
                 sender.sendMessage(ConfigUtils.getString("messages.global.no-permission"));
                 return true;
             }
-            plugin.getCleanManager().startGlobalClean(10);
+            plugin.getLaggManager().startCleanup(10);
             sender.sendMessage(ChatUtils.colorize("&6&lNaturalCore &8» &7Memulai pembersihan item global..."));
             return true;
         }
