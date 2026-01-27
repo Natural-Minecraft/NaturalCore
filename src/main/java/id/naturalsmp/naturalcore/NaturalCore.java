@@ -170,6 +170,26 @@ public final class NaturalCore extends JavaPlugin {
 
         // Plugin Messaging
         getServer().getMessenger().registerOutgoingPluginChannel(this, "natural:main");
+        getServer().getMessenger().registerIncomingPluginChannel(this, "natural:main", (channel, player, message) -> {
+            if (!channel.equals("natural:main"))
+                return;
+
+            java.io.ByteArrayInputStream b = new java.io.ByteArrayInputStream(message);
+            java.io.DataInputStream in = new java.io.DataInputStream(b);
+
+            try {
+                String subChannel = in.readUTF();
+                if (subChannel.equalsIgnoreCase("Maintenance")) {
+                    boolean active = in.readBoolean();
+                    if (maintenanceManager != null) {
+                        maintenanceManager.setActive(active);
+                        // Whitelist sync could also be done here if needed
+                    }
+                }
+            } catch (java.io.IOException e) {
+                e.printStackTrace();
+            }
+        });
 
         // 11. Ranks Module
         id.naturalsmp.naturalcore.admin.RankGUI rankGUI = new id.naturalsmp.naturalcore.admin.RankGUI(this);

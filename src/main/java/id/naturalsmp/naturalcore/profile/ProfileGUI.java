@@ -33,9 +33,78 @@ public class ProfileGUI implements Listener {
     public void openGUI(Player viewer, OfflinePlayer target) {
         viewer.playSound(viewer.getLocation(), Sound.BLOCK_ENDER_CHEST_OPEN, 0.5f, 1.0f); // Sound Effect
 
+        // 1. Open Placeholder Loading GUI
         Inventory inv = Bukkit.createInventory(new ProfileHolder(), 54,
-                ChatUtils.colorize("&#00AAFF❂ &#00AAFFᴘʀᴏꜰɪʟᴇ &#55FF55❂"));
+                ChatUtils.colorize("&#00AAFF❂ &#00AAFFᴘʀᴏꜰɪʟᴇ &8(Loading...)"));
 
+        // Fill loading state
+        ItemStack loading = createItem(Material.CLOCK, "&e&lLoading Data...", "&7Please wait...");
+        inv.setItem(22, loading);
+        viewer.openInventory(inv);
+
+        // 2. Async Data Fetch
+        Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
+            ProfileData data = new ProfileData();
+
+            // Tier
+            if (plugin.getTierManager() != null) {
+                var tier = plugin.getTierManager().getCurrentTier(target);
+                data.rankDisplay = (tier != null) ? tier.display : "Unknown";
+            } else {
+                data.rankDisplay = "Loading...";
+            }
+
+            // Status & Ping
+            data.isOnline = target.isOnline();
+            if (data.isOnline && target.getPlayer() != null) {
+                data.ping = target.getPlayer().getPing();
+            }
+
+            // Stats
+            data.kdr = profileManager.getKDR(target);
+            data.deaths = profileManager.getDeaths(target);
+            data.playtime = profileManager.getPlaytimeFormatted(target);
+            data.firstJoin = profileManager.getFirstJoin(target);
+
+            // Economy
+            data.hasCoins = profileManager.hasCoinsEngine();
+            if (data.hasCoins) {
+                data.coins = profileManager.getCoinsEngineBalance(target);
+            }
+
+            // AuraSkills
+            data.hasSkills = profileManager.hasAuraSkills();
+            if (data.hasSkills) {
+                data.power = profileManager.getAuraSkillsPower(target);
+                data.mining = profileManager.getAuraSkillsLevel(target, "mining");
+                data.fighting = profileManager.getAuraSkillsLevel(target, "fighting");
+                data.foraging = profileManager.getAuraSkillsLevel(target, "foraging");
+                data.archery = profileManager.getAuraSkillsLevel(target, "archery");
+            }
+
+            // 3. Sync Render
+            Bukkit.getScheduler().runTask(plugin, () -> {
+                if (!viewer.isOnline() || viewer.getOpenInventory().getTopInventory() == null
+                        || !(viewer.getOpenInventory().getTopInventory().getHolder() instanceof ProfileHolder)) {
+                    return; // Player closed GUI or switched
+                }
+
+                // Update Title (Hack: Re-open or just update items if title update impossible
+                // without flicker)
+                // For smooth UX, we just update items. Title remains "Loading..." briefly or we
+                // can't change it easily on 1.16+ without packets.
+                // Re-opening inventory causes a flicker, so we just populate the existing one.
+                // Ideally, we'd start with correct title but empty items.
+
+                // Clear loading item
+                inv.setItem(22, null);
+
+                renderProfile(inv, viewer, target, data);
+            });
+        });
+    }
+
+    private void renderProfile(Inventory inv, Player viewer, OfflinePlayer target, ProfileData data) {
         // 1. Head Info (Slot 13)
         ItemStack head = new ItemStack(Material.PLAYER_HEAD);
         SkullMeta headMeta = (SkullMeta) head.getItemMeta();
@@ -43,14 +112,12 @@ public class ProfileGUI implements Listener {
         headMeta.setDisplayName(ChatUtils.colorize("&a&l" + target.getName()));
         List<String> headLore = new ArrayList<>();
         headLore.add("&8&m------------------");
-        headLore.add(
-                "&7Rank: &f" + (plugin.getTierManager() != null ? plugin.getTierManager().getCurrentTier(viewer).display
-                        : "Loading...")); // Use viewer for now or fetch target rank properly
-        String status = target.isOnline() ? "&aOnline" : "&cOffline";
+        headLore.add("&7Rank: &f" + data.rankDisplay);
+
+        String status = data.isOnline ? "&aOnline" : "&cOffline";
         headLore.add("&7Status: " + status);
-        if (target.isOnline()) {
-            int ping = target.getPlayer().getPing();
-            headLore.add("&7Ping: &e" + ping + "ms");
+        if (data.isOnline) {
+            headLore.add("&7Ping: &e" + data.ping + "ms");
         }
         headLore.add("&8&m------------------");
         headMeta.setLore(ChatUtils.colorize(headLore));
@@ -60,30 +127,30 @@ public class ProfileGUI implements Listener {
         // 2. Statistics (Slot 29)
         List<String> statsLore = new ArrayList<>();
         statsLore.add("");
-        statsLore.add("&f⚔ Marksman: &7" + profileManager.getKDR(target));
-        statsLore.add("&f☠ Deaths: &c" + profileManager.getDeaths(target));
-        statsLore.add("&f⌚ Playtime: &b" + profileManager.getPlaytimeFormatted(target));
-        statsLore.add("&f📅 Join: &e" + profileManager.getFirstJoin(target));
+        statsLore.add("&f⚔ Marksman: &7" + data.kdr);
+        statsLore.add("&f☠ Deaths: &c" + data.deaths);
+        statsLore.add("&f⌚ Playtime: &b" + data.playtime);
+        statsLore.add("&f📅 Join: &e" + data.firstJoin);
         inv.setItem(29, createItem(Material.CLOCK, "&b&lSTATISTIK", statsLore.toArray(new String[0])));
 
         // 3. Economy (Slot 31)
         List<String> ecoLore = new ArrayList<>();
-        if (profileManager.hasCoinsEngine()) {
-            ecoLore.add("&7NaturalCoin: &6" + profileManager.getCoinsEngineBalance(target) + " NC");
+        if (data.hasCoins) {
+            ecoLore.add("&7NaturalCoin: &6" + data.coins + " NC");
         } else {
             ecoLore.add("&7NaturalCoin: &cFeature Disabled");
         }
         inv.setItem(31, createItem(Material.GOLD_INGOT, "&6&lEconomy Stats", ecoLore.toArray(new String[0])));
 
         // 4. AuraSkills (Slot 33)
-        if (profileManager.hasAuraSkills()) {
+        if (data.hasSkills) {
             List<String> skillLore = new ArrayList<>();
             skillLore.add("");
-            skillLore.add("&f⭐ Total Power: &b" + profileManager.getAuraSkillsPower(target));
-            skillLore.add("&f⛏ Mining: &eLvl " + profileManager.getAuraSkillsLevel(target, "mining"));
-            skillLore.add("&f⚔ Fighting: &eLvl " + profileManager.getAuraSkillsLevel(target, "fighting"));
-            skillLore.add("&f🌳 Foraging: &eLvl " + profileManager.getAuraSkillsLevel(target, "foraging"));
-            skillLore.add("&f🏹 Archery: &eLvl " + profileManager.getAuraSkillsLevel(target, "archery"));
+            skillLore.add("&f⭐ Total Power: &b" + data.power);
+            skillLore.add("&f⛏ Mining: &eLvl " + data.mining);
+            skillLore.add("&f⚔ Fighting: &eLvl " + data.fighting);
+            skillLore.add("&f🌳 Foraging: &eLvl " + data.foraging);
+            skillLore.add("&f🏹 Archery: &eLvl " + data.archery);
             skillLore.add("");
             skillLore.add("&7Buka &b/skills &7untuk detail lanjut.");
             inv.setItem(33, createItem(Material.EXPERIENCE_BOTTLE, "&b&lAURASKILLS", skillLore.toArray(new String[0])));
@@ -92,7 +159,6 @@ public class ProfileGUI implements Listener {
         // 5. Social Actions (Slot 48, 50) - Only if viewing others
         if (!target.getUniqueId().equals(viewer.getUniqueId())) {
             inv.setItem(49, createItem(Material.PAPER, "&b&lSend Message", "&7Klik untuk kirim pesan"));
-            // Bisa tambah add friend dll
         }
 
         // Fillers (Black Glass)
@@ -102,8 +168,24 @@ public class ProfileGUI implements Listener {
                 inv.setItem(i, filler);
             }
         }
+    }
 
-        viewer.openInventory(inv);
+    private static class ProfileData {
+        String rankDisplay;
+        boolean isOnline;
+        int ping;
+        String kdr;
+        int deaths;
+        String playtime;
+        String firstJoin;
+        boolean hasCoins;
+        double coins;
+        boolean hasSkills;
+        int power;
+        int mining;
+        int fighting;
+        int foraging;
+        int archery;
     }
 
     private ItemStack createItem(Material mat, String name, String... lore) {

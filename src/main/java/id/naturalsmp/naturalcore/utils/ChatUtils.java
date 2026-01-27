@@ -16,6 +16,11 @@ public class ChatUtils {
     private static final Pattern HEX_PATTERN = Pattern.compile("&#([A-Fa-f0-9]{6})");
     private static final DecimalFormat CURRENCY_FORMAT = new DecimalFormat("#,###.##");
 
+    private static final net.kyori.adventure.text.minimessage.MiniMessage MINI_MESSAGE = net.kyori.adventure.text.minimessage.MiniMessage
+            .miniMessage();
+    private static final net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer LEGACY_SERIALIZER = net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer
+            .legacyAmpersand();
+
     /**
      * Mengubah kode warna (&a, &l) dan Hex Color (&#RRGGBB) menjadi warna asli.
      */
@@ -23,21 +28,43 @@ public class ChatUtils {
         if (message == null || message.isEmpty())
             return "";
 
+        // Jika mengandung < (MiniMessage)
+        if (message.contains("<")) {
+            return net.md_5.bungee.api.ChatColor.translateAlternateColorCodes('&',
+                    net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer.legacySection()
+                            .serialize(MINI_MESSAGE.deserialize(message)));
+        }
+
         Matcher matcher = HEX_PATTERN.matcher(message);
         StringBuilder buffer = new StringBuilder();
 
         while (matcher.find()) {
             try {
-                // Konversi &#RRGGBB menjadi ChatColor Hex
                 String hexCode = matcher.group(1);
                 matcher.appendReplacement(buffer, ChatColor.of("#" + hexCode).toString());
             } catch (Exception e) {
-                // Fallback jika terjadi error pada versi lama
                 matcher.appendReplacement(buffer, "");
             }
         }
 
         return ChatColor.translateAlternateColorCodes('&', matcher.appendTail(buffer).toString());
+    }
+
+    /**
+     * Mengubah string (Legacy atau MiniMessage) menjadi Adventure Component.
+     */
+    public static net.kyori.adventure.text.Component toComponent(String message) {
+        if (message == null || message.isEmpty())
+            return net.kyori.adventure.text.Component.empty();
+
+        // Jika mengandung < (MiniMessage)
+        if (message.contains("<")) {
+            return MINI_MESSAGE.deserialize(message);
+        }
+
+        // Fallback ke legacy colorization lalu ke component
+        return net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer.legacySection()
+                .deserialize(colorize(message).replace("&", "§"));
     }
 
     public static java.util.List<String> colorize(java.util.List<String> list) {

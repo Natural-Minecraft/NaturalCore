@@ -433,6 +433,30 @@ public class BannerManager {
         return activeBanners;
     }
 
+    public void hideAllBanners(Player player) {
+        // Run slightly later to ensure player is fully in world
+        Bukkit.getScheduler().runTaskLater(plugin, () -> {
+            if (!player.isOnline())
+                return;
+
+            int count = 0;
+            for (Banner banner : activeBanners.values()) {
+                for (UUID uuid : banner.getEntityUuids()) {
+                    Entity entity = Bukkit.getEntity(uuid);
+                    if (entity != null) {
+                        player.hideEntity(plugin, entity);
+                        count++;
+                    }
+                }
+            }
+            if (count > 0) {
+                // Optional debug
+                // plugin.getLogger().info("Hidden " + count + " banner entities for Bedrock
+                // player " + player.getName());
+            }
+        }, 20L); // 1 second delay
+    }
+
     public NaturalCore plugin() {
         return plugin;
     }

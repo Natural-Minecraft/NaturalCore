@@ -54,26 +54,30 @@ public class RankGUI implements Listener {
 
         ItemStack item = new ItemStack(mat);
         ItemMeta meta = item.getItemMeta();
-        meta.setDisplayName(ChatUtils.colorize(name));
+        if (meta != null) {
+            meta.displayName(ChatUtils.toComponent(name));
 
-        List<String> coloredLore = new ArrayList<>();
-        for (String s : lore)
-            coloredLore.add(ChatUtils.colorize(s));
-        meta.setLore(coloredLore);
+            List<net.kyori.adventure.text.Component> componentLore = new ArrayList<>();
+            for (String s : lore)
+                componentLore.add(ChatUtils.toComponent(s));
+            meta.lore(componentLore);
 
-        item.setItemMeta(meta);
+            item.setItemMeta(meta);
+        }
         return item;
     }
 
     private ItemStack createItem(Material mat, String name, List<String> lore) {
         ItemStack item = new ItemStack(mat);
         ItemMeta meta = item.getItemMeta();
-        meta.setDisplayName(ChatUtils.colorize(name));
-        List<String> coloredLore = new ArrayList<>();
-        for (String s : lore)
-            coloredLore.add(ChatUtils.colorize(s));
-        meta.setLore(coloredLore);
-        item.setItemMeta(meta);
+        if (meta != null) {
+            meta.displayName(ChatUtils.toComponent(name));
+            List<net.kyori.adventure.text.Component> componentLore = new ArrayList<>();
+            for (String s : lore)
+                componentLore.add(ChatUtils.toComponent(s));
+            meta.lore(componentLore);
+            item.setItemMeta(meta);
+        }
         return item;
     }
 

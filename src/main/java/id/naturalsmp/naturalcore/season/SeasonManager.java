@@ -170,16 +170,34 @@ public class SeasonManager {
             base += config.getDouble("modifiers.in-water", -5.0);
         }
 
-        for (Block b : getNearbyBlocks(loc, 2)) {
-            if (b.getType() == Material.FIRE || b.getType() == Material.CAMPFIRE
-                    || b.getType() == Material.SOUL_CAMPFIRE) {
-                base += config.getDouble("modifiers.near-fire", 15.0);
-                break;
+        // Optimize: Check nearby blocks directly without allocation
+        int radius = 2;
+        int pX = loc.getBlockX();
+        int pY = loc.getBlockY();
+        int pZ = loc.getBlockZ();
+
+        boolean foundHeat = false;
+
+        for (int x = pX - radius; x <= pX + radius; x++) {
+            for (int y = pY - radius; y <= pY + radius; y++) {
+                for (int z = pZ - radius; z <= pZ + radius; z++) {
+                    Material type = loc.getWorld().getBlockAt(x, y, z).getType();
+                    if (type == Material.FIRE || type == Material.CAMPFIRE || type == Material.SOUL_CAMPFIRE) {
+                        base += config.getDouble("modifiers.near-fire", 15.0);
+                        foundHeat = true;
+                        break;
+                    }
+                    if (type == Material.LAVA) {
+                        base += config.getDouble("modifiers.near-lava", 40.0);
+                        foundHeat = true;
+                        break;
+                    }
+                }
+                if (foundHeat)
+                    break;
             }
-            if (b.getType() == Material.LAVA) {
-                base += config.getDouble("modifiers.near-lava", 40.0);
+            if (foundHeat)
                 break;
-            }
         }
 
         return base;
@@ -217,22 +235,6 @@ public class SeasonManager {
                 p.sendTitle("", ChatUtils.colorize("&b&lFREEZING!"), 0, 20, 10);
             }
         }
-    }
-
-    private java.util.List<Block> getNearbyBlocks(Location loc, int radius) {
-        java.util.List<Block> blocks = new java.util.ArrayList<>();
-        int pX = loc.getBlockX();
-        int pY = loc.getBlockY();
-        int pZ = loc.getBlockZ();
-
-        for (int x = pX - radius; x <= pX + radius; x++) {
-            for (int y = pY - radius; y <= pY + radius; y++) {
-                for (int z = pZ - radius; z <= pZ + radius; z++) {
-                    blocks.add(loc.getWorld().getBlockAt(x, y, z));
-                }
-            }
-        }
-        return blocks;
     }
 
     public void refreshVisuals() {

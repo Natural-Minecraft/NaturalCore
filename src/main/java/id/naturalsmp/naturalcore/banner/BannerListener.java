@@ -104,6 +104,16 @@ public class BannerListener implements Listener {
         }
     }
 
+    @EventHandler
+    public void onJoin(org.bukkit.event.player.PlayerJoinEvent event) {
+        if (id.naturalsmp.naturalcore.utils.BedrockUtils.isBedrock(event.getPlayer())) {
+            // Delay slightly to ensure entities are loaded/spawned for the player
+            // But usually hideEntity works immediately if the entity exists in server
+            // memory
+            manager.hideAllBanners(event.getPlayer());
+        }
+    }
+
     public static Location getPos1(UUID uuid) {
         return pos1.get(uuid);
     }

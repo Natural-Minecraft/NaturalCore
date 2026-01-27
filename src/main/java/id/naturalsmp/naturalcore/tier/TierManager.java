@@ -86,6 +86,10 @@ public class TierManager {
     }
 
     public int getPlayerLevel(Player p) {
+        return getPlayerLevel((org.bukkit.OfflinePlayer) p);
+    }
+
+    public int getPlayerLevel(org.bukkit.OfflinePlayer p) {
         // Default 1 (Warrior III) instead of 0
         return playerTiers.getOrDefault(p.getUniqueId(), 1);
     }
@@ -104,6 +108,10 @@ public class TierManager {
     }
 
     public Tier getCurrentTier(Player p) {
+        return getCurrentTier((org.bukkit.OfflinePlayer) p);
+    }
+
+    public Tier getCurrentTier(org.bukkit.OfflinePlayer p) {
         return getTier(getPlayerLevel(p));
     }
 

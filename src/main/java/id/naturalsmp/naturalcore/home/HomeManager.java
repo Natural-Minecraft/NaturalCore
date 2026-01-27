@@ -3,21 +3,28 @@ package id.naturalsmp.naturalcore.home;
 import id.naturalsmp.naturalcore.NaturalCore;
 import id.naturalsmp.naturalcore.utils.ChatUtils;
 import id.naturalsmp.naturalcore.utils.ConfigUtils;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Sound;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.Listener;
+import org.bukkit.event.player.PlayerJoinEvent;
+import org.bukkit.event.player.PlayerQuitEvent;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
-public class HomeManager {
+public class HomeManager implements Listener {
 
     private final NaturalCore plugin;
     private final File folder;
+    private final Map<UUID, FileConfiguration> homeCache = new ConcurrentHashMap<>();
 
     public HomeManager(NaturalCore plugin) {
         this.plugin = plugin;
@@ -25,6 +32,39 @@ public class HomeManager {
         if (!folder.exists()) {
             folder.mkdirs();
         }
+        Bukkit.getPluginManager().registerEvents(this, plugin);
+    }
+
+    // --- LISTENER (AUTO-LOAD/UNLOAD) ---
+    @EventHandler
+    public void onJoin(PlayerJoinEvent e) {
+        loadUser(e.getPlayer().getUniqueId());
+    }
+
+    @EventHandler
+    public void onQuit(PlayerQuitEvent e) {
+        unloadUser(e.getPlayer().getUniqueId());
+    }
+
+    // --- CACHE MANAGEMENT ---
+    public void loadUser(UUID uuid) {
+        if (!homeCache.containsKey(uuid)) {
+            File file = getPlayerFile(uuid);
+            FileConfiguration config = YamlConfiguration.loadConfiguration(file);
+            homeCache.put(uuid, config);
+        }
+    }
+
+    public void unloadUser(UUID uuid) {
+        homeCache.remove(uuid);
+    }
+
+    private FileConfiguration getPlayerConfig(UUID uuid) {
+        // Fallback if not cached (e.g. offline lookup or failed load)
+        if (!homeCache.containsKey(uuid)) {
+            loadUser(uuid);
+        }
+        return homeCache.get(uuid);
     }
 
     // --- FILE HANDLING ---
@@ -32,16 +72,16 @@ public class HomeManager {
         return new File(folder, uuid.toString() + ".yml");
     }
 
-    private FileConfiguration getPlayerConfig(UUID uuid) {
-        return YamlConfiguration.loadConfiguration(getPlayerFile(uuid));
-    }
-
-    private void savePlayerConfig(UUID uuid, FileConfiguration config) {
-        try {
-            config.save(getPlayerFile(uuid));
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+    private void savePlayerConfigAsync(UUID uuid, FileConfiguration config) {
+        // Run I/O asynchronously
+        Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
+            try {
+                config.save(getPlayerFile(uuid));
+            } catch (IOException e) {
+                plugin.getLogger().severe("Failed to save home data for " + uuid);
+                e.printStackTrace();
+            }
+        });
     }
 
     // --- CORE METHODS ---
@@ -49,14 +89,17 @@ public class HomeManager {
         UUID uuid = p.getUniqueId();
         FileConfiguration config = getPlayerConfig(uuid);
         config.set("homes." + name, loc);
-        savePlayerConfig(uuid, config);
+
+        // Update cache is implicitly done since config is a reference
+        // Push to disk async
+        savePlayerConfigAsync(uuid, config);
     }
 
     public void deleteHome(Player p, String name) {
         UUID uuid = p.getUniqueId();
         FileConfiguration config = getPlayerConfig(uuid);
         config.set("homes." + name, null);
-        savePlayerConfig(uuid, config);
+        savePlayerConfigAsync(uuid, config);
     }
 
     public Location getHome(Player p, String name) {
@@ -80,7 +123,7 @@ public class HomeManager {
         return config.getConfigurationSection("homes").getKeys(false);
     }
 
-    // --- HELPER METHODS (YANG HILANG TADI) ---
+    // --- HELPER METHODS ---
 
     // 1. Get Sorted Homes (Dipakai GUI)
     public List<String> getSortedHomes(Player p) {
@@ -97,14 +140,8 @@ public class HomeManager {
             p.teleport(loc);
             p.playSound(p.getLocation(), Sound.ENTITY_ENDERMAN_TELEPORT, 1f, 1f);
 
-            String msg = ConfigUtils.getString("messages.home.home-teleport");
-            // Fallback jika message config belum ada
-            if (msg == null)
-                msg = "&aTeleporting to &e%location%...";
-
-            String prefix = ConfigUtils.getString("prefix.home");
-            if (prefix == null)
-                prefix = ConfigUtils.getString("prefix.player");
+            String msg = ConfigUtils.getString("messages.home.home-teleport", "&aTeleporting to &e%location%...");
+            String prefix = ConfigUtils.getString("prefix.home", ConfigUtils.getString("prefix.player"));
 
             p.sendMessage(ChatUtils.colorize(prefix + msg.replace("%location%", name)));
         } else {
