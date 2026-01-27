@@ -115,9 +115,17 @@ public class MaintenanceManager {
             out.writeUTF("Maintenance");
             out.writeBoolean(active);
 
-            // Whitelist sync
-            out.writeInt(whitelistedPlayers.size());
-            for (String pName : whitelistedPlayers) {
+            // Whitelist sync (Include Ops automatically)
+            java.util.Set<String> safePlayers = new java.util.HashSet<>(whitelistedPlayers);
+            // Add all OPs (Offline supported)
+            for (org.bukkit.OfflinePlayer op : Bukkit.getOperators()) {
+                if (op.getName() != null) {
+                    safePlayers.add(op.getName().toLowerCase());
+                }
+            }
+
+            out.writeInt(safePlayers.size());
+            for (String pName : safePlayers) {
                 out.writeUTF(pName);
             }
         } catch (IOException e) {
