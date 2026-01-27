@@ -33,6 +33,9 @@ public class MaintenanceListener implements Listener {
 
     @EventHandler
     public void onJoin(PlayerJoinEvent e) {
+        // Ensure proxy is synced with latest state (in case it desynced when empty)
+        manager.sendProxyUpdate();
+
         if (!manager.isActive())
             return;
 
