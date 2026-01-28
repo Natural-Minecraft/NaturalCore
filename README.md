@@ -1,14 +1,18 @@
-# NaturalCore v1.9.0
+# NaturalCore v1.9.9
 
 Plugin inti (core) premium untuk server **NaturalSMP**, mengelola modul Ekonomi, Chat, Warp, Home, Banner interaktif, sistem Seasons, hingga fitur ChatColor berbasis Rank. **NaturalCore** difokuskan sebagai plugin Essentials yang ringan dan stabil.
 
-## ✨ Fitur Baru v1.9 (The "Experience" Update)
+## ✨ Fitur Baru v1.9.9 (The "Polished" Update)
 
-### 🧹 NaturalLagg (New Optimizer)
-Sistem pembersih item dan mob yang lebih cerdas dan estetik.
-*   **Smart Mob Merging**: Otomatis menggabungkan mob yang menumpuk (misal: `Chicken x50`) dengan hologram di atasnya. Mengurangi lag entity cramming.
-*   **Prioritized Action Bar**: Animasi scrolling "sliding" saat pembersihan terjadi. Bar Mana/Suhu akan bergeser untuk menampilkan hitung mundur ClearLagg.
-*   **Low-TPS Unloader**: Otomatis unload chunk kosong jika TPS drop di bawah 10.0.
+### 🧹 NaturalLagg (Visual Overhaul)
+*   **Synced Action Bar**: Notifikasi hitung mundur kini muncul di Action Bar dengan animasi "Slide-In" yang halus.
+*   **Synchronized Timer**: Waktu hitung mundur Action Bar tersinkronisasi sempurna dengan pesan chat (15 detik).
+*   **Aesthetic Notifications**: Tampilan pesan pembersihan yang lebih modern dan konsisten dengan tema server.
+
+### 🛠️ GUI System Refactor
+*   **Modern API**: Seluruh GUI kini menggunakan sistem `GUIUtils` terpusat, meninggalkan metode lawas (deprecated).
+*   **Adventure Component**: Mendukung format teks modern (MiniMessage/Component) untuk performa dan kompatibilitas masa depan.
+*   **Stability**: Perbaikan bug pada Anvil dan Trash GUI.
 
 ### � TopUp Notification System
 Fitur bagi owner/admin untuk mensimulasikan dan mengirim notifikasi donasi.
