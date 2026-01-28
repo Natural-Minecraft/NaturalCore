@@ -2,6 +2,8 @@ package id.naturalsmp.naturalcore.tier;
 
 import id.naturalsmp.naturalcore.NaturalCore;
 import id.naturalsmp.naturalcore.utils.ChatUtils;
+import id.naturalsmp.naturalcore.utils.GUIUtils;
+import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.OfflinePlayer;
@@ -31,15 +33,16 @@ public class TierTopGUI implements Listener {
 
     public void openGUI(Player viewer) {
         viewer.playSound(viewer.getLocation(), Sound.ITEM_BOOK_PAGE_TURN, 1.0f, 1.5f); // Crisp sound
-        Inventory inv = Bukkit.createInventory(null, 54, ChatUtils.colorize("&8&l🏆 TOP GLOBAL SEASON 🏆"));
+        Inventory inv = GUIUtils.createGUI(new TierTopHolder(), 54, "&8&l🏆 TOP GLOBAL SEASON 🏆");
 
         // Get Top 10
         Map<String, Integer> top = tierManager.getTopPlayers(10);
-        int slot = 0;
 
-        // Posisi cantik di inventory
-        // Baris 1: 0-8 (Top 1-9?)
-        // Kita pakai simple layout: 0, 1, 2...
+        // Custom positions for podium effect?
+        // 1 -> 13 (Center Top)
+        // 2 -> 21
+        // 3 -> 23
+        // 4-10 -> Bawah
 
         int rank = 1;
         for (Map.Entry<String, Integer> entry : top.entrySet()) {
@@ -63,15 +66,15 @@ public class TierTopGUI implements Listener {
             else
                 rankColor = "&f#" + rank;
 
-            meta.setDisplayName(ChatUtils.colorize(rankColor + " &e" + p.getName()));
+            meta.displayName(ChatUtils.toComponent(rankColor + " &e" + p.getName()));
 
-            List<String> lore = new ArrayList<>();
-            lore.add("");
-            lore.add(ChatUtils.colorize("&7Rank: " + display));
-            lore.add(ChatUtils.colorize("&7Level: &f" + level));
-            lore.add("");
-            lore.add(ChatUtils.colorize("&e&oSeason Champion Candidate?"));
-            meta.setLore(lore);
+            List<Component> lore = new ArrayList<>();
+            lore.add(Component.empty());
+            lore.add(ChatUtils.toComponent("&7Rank: " + display));
+            lore.add(ChatUtils.toComponent("&7Level: &f" + level));
+            lore.add(Component.empty());
+            lore.add(ChatUtils.toComponent("&e&oSeason Champion Candidate?"));
+            meta.lore(lore);
             head.setItemMeta(meta);
 
             inv.setItem(getSlotForRank(rank), head);
@@ -79,11 +82,7 @@ public class TierTopGUI implements Listener {
         }
 
         // Fillers
-        ItemStack filler = new ItemStack(Material.BLACK_STAINED_GLASS_PANE);
-        ItemMeta fMeta = filler.getItemMeta();
-        fMeta.setDisplayName(" ");
-        filler.setItemMeta(fMeta);
-
+        ItemStack filler = GUIUtils.createFiller(Material.BLACK_STAINED_GLASS_PANE);
         for (int i = 0; i < 54; i++) {
             if (inv.getItem(i) == null)
                 inv.setItem(i, filler);
@@ -93,11 +92,6 @@ public class TierTopGUI implements Listener {
     }
 
     private int getSlotForRank(int rank) {
-        // Custom positions for podium effect?
-        // 1 -> 13 (Center Top)
-        // 2 -> 21
-        // 3 -> 23
-        // 4-10 -> Bawah
         switch (rank) {
             case 1:
                 return 13;
@@ -112,7 +106,7 @@ public class TierTopGUI implements Listener {
 
     @EventHandler
     public void onClick(InventoryClickEvent e) {
-        if (e.getView().getTitle().equals(ChatUtils.colorize("&8Top Global Season"))) {
+        if (e.getInventory().getHolder() instanceof TierTopHolder) {
             e.setCancelled(true);
         }
     }

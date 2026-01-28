@@ -2,6 +2,7 @@ package id.naturalsmp.naturalcore.combat;
 
 import id.naturalsmp.naturalcore.NaturalCore;
 import id.naturalsmp.naturalcore.utils.ChatUtils;
+import id.naturalsmp.naturalcore.utils.GUIUtils;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -55,8 +56,8 @@ public class CombatListener implements Listener {
         Player player = event.getPlayer();
         if (plugin.getCombatManager().isInCombat(player)) {
             player.setHealth(0); // Kill the player
-            plugin.getServer().broadcastMessage(ChatUtils.colorize(
-                    "&6&lNaturalPVP &8» &e" + player.getName() + " &cmencoba kabur saat bertempur dan tewas!"));
+            GUIUtils.broadcast(
+                    "&6&lNaturalPVP &8» &e" + player.getName() + " &cmencoba kabur saat bertempur dan tewas!");
         }
     }
 

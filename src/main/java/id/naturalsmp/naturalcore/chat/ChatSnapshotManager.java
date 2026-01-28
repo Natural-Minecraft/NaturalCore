@@ -1,7 +1,8 @@
 package id.naturalsmp.naturalcore.chat;
 
 import id.naturalsmp.naturalcore.utils.ChatUtils;
-import org.bukkit.Bukkit;
+import id.naturalsmp.naturalcore.utils.GUIUtils;
+import net.kyori.adventure.text.Component;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
@@ -27,8 +28,11 @@ public class ChatSnapshotManager {
 
     public static UUID createItemSnapshot(String ownerName, ItemStack item) {
         UUID id = UUID.randomUUID();
-        String title = ChatUtils.colorize("&8Preview Item: &f" + ownerName);
-        Inventory inv = Bukkit.createInventory(null, 27, title);
+        String title = "&8Preview Item: &f" + ownerName;
+        // GUIUtils.createGUI handles title colorization if passed as string usually,
+        // but here we might want to be explicit or let GUIUtils handle it.
+        // Assuming GUIUtils.createGUI takes String and handles color.
+        Inventory inv = GUIUtils.createGUI(null, 27, title);
 
         ItemStack filler = createFiller();
         for (int i = 0; i < 27; i++) {
@@ -42,8 +46,8 @@ public class ChatSnapshotManager {
 
     public static UUID createInventorySnapshot(Player player) {
         UUID id = UUID.randomUUID();
-        String title = ChatUtils.colorize("&8[" + player.getName() + "'s Inventory]");
-        Inventory inv = Bukkit.createInventory(null, 54, title);
+        String title = "&8[" + player.getName() + "'s Inventory]";
+        Inventory inv = GUIUtils.createGUI(null, 54, title);
 
         ItemStack filler = createFiller();
 
@@ -68,7 +72,7 @@ public class ChatSnapshotManager {
         SkullMeta headMeta = (SkullMeta) head.getItemMeta();
         if (headMeta != null) {
             headMeta.setOwningPlayer(player);
-            headMeta.setDisplayName(ChatUtils.colorize("&b&l" + player.getName()));
+            headMeta.displayName(ChatUtils.toComponent("&b&l" + player.getName()));
             head.setItemMeta(headMeta);
         }
         inv.setItem(6, head);
@@ -77,9 +81,9 @@ public class ChatSnapshotManager {
         ItemStack xp = new ItemStack(Material.EXPERIENCE_BOTTLE);
         ItemMeta xpMeta = xp.getItemMeta();
         if (xpMeta != null) {
-            xpMeta.setDisplayName(ChatUtils.colorize("&a&lLevel &f" + player.getLevel()));
-            xpMeta.setLore(
-                    Collections.singletonList(ChatUtils.colorize("&7Total XP: &e" + player.getTotalExperience())));
+            xpMeta.displayName(ChatUtils.toComponent("&a&lLevel &f" + player.getLevel()));
+            xpMeta.lore(
+                    Collections.singletonList(ChatUtils.toComponent("&7Total XP: &e" + player.getTotalExperience())));
             xp.setItemMeta(xpMeta);
         }
         inv.setItem(8, xp);
@@ -107,8 +111,8 @@ public class ChatSnapshotManager {
 
     public static UUID createEnderSnapshot(String ownerName, ItemStack[] contents) {
         UUID id = UUID.randomUUID();
-        String title = ChatUtils.colorize("&8[" + ownerName + "'s Enderchest]");
-        Inventory inv = Bukkit.createInventory(null, 27, title);
+        String title = "&8[" + ownerName + "'s Enderchest]";
+        Inventory inv = GUIUtils.createGUI(null, 27, title);
         inv.setContents(contents);
         snapshots.put(id, new SnapshotData(inv, title));
         return id;
@@ -122,7 +126,7 @@ public class ChatSnapshotManager {
         ItemStack item = new ItemStack(Material.GRAY_STAINED_GLASS_PANE);
         ItemMeta meta = item.getItemMeta();
         if (meta != null) {
-            meta.setDisplayName(" ");
+            meta.displayName(Component.text(" "));
             item.setItemMeta(meta);
         }
         return item;
@@ -132,7 +136,7 @@ public class ChatSnapshotManager {
         ItemStack item = new ItemStack(mat);
         ItemMeta meta = item.getItemMeta();
         if (meta != null) {
-            meta.setDisplayName(ChatUtils.colorize(name));
+            meta.displayName(ChatUtils.toComponent(name));
             item.setItemMeta(meta);
         }
         return item;

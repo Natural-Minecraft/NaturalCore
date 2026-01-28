@@ -2,6 +2,8 @@ package id.naturalsmp.naturalcore.utility;
 
 import id.naturalsmp.naturalcore.NaturalCore;
 import id.naturalsmp.naturalcore.utils.ChatUtils;
+import id.naturalsmp.naturalcore.utils.GUIUtils;
+import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.Sound;
@@ -30,13 +32,13 @@ public class ServerStatusGUI implements Listener {
     }
 
     public void openGUI(Player player) {
-        Inventory inv = Bukkit.createInventory(new StatusHolder(), 45,
-                ChatUtils.colorize("&#00FFAA&lＳＥＲＶＥＲ &8| &#00D4FF&lＳＴＡＴＵＳ"));
+        Inventory inv = GUIUtils.createGUI(new StatusHolder(), 45,
+                "&#00FFAA&lＳＥＲＶＥＲ &8| &#00D4FF&lＳＴＡＴＵＳ");
 
         ServerHealthManager health = plugin.getHealthManager();
 
         // Decoration
-        ItemStack cyanGlass = createItem(Material.CYAN_STAINED_GLASS_PANE, " ");
+        ItemStack cyanGlass = GUIUtils.createFiller(Material.CYAN_STAINED_GLASS_PANE);
         for (int i = 0; i < 9; i++) {
             inv.setItem(i, cyanGlass);
             inv.setItem(36 + i, cyanGlass);
@@ -114,11 +116,11 @@ public class ServerStatusGUI implements Listener {
         ItemStack item = new ItemStack(mat);
         ItemMeta meta = item.getItemMeta();
         if (meta != null) {
-            meta.setDisplayName(ChatUtils.colorize(name));
-            List<String> loreList = new ArrayList<>();
+            meta.displayName(ChatUtils.toComponent(name));
+            List<Component> loreList = new ArrayList<>();
             for (String l : lore)
-                loreList.add(ChatUtils.colorize(l));
-            meta.setLore(loreList);
+                loreList.add(ChatUtils.toComponent(l));
+            meta.lore(loreList);
             item.setItemMeta(meta);
         }
         return item;

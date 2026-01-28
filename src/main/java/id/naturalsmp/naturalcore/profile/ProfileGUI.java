@@ -2,6 +2,8 @@ package id.naturalsmp.naturalcore.profile;
 
 import id.naturalsmp.naturalcore.NaturalCore;
 import id.naturalsmp.naturalcore.utils.ChatUtils;
+import id.naturalsmp.naturalcore.utils.GUIUtils;
+import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.OfflinePlayer;
@@ -34,8 +36,8 @@ public class ProfileGUI implements Listener {
         viewer.playSound(viewer.getLocation(), Sound.BLOCK_ENDER_CHEST_OPEN, 0.5f, 1.0f); // Sound Effect
 
         // 1. Open Placeholder Loading GUI
-        Inventory inv = Bukkit.createInventory(new ProfileHolder(), 54,
-                ChatUtils.colorize("&#00AAFF❂ &#00AAFFᴘʀᴏꜰɪʟᴇ &8(Loading...)"));
+        Inventory inv = GUIUtils.createGUI(new ProfileHolder(), 54,
+                "&#00AAFF❂ &#00AAFFᴘʀᴏꜰɪʟᴇ &8(Loading...)");
 
         // Fill loading state
         ItemStack loading = createItem(Material.CLOCK, "&e&lLoading Data...", "&7Please wait...");
@@ -109,18 +111,18 @@ public class ProfileGUI implements Listener {
         ItemStack head = new ItemStack(Material.PLAYER_HEAD);
         SkullMeta headMeta = (SkullMeta) head.getItemMeta();
         headMeta.setOwningPlayer(target);
-        headMeta.setDisplayName(ChatUtils.colorize("&a&l" + target.getName()));
-        List<String> headLore = new ArrayList<>();
-        headLore.add("&8&m------------------");
-        headLore.add("&7Rank: &f" + data.rankDisplay);
+        headMeta.displayName(ChatUtils.toComponent("&a&l" + target.getName()));
+        List<Component> headLore = new ArrayList<>();
+        headLore.add(ChatUtils.toComponent("&8&m------------------"));
+        headLore.add(ChatUtils.toComponent("&7Rank: &f" + data.rankDisplay));
 
         String status = data.isOnline ? "&aOnline" : "&cOffline";
-        headLore.add("&7Status: " + status);
+        headLore.add(ChatUtils.toComponent("&7Status: " + status));
         if (data.isOnline) {
-            headLore.add("&7Ping: &e" + data.ping + "ms");
+            headLore.add(ChatUtils.toComponent("&7Ping: &e" + data.ping + "ms"));
         }
-        headLore.add("&8&m------------------");
-        headMeta.setLore(ChatUtils.colorize(headLore));
+        headLore.add(ChatUtils.toComponent("&8&m------------------"));
+        headMeta.lore(headLore);
         head.setItemMeta(headMeta);
         inv.setItem(13, head);
 
@@ -162,7 +164,7 @@ public class ProfileGUI implements Listener {
         }
 
         // Fillers (Black Glass)
-        ItemStack filler = createItem(Material.BLACK_STAINED_GLASS_PANE, " ");
+        ItemStack filler = GUIUtils.createFiller(Material.BLACK_STAINED_GLASS_PANE);
         for (int i = 0; i < 54; i++) {
             if (inv.getItem(i) == null) {
                 inv.setItem(i, filler);
@@ -191,12 +193,12 @@ public class ProfileGUI implements Listener {
     private ItemStack createItem(Material mat, String name, String... lore) {
         ItemStack item = new ItemStack(mat);
         ItemMeta meta = item.getItemMeta();
-        meta.setDisplayName(ChatUtils.colorize(name));
-        List<String> l = new ArrayList<>();
+        meta.displayName(ChatUtils.toComponent(name));
+        List<Component> l = new ArrayList<>();
         for (String s : lore) {
-            l.add(ChatUtils.colorize(s));
+            l.add(ChatUtils.toComponent(s));
         }
-        meta.setLore(l);
+        meta.lore(l);
         item.setItemMeta(meta);
         return item;
     }

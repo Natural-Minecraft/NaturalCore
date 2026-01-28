@@ -3,6 +3,8 @@ package id.naturalsmp.naturalcore.general;
 import id.naturalsmp.naturalcore.NaturalCore;
 import id.naturalsmp.naturalcore.utils.ChatUtils;
 import id.naturalsmp.naturalcore.utils.ConfigUtils;
+import id.naturalsmp.naturalcore.utils.GUIUtils;
+import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.Sound;
@@ -30,10 +32,10 @@ public class StartGUI implements Listener {
 
     public void openGUI(Player player) {
         String title = ConfigUtils.getString("messages.gui.start.title");
-        Inventory inv = Bukkit.createInventory(new StartHolder(), 9, ChatUtils.colorize(title));
+        Inventory inv = GUIUtils.createGUI(new StartHolder(), 9, title);
 
         // Fill background with grey glass
-        ItemStack filler = createItem(Material.GRAY_STAINED_GLASS_PANE, " ");
+        ItemStack filler = GUIUtils.createFiller(Material.GRAY_STAINED_GLASS_PANE);
         for (int i = 0; i < 9; i++)
             inv.setItem(i, filler);
 
@@ -41,13 +43,13 @@ public class StartGUI implements Listener {
         ItemStack dungeon = new ItemStack(Material.DIAMOND_SWORD);
         dungeon.addUnsafeEnchantment(Enchantment.SHARPNESS, 1);
         ItemMeta dMeta = dungeon.getItemMeta();
-        dMeta.setDisplayName(ChatUtils.colorize("&#FF5555&l⚔ DUNGEON"));
-        List<String> dLore = new ArrayList<>();
-        dLore.add(ChatUtils.colorize("&7Uji keberanianmu di dunia"));
-        dLore.add(ChatUtils.colorize("&7penuh monster dan loot berharga!"));
-        dLore.add("");
-        dLore.add(ChatUtils.colorize("&#FFAA00&l➥ KLIK UNTUK MASUK"));
-        dMeta.setLore(dLore);
+        dMeta.displayName(ChatUtils.toComponent("&#FF5555&l⚔ DUNGEON"));
+        List<Component> dLore = new ArrayList<>();
+        dLore.add(ChatUtils.toComponent("&7Uji keberanianmu di dunia"));
+        dLore.add(ChatUtils.toComponent("&7penuh monster dan loot berharga!"));
+        dLore.add(Component.empty());
+        dLore.add(ChatUtils.toComponent("&#FFAA00&l➥ KLIK UNTUK MASUK"));
+        dMeta.lore(dLore);
         dMeta.addItemFlags(ItemFlag.HIDE_ENCHANTS);
         dungeon.setItemMeta(dMeta);
         inv.setItem(2, dungeon);
@@ -68,11 +70,11 @@ public class StartGUI implements Listener {
     private ItemStack createItem(Material mat, String name, String... lore) {
         ItemStack item = new ItemStack(mat);
         ItemMeta meta = item.getItemMeta();
-        meta.setDisplayName(ChatUtils.colorize(name));
-        List<String> l = new ArrayList<>();
+        meta.displayName(ChatUtils.toComponent(name));
+        List<Component> l = new ArrayList<>();
         for (String s : lore)
-            l.add(ChatUtils.colorize(s));
-        meta.setLore(l);
+            l.add(ChatUtils.toComponent(s));
+        meta.lore(l);
         item.setItemMeta(meta);
         return item;
     }

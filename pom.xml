@@ -6,7 +6,7 @@
 
     <groupId>id.naturalsmp</groupId>
     <artifactId>NaturalCore</artifactId>
-    <version>1.9.0</version>
+    <version>1.9.9</version>
     <packaging>jar</packaging>
 
     <name>NaturalCore</name>
@@ -114,6 +114,7 @@
     </dependencies>
 
     <build>
+        <finalName>NaturalCore</finalName>
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>

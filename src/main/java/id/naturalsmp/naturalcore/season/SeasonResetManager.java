@@ -7,6 +7,7 @@ import dev.aurelium.auraskills.api.user.SkillsUser;
 import id.naturalsmp.naturalcore.NaturalCore;
 import id.naturalsmp.naturalcore.tier.TierManager;
 import id.naturalsmp.naturalcore.utils.ChatUtils;
+import id.naturalsmp.naturalcore.utils.GUIUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -42,8 +43,8 @@ public class SeasonResetManager {
         }
 
         admin.sendMessage(ChatUtils.colorize("&a&l[Reset] SEASON RESET COMPLETE!"));
-        Bukkit.broadcastMessage(ChatUtils.colorize(
-                "&6&lNaturalSMP &8» &fMusim telah berganti! Status Tier & Skill telah disesuaikan (50% Rebirth)."));
+        GUIUtils.broadcast(
+                "&6&lNaturalSMP &8» &fMusim telah berganti! Status Tier & Skill telah disesuaikan (50% Rebirth).");
     }
 
     private void resetTiers(CommandSender admin) {

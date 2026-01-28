@@ -3,6 +3,7 @@ package id.naturalsmp.naturalcore.admin;
 import id.naturalsmp.naturalcore.NaturalCore;
 import id.naturalsmp.naturalcore.utils.ChatUtils;
 import id.naturalsmp.naturalcore.utils.ConfigUtils;
+import id.naturalsmp.naturalcore.utils.GUIUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.Sound;
 import org.bukkit.command.Command;
@@ -56,12 +57,12 @@ public class RestartAlertCommand implements CommandExecutor {
         String body = ConfigUtils.getMessage("admin.restart.warning-body").replace("%time%", String.valueOf(seconds));
         String footer = ConfigUtils.getMessage("admin.restart.warning-footer");
 
-        Bukkit.broadcastMessage(header);
-        Bukkit.broadcastMessage(titleMsg);
-        Bukkit.broadcastMessage("");
-        Bukkit.broadcastMessage(body);
-        Bukkit.broadcastMessage("");
-        Bukkit.broadcastMessage(footer);
+        GUIUtils.broadcast(header);
+        GUIUtils.broadcast(titleMsg);
+        GUIUtils.broadcastEmpty();
+        GUIUtils.broadcast(body);
+        GUIUtils.broadcastEmpty();
+        GUIUtils.broadcast(footer);
 
         // --- BOSS BAR SETUP ---
         bossBar = Bukkit.createBossBar(
@@ -140,7 +141,7 @@ public class RestartAlertCommand implements CommandExecutor {
     }
 
     private void processRestart() {
-        Bukkit.broadcastMessage(ConfigUtils.getMessage("admin.restart.saving-data"));
+        GUIUtils.broadcast(ConfigUtils.getMessage("admin.restart.saving-data"));
         Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "save-all");
 
         String kickReason = ConfigUtils.getMessage("admin.restart.kick-reason");

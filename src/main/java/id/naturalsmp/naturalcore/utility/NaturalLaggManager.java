@@ -142,11 +142,20 @@ public class NaturalLaggManager implements Listener {
             @Override
             public void run() {
                 autoRemovalCountdown--;
-                if (warningTimes.contains(autoRemovalCountdown)) {
+
+                // 15s Sync: Chat msg AND Start Animation
+                if (autoRemovalCountdown == 15) {
+                    broadcastWarning(15);
+                    startAnimation();
+                }
+                // Other warnings (only if not 15, to avoid double broadcast if 15 is in list)
+                else if (warningTimes.contains(autoRemovalCountdown) && autoRemovalCountdown != 15) {
                     broadcastWarning(autoRemovalCountdown);
                 }
+
                 if (autoRemovalCountdown <= 0) {
-                    startCleanup(defaultCleanupDuration);
+                    performClean();
+                    triggerSuccessAnimation();
                     autoRemovalCountdown = autoRemovalInterval;
                 }
             }
@@ -173,57 +182,76 @@ public class NaturalLaggManager implements Listener {
     }
 
     public void startCleanup(int seconds) {
+        this.autoRemovalCountdown = seconds;
+        // If countdown is less than or equal to 15 (animation start threshold), start
+        // animation immediately
+        // Otherwise, the main loop will catch it when it reaches 15.
+        if (seconds <= 15) {
+            startAnimation();
+        }
+        broadcastWarning(seconds);
+    }
+
+    // Trigger visual slide-in
+    public void startAnimation() {
         if (state != LaggState.IDLE)
             return;
-        this.countdownSeconds = seconds;
         this.state = LaggState.SLIDING_IN;
         this.animationFrame = 0;
-        this.currentTick = 0;
+    }
+
+    // Trigger visual success
+    public void triggerSuccessAnimation() {
+        this.state = LaggState.SUCCESS_SLIDING_IN;
+        this.animationFrame = 0;
     }
 
     private void tickAnimation() {
         if (state == LaggState.IDLE)
             return;
+
         animationFrame++;
-        if (state == LaggState.SLIDING_IN) {
-            if (animationFrame >= MAX_FRAMES) {
-                state = LaggState.COUNTDOWN;
-                animationFrame = 0;
-            }
-            if (animationFrame % 2 == 0)
-                playTickSound(1.5f);
-        } else if (state == LaggState.COUNTDOWN) {
-            currentTick += 2;
-            if (currentTick >= 20) {
-                countdownSeconds--;
-                currentTick = 0;
-                if (countdownSeconds <= 0) {
-                    performClean();
-                    state = LaggState.SUCCESS_SLIDING_IN;
+
+        switch (state) {
+            case SLIDING_IN -> {
+                if (animationFrame >= MAX_FRAMES) {
+                    state = LaggState.COUNTDOWN;
                     animationFrame = 0;
-                } else if (countdownSeconds <= 5) {
+                }
+                if (animationFrame % 2 == 0)
+                    playTickSound(1.5f);
+            }
+            case COUNTDOWN -> {
+                // Visual ticks for arrows, logic driven by autoRemovalCountdown
+                // Check if we should stop (master countdown reset or finished)
+                if (autoRemovalCountdown > 15 || autoRemovalCountdown <= 0) {
+                    // Handled by triggerSuccessAnimation call in main loop
+                } else if (autoRemovalCountdown <= 5 && animationFrame % 10 == 0) {
                     playTickSound(2.0f);
                 }
             }
-        } else if (state == LaggState.SUCCESS_SLIDING_IN) {
-            if (animationFrame >= MAX_FRAMES) {
-                state = LaggState.SUCCESS_STATIC;
-                animationFrame = 0;
-                successStayTicks = 0;
+            case SUCCESS_SLIDING_IN -> {
+                if (animationFrame >= MAX_FRAMES) {
+                    state = LaggState.SUCCESS_STATIC;
+                    animationFrame = 0;
+                    successStayTicks = 0;
+                }
             }
-        } else if (state == LaggState.SUCCESS_STATIC) {
-            successStayTicks += 2;
-            if (successStayTicks >= 60) {
-                state = LaggState.SLIDING_OUT;
-                animationFrame = 0;
+            case SUCCESS_STATIC -> {
+                successStayTicks += 2;
+                if (successStayTicks >= 60) {
+                    state = LaggState.SLIDING_OUT;
+                    animationFrame = 0;
+                }
             }
-        } else if (state == LaggState.SLIDING_OUT) {
-            if (animationFrame >= MAX_FRAMES) {
-                state = LaggState.IDLE;
-                animationFrame = 0;
+            case SLIDING_OUT -> {
+                if (animationFrame >= MAX_FRAMES) {
+                    state = LaggState.IDLE;
+                    animationFrame = 0;
+                }
+                if (animationFrame % 2 == 0)
+                    playTickSound(1.2f);
             }
-            if (animationFrame % 2 == 0)
-                playTickSound(1.2f);
         }
     }
 
@@ -236,39 +264,63 @@ public class NaturalLaggManager implements Listener {
     public String getDisplay(String currentHUD) {
         if (state == LaggState.IDLE)
             return null;
-        String hud = ChatUtils.colorize(currentHUD);
+
         String laggText = getLaggContent();
+
+        // Slide In: Text enters from Right to Left
         if (state == LaggState.SLIDING_IN || state == LaggState.SUCCESS_SLIDING_IN) {
             float progress = (float) animationFrame / MAX_FRAMES;
-            int cutLen = (int) (hud.length() * progress);
-            int revealLen = (int) (laggText.length() * progress);
-            return ChatUtils.colorAwareSubstring(hud, cutLen, hud.length()) + "     "
-                    + ChatUtils.colorAwareSubstring(laggText, 0, revealLen);
-        } else if (state == LaggState.SLIDING_OUT) {
-            float progress = (float) animationFrame / MAX_FRAMES;
-            int cutLen = (int) (laggText.length() * progress);
-            int revealLen = (int) (hud.length() * progress);
-            return ChatUtils.colorAwareSubstring(laggText, cutLen, laggText.length()) + "     "
-                    + ChatUtils.colorAwareSubstring(hud, 0, revealLen);
+            // Easing function for smooth slide
+            float ease = 1 - (float) Math.pow(1 - progress, 3);
+
+            // We want it to look like it's sliding in from the right.
+            // Simplified "Typewriter" or "Reveal" effect for Action Bar constraints
+            int revealLen = (int) (laggText.length() * ease);
+            return ChatUtils.colorAwareSubstring(laggText, 0, revealLen);
         }
+
+        // Slide Out: Text exits to Left (or fades)
+        else if (state == LaggState.SLIDING_OUT) {
+            float progress = (float) animationFrame / MAX_FRAMES;
+            float ease = (float) Math.pow(progress, 3);
+
+            int cutLen = (int) (laggText.length() * ease);
+            return ChatUtils.colorAwareSubstring(laggText, cutLen, laggText.length());
+        }
+
         return laggText;
     }
 
     private String getLaggContent() {
-        if (state == LaggState.COUNTDOWN) {
-            String arrows = "»»»»»";
-            int offset = animationFrame % arrows.length();
-            String scroll = arrows.substring(offset) + arrows.substring(0, offset);
-            String msg = ConfigUtils.getString("messages.lagg.action-bar.countdown",
-                    "&#FF5555&l%scroll% &fCLEARING ITEMS IN &#FF5555&l%time%s &f%scroll%");
-            return ChatUtils
-                    .colorize(msg.replace("%scroll%", scroll).replace("%time%", String.valueOf(countdownSeconds)));
-        } else if (state == LaggState.SUCCESS_STATIC || state == LaggState.SUCCESS_SLIDING_IN) {
+        if (state == LaggState.SLIDING_IN || state == LaggState.COUNTDOWN || state == LaggState.SLIDING_OUT) {
+            // Show countdown content
+            if (state == LaggState.SLIDING_OUT && successStayTicks > 0) {
+                // Actually if we are in sliding out, we are likely showing the success message
+                // sliding out
+                // But wait, the state transition logic goes Success -> Static -> Slide Out
+                // So Slide Out should show Success message fading out.
+                // However, the block above shares logic. Let's separate "Countdown content" vs
+                // "Success content".
+            }
+        }
+
+        if (state == LaggState.SUCCESS_SLIDING_IN || state == LaggState.SUCCESS_STATIC
+                || (state == LaggState.SLIDING_OUT && cleanedCount > 0)) {
             String msg = ConfigUtils.getString("messages.lagg.cleanup-complete",
                     "&#55FF55&l✔ CLEANUP COMPLETE &7(Removed %count% items)");
             return ChatUtils.colorize(msg.replace("%count%", String.valueOf(cleanedCount)));
         }
-        return "";
+
+        // Default: Countdown Content
+        String arrows = "»»»»»";
+        int offset = (animationFrame / 2) % arrows.length(); // Slow down arrow anim
+        String scroll = arrows.substring(offset) + arrows.substring(0, offset);
+        String msg = ConfigUtils.getString("messages.lagg.action-bar.countdown",
+                "&#FF5555&l%scroll% &fCLEARING ITEMS IN &#FF5555&l%time%s &f%scroll%");
+
+        // Use the master countdown variable
+        return ChatUtils
+                .colorize(msg.replace("%scroll%", scroll).replace("%time%", String.valueOf(autoRemovalCountdown)));
     }
 
     private void performClean() {

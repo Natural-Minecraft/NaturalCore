@@ -52,7 +52,6 @@ public class ImageUtils {
      * Converts a 128x128 sub-image to a byte array using Minecraft's map palette.
      * This is CRITICAL for performance.
      */
-    @SuppressWarnings("deprecation")
     public static byte[] convertToMapColors(BufferedImage part) {
         byte[] colors = new byte[128 * 128];
         Map<Integer, Byte> matchCache = new HashMap<>();
@@ -66,7 +65,9 @@ public class ImageUtils {
                 if (cached != null) {
                     colors[y * 128 + x] = cached;
                 } else {
-                    byte matched = MapPalette.matchColor(new Color(rgb, true));
+                    Color c = new Color(rgb, true);
+                    @SuppressWarnings("deprecation")
+                    byte matched = MapPalette.matchColor(c.getRed(), c.getGreen(), c.getBlue());
                     matchCache.put(rgb, matched);
                     colors[y * 128 + x] = matched;
                 }

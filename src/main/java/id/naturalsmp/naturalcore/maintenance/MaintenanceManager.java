@@ -3,6 +3,7 @@ package id.naturalsmp.naturalcore.maintenance;
 import id.naturalsmp.naturalcore.NaturalCore;
 import id.naturalsmp.naturalcore.utils.ChatUtils;
 import id.naturalsmp.naturalcore.utils.ConfigUtils;
+import id.naturalsmp.naturalcore.utils.GUIUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
@@ -55,7 +56,7 @@ public class MaintenanceManager {
     private void broadcastCountdown(int seconds) {
         String msg = ConfigUtils.getString("messages.admin.maintenance.countdown")
                 .replace("%time%", String.valueOf(seconds));
-        Bukkit.broadcastMessage(ChatUtils.colorize(msg));
+        GUIUtils.broadcast(msg);
 
         for (Player p : Bukkit.getOnlinePlayers()) {
             p.playSound(p.getLocation(), Sound.BLOCK_NOTE_BLOCK_PLING, 1f, 1f);
@@ -76,9 +77,9 @@ public class MaintenanceManager {
                     p.kickPlayer(ChatUtils.colorize(kickReason));
                 }
             }
-            Bukkit.broadcastMessage(ChatUtils.colorize("&6&lMaintenance &8» &aMode Maintenance telah AKTIF."));
+            GUIUtils.broadcast("&6&lMaintenance &8» &aMode Maintenance telah AKTIF.");
         } else {
-            Bukkit.broadcastMessage(ChatUtils.colorize("&6&lMaintenance &8» &cMode Maintenance telah NONAKTIF."));
+            GUIUtils.broadcast("&6&lMaintenance &8» &cMode Maintenance telah NONAKTIF.");
         }
     }
 

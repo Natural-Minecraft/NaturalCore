@@ -120,9 +120,9 @@ Fitur bagi owner/admin untuk mensimulasikan dan mengirim notifikasi donasi.
 ### 🎨 Chat Color Ranks
 Akses warna chat berdasarkan permission.
 *   `naturalsmp.chat.color` : Akses dasar command `/chatcolor`.
+*   `naturalsmp.color.midi` : Akses warna Midi.
 *   `naturalsmp.color.vip` : Akses warna VIP (Gold, Yellow, dll).
 *   `naturalsmp.color.mvp` : Akses warna MVP (Aqua, Pink, dll).
-*   `naturalsmp.color.midi` : Akses warna Midi.
 *   `naturalsmp.color.nature` : Akses **ALL** (Bold, Italic, Magic, Special Fonts).
 
 ### 🏠 Home Limits

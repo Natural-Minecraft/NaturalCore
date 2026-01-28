@@ -3,6 +3,8 @@ package id.naturalsmp.naturalcore.home;
 import id.naturalsmp.naturalcore.NaturalCore;
 import id.naturalsmp.naturalcore.utils.ChatUtils;
 import id.naturalsmp.naturalcore.utils.ConfigUtils;
+import id.naturalsmp.naturalcore.utils.GUIUtils;
+import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -57,14 +59,14 @@ public class HomeGUI implements Listener {
             page = totalPages - 1;
 
         // 3. Setup Inventory 1 Row (9 Slot)
-        Inventory inv = Bukkit.createInventory(new HomeHolder(), 9,
-                ChatUtils.colorize(GUI_TITLE + " &8(" + (page + 1) + ")"));
+        Inventory inv = GUIUtils.createGUI(new HomeHolder(), 9,
+                GUI_TITLE + " &8(" + (page + 1) + ")");
 
         // 4. Pasang Pembatas (Slot 1 & 7)
         ItemStack pane = new ItemStack(Material.GRAY_STAINED_GLASS_PANE);
         ItemMeta paneMeta = pane.getItemMeta();
         if (paneMeta != null) {
-            paneMeta.setDisplayName(" ");
+            paneMeta.displayName(Component.text(" "));
             pane.setItemMeta(paneMeta);
         }
 
@@ -113,15 +115,15 @@ public class HomeGUI implements Listener {
         ItemStack item = new ItemStack(Material.RED_BED);
         ItemMeta meta = item.getItemMeta();
         if (meta != null) {
-            meta.setDisplayName(
-                    ConfigUtils.getString("messages.gui.home.item-name").replace("%name%", name));
+            meta.displayName(ChatUtils.toComponent(
+                    ConfigUtils.getString("messages.gui.home.item-name").replace("%name%", name)));
             String world = (loc.getWorld() != null) ? loc.getWorld().getName() : "unknown";
 
             List<String> rawLore = ConfigUtils.getMessageList("gui.home.item-lore");
-            List<String> lore = new ArrayList<>();
+            List<Component> lore = new ArrayList<>();
             if (rawLore != null) {
                 for (String s : rawLore) {
-                    lore.add(ChatUtils.colorize(s
+                    lore.add(ChatUtils.toComponent(s
                             .replace("%name%", name)
                             .replace("%world%", world)
                             .replace("%x%", String.valueOf(loc.getBlockX()))
@@ -129,7 +131,7 @@ public class HomeGUI implements Listener {
                             .replace("%z%", String.valueOf(loc.getBlockZ()))));
                 }
             }
-            meta.setLore(lore);
+            meta.lore(lore);
             item.setItemMeta(meta);
         }
         return item;
@@ -139,7 +141,7 @@ public class HomeGUI implements Listener {
         ItemStack item = new ItemStack(Material.ARROW);
         ItemMeta meta = item.getItemMeta();
         if (meta != null) {
-            meta.setDisplayName(ChatUtils.colorize(name));
+            meta.displayName(ChatUtils.toComponent(name));
             item.setItemMeta(meta);
         }
         return item;
@@ -189,7 +191,14 @@ public class HomeGUI implements Listener {
         if (slot >= 2 && slot <= 6) {
             if (e.getCurrentItem().getType() == Material.RED_BED) {
                 // Ambil nama home dari Display Name item (Hapus kode warna)
-                String homeName = ChatUtils.stripColor(e.getCurrentItem().getItemMeta().getDisplayName());
+                // Use Component extraction if necessary, otherwise use
+                // getItemMeta().getDisplayName() (deprecated shim) or ChatUtils logic
+                // Relying on legacy getDisplayName() for now since default API often patches
+                // it.
+                // Assuming ChatUtils.stripColor handles null/legacy string.
+                @SuppressWarnings("deprecation")
+                String displayName = e.getCurrentItem().getItemMeta().getDisplayName();
+                String homeName = ChatUtils.stripColor(displayName);
 
                 p.closeInventory();
                 p.performCommand("home " + homeName); // Cara paling aman memanggil teleport logic

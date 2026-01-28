@@ -2,6 +2,8 @@ package id.naturalsmp.naturalcore.trade;
 
 import id.naturalsmp.naturalcore.NaturalCore;
 import id.naturalsmp.naturalcore.utils.ChatUtils;
+import id.naturalsmp.naturalcore.utils.GUIUtils;
+import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.Sound;
@@ -30,15 +32,15 @@ public class TradeGUI implements Listener {
     }
 
     public void openTradeGUI(Player p, TradeSession session) {
-        Inventory inv = Bukkit.createInventory(new TradeHolder(session), 54,
-                ChatUtils.colorize("&#6CCAFE&lＴＲＡＤＥ &8| &f" + session.getOther(p).getName()));
+        Inventory inv = GUIUtils.createGUI(new TradeHolder(session), 54,
+                "&#6CCAFE&lＴＲＡＤＥ &8| &f" + session.getOther(p).getName());
 
         renderTrade(inv, p, session);
         p.openInventory(inv);
     }
 
     private void renderTrade(Inventory inv, Player viewer, TradeSession session) {
-        ItemStack separator = createItem(Material.GRAY_STAINED_GLASS_PANE, " ");
+        ItemStack separator = GUIUtils.createFiller(Material.GRAY_STAINED_GLASS_PANE);
         for (int i = 4; i < 54; i += 9)
             inv.setItem(i, separator);
 
@@ -224,15 +226,16 @@ public class TradeGUI implements Listener {
         }
     }
 
+    // Refactored to use Component APIs internally
     private ItemStack createItem(Material mat, String name, String... lore) {
         ItemStack item = new ItemStack(mat);
         ItemMeta meta = item.getItemMeta();
         if (meta != null) {
-            meta.setDisplayName(ChatUtils.colorize(name));
-            List<String> loreList = new ArrayList<>();
+            meta.displayName(ChatUtils.toComponent(name));
+            List<Component> loreList = new ArrayList<>();
             for (String l : lore)
-                loreList.add(ChatUtils.colorize(l));
-            meta.setLore(loreList);
+                loreList.add(ChatUtils.toComponent(l));
+            meta.lore(loreList);
             item.setItemMeta(meta);
         }
         return item;

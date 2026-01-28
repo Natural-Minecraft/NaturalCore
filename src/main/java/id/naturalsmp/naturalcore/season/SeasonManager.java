@@ -3,6 +3,7 @@ package id.naturalsmp.naturalcore.season;
 import id.naturalsmp.naturalcore.NaturalCore;
 import id.naturalsmp.naturalcore.utils.ChatUtils;
 import id.naturalsmp.naturalcore.utils.ConfigUtils;
+import id.naturalsmp.naturalcore.utils.GUIUtils;
 import me.clip.placeholderapi.PlaceholderAPI;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -107,8 +108,8 @@ public class SeasonManager {
 
     public void nextSeason() {
         this.currentSeason = currentSeason.next();
-        Bukkit.broadcastMessage(ChatUtils.colorize("&6&l[NaturalSMP] &fMusim telah berganti menjadi "
-                + currentSeason.getIcon() + " &e" + currentSeason.name()));
+        GUIUtils.broadcast("&6&l[NaturalSMP] &fMusim telah berganti menjadi "
+                + currentSeason.getIcon() + " &e" + currentSeason.name());
 
         if (ConfigUtils.getSeasonConfig().getBoolean("visuals.enabled", true)) {
             refreshVisuals();
@@ -118,8 +119,8 @@ public class SeasonManager {
 
     public void forceSetSeason(Season season) {
         this.currentSeason = season;
-        Bukkit.broadcastMessage(ChatUtils.colorize("&6&l[NaturalSMP] &fAdmin mengubah musim menjadi "
-                + currentSeason.getIcon() + " &e" + currentSeason.name()));
+        GUIUtils.broadcast("&6&l[NaturalSMP] &fAdmin mengubah musim menjadi "
+                + currentSeason.getIcon() + " &e" + currentSeason.name());
         if (ConfigUtils.getSeasonConfig().getBoolean("visuals.enabled", true)) {
             refreshVisuals();
         }

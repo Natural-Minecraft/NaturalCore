@@ -2,6 +2,8 @@ package id.naturalsmp.naturalcore.tier;
 
 import id.naturalsmp.naturalcore.NaturalCore;
 import id.naturalsmp.naturalcore.utils.ChatUtils;
+import id.naturalsmp.naturalcore.utils.GUIUtils;
+import id.naturalsmp.naturalcore.utils.ConfigUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.Statistic;
@@ -12,11 +14,10 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.ItemMeta;
+import id.naturalsmp.naturalcore.tier.TierManager.Tier;
 
 import java.util.ArrayList;
 import java.util.List;
-import id.naturalsmp.naturalcore.tier.TierManager.Tier;
 
 public class TierGUI implements Listener {
 
@@ -30,7 +31,7 @@ public class TierGUI implements Listener {
 
     public void openGUI(Player p) {
         p.playSound(p.getLocation(), Sound.UI_BUTTON_CLICK, 0.5f, 1.2f); // Sound Effect Open
-        Inventory inv = Bukkit.createInventory(null, 27, ChatUtils.colorize("&8&lNatural Rank Progression"));
+        Inventory inv = GUIUtils.createGUI(new TierHolder(), 27, "&8&lNatural Rank Progression");
 
         Tier current = tierManager.getCurrentTier(p);
         Tier next = tierManager.getNextTier(p);
@@ -51,7 +52,7 @@ public class TierGUI implements Listener {
             curLore.add("&e&omencapai puncak!");
             curLore.add("&8&m------------------");
         }
-        inv.setItem(11, createItem(Material.KNOWLEDGE_BOOK, "&b&lINFO RANK", curLore));
+        inv.setItem(11, GUIUtils.createItem(Material.KNOWLEDGE_BOOK, "&b&lINFO RANK", curLore));
 
         // 2. Rank Up (Slot 15)
         if (next != null) {
@@ -83,17 +84,18 @@ public class TierGUI implements Listener {
 
             Material iconStart = tierManager.canRankUp(p) ? Material.EXPERIENCE_BOTTLE
                     : Material.RED_STAINED_GLASS_PANE;
-            inv.setItem(15, createItem(iconStart, "&6&lRANK UP", reqLore));
+            inv.setItem(15, GUIUtils.createItem(iconStart, "&6&lRANK UP", reqLore));
         } else {
-            inv.setItem(15, createItem(Material.NETHER_STAR, "&d&lMYTHIC GLORY",
-                    "&7Kamu sudah mencapai level",
-                    "&7tertinggi di server ini!",
-                    "",
-                    "&e&lGGWP!"));
+            List<String> maxLore = new ArrayList<>();
+            maxLore.add("&7Kamu sudah mencapai level");
+            maxLore.add("&7tertinggi di server ini!");
+            maxLore.add("");
+            maxLore.add("&e&lGGWP!");
+            inv.setItem(15, GUIUtils.createItem(Material.NETHER_STAR, "&d&lMYTHIC GLORY", maxLore));
         }
 
         // Filler
-        ItemStack filler = createItem(Material.GRAY_STAINED_GLASS_PANE, " ");
+        ItemStack filler = GUIUtils.createFiller(Material.GRAY_STAINED_GLASS_PANE);
         for (int i = 0; i < 27; i++) {
             if (inv.getItem(i) == null)
                 inv.setItem(i, filler);
@@ -102,48 +104,36 @@ public class TierGUI implements Listener {
         p.openInventory(inv);
     }
 
-    private ItemStack createItem(Material mat, String name, List<String> lore) {
-        return createItem(mat, name, lore.toArray(new String[0]));
-    }
-
-    private ItemStack createItem(Material mat, String name, String... lore) {
-        ItemStack item = new ItemStack(mat);
-        ItemMeta meta = item.getItemMeta();
-        meta.setDisplayName(ChatUtils.colorize(name));
-        List<String> l = new ArrayList<>();
-        for (String s : lore)
-            l.add(ChatUtils.colorize(s));
-        meta.setLore(l);
-        item.setItemMeta(meta);
-        return item;
-    }
-
     @EventHandler
     public void onClick(InventoryClickEvent e) {
-        if (e.getView().getTitle().equals(ChatUtils.colorize("&8Natural Tier System"))) {
-            e.setCancelled(true);
-            if (e.getCurrentItem() == null)
-                return;
+        if (!(e.getInventory().getHolder() instanceof TierHolder))
+            return;
 
-            Player p = (Player) e.getWhoClicked();
-            ItemStack item = e.getCurrentItem();
+        e.setCancelled(true);
+        if (e.getCurrentItem() == null)
+            return;
 
-            if (item.getType() == Material.EXPERIENCE_BOTTLE) {
-                if (tierManager.rankUp(p)) {
-                    p.playSound(p.getLocation(), Sound.UI_TOAST_CHALLENGE_COMPLETE, 1f, 1f);
-                    p.sendMessage(ChatUtils
-                            .colorize("&a&lCONGRATS! &fKamu naik rank ke " + tierManager.getCurrentTier(p).display));
+        Player p = (Player) e.getWhoClicked();
+        ItemStack item = e.getCurrentItem();
 
-                    // Broadcast
-                    String prefix = id.naturalsmp.naturalcore.utils.ConfigUtils.getString("prefix.player");
-                    Bukkit.broadcastMessage(ChatUtils.colorize(prefix + "&e" + p.getName()
-                            + " &ftelah naik rank menjadi " + tierManager.getCurrentTier(p).display));
+        if (item.getType() == Material.EXPERIENCE_BOTTLE) {
+            // Cek juga nama item biar aman (atau cek holder)
+            // Di sini holder sudah TierHolder, jadi aman asumsi ini item Rank Up
 
-                    p.closeInventory();
-                } else {
-                    p.sendMessage(ChatUtils.colorize("&cGagal rank up. Periksa saldo/stats mu."));
-                    p.closeInventory();
-                }
+            if (tierManager.rankUp(p)) {
+                p.playSound(p.getLocation(), Sound.UI_TOAST_CHALLENGE_COMPLETE, 1f, 1f);
+                p.sendMessage(ChatUtils
+                        .colorize("&a&lCONGRATS! &fKamu naik rank ke " + tierManager.getCurrentTier(p).display));
+
+                // Broadcast
+                String prefix = ConfigUtils.getString("prefix.player");
+                GUIUtils.broadcast(prefix + "&e" + p.getName()
+                        + " &ftelah naik rank menjadi " + tierManager.getCurrentTier(p).display);
+
+                p.closeInventory();
+            } else {
+                p.sendMessage(ChatUtils.colorize("&cGagal rank up. Periksa saldo/stats mu."));
+                p.closeInventory();
             }
         }
     }

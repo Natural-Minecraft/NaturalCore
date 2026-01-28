@@ -4,6 +4,8 @@ import id.naturalsmp.naturalcore.NaturalCore;
 import id.naturalsmp.naturalcore.permissions.PermissionManager;
 import id.naturalsmp.naturalcore.utils.ChatUtils;
 import id.naturalsmp.naturalcore.utils.ConfigUtils;
+import id.naturalsmp.naturalcore.utils.GUIUtils;
+import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.Sound;
@@ -32,11 +34,11 @@ public class RankGUI implements Listener {
 
     public void openGUI(Player p) {
         p.playSound(p.getLocation(), Sound.BLOCK_AMETHYST_BLOCK_CHIME, 1.0f, 1.2f);
-        Inventory inv = Bukkit.createInventory(new RankHolder(), 27,
-                ChatUtils.colorize(ConfigUtils.getMessage("ranks.gui-title")));
+        Inventory inv = GUIUtils.createGUI(new RankHolder(), 27,
+                ConfigUtils.getMessage("ranks.gui-title"));
 
         // --- GLASS BORDER ---
-        ItemStack glass = createItem(Material.GRAY_STAINED_GLASS_PANE, " ", new ArrayList<>());
+        ItemStack glass = GUIUtils.createFiller(Material.GRAY_STAINED_GLASS_PANE);
         for (int i = 0; i < 27; i++) {
             inv.setItem(i, glass);
         }
@@ -78,7 +80,7 @@ public class RankGUI implements Listener {
         if (meta != null) {
             meta.displayName(ChatUtils.toComponent(name));
 
-            List<net.kyori.adventure.text.Component> componentLore = new ArrayList<>();
+            List<Component> componentLore = new ArrayList<>();
             for (String s : lore)
                 componentLore.add(ChatUtils.toComponent(s));
             meta.lore(componentLore);
@@ -93,7 +95,7 @@ public class RankGUI implements Listener {
         ItemMeta meta = item.getItemMeta();
         if (meta != null) {
             meta.displayName(ChatUtils.toComponent(name));
-            List<net.kyori.adventure.text.Component> componentLore = new ArrayList<>();
+            List<Component> componentLore = new ArrayList<>();
             for (String s : lore)
                 componentLore.add(ChatUtils.toComponent(s));
             meta.lore(componentLore);
@@ -118,7 +120,7 @@ public class RankGUI implements Listener {
             p.playSound(p.getLocation(), Sound.BLOCK_IRON_DOOR_CLOSE, 1f, 1.2f);
         } else if (e.getSlot() == 10 || e.getSlot() == 12 || e.getSlot() == 14 || e.getSlot() == 16) {
             p.playSound(p.getLocation(), Sound.ENTITY_EXPERIENCE_ORB_PICKUP, 1f, 1f);
-            p.sendMessage(ChatUtils.colorize(
+            p.sendMessage(ChatUtils.toComponent(
                     "&6&lNaturalSMP &8» &7Silahkan hubungi administrator atau kunjungi &estore.naturalsmp.id &7untuk pembelian!"));
         }
     }

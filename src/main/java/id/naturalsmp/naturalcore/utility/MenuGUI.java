@@ -3,6 +3,8 @@ package id.naturalsmp.naturalcore.utility;
 import id.naturalsmp.naturalcore.NaturalCore;
 import id.naturalsmp.naturalcore.utils.ChatUtils;
 import id.naturalsmp.naturalcore.utils.ConfigUtils;
+import id.naturalsmp.naturalcore.utils.GUIUtils;
+import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.Sound;
@@ -28,7 +30,7 @@ public class MenuGUI implements Listener {
 
     public void openGUI(Player player) {
         String title = ConfigUtils.getString("messages.gui.menu.title");
-        Inventory inv = Bukkit.createInventory(new MenuHolder(), 54, ChatUtils.colorize(title));
+        Inventory inv = GUIUtils.createGUI(new MenuHolder(), 54, title);
 
         // Border
         fillBorder(inv);
@@ -36,13 +38,13 @@ public class MenuGUI implements Listener {
         // 1. Profile (Slot 13)
         ItemStack profile = new ItemStack(Material.PLAYER_HEAD);
         ItemMeta pMeta = profile.getItemMeta();
-        pMeta.setDisplayName(ChatUtils.colorize("&#55FF55&l👤 PROFIL SAYA"));
-        List<String> pLore = new ArrayList<>();
-        pLore.add(ChatUtils.colorize("&7Klik untuk melihat statistik"));
-        pLore.add(ChatUtils.colorize("&7dan informasi akunmu."));
-        pLore.add("");
-        pLore.add(ChatUtils.colorize("&#FFAA00&l➥ KLIK UNTUK MEMBUKA"));
-        pMeta.setLore(pLore);
+        pMeta.displayName(ChatUtils.toComponent("&#55FF55&l👤 PROFIL SAYA"));
+        List<Component> pLore = new ArrayList<>();
+        pLore.add(ChatUtils.toComponent("&7Klik untuk melihat statistik"));
+        pLore.add(ChatUtils.toComponent("&7dan informasi akunmu."));
+        pLore.add(Component.empty());
+        pLore.add(ChatUtils.toComponent("&#FFAA00&l➥ KLIK UNTUK MEMBUKA"));
+        pMeta.lore(pLore);
         profile.setItemMeta(pMeta);
         inv.setItem(13, profile);
 
@@ -74,7 +76,7 @@ public class MenuGUI implements Listener {
     }
 
     private void fillBorder(Inventory inv) {
-        ItemStack filler = createItem(Material.BLACK_STAINED_GLASS_PANE, " ");
+        ItemStack filler = GUIUtils.createFiller(Material.BLACK_STAINED_GLASS_PANE);
         for (int i = 0; i < 9; i++)
             inv.setItem(i, filler);
         for (int i = 45; i < 54; i++)
@@ -88,11 +90,11 @@ public class MenuGUI implements Listener {
     private ItemStack createItem(Material mat, String name, String... lore) {
         ItemStack item = new ItemStack(mat);
         ItemMeta meta = item.getItemMeta();
-        meta.setDisplayName(ChatUtils.colorize(name));
-        List<String> l = new ArrayList<>();
+        meta.displayName(ChatUtils.toComponent(name));
+        List<Component> l = new ArrayList<>();
         for (String s : lore)
-            l.add(ChatUtils.colorize(s));
-        meta.setLore(l);
+            l.add(ChatUtils.toComponent(s));
+        meta.lore(l);
         item.setItemMeta(meta);
         return item;
     }
@@ -120,7 +122,7 @@ public class MenuGUI implements Listener {
             case 33 -> p.performCommand("shop"); // Assuming there's a /shop
             case 40 -> p.performCommand("chatcolor");
             case 48 -> p.performCommand("warp tutorial");
-            case 50 -> p.sendMessage(ChatUtils.colorize("&bDiscord: &fhttps://dc.naturalsmp.my.id/"));
+            case 50 -> p.sendMessage(ChatUtils.toComponent("&bDiscord: &fhttps://dc.naturalsmp.my.id/"));
         }
     }
 

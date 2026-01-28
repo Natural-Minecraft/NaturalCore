@@ -3,6 +3,8 @@ package id.naturalsmp.naturalcore.economy;
 import id.naturalsmp.naturalcore.NaturalCore;
 import id.naturalsmp.naturalcore.utils.ChatUtils;
 import id.naturalsmp.naturalcore.utils.ConfigUtils;
+import id.naturalsmp.naturalcore.utils.GUIUtils;
+import net.kyori.adventure.text.Component;
 import net.milkbowl.vault.economy.Economy;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
@@ -13,9 +15,10 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryDragEvent;
 import org.bukkit.inventory.Inventory;
+import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.SkullMeta;
-import org.bukkit.inventory.meta.ItemMeta;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -23,14 +26,11 @@ import java.util.stream.Collectors;
 public class BaltopGUI implements Listener {
 
     public void openGUI(Player p) {
-        Inventory inv = Bukkit.createInventory(null, 27,
-                ChatUtils.colorize(ConfigUtils.getString("messages.gui.baltop.title")));
+        Inventory inv = GUIUtils.createGUI(new BaltopHolder(), 27,
+                ConfigUtils.getString("messages.gui.baltop.title"));
 
         // Background Filler
-        ItemStack filler = new ItemStack(Material.BLACK_STAINED_GLASS_PANE);
-        ItemMeta fMeta = filler.getItemMeta();
-        fMeta.setDisplayName(" ");
-        filler.setItemMeta(fMeta);
+        ItemStack filler = GUIUtils.createFiller(Material.BLACK_STAINED_GLASS_PANE);
         for (int i = 0; i < 27; i++)
             inv.setItem(i, filler);
 
@@ -62,20 +62,20 @@ public class BaltopGUI implements Listener {
                     meta.setOwningPlayer(op);
 
                     String playerName = (op.getName() != null ? op.getName() : "Unknown");
-                    meta.setDisplayName(ChatUtils.colorize(ConfigUtils.getString("messages.gui.baltop.item-name")
+                    meta.displayName(ChatUtils.toComponent(ConfigUtils.getString("messages.gui.baltop.item-name")
                             .replace("%rank%", String.valueOf(rank))
                             .replace("%player%", playerName)));
 
                     List<String> rawLore = ConfigUtils.getMessageList("gui.baltop.item-lore");
-                    List<String> lore = new ArrayList<>();
+                    List<Component> lore = new ArrayList<>();
                     if (rawLore != null) {
                         for (String s : rawLore) {
-                            lore.add(ChatUtils.colorize(s
+                            lore.add(ChatUtils.toComponent(s
                                     .replace("%symbol%", symbol)
                                     .replace("%amount%", String.format("%,.0f", eco.getBalance(op)))));
                         }
                     }
-                    meta.setLore(lore);
+                    meta.lore(lore);
 
                     head.setItemMeta(meta);
                     inv.setItem(slot, head);
@@ -91,15 +91,22 @@ public class BaltopGUI implements Listener {
     // --- SECURITY ---
     @EventHandler
     public void onClick(InventoryClickEvent e) {
-        if (ChatUtils.stripColor(e.getView().getTitle()).contains("ɴᴀᴛᴜʀᴀʟ")) {
+        if (e.getInventory().getHolder() instanceof BaltopHolder) {
             e.setCancelled(true);
         }
     }
 
     @EventHandler
     public void onDrag(InventoryDragEvent e) {
-        if (ChatUtils.stripColor(e.getView().getTitle()).contains("ɴᴀᴛᴜʀᴀʟ")) {
+        if (e.getInventory().getHolder() instanceof BaltopHolder) {
             e.setCancelled(true);
+        }
+    }
+
+    public static class BaltopHolder implements InventoryHolder {
+        @Override
+        public @NotNull Inventory getInventory() {
+            return null;
         }
     }
 }

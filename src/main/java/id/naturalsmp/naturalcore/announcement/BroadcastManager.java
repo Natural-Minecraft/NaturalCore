@@ -2,13 +2,12 @@ package id.naturalsmp.naturalcore.announcement;
 
 import id.naturalsmp.naturalcore.NaturalCore;
 import id.naturalsmp.naturalcore.utils.ChatUtils;
-import org.bukkit.Bukkit;
+import id.naturalsmp.naturalcore.utils.GUIUtils;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -66,9 +65,9 @@ public class BroadcastManager {
         String prefix = ChatUtils.colorize(config.getString("settings.prefix", "&#6CCAFE&lINFO &8┃ &f"));
         String message = ChatUtils.colorize(rawMessage);
 
-        Bukkit.broadcastMessage("");
-        Bukkit.broadcastMessage(prefix + message);
-        Bukkit.broadcastMessage("");
+        GUIUtils.broadcastEmpty();
+        GUIUtils.broadcast(prefix + message);
+        GUIUtils.broadcastEmpty();
     }
 
     public void reload() {

@@ -2,7 +2,8 @@ package id.naturalsmp.naturalcore.chat;
 
 import id.naturalsmp.naturalcore.NaturalCore;
 import id.naturalsmp.naturalcore.utils.ChatUtils;
-import org.bukkit.Bukkit;
+import id.naturalsmp.naturalcore.utils.GUIUtils;
+import net.kyori.adventure.text.Component;
 import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
@@ -29,11 +30,11 @@ public class EmojiGUI implements Listener {
 
     public void openGUI(Player p) {
         p.playSound(p.getLocation(), Sound.BLOCK_AMETHYST_BLOCK_CHIME, 1.0f, 1.0f);
-        Inventory inv = Bukkit.createInventory(null, 54, ChatUtils.colorize("&#00FFD4&lＮＡＴＵＲＡＬ &8| &#FF00D4&lＥＭＯＪＩＳ"));
+        Inventory inv = GUIUtils.createGUI(null, 54, "&#00FFD4&lＮＡＴＵＲＡＬ &8| &#FF00D4&lＥＭＯＪＩＳ");
 
         // --- GLASSMORPHISM BORDER ---
-        ItemStack glass = createItem(Material.PINK_STAINED_GLASS_PANE, " ", new ArrayList<>(), "");
-        ItemStack glass2 = createItem(Material.MAGENTA_STAINED_GLASS_PANE, " ", new ArrayList<>(), "");
+        ItemStack glass = GUIUtils.createFiller(Material.PINK_STAINED_GLASS_PANE);
+        ItemStack glass2 = GUIUtils.createFiller(Material.MAGENTA_STAINED_GLASS_PANE);
 
         for (int i = 0; i < 9; i++) {
             inv.setItem(i, glass);
@@ -90,14 +91,14 @@ public class EmojiGUI implements Listener {
     private ItemStack createItem(Material mat, String name, List<String> lore, String triggerKey) {
         ItemStack item = new ItemStack(mat);
         ItemMeta meta = item.getItemMeta();
-        meta.setDisplayName(ChatUtils.colorize(name));
-        List<String> coloredLore = new ArrayList<>();
+        meta.displayName(ChatUtils.toComponent(name));
+        List<Component> coloredLore = new ArrayList<>();
         for (String s : lore)
-            coloredLore.add(ChatUtils.colorize(s));
+            coloredLore.add(ChatUtils.toComponent(s));
         // Hide trigger in invisible lore or NBT if consistent clicking needed,
         // but here we just use it for display mostly.
-        coloredLore.add(ChatUtils.colorize("&0id:" + triggerKey)); // Hidden ID
-        meta.setLore(coloredLore);
+        coloredLore.add(ChatUtils.toComponent("&0id:" + triggerKey)); // Hidden ID
+        meta.lore(coloredLore);
         item.setItemMeta(meta);
         return item;
     }
@@ -116,15 +117,19 @@ public class EmojiGUI implements Listener {
             ItemMeta meta = item.getItemMeta();
 
             if (meta != null && meta.hasLore()) {
-                String hiddenId = ChatUtils.stripColor(meta.getLore().get(meta.getLore().size() - 1));
-                if (hiddenId.startsWith("id:")) {
-                    String trigger = hiddenId.substring(3);
-                    EmojiManager.EmojiData data = emojiManager.getEmojiRegistry().get(trigger);
+                @SuppressWarnings("deprecation")
+                List<String> legacyLore = meta.getLore();
+                if (legacyLore != null && !legacyLore.isEmpty()) {
+                    String hiddenId = ChatUtils.stripColor(legacyLore.get(legacyLore.size() - 1));
+                    if (hiddenId.startsWith("id:")) {
+                        String trigger = hiddenId.substring(3);
+                        EmojiManager.EmojiData data = emojiManager.getEmojiRegistry().get(trigger);
 
-                    if (data != null) {
-                        p.closeInventory();
-                        p.chat(trigger); // Simulate typing
-                        p.playSound(p.getLocation(), Sound.ENTITY_VILLAGER_YES, 1f, 1f);
+                        if (data != null) {
+                            p.closeInventory();
+                            p.chat(trigger); // Simulate typing
+                            p.playSound(p.getLocation(), Sound.ENTITY_VILLAGER_YES, 1f, 1f);
+                        }
                     }
                 }
             }

@@ -1,8 +1,8 @@
 package id.naturalsmp.naturalcore.chat;
 
 import id.naturalsmp.naturalcore.NaturalCore;
-import id.naturalsmp.naturalcore.utils.ChatUtils;
 import id.naturalsmp.naturalcore.utils.ConfigUtils;
+import id.naturalsmp.naturalcore.utils.GUIUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
@@ -53,7 +53,7 @@ public class GlobalNotificationListener implements Listener {
                     .replace("%player%", victim.getName());
         }
 
-        Bukkit.broadcastMessage(ChatUtils.colorize(message));
+        GUIUtils.broadcast(message);
     }
 
     @EventHandler(priority = EventPriority.HIGH)
@@ -77,7 +77,7 @@ public class GlobalNotificationListener implements Listener {
                 .replace("%player%", p.getName())
                 .replace("%achievement%", title);
 
-        Bukkit.broadcastMessage(ChatUtils.colorize(message));
+        GUIUtils.broadcast(message);
 
         for (Player online : Bukkit.getOnlinePlayers()) {
             online.playSound(online.getLocation(), Sound.UI_TOAST_CHALLENGE_COMPLETE, 0.5f, 1.5f);

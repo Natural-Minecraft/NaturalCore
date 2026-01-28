@@ -3,6 +3,8 @@ package id.naturalsmp.naturalcore.warp;
 import id.naturalsmp.naturalcore.NaturalCore;
 import id.naturalsmp.naturalcore.utils.ChatUtils;
 import id.naturalsmp.naturalcore.utils.ConfigUtils;
+import id.naturalsmp.naturalcore.utils.GUIUtils;
+import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.Sound;
@@ -11,12 +13,12 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
-import org.bukkit.event.inventory.InventoryDragEvent; // Wajib import
+import org.bukkit.event.inventory.InventoryDragEvent;
 import org.bukkit.inventory.Inventory;
+import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
-import org.bukkit.inventory.InventoryHolder; // Wajib import
 import java.util.*;
 
 public class WarpGUI implements Listener {
@@ -28,15 +30,13 @@ public class WarpGUI implements Listener {
         this.plugin = plugin;
     }
 
-    @SuppressWarnings("deprecation")
     public void openGUI(Player player, boolean isEditor) {
         // Title Estetik (Gradient Simulation)
         String title = isEditor
-                ? ChatUtils.colorize("&c&lWARP &4&lEDITOR &8| &7Admin Mode")
-                : ChatUtils.colorize(
-                        "&x&0&0&A&A&F&F&lN&x&1&1&B&B&F&F&la&x&2&2&C&C&F&F&lt&x&3&3&D&D&F&F&lu&x&4&4&E&E&F&F&lr&x&5&5&F&F&F&F&la&x&6&6&F&F&F&F&ll &x&7&7&F&F&F&F&lW&x&8&8&F&F&F&F&la&x&9&9&F&F&F&F&lr&x&A&A&F&F&F&F&lp&x&B&B&F&F&F&F&ls");
+                ? "&c&lWARP &4&lEDITOR &8| &7Admin Mode"
+                : "&x&0&0&A&A&F&F&lN&x&1&1&B&B&F&F&la&x&2&2&C&C&F&F&lt&x&3&3&D&D&F&F&lu&x&4&4&E&E&F&F&lr&x&5&5&F&F&F&F&la&x&6&6&F&F&F&F&ll &x&7&7&F&F&F&F&lW&x&8&8&F&F&F&F&la&x&9&9&F&F&F&F&lr&x&A&A&F&F&F&F&lp&x&B&B&F&F&F&F&ls";
 
-        Inventory inv = Bukkit.createInventory(new WarpHolder(), 54, title);
+        Inventory inv = GUIUtils.createGUI(new WarpHolder(), 54, title);
 
         fillBorder(inv);
 
@@ -65,7 +65,6 @@ public class WarpGUI implements Listener {
         player.playSound(player.getLocation(), Sound.BLOCK_CHEST_OPEN, 1f, 1f);
     }
 
-    @SuppressWarnings("deprecation")
     private ItemStack createWarpItem(Warp w, boolean isEditor) {
         ItemStack item = new ItemStack(w.getIcon());
         ItemMeta meta = item.getItemMeta();
@@ -74,21 +73,21 @@ public class WarpGUI implements Listener {
         String titleCasedName = toTitleCase(cleanId);
 
         // Use clean name without weird formats
-        meta.setDisplayName(ChatUtils.colorize("&b&l" + titleCasedName));
+        meta.displayName(ChatUtils.toComponent("&b&l" + titleCasedName));
 
         List<String> rawLore = isEditor
                 ? ConfigUtils.getMessageList("gui.warp.item-editor-lore")
                 : ConfigUtils.getMessageList("gui.warp.item-lore");
 
-        List<String> lore = new ArrayList<>();
+        List<Component> lore = new ArrayList<>();
         if (rawLore != null) {
             for (String s : rawLore) {
-                lore.add(ChatUtils.colorize(s
+                lore.add(ChatUtils.toComponent(s
                         .replace("%id%", cleanId)
                         .replace("%name%", titleCasedName)));
             }
         }
-        meta.setLore(lore);
+        meta.lore(lore);
         item.setItemMeta(meta);
         return item;
     }
@@ -112,11 +111,10 @@ public class WarpGUI implements Listener {
         return sb.toString();
     }
 
-    @SuppressWarnings("deprecation")
     private void fillBorder(Inventory inv) {
         ItemStack border = new ItemStack(Material.GRAY_STAINED_GLASS_PANE);
         ItemMeta meta = border.getItemMeta();
-        meta.setDisplayName(ChatUtils.colorize("&7"));
+        meta.displayName(ChatUtils.toComponent("&7"));
         border.setItemMeta(meta);
         int size = inv.getSize();
         for (int i = 0; i < size; i++) {
@@ -195,7 +193,6 @@ public class WarpGUI implements Listener {
     // --- EVENT HANDLER ---
 
     @EventHandler
-    @SuppressWarnings("deprecation")
     public void onClick(InventoryClickEvent e) {
         if (!(e.getWhoClicked() instanceof Player))
             return;
@@ -218,10 +215,39 @@ public class WarpGUI implements Listener {
             return;
 
         ItemMeta meta = clicked.getItemMeta();
-        if (!meta.hasLore() || meta.getLore().isEmpty())
+        if (!meta.hasLore() || meta.lore() == null || meta.lore().isEmpty())
             return;
 
-        String warpId = ChatUtils.stripColor(meta.getLore().get(0));
+        // Note: Retrieving lore from Component can be tricky if we want plain text.
+        // But here we just need the ID which is usually in the first line or known.
+        // Wait, current logic: String warpId =
+        // ChatUtils.stripColor(meta.getLore().get(0));
+        // We need to support Component-based lore retrieval.
+        // Or we can store the ID in PDC (PersistentDataContainer) for robust handling,
+        // but for now let's try to extract text from Component.
+
+        // This is risky if we change to Component.
+        // Let's defer component migration for lore READING, or assume ID extraction
+        // needs fix.
+        // Actually, let's keep the helper method returning String lore in
+        // 'meta.getLore()'
+        // IF we didn't change it. But we DID change createWarpItem to use
+        // meta.lore(List<Component>).
+        // So meta.getLore() (deprecated) might return null or work if Spigot converts
+        // it back.
+        // To be safe, we should assume we need to extract from Component.
+
+        // However, extracting plain text from Component lore:
+        // We can use meta.lore() which returns List<Component>.
+        List<Component> lore = meta.lore();
+        if (lore == null || lore.isEmpty())
+            return;
+
+        // We need to serialize back to string to strip color.
+        String firstLine = net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer.legacyAmpersand()
+                .serialize(lore.get(0));
+        String warpId = ChatUtils.stripColor(firstLine);
+
         Warp w = plugin.getWarpManager().getWarp(warpId);
 
         if (w == null)

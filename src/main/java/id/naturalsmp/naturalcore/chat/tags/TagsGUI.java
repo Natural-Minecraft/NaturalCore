@@ -2,9 +2,9 @@ package id.naturalsmp.naturalcore.chat.tags;
 
 import id.naturalsmp.naturalcore.NaturalCore;
 import id.naturalsmp.naturalcore.utils.ChatUtils;
-import org.bukkit.Bukkit;
+import id.naturalsmp.naturalcore.utils.GUIUtils;
+import net.kyori.adventure.text.Component;
 import org.bukkit.Material;
-import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -29,7 +29,7 @@ public class TagsGUI implements Listener {
 
     public void openGUI(Player p) {
         p.playSound(p.getLocation(), org.bukkit.Sound.BLOCK_BARREL_OPEN, 1.0f, 0.8f);
-        Inventory inv = Bukkit.createInventory(null, 54, ChatUtils.colorize("&8Chat Tags Collection"));
+        Inventory inv = GUIUtils.createGUI(null, 54, "&8Chat Tags Collection");
 
         String currentTag = tagsManager.getPlayerTag(p);
         Map<String, String> tags = tagsManager.getAvailableTags();
@@ -81,19 +81,19 @@ public class TagsGUI implements Listener {
     private ItemStack createItem(Material mat, String name, String... lore) {
         ItemStack item = new ItemStack(mat);
         ItemMeta meta = item.getItemMeta();
-        meta.setDisplayName(ChatUtils.colorize(name));
-        List<String> l = new ArrayList<>();
+        meta.displayName(ChatUtils.toComponent(name));
+        List<Component> l = new ArrayList<>();
         for (String s : lore) {
-            l.add(ChatUtils.colorize(s));
+            l.add(ChatUtils.toComponent(s));
         }
-        meta.setLore(l);
+        meta.lore(l);
         item.setItemMeta(meta);
         return item;
     }
 
     @EventHandler
     public void onClick(InventoryClickEvent e) {
-        if (e.getView().getTitle().equals(ChatUtils.colorize("&8Chat Tags Collection"))) {
+        if (e.getView().title().equals(ChatUtils.toComponent("&8Chat Tags Collection"))) {
             e.setCancelled(true);
 
             if (e.getCurrentItem() == null)
@@ -103,7 +103,7 @@ public class TagsGUI implements Listener {
 
             if (item.getType() == Material.BARRIER) {
                 tagsManager.setPlayerTag(p, null);
-                p.sendMessage(ChatUtils.colorize("&aTag dihapus!"));
+                p.sendMessage(ChatUtils.toComponent("&aTag dihapus!"));
                 p.closeInventory();
                 return;
             }
@@ -117,10 +117,11 @@ public class TagsGUI implements Listener {
 
                     if (p.hasPermission("naturalsmp.tags." + id)) {
                         tagsManager.setPlayerTag(p, id);
-                        p.sendMessage(ChatUtils.colorize("&aTag terpasang: " + tagsManager.getAvailableTags().get(id)));
+                        p.sendMessage(
+                                ChatUtils.toComponent("&aTag terpasang: " + tagsManager.getAvailableTags().get(id)));
                         p.closeInventory();
                     } else {
-                        p.sendMessage(ChatUtils.colorize("&cKamu belum membuka tag ini!"));
+                        p.sendMessage(ChatUtils.toComponent("&cKamu belum membuka tag ini!"));
                     }
                 }
             }

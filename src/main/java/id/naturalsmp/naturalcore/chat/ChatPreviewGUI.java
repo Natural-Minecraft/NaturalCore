@@ -1,7 +1,7 @@
 package id.naturalsmp.naturalcore.chat;
 
 import id.naturalsmp.naturalcore.utils.ChatUtils;
-import org.bukkit.Bukkit;
+import id.naturalsmp.naturalcore.utils.GUIUtils;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -19,7 +19,7 @@ public class ChatPreviewGUI implements Listener, InventoryHolder {
         ChatSnapshotManager.SnapshotData data = ChatSnapshotManager.getSnapshot(snapshotId);
 
         if (data == null) {
-            viewer.sendMessage(ChatUtils.colorize("&cSnapshot ini sudah kadaluarsa (Expired)."));
+            viewer.sendMessage(ChatUtils.toComponent("&cSnapshot ini sudah kadaluarsa (Expired)."));
             return;
         }
 
@@ -27,7 +27,8 @@ public class ChatPreviewGUI implements Listener, InventoryHolder {
         String title = data.title;
 
         // Create a copy with our holder to prevent interaction
-        Inventory gui = Bukkit.createInventory(new ChatPreviewGUI(), snapshot.getSize(), title);
+        // Use standard createGUI
+        Inventory gui = GUIUtils.createGUI(new ChatPreviewGUI(), snapshot.getSize(), title);
         gui.setContents(snapshot.getContents());
 
         viewer.openInventory(gui);

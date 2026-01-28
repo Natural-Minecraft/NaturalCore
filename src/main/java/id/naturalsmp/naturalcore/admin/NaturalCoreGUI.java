@@ -3,6 +3,8 @@ package id.naturalsmp.naturalcore.admin;
 import id.naturalsmp.naturalcore.NaturalCore;
 import id.naturalsmp.naturalcore.utils.ChatUtils;
 import id.naturalsmp.naturalcore.utils.ConfigUtils;
+import id.naturalsmp.naturalcore.utils.GUIUtils;
+import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.Sound;
@@ -35,13 +37,13 @@ public class NaturalCoreGUI implements Listener {
         }
 
         // Standard 54 slots (6 rows) for more "Large Dashboard" feel
-        Inventory inv = Bukkit.createInventory(new AdminHolder(), 54,
-                ChatUtils.colorize("&#00FFD4&lＮＡＴＵＲＡＬ &8| &#00D4FF&lＡＤＭＩＮ"));
+        Inventory inv = GUIUtils.createGUI(new AdminHolder(), 54,
+                "&#00FFD4&lＮＡＴＵＲＡＬ &8| &#00D4FF&lＡＤＭＩＮ");
 
         // --- GLASSMORPHISM FILLER (Frosted Border Effect) ---
-        ItemStack cyanGlass = createItem(Material.CYAN_STAINED_GLASS_PANE, " ");
-        ItemStack limeGlass = createItem(Material.LIME_STAINED_GLASS_PANE, " ");
-        ItemStack whiteGlass = createItem(Material.WHITE_STAINED_GLASS_PANE, " ");
+        ItemStack cyanGlass = GUIUtils.createFiller(Material.CYAN_STAINED_GLASS_PANE);
+        ItemStack limeGlass = GUIUtils.createFiller(Material.LIME_STAINED_GLASS_PANE);
+        ItemStack whiteGlass = GUIUtils.createFiller(Material.WHITE_STAINED_GLASS_PANE);
 
         // Top and Bottom Borders
         for (int i = 0; i < 9; i++) {
@@ -109,12 +111,12 @@ public class NaturalCoreGUI implements Listener {
         ItemStack item = new ItemStack(mat);
         ItemMeta meta = item.getItemMeta();
         if (meta != null) {
-            meta.setDisplayName(ChatUtils.colorize(name));
-            List<String> loreList = new ArrayList<>();
+            meta.displayName(ChatUtils.toComponent(name));
+            List<Component> loreList = new ArrayList<>();
             for (String l : lore) {
-                loreList.add(ChatUtils.colorize(l));
+                loreList.add(ChatUtils.toComponent(l));
             }
-            meta.setLore(loreList);
+            meta.lore(loreList);
             item.setItemMeta(meta);
         }
         return item;
@@ -157,12 +159,12 @@ public class NaturalCoreGUI implements Listener {
             }
             case COMMAND_BLOCK -> { // Reset Season
                 p.closeInventory();
-                p.sendMessage(ChatUtils.colorize(
+                p.sendMessage(ChatUtils.toComponent(
                         "&6&lNaturalCore &8» &7Gunakan &e/nacore admin resetseason confirm &7di chat untuk konfirmasi."));
                 p.playSound(p.getLocation(), Sound.BLOCK_ANVIL_LAND, 1f, 1f);
             }
             case NETHER_STAR -> { // Info
-                p.sendMessage(ChatUtils.colorize("&6&lNaturalCore &8» &7Anda sedang menggunakan sistem &fCore v"
+                p.sendMessage(ChatUtils.toComponent("&6&lNaturalCore &8» &7Anda sedang menggunakan sistem &fCore v"
                         + plugin.getDescription().getVersion()));
                 p.playSound(p.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, 0.5f, 2f);
             }

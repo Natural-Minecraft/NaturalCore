@@ -2,7 +2,7 @@ package id.naturalsmp.naturalcore.admin;
 
 import id.naturalsmp.naturalcore.utils.ChatUtils;
 import id.naturalsmp.naturalcore.utils.ConfigUtils;
-import org.bukkit.Bukkit;
+import id.naturalsmp.naturalcore.utils.GUIUtils;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -64,9 +64,9 @@ public class BroadcastCommand implements CommandExecutor {
                     player.sendMessage("");
                 });
             } else {
-                Bukkit.broadcastMessage("");
-                Bukkit.broadcastMessage(coloredMsg);
-                Bukkit.broadcastMessage("");
+                GUIUtils.broadcastEmpty();
+                GUIUtils.broadcast(coloredMsg);
+                GUIUtils.broadcastEmpty();
             }
         } else {
             sender.sendMessage(ConfigUtils.getMessage("admin.broadcast.usage"));

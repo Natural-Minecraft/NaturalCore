@@ -3,6 +3,8 @@ package id.naturalsmp.naturalcore.chat;
 import id.naturalsmp.naturalcore.NaturalCore;
 import id.naturalsmp.naturalcore.utils.ChatUtils;
 import id.naturalsmp.naturalcore.utils.ConfigUtils;
+import id.naturalsmp.naturalcore.utils.GUIUtils;
+import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.Sound;
@@ -29,10 +31,10 @@ public class ChatColorGUI implements Listener {
     }
 
     public void openGUI(Player p) {
-        Inventory inv = Bukkit.createInventory(new ChatColorHolder(), 54, ChatUtils.colorize(GUI_TITLE));
+        Inventory inv = GUIUtils.createGUI(new ChatColorHolder(), 54, GUI_TITLE);
 
         // Filler
-        ItemStack filler = createItem(Material.GRAY_STAINED_GLASS_PANE, " ");
+        ItemStack filler = GUIUtils.createFiller(Material.GRAY_STAINED_GLASS_PANE);
         for (int i = 0; i < 54; i++) {
             inv.setItem(i, filler);
         }
@@ -88,7 +90,7 @@ public class ChatColorGUI implements Listener {
         ItemStack item = new ItemStack(mat);
         ItemMeta meta = item.getItemMeta();
         if (meta != null) {
-            meta.setDisplayName(ChatUtils.colorize(name));
+            meta.displayName(ChatUtils.toComponent(name));
             if (cmd != 0)
                 meta.setCustomModelData(cmd);
             item.setItemMeta(meta);
@@ -103,27 +105,27 @@ public class ChatColorGUI implements Listener {
         if (!hasPerm) {
             ItemStack item = new ItemStack(Material.GRAY_DYE);
             ItemMeta meta = item.getItemMeta();
-            meta.setDisplayName(ChatUtils.colorize("&7Locked: " + name));
-            List<String> lore = new ArrayList<>();
-            lore.add(ChatUtils.colorize(ConfigUtils.getString("messages.gui.chatcolor.locked-lore")));
-            meta.setLore(lore);
+            meta.displayName(ChatUtils.toComponent("&7Locked: " + name));
+            List<Component> lore = new ArrayList<>();
+            lore.add(ChatUtils.toComponent(ConfigUtils.getString("messages.gui.chatcolor.locked-lore")));
+            meta.lore(lore);
             item.setItemMeta(meta);
             return item;
         }
 
         ItemStack item = new ItemStack(mat);
         ItemMeta meta = item.getItemMeta();
-        meta.setDisplayName(ChatUtils.colorize(name));
-        List<String> lore = new ArrayList<>();
+        meta.displayName(ChatUtils.toComponent(name));
+        List<Component> lore = new ArrayList<>();
 
         if (manager.getPlayerColor(p).equals(code)) {
-            lore.add(ChatUtils.colorize(ConfigUtils.getString("messages.gui.chatcolor.selected-lore")));
+            lore.add(ChatUtils.toComponent(ConfigUtils.getString("messages.gui.chatcolor.selected-lore")));
             meta.addEnchant(org.bukkit.enchantments.Enchantment.UNBREAKING, 1, true);
             meta.addItemFlags(org.bukkit.inventory.ItemFlag.HIDE_ENCHANTS);
         } else {
-            lore.add(ChatUtils.colorize(ConfigUtils.getString("messages.gui.chatcolor.click-select")));
+            lore.add(ChatUtils.toComponent(ConfigUtils.getString("messages.gui.chatcolor.click-select")));
         }
-        meta.setLore(lore);
+        meta.lore(lore);
         item.setItemMeta(meta);
         return item;
     }
@@ -132,7 +134,7 @@ public class ChatColorGUI implements Listener {
         ChatColorManager manager = plugin.getChatColorManager();
         ItemStack item = new ItemStack(mat);
         ItemMeta meta = item.getItemMeta();
-        meta.setDisplayName(ChatUtils.colorize(name));
+        meta.displayName(ChatUtils.toComponent(name));
 
         boolean isActive = false;
         if (type.equals("bold"))
@@ -140,13 +142,13 @@ public class ChatColorGUI implements Listener {
         if (type.equals("italic"))
             isActive = manager.isItalic(p);
 
-        List<String> lore = new ArrayList<>();
+        List<Component> lore = new ArrayList<>();
         if (!p.hasPermission("naturalsmp.color.nature")) {
-            lore.add(ChatUtils.colorize(ConfigUtils.getString("messages.utils.chatcolor-style-locked")));
+            lore.add(ChatUtils.toComponent(ConfigUtils.getString("messages.utils.chatcolor-style-locked")));
         } else {
-            lore.add(isActive ? ChatUtils.colorize("&a&lENABLED") : ChatUtils.colorize("&cDISABLED"));
+            lore.add(isActive ? ChatUtils.toComponent("&a&lENABLED") : ChatUtils.toComponent("&cDISABLED"));
         }
-        meta.setLore(lore);
+        meta.lore(lore);
         item.setItemMeta(meta);
         return item;
     }
@@ -155,21 +157,21 @@ public class ChatColorGUI implements Listener {
         ChatColorManager manager = plugin.getChatColorManager();
         ItemStack item = new ItemStack(mat);
         ItemMeta meta = item.getItemMeta();
-        meta.setDisplayName(ChatUtils.colorize(name));
+        meta.displayName(ChatUtils.toComponent(name));
 
-        List<String> lore = new ArrayList<>();
+        List<Component> lore = new ArrayList<>();
         if (!p.hasPermission("naturalsmp.color.nature")) {
-            lore.add(ChatUtils.colorize(ConfigUtils.getString("messages.utils.chatcolor-style-locked")));
+            lore.add(ChatUtils.toComponent(ConfigUtils.getString("messages.utils.chatcolor-style-locked")));
         } else {
             if (manager.getPlayerFont(p).equals(fontName)) {
-                lore.add(ChatUtils.colorize(ConfigUtils.getString("messages.gui.chatcolor.selected-lore")));
+                lore.add(ChatUtils.toComponent(ConfigUtils.getString("messages.gui.chatcolor.selected-lore")));
                 meta.addEnchant(org.bukkit.enchantments.Enchantment.UNBREAKING, 1, true);
                 meta.addItemFlags(org.bukkit.inventory.ItemFlag.HIDE_ENCHANTS);
             } else {
-                lore.add(ChatUtils.colorize(ConfigUtils.getString("messages.gui.chatcolor.click-select")));
+                lore.add(ChatUtils.toComponent(ConfigUtils.getString("messages.gui.chatcolor.click-select")));
             }
         }
-        meta.setLore(lore);
+        meta.lore(lore);
         item.setItemMeta(meta);
         return item;
     }
@@ -178,12 +180,12 @@ public class ChatColorGUI implements Listener {
         ItemStack item = new ItemStack(mat);
         ItemMeta meta = item.getItemMeta();
         if (meta != null) {
-            meta.setDisplayName(ChatUtils.colorize(name));
-            List<String> loreList = new ArrayList<>();
+            meta.displayName(ChatUtils.toComponent(name));
+            List<Component> loreList = new ArrayList<>();
             for (String l : lore) {
-                loreList.add(ChatUtils.colorize(l));
+                loreList.add(ChatUtils.toComponent(l));
             }
-            meta.setLore(loreList);
+            meta.lore(loreList);
             item.setItemMeta(meta);
         }
         return item;
@@ -210,12 +212,14 @@ public class ChatColorGUI implements Listener {
         if (mat.name().contains("WOOL")) {
             if (current.getType() == Material.GRAY_DYE) {
                 p.playSound(p.getLocation(), Sound.BLOCK_NOTE_BLOCK_BASS, 1f, 0.5f);
-                p.sendMessage(ChatUtils.colorize(ConfigUtils.getString("prefix.player")
+                p.sendMessage(ChatUtils.toComponent(ConfigUtils.getString("prefix.player")
                         + ConfigUtils.getString("messages.utils.chatcolor-locked")));
                 return;
             }
 
-            String name = ChatUtils.stripColor(current.getItemMeta().getDisplayName());
+            @SuppressWarnings("deprecation")
+            String displayName = current.getItemMeta().getDisplayName();
+            String name = ChatUtils.stripColor(displayName);
             String colorCode = "&f";
 
             if (name.contains("Pink"))

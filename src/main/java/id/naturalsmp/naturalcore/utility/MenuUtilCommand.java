@@ -2,6 +2,7 @@ package id.naturalsmp.naturalcore.utility;
 
 import id.naturalsmp.naturalcore.utils.ChatUtils;
 import id.naturalsmp.naturalcore.utils.ConfigUtils;
+import id.naturalsmp.naturalcore.utils.GUIUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -30,7 +31,7 @@ public class MenuUtilCommand implements CommandExecutor {
             }
 
             p.openInventory(
-                    Bukkit.createInventory(null, 36, ChatUtils.colorize("&cTrash Can (Items will be deleted)")));
+                    GUIUtils.createGUI(null, 36, "&cTrash Can (Items will be deleted)"));
             p.sendMessage(ChatUtils.colorize(prefix + ConfigUtils.getString("messages.utils.trash-opened")));
             p.playSound(p.getLocation(), org.bukkit.Sound.BLOCK_CHEST_OPEN, 1f, 1f);
             return true;
@@ -55,7 +56,8 @@ public class MenuUtilCommand implements CommandExecutor {
                 return true;
             }
             // Membuka Anvil Virtual (Bukan GUI custom, tapi native inventory)
-            p.openInventory(Bukkit.createInventory(null, org.bukkit.event.inventory.InventoryType.ANVIL));
+            p.openInventory(
+                    GUIUtils.createGUI(null, org.bukkit.event.inventory.InventoryType.ANVIL, "Repair & Rename"));
             p.sendMessage(ChatUtils.colorize(prefix + ConfigUtils.getString("messages.utils.anvil-opened")));
             p.playSound(p.getLocation(), org.bukkit.Sound.BLOCK_ANVIL_USE, 1f, 1f); // Use with care, loud
             return true;

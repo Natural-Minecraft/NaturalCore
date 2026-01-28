@@ -2,6 +2,7 @@ package id.naturalsmp.naturalcore.general;
 
 import id.naturalsmp.naturalcore.utils.ChatUtils;
 import id.naturalsmp.naturalcore.utils.ConfigUtils;
+import id.naturalsmp.naturalcore.utils.GUIUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -35,7 +36,7 @@ public class AdvancedChatCommand implements CommandExecutor {
                         .replace("%player%", sender.getName())
                         .replace("%message%", message));
 
-                Bukkit.broadcastMessage(finalMsg);
+                GUIUtils.broadcast(finalMsg);
                 return true;
             }
             case "sudo" -> {
