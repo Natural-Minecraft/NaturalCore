@@ -56,17 +56,17 @@ public class RestartAlertCommand implements CommandExecutor {
         String body = ConfigUtils.getMessage("admin.restart.warning-body").replace("%time%", String.valueOf(seconds));
         String footer = ConfigUtils.getMessage("admin.restart.warning-footer");
 
-        Bukkit.broadcastMessage(ChatUtils.colorize(header));
-        Bukkit.broadcastMessage(ChatUtils.colorize(titleMsg));
+        Bukkit.broadcastMessage(header);
+        Bukkit.broadcastMessage(titleMsg);
         Bukkit.broadcastMessage("");
-        Bukkit.broadcastMessage(ChatUtils.colorize(body));
+        Bukkit.broadcastMessage(body);
         Bukkit.broadcastMessage("");
-        Bukkit.broadcastMessage(ChatUtils.colorize(footer));
+        Bukkit.broadcastMessage(footer);
 
         // --- BOSS BAR SETUP ---
         bossBar = Bukkit.createBossBar(
-                ChatUtils.colorize(ConfigUtils.getMessage("admin.restart.bossbar-title").replace("%time%",
-                        String.valueOf(seconds))),
+                ConfigUtils.getMessage("admin.restart.bossbar-title").replace("%time%",
+                        String.valueOf(seconds)),
                 BarColor.GREEN,
                 BarStyle.SOLID);
         Bukkit.getOnlinePlayers().forEach(bossBar::addPlayer);
@@ -89,8 +89,8 @@ public class RestartAlertCommand implements CommandExecutor {
                 // Update BossBar
                 double progress = (double) timeLeft / initialTime;
                 bossBar.setProgress(Math.max(0.0, Math.min(1.0, progress)));
-                bossBar.setTitle(ChatUtils.colorize(ConfigUtils.getMessage("admin.restart.bossbar-title")
-                        .replace("%time%", String.valueOf(timeLeft))));
+                bossBar.setTitle(ConfigUtils.getMessage("admin.restart.bossbar-title")
+                        .replace("%time%", String.valueOf(timeLeft)));
 
                 // Change BossBar Color based on time
                 if (progress < 0.2)
@@ -132,7 +132,7 @@ public class RestartAlertCommand implements CommandExecutor {
             pitch = 1.0f + ((10 - time) * 0.1f);
 
         for (Player p : Bukkit.getOnlinePlayers()) {
-            p.sendTitle(ChatUtils.colorize(title), ChatUtils.colorize(subTitle), 0, 25, 5);
+            p.sendTitle(title, subTitle, 0, 25, 5);
             p.playSound(p.getLocation(), Sound.BLOCK_NOTE_BLOCK_PLING, 1f, pitch);
             if (!bossBar.getPlayers().contains(p))
                 bossBar.addPlayer(p);
@@ -140,12 +140,12 @@ public class RestartAlertCommand implements CommandExecutor {
     }
 
     private void processRestart() {
-        Bukkit.broadcastMessage(ChatUtils.colorize(ConfigUtils.getMessage("admin.restart.saving-data")));
+        Bukkit.broadcastMessage(ConfigUtils.getMessage("admin.restart.saving-data"));
         Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "save-all");
 
         String kickReason = ConfigUtils.getMessage("admin.restart.kick-reason");
         for (Player p : Bukkit.getOnlinePlayers()) {
-            p.kickPlayer(ChatUtils.colorize(kickReason));
+            p.kickPlayer(kickReason);
         }
 
         Bukkit.getScheduler().runTaskLater(NaturalCore.getInstance(), () -> {

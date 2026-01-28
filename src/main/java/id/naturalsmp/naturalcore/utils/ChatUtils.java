@@ -30,9 +30,15 @@ public class ChatUtils {
 
         // Jika mengandung < (MiniMessage)
         if (message.contains("<")) {
-            return net.md_5.bungee.api.ChatColor.translateAlternateColorCodes('&',
-                    net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer.legacySection()
-                            .serialize(MINI_MESSAGE.deserialize(message)));
+            try {
+                return net.md_5.bungee.api.ChatColor.translateAlternateColorCodes('&',
+                        net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer.legacySection()
+                                .serialize(MINI_MESSAGE.deserialize(message)));
+            } catch (Exception e) {
+                // Fallback jika MiniMessage gagal (mungkin karena mixed legacy color)
+                // Kita bersihkan dulu legacy color sebelum coba parsing ulang jika perlu,
+                // tapi cara termudah adalah lanjut ke legacy colorization biasa.
+            }
         }
 
         Matcher matcher = HEX_PATTERN.matcher(message);
@@ -60,7 +66,13 @@ public class ChatUtils {
         net.kyori.adventure.text.Component component;
         // Jika mengandung < (MiniMessage)
         if (message.contains("<")) {
-            component = MINI_MESSAGE.deserialize(message);
+            try {
+                component = MINI_MESSAGE.deserialize(message);
+            } catch (Exception e) {
+                // Fallback ke legacy jika MiniMessage gagal
+                component = net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer.legacySection()
+                        .deserialize(colorize(message).replace("&", "§"));
+            }
         } else {
             // Fallback ke legacy colorization lalu ke component
             component = net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer.legacySection()
