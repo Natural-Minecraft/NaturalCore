@@ -390,7 +390,6 @@ public final class NaturalCore extends JavaPlugin {
 
         registerCmd("clean", new id.naturalsmp.naturalcore.utility.CleanCommand(this));
         registerCmd("staffmode", new id.naturalsmp.naturalcore.staff.StaffModeCommand(this));
-        registerCmd("sc", new id.naturalsmp.naturalcore.staff.StaffChatCommand(this));
         registerCmd("staffchat", new id.naturalsmp.naturalcore.staff.StaffChatCommand(this));
         registerCmd("staff", new id.naturalsmp.naturalcore.staff.StaffCommand(this, staffGUI));
         registerCmd("trade", new id.naturalsmp.naturalcore.trade.TradeCommand(this));
