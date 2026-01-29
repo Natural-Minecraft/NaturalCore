@@ -43,6 +43,7 @@ import id.naturalsmp.naturalcore.chat.MessageManager;
 import id.naturalsmp.naturalcore.chat.PrivateMessageCommand;
 import id.naturalsmp.naturalcore.utility.WorldUtilCommand;
 import id.naturalsmp.naturalcore.utility.EssentialPerksCommand;
+import id.naturalsmp.naturalcore.utility.NaturalLaggCommand;
 import id.naturalsmp.naturalcore.topup.TopupSuccessGUI;
 import id.naturalsmp.naturalcore.topup.TopupCommand;
 

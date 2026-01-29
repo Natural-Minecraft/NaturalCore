@@ -56,6 +56,13 @@ public class ChatUtils {
         return ChatColor.translateAlternateColorCodes('&', matcher.appendTail(buffer).toString());
     }
 
+    public static String serialize(net.kyori.adventure.text.Component component) {
+        if (component == null)
+            return "";
+        return net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer.legacySection()
+                .serialize(component);
+    }
+
     /**
      * Mengubah string (Legacy atau MiniMessage) menjadi Adventure Component.
      */
