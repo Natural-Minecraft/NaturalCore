@@ -66,7 +66,7 @@ public class ImageUtils {
                     colors[y * 128 + x] = cached;
                 } else {
                     Color c = new Color(rgb, true);
-                    @SuppressWarnings("deprecation")
+                    @SuppressWarnings({ "deprecation", "removal" })
                     byte matched = MapPalette.matchColor(c.getRed(), c.getGreen(), c.getBlue());
                     matchCache.put(rgb, matched);
                     colors[y * 128 + x] = matched;
