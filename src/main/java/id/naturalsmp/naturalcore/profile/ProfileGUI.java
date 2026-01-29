@@ -48,12 +48,24 @@ public class ProfileGUI implements Listener {
         Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
             ProfileData data = new ProfileData();
 
-            // Tier
+            // Tier & Rank
             if (plugin.getTierManager() != null) {
                 var tier = plugin.getTierManager().getCurrentTier(target);
                 data.rankDisplay = (tier != null) ? tier.display : "Unknown";
             } else {
                 data.rankDisplay = "Loading...";
+            }
+
+            // LuckPerms Rank (Via Vault)
+            try {
+                if (plugin.getVaultManager() != null && plugin.getVaultManager().getChat() != null) {
+                    data.rankName = plugin.getVaultManager().getChat().getPrimaryGroup(null, target);
+                    if (data.rankName != null) {
+                        data.rankName = data.rankName.substring(0, 1).toUpperCase() + data.rankName.substring(1);
+                    }
+                }
+            } catch (Exception e) {
+                data.rankName = "Default";
             }
 
             // Status & Ping
@@ -69,6 +81,7 @@ public class ProfileGUI implements Listener {
             data.firstJoin = profileManager.getFirstJoin(target);
 
             // Economy
+            data.moneyFormatted = profileManager.getFormattedVaultBalance(target);
             data.hasCoins = profileManager.hasCoinsEngine();
             if (data.hasCoins) {
                 data.coins = profileManager.getCoinsEngineBalance(target);
@@ -107,21 +120,27 @@ public class ProfileGUI implements Listener {
     }
 
     private void renderProfile(Inventory inv, Player viewer, OfflinePlayer target, ProfileData data) {
-        // 1. Head Info (Slot 13)
+        // 1. Head Info (Slot 13) - The "Identity" focus
         ItemStack head = new ItemStack(Material.PLAYER_HEAD);
         SkullMeta headMeta = (SkullMeta) head.getItemMeta();
         headMeta.setOwningPlayer(target);
-        headMeta.displayName(ChatUtils.toComponent("&a&l" + target.getName()));
+        headMeta.displayName(ChatUtils.toComponent("&#00AAFF❂ &l" + target.getName() + " &#00AAFF❂"));
         List<Component> headLore = new ArrayList<>();
-        headLore.add(ChatUtils.toComponent("&8&m------------------"));
-        headLore.add(ChatUtils.toComponent("&7Rank: &f" + data.rankDisplay));
-
+        headLore.add(ChatUtils.toComponent("&8&m----------------------------"));
+        headLore.add(ChatUtils.toComponent("&7Rank: &f" + data.rankName));
+        headLore.add(ChatUtils.toComponent("&7Tier: " + data.rankDisplay));
+        headLore.add(ChatUtils.toComponent(""));
+        headLore.add(ChatUtils.toComponent("&7Uang: &aRp " + data.moneyFormatted));
+        if (data.hasCoins) {
+            headLore.add(ChatUtils.toComponent("&7NaturalCoin: &6" + data.coins + " NC"));
+        }
+        headLore.add(ChatUtils.toComponent(""));
         String status = data.isOnline ? "&aOnline" : "&cOffline";
         headLore.add(ChatUtils.toComponent("&7Status: " + status));
         if (data.isOnline) {
             headLore.add(ChatUtils.toComponent("&7Ping: &e" + data.ping + "ms"));
         }
-        headLore.add(ChatUtils.toComponent("&8&m------------------"));
+        headLore.add(ChatUtils.toComponent("&8&m----------------------------"));
         headMeta.lore(headLore);
         head.setItemMeta(headMeta);
         inv.setItem(13, head);
@@ -135,14 +154,12 @@ public class ProfileGUI implements Listener {
         statsLore.add("&f📅 Join: &e" + data.firstJoin);
         inv.setItem(29, createItem(Material.CLOCK, "&b&lSTATISTIK", statsLore.toArray(new String[0])));
 
-        // 3. Economy (Slot 31)
+        // 3. Economy Details (Slot 31) - Replaced with detailed view
         List<String> ecoLore = new ArrayList<>();
-        if (data.hasCoins) {
-            ecoLore.add("&7NaturalCoin: &6" + data.coins + " NC");
-        } else {
-            ecoLore.add("&7NaturalCoin: &cFeature Disabled");
-        }
-        inv.setItem(31, createItem(Material.GOLD_INGOT, "&6&lEconomy Stats", ecoLore.toArray(new String[0])));
+        ecoLore.add("");
+        ecoLore.add("&7Saldo Bank: &aRp " + data.moneyFormatted);
+        ecoLore.add("&7Saldo Koin: &6" + (data.hasCoins ? data.coins : 0) + " NC");
+        inv.setItem(31, createItem(Material.GOLD_INGOT, "&6&lDOMPET DIGITAL", ecoLore.toArray(new String[0])));
 
         // 4. AuraSkills (Slot 33)
         if (data.hasSkills) {
@@ -154,11 +171,11 @@ public class ProfileGUI implements Listener {
             skillLore.add("&f🌳 Foraging: &eLvl " + data.foraging);
             skillLore.add("&f🏹 Archery: &eLvl " + data.archery);
             skillLore.add("");
-            skillLore.add("&7Buka &b/skills &7untuk detail lanjut.");
+            skillLore.add("&#55FF55&l➥ KLIK UNTUK BUKA SKILLS");
             inv.setItem(33, createItem(Material.EXPERIENCE_BOTTLE, "&b&lAURASKILLS", skillLore.toArray(new String[0])));
         }
 
-        // 5. Social Actions (Slot 48, 50) - Only if viewing others
+        // 5. Social Actions (Slot 49) - Only if viewing others
         if (!target.getUniqueId().equals(viewer.getUniqueId())) {
             inv.setItem(49, createItem(Material.PAPER, "&b&lSend Message", "&7Klik untuk kirim pesan"));
         }
@@ -174,6 +191,8 @@ public class ProfileGUI implements Listener {
 
     private static class ProfileData {
         String rankDisplay;
+        String rankName; // LuckPerms Rank
+        String moneyFormatted;
         boolean isOnline;
         int ping;
         String kdr;
@@ -206,13 +225,21 @@ public class ProfileGUI implements Listener {
     @EventHandler
     public void onClick(InventoryClickEvent e) {
         if (e.getInventory().getHolder() instanceof ProfileHolder) {
-            e.setCancelled(true); // Prevent taking items
+            e.setCancelled(true);
+            Player p = (Player) e.getWhoClicked();
 
             if (e.getCurrentItem() == null)
                 return;
 
-            // Logic click bisa ditambah disini
-            // Misal klik profile sendiri buka settings
+            Material mat = e.getCurrentItem().getType();
+            if (mat == Material.EXPERIENCE_BOTTLE) {
+                p.closeInventory();
+                p.performCommand("skills");
+            } else if (mat == Material.PAPER) {
+                // Future: open chat input for message
+                p.closeInventory();
+                p.sendMessage(ChatUtils.colorize("&6&lProfile &8» &7Gunakan &e/msg <player> &7untuk berkirim pesan."));
+            }
         }
     }
 

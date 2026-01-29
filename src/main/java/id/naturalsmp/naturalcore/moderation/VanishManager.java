@@ -44,14 +44,15 @@ public class VanishManager implements Listener {
             }
 
             // 2. Fake Quit Message
-            String quitMsg = ConfigUtils.getString("social.quit-message");
+            String quitMsg = ConfigUtils.getString("messages.social.quit-message");
             GUIUtils.broadcast(ChatUtils.formatMessage(p, quitMsg));
 
             // 3. Status Effects
             p.setAllowFlight(true);
             p.setSleepingIgnored(true);
+            p.setPlayerListName(null); // Remove from TAB for self too/cleaner behavior
 
-            p.sendMessage(ConfigUtils.getString("prefix.moderation")
+            p.sendMessage(ConfigUtils.getString("messages.prefix.moderation")
                     + ConfigUtils.getString("messages.moderation.vanish-enabled"));
             p.sendTitle("", ChatUtils.colorize("&b&lVANISHED"), 0, 40, 10);
 
@@ -66,10 +67,11 @@ public class VanishManager implements Listener {
             }
 
             // 2. Fake Join Message
-            String joinMsg = ConfigUtils.getString("social.join-message");
+            String joinMsg = ConfigUtils.getString("messages.social.join-message");
             GUIUtils.broadcast(ChatUtils.formatMessage(p, joinMsg));
 
             // 3. Reset
+            p.setPlayerListName(p.getName());
             if (p.getGameMode() != GameMode.CREATIVE && p.getGameMode() != GameMode.SPECTATOR) {
                 // Keep flight if they have fly permission, else disable
                 if (!p.hasPermission("naturalsmp.fly")) {
@@ -79,10 +81,41 @@ public class VanishManager implements Listener {
             }
             p.setSleepingIgnored(false);
 
-            p.sendMessage(ConfigUtils.getString("prefix.moderation")
+            p.sendMessage(ConfigUtils.getString("messages.prefix.moderation")
                     + ConfigUtils.getString("messages.moderation.vanish-disabled"));
 
             plugin.getLogger().info(p.getName() + " is now UN-VANISHED ✨");
+        }
+    }
+
+    // --- GHOST FEATURES (Event Handlers) ---
+
+    @EventHandler(priority = org.bukkit.event.EventPriority.HIGHEST)
+    public void onPickup(EntityPickupItemEvent e) {
+        if (e.getEntity() instanceof Player p) {
+            if (isVanished(p)) {
+                e.setCancelled(true);
+            }
+        }
+    }
+
+    @EventHandler(priority = org.bukkit.event.EventPriority.HIGHEST)
+    public void onInteract(PlayerInteractEvent e) {
+        if (isVanished(e.getPlayer())) {
+            // Prevent treading on pressure plates / physical interaction
+            if (e.getAction() == Action.PHYSICAL) {
+                e.setCancelled(true);
+            }
+        }
+    }
+
+    @EventHandler(priority = org.bukkit.event.EventPriority.HIGHEST)
+    public void onTarget(EntityTargetLivingEntityEvent e) {
+        if (e.getTarget() instanceof Player p) {
+            if (isVanished(p)) {
+                e.setTarget(null);
+                e.setCancelled(true);
+            }
         }
     }
 

@@ -29,12 +29,12 @@ admin:
     shout-format: "&a&lShout &b> &e%message%"
   restart:
     confirm-required: "&8&l| &cSilahkan ketik &aConfirmation &cterlebih dahulu"
-    warning-header: "&#ff0000&m&l---------=============---------"
+    warning-header: "&#ff0000&m&l-----------===============-----------"
     warning-title: "                 <gradient:#ff0000:#ff8c00><b>WARNING</b></gradient>"
     warning-body: |-
        <center>&cServer akan melakukan restart otomatis</center>
              <center>&cdalam waktu &a%time% &cdetik</center>
-    warning-footer: "&#ff0000&m&l---------=============---------"
+    warning-footer: "&#ff0000&m&l-----------===============-----------"
     countdown-title: "<gradient:#ff0000:#ff8c00><b>! RESTART !</b></gradient>"
     countdown-subtitle: "&fServer restart dalam &e%time% &fdetik"
     saving-data: "&#ffaa00&l💾 SAVING DATA..."

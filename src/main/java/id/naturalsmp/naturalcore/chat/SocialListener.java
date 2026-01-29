@@ -47,7 +47,7 @@ public class SocialListener implements Listener {
         // --- JOIN MESSAGE ---
         if (p.hasPermission("naturalsmp.nature")) {
             e.joinMessage(null);
-            List<String> lines = ConfigUtils.getStringList("social.nature-join");
+            List<String> lines = ConfigUtils.getStringList("messages.social.nature-join");
             for (String line : lines) {
                 GUIUtils.broadcast(ChatUtils.formatMessage(p, line));
             }
@@ -56,7 +56,7 @@ public class SocialListener implements Listener {
                 online.playSound(online.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, 1f, 0.5f);
             }
         } else {
-            String joinMsg = ConfigUtils.getString("social.join-message");
+            String joinMsg = ConfigUtils.getString("messages.social.join-message");
             e.joinMessage(ChatUtils.toComponent(ChatUtils.formatMessage(p, joinMsg)));
         }
     }
@@ -70,7 +70,7 @@ public class SocialListener implements Listener {
             return;
         }
 
-        String quitMsg = ConfigUtils.getString("social.quit-message");
+        String quitMsg = ConfigUtils.getString("messages.social.quit-message");
         e.quitMessage(ChatUtils.toComponent(ChatUtils.formatMessage(p, quitMsg)));
     }
 }
