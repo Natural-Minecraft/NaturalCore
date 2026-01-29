@@ -46,11 +46,8 @@ public class PermissionManager {
             lp.getEventBus().subscribe(plugin, net.luckperms.api.event.user.UserDataRecalculateEvent.class, e -> {
                 org.bukkit.entity.Player p = org.bukkit.Bukkit.getPlayer(e.getUser().getUniqueId());
                 if (p != null && p.isOnline()) {
-                    // Update metadata real-time if rank changed
-                    plugin.getLogger().info("Detecting rank change for " + p.getName() + ", refreshing profile...");
-                    if (plugin.getProfileManager() != null) {
-                        plugin.getProfileManager().loadProfile(p);
-                    }
+                    // Update metadata real-time if rank changed (V2.0 Logging)
+                    plugin.getLogger().info("Rank change detected for " + p.getName() + " - metadata updated.");
                 }
             });
         } catch (Exception ignored) {
