@@ -23,16 +23,6 @@ public class CleanCommand implements CommandExecutor {
     public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label,
             @NotNull String[] args) {
 
-        if (args.length > 0 && args[0].equalsIgnoreCase("ground")) {
-            if (!sender.hasPermission("naturalsmp.admin")) {
-                sender.sendMessage(ConfigUtils.getString("messages.global.no-permission"));
-                return true;
-            }
-            plugin.getLaggManager().startCleanup(10);
-            sender.sendMessage(ChatUtils.colorize("&6&lNaturalCore &8» &7Memulai pembersihan item global..."));
-            return true;
-        }
-
         if (!(sender instanceof Player))
             return true;
         Player p = (Player) sender;

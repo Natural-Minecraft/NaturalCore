@@ -177,7 +177,7 @@ commands:
     permission: naturalsmp.list
   lag:
     description: Cek performa server
-    aliases: [tps, mem, memory, uptime]
+    aliases: [tps, mem, memory, uptime, lagg]
     permission: naturalsmp.lag
   info:
     description: Info server
@@ -346,7 +346,7 @@ commands:
     aliases: [color, ccolor]
     permission: naturalsmp.chat.color
   clean:
-    description: Bersihkan inventory (kecuali armor)
+    description: Bersihkan inventory sendiri
     aliases: [clear, ci]
     permission: naturalsmp.clean
   back:

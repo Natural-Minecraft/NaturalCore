@@ -388,6 +388,8 @@ public final class NaturalCore extends JavaPlugin {
         this.playtimeManager = new id.naturalsmp.naturalcore.playtime.PlaytimeManager(this);
         this.broadcastManager = new id.naturalsmp.naturalcore.announcement.BroadcastManager(this);
 
+        NaturalLaggCommand laggCmd = new NaturalLaggCommand(this);
+        registerCmd("lagg", laggCmd);
         registerCmd("clean", new id.naturalsmp.naturalcore.utility.CleanCommand(this));
         registerCmd("staffmode", new id.naturalsmp.naturalcore.staff.StaffModeCommand(this));
         registerCmd("staffchat", new id.naturalsmp.naturalcore.staff.StaffChatCommand(this));

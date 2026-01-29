@@ -14,7 +14,7 @@ Plugin inti (core) premium untuk server **NaturalSMP**, mengelola modul Ekonomi,
 *   **Adventure Component**: Mendukung format teks modern (MiniMessage/Component) untuk performa dan kompatibilitas masa depan.
 *   **Stability**: Perbaikan bug pada Anvil dan Trash GUI.
 
-### � TopUp Notification System
+### � TopUp Notification Systemanti
 Fitur bagi owner/admin untuk mensimulasikan dan mengirim notifikasi donasi.
 *   **GUI & Broadcast**: Tampilan GUI "Pembayaran Berhasil" dan broadcast global yang meriah.
 *   **Admin Tools**: Tombol khusus di `/nacore admin` untuk simulasi cepat.
@@ -96,7 +96,8 @@ Fitur bagi owner/admin untuk mensimulasikan dan mengirim notifikasi donasi.
 | `/heal` | - | Isi HP & Hunger | `naturalsmp.heal` |
 | `/repair` | `fix` | Perbaiki item di tangan | `naturalsmp.repair` |
 | `/clean` | `ci` | Bersihkan inventory (Safe) | `naturalsmp.clean` |
-| `/clean ground` | - | Bersihkan item di tanah (Admin) | `naturalsmp.admin` |
+| `/lagg` | `tps`, `mem` | Cek performa server (Stats) | `naturalsmp.lag` |
+| `/lagg clear` | - | Bersihkan item di tanah (Admin) | `naturalsmp.admin` |
 | `/craft` | `wb` | Buka Workbench virtual | `naturalsmp.craft` |
 | `/anvil` | `av` | Buka Anvil virtual | `naturalsmp.anvil` |
 | `/enderchest` | `ec` | Buka Enderchest virtual | `naturalsmp.enderchest` |
