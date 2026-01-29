@@ -64,6 +64,23 @@ public class ChatUtils {
     }
 
     /**
+     * Mengubah string menjadi Component yang SANGAT aman untuk fase Login.
+     * Menggunakan format § (legacy) dan mematikan semua fitur Adventure yang
+     * kompleks.
+     */
+    public static net.kyori.adventure.text.Component toLoginSafeComponent(String message) {
+        if (message == null || message.isEmpty())
+            return net.kyori.adventure.text.Component.empty();
+
+        // 1. Colorize with legacy handling
+        String colored = colorize(message).replace("&", "§");
+
+        // 2. Convert to component via legacy serializer to ensure it's "flat"
+        return net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer.legacySection()
+                .deserialize(colored);
+    }
+
+    /**
      * Mengubah string (Legacy atau MiniMessage) menjadi Adventure Component.
      */
     public static net.kyori.adventure.text.Component toComponent(String message) {

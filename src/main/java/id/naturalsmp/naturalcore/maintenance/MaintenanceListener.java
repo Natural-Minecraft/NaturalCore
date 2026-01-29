@@ -28,7 +28,7 @@ public class MaintenanceListener implements Listener {
 
         // We will do a permission check on PlayerJoinEvent as well for secondary safety
         String kickReason = ConfigUtils.getString("messages.admin.maintenance.kick-reason");
-        e.disallow(AsyncPlayerPreLoginEvent.Result.KICK_OTHER, ChatUtils.toComponent(kickReason));
+        e.disallow(AsyncPlayerPreLoginEvent.Result.KICK_OTHER, ChatUtils.toLoginSafeComponent(kickReason));
     }
 
     @EventHandler
@@ -46,6 +46,6 @@ public class MaintenanceListener implements Listener {
         }
 
         String kickReason = ConfigUtils.getString("messages.admin.maintenance.kick-reason");
-        e.getPlayer().kick(ChatUtils.toComponent(kickReason));
+        e.getPlayer().kick(ChatUtils.toLoginSafeComponent(kickReason));
     }
 }

@@ -40,7 +40,7 @@ admin:
     saving-data: "&#ffaa00&l💾 SAVING DATA..."
     bossbar-title: "<gradient:#00ff00:#ff0000><b>Sistem Restart Otomatis</b></gradient> &7- &f%time%s"
     kick-reason: |-
-      &a&lNaturalSMP &8» <gradient:#ff0000:#ff8c00><b>RESTART</b></gradient>
+      &a&lNaturalSMP &8» &c&lRESTART
       
       &7Server sedang melakukan pemeliharaan rutin.
       &7Silahkan coba kembali dalam &e3-5 menit&7.
@@ -49,7 +49,7 @@ admin:
   maintenance:
     countdown: "&6&lMaintenance &8» &7Server akan masuk ke mode maintenance dalam &e%time%&7 detik."
     kick-reason: |-
-      &6&lNaturalSMP &8» <gradient:#FFAA00:#FFFF55><b>MAINTENANCE</b></gradient>
+      &6&lNaturalSMP &8» &e&lMAINTENANCE
       
       &7Server sedang dalam tahap perbaikan/update.
       &7Hanya staf yang diizinkan masuk saat ini.
