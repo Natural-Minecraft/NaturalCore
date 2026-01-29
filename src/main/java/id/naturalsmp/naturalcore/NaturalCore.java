@@ -88,13 +88,27 @@ public final class NaturalCore extends JavaPlugin {
     private id.naturalsmp.naturalcore.combat.CombatManager combatManager;
     private id.naturalsmp.naturalcore.playtime.PlaytimeManager playtimeManager;
     private id.naturalsmp.naturalcore.announcement.BroadcastManager broadcastManager;
+    private id.naturalsmp.naturalcore.utility.BackupManager backupManager;
 
     @Override
     public void onEnable() {
         instance = this;
 
         // 1. Startup Log
-        getLogger().info(ChatUtils.colorize("&6&lNaturalCore &aStarting up..."));
+        getLogger()
+                .info(ChatUtils.colorize("&6&lNaturalCore &av" + getDescription().getVersion() + " &7Starting up..."));
+        String banner = """
+                &e   _  Status: &aONLINE&e
+                &e  | \\ | | __ _| |_ _   _ _ __ __ _| |
+                &e  |  \\| |/ _` | __| | | | '__/ _` | |
+                &e  | |\\  | (_| | |_| |_| | | | (_| | |
+                &e  |_| \\_|\\__,_|\\__|\\__,_|_|  \\__,_|_|
+                &6&l     -= NATURAL CORE v2.0.0 =-
+                &7       Developed for NaturalSMP
+                """;
+        for (String line : banner.split("\n")) {
+            Bukkit.getConsoleSender().sendMessage(ChatUtils.colorize(line));
+        }
 
         // 2. Setup Config & Migration
         saveDefaultConfig();
@@ -102,7 +116,8 @@ public final class NaturalCore extends JavaPlugin {
         id.naturalsmp.naturalcore.utils.ConfigUpdater.updateConfig(this, "messages.yml");
         id.naturalsmp.naturalcore.utils.ConfigUpdater.updateConfig(this, "essentials_disabled_commands.yml");
 
-        // Init Managers
+        // 2B. Init Backup System (v2.0)
+        this.backupManager = new id.naturalsmp.naturalcore.utility.BackupManager(this);
         this.seasonResetManager = new id.naturalsmp.naturalcore.season.SeasonResetManager(this);
         this.tagsManager = new id.naturalsmp.naturalcore.chat.tags.TagsManager(this);
 
@@ -625,6 +640,10 @@ public final class NaturalCore extends JavaPlugin {
 
     public id.naturalsmp.naturalcore.utility.ServerHealthManager getHealthManager() {
         return healthManager;
+    }
+
+    public id.naturalsmp.naturalcore.utility.BackupManager getBackupManager() {
+        return backupManager;
     }
 
     // --- HELPER UNTUK MENCEGAH CRASH ---

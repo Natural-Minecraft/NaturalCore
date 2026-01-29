@@ -35,6 +35,26 @@ public class PermissionManager {
         }
 
         loadPermissions();
+
+        // --- REALTIME LUCKPERMS SYNC (v2.0) ---
+        setupLuckPermsListener();
+    }
+
+    private void setupLuckPermsListener() {
+        try {
+            net.luckperms.api.LuckPerms lp = net.luckperms.api.LuckPermsProvider.get();
+            lp.getEventBus().subscribe(plugin, net.luckperms.api.event.user.UserDataRecalculateEvent.class, e -> {
+                org.bukkit.entity.Player p = org.bukkit.Bukkit.getPlayer(e.getUser().getUniqueId());
+                if (p != null && p.isOnline()) {
+                    // Update metadata real-time if rank changed
+                    plugin.getLogger().info("Detecting rank change for " + p.getName() + ", refreshing profile...");
+                    if (plugin.getProfileManager() != null) {
+                        plugin.getProfileManager().loadProfile(p);
+                    }
+                }
+            });
+        } catch (Exception ignored) {
+        }
     }
 
     public void loadPermissions() {

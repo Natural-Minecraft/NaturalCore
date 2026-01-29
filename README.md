@@ -1,8 +1,8 @@
-# NaturalCore v1.9.9
+# NaturalCore v2.0.0 (Phoenix Edition)
 
-Plugin inti (core) premium untuk server **NaturalSMP**, mengelola modul Ekonomi, Chat, Warp, Home, Banner interaktif, sistem Seasons, hingga fitur ChatColor berbasis Rank. **NaturalCore** difokuskan sebagai plugin Essentials yang ringan dan stabil.
+Plugin inti (core) premium untuk server **NaturalSMP**, mengelola seluruh aspek penting server dengan stabilitas ultra-tinggi dan estetika premium.
 
-## ✨ Fitur Baru v1.9.9 (The "Polished" Update)
+## ✨ Fitur Baru v2.0.0 (The Phoenix Update)
 
 ### 🧹 NaturalLagg (Visual Overhaul)
 *   **Synced Action Bar**: Notifikasi hitung mundur kini muncul di Action Bar dengan animasi "Slide-In" yang halus.

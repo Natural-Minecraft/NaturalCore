@@ -88,6 +88,13 @@ public class NaturalCoreCommand implements CommandExecutor, TabCompleter {
                     if (sender instanceof Player p)
                         plugin.getStatusGUI().openGUI(p);
                 }
+                case "backup" -> {
+                    if (plugin.getBackupManager() != null) {
+                        sender.sendMessage(ChatUtils.colorize("&6&lBackup &8» &fCreating manual backup..."));
+                        plugin.getBackupManager().createBackup("ManualBackup");
+                        sender.sendMessage(ChatUtils.colorize("&6&lBackup &8» &aDone!"));
+                    }
+                }
                 case "gui" -> {
                     if (sender instanceof Player p)
                         new NaturalCoreGUI(plugin).openGUI(p);
@@ -167,7 +174,7 @@ public class NaturalCoreCommand implements CommandExecutor, TabCompleter {
         }
 
         if (args.length == 2 && args[0].equalsIgnoreCase("admin")) {
-            return Arrays.asList("reload", "resetseason", "ranksync", "gui", "status").stream()
+            return Arrays.asList("reload", "resetseason", "ranksync", "gui", "status", "backup").stream()
                     .filter(s -> s.startsWith(args[1].toLowerCase())).collect(java.util.stream.Collectors.toList());
         }
 
