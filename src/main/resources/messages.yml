@@ -61,6 +61,11 @@ admin:
 social:
   join-message: "&8[&a+&8] &7%displayname%"
   quit-message: "&8[&c-&8] &7%displayname%"
+  nature-join:
+    - ""
+    - "  <gradient:#00AAFF:#55FF55>&l» Welcome to NaturalSMP! «</gradient>"
+    - "  &b%displayname% &7telah kembali ke alam."
+    - ""
   first-join-message: "&d&lNEW &8┃ &fWelcome &d%displayname% &7to the server! &e(#%count%)"
   motd:
     - "&8&m--------------------------------"

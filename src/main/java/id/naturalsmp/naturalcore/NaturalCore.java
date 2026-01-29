@@ -38,6 +38,7 @@ import id.naturalsmp.naturalcore.moderation.ModerationCommand;
 
 import id.naturalsmp.naturalcore.general.RTPCommand;
 import id.naturalsmp.naturalcore.chat.EmojiManager;
+import id.naturalsmp.naturalcore.chat.SocialListener;
 import id.naturalsmp.naturalcore.chat.EmojiCommand;
 import id.naturalsmp.naturalcore.chat.MessageManager;
 import id.naturalsmp.naturalcore.chat.PrivateMessageCommand;
@@ -214,6 +215,11 @@ public final class NaturalCore extends JavaPlugin {
         // Rank Editor (v1.9.9)
         RankEditorGUI rankEditor = new RankEditorGUI(this);
         getServer().getPluginManager().registerEvents(rankEditor, this);
+
+        // Social System (v1.9.9)
+        SocialListener socialListener = new SocialListener(this);
+        getServer().getPluginManager().registerEvents(socialListener, this);
+
         registerCmd("rankeditor", (sender, cmd, label, args) -> {
             if (sender instanceof Player)
                 rankEditor.openMainMenu((Player) sender);
@@ -332,7 +338,8 @@ public final class NaturalCore extends JavaPlugin {
         registerCmd("vanish", modCmd);
         registerCmd("whois", modCmd);
 
-        // Register Vanish Listener (Realtime Hide)
+        // Register Vanish Listener
+        getServer().getPluginManager().registerEvents(this.vanishManager, this);
         getServer().getPluginManager().registerEvents(new VanishListener(this), this);
 
         // 16. PlaceholderAPI Expansion
@@ -355,6 +362,7 @@ public final class NaturalCore extends JavaPlugin {
 
         // 18. Messaging System
         getServer().getPluginManager().registerEvents(new ChatListener(this), this);
+        getServer().getPluginManager().registerEvents(new SocialListener(this), this);
         // MentionListener is now integrated into ChatListener (Adventure API)
         getServer().getPluginManager().registerEvents(new ChatTabCompleter(), this);
         getServer().getPluginManager().registerEvents(new ChatPreviewGUI(), this);

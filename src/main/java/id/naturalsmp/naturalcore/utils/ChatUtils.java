@@ -87,6 +87,18 @@ public class ChatUtils {
         if (message == null || message.isEmpty())
             return net.kyori.adventure.text.Component.empty();
 
+        // Handle <center> tags
+        if (message.contains("<center>")) {
+            int start = message.indexOf("<center>");
+            int end = message.indexOf("</center>");
+            if (end > start) {
+                String before = message.substring(0, start);
+                String content = message.substring(start + 8, end);
+                String after = message.substring(end + 9);
+                return toComponent(before).append(toComponent(center(content))).append(toComponent(after));
+            }
+        }
+
         net.kyori.adventure.text.Component component;
         // Jika mengandung < (MiniMessage)
         if (message.contains("<")) {
@@ -108,6 +120,46 @@ public class ChatUtils {
         return net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer.legacySection()
                 .deserialize(net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer.legacySection()
                         .serialize(component));
+    }
+
+    /**
+     * Center text for Minecraft chat (default 320px width).
+     */
+    public static String center(String text) {
+        if (text == null || text.isEmpty())
+            return "";
+
+        String stripped = stripColor(text);
+        int totalWidth = 320; // Standard MC chat width in pixels
+        int textWidth = 0;
+
+        for (char c : stripped.toCharArray()) {
+            // Very basic pixel width estimation for standard fonts
+            if (c == 'i' || c == '!' || c == '.' || c == ',')
+                textWidth += 2;
+            else if (c == 'l' || c == '\'' || c == ';')
+                textWidth += 3;
+            else if (c == 't' || c == '[' || c == ']' || c == 'I')
+                textWidth += 4;
+            else if (c == 'f' || c == 'k' || c == '(' || c == ')' || c == '{' || c == '}')
+                textWidth += 5;
+            else if (c == ' ')
+                textWidth += 4;
+            else
+                textWidth += 6; // Default character width
+        }
+
+        int centerPos = totalWidth / 2;
+        int halfTextWidth = textWidth / 2;
+        int paddingWidth = centerPos - halfTextWidth;
+
+        if (paddingWidth <= 0)
+            return text;
+
+        int spaceWidth = 4; // Width of a single space
+        int spaceCount = paddingWidth / spaceWidth;
+
+        return " ".repeat(Math.max(0, spaceCount)) + text;
     }
 
     public static java.util.List<String> colorize(java.util.List<String> list) {
