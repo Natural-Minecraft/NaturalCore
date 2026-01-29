@@ -48,9 +48,9 @@ public class RankGUI implements Listener {
 
         // Filter and Sort by weight if possible, but for now just display MIDI, VIP,
         // MVP, NATURE in order
-        // We look for keys "naturalsmp.midi", etc.
+        // We look for keys "midi", "vip", etc.
         int[] slots = { 10, 12, 14, 16 };
-        String[] keys = { "naturalsmp.midi", "naturalsmp.vip", "naturalsmp.mvp", "naturalsmp.nature" };
+        String[] keys = { "midi", "vip", "mvp", "nature" };
         Material[] mats = { Material.LAPIS_LAZULI, Material.EMERALD, Material.GOLD_INGOT, Material.DIAMOND };
 
         for (int i = 0; i < keys.length; i++) {

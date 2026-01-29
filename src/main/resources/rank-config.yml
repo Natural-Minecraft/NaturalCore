@@ -1,12 +1,14 @@
 # ==========================================
 #     NATURAL CORE - RANK PERMISSIONS
 # ==========================================
-# Di LuckPerms, anda cukup memberikan 1 permission kunci.
-# Plugin akan otomatis mendaftarkan semua sub-permission di bawahnya.
-# Metadata (prefix, weight, dll) bisa di-sync otomatis ke LuckPerms.
+# Di LuckPerms, anda cukup memberikan permission: group.<id>
+# atau permission kunci yang didefinisikan di bawah.
 
 # --- DEFAULT (SEMUA PLAYER) ---
-naturalsmp.default:
+default:
+  permission: naturalsmp.default
+  console-name: "Member"
+  display-name: "&7Member"
   prefix: " "
   weight: 0
   permissions:
@@ -89,7 +91,10 @@ naturalsmp.default:
     - naturalsmp.back
 
 # --- MIDI RANK ---
-naturalsmp.midi:
+midi:
+  permission: naturalsmp.midi
+  console-name: "Midi"
+  display-name: "&dMidi"
   prefix: " "
   weight: 100
   permissions:
@@ -101,10 +106,13 @@ naturalsmp.midi:
     - redprotect.limits.blocks.25000
     - redprotect.limits.claim.10
   inheritance:
-    - naturalsmp.default
+    - default
 
 # --- VIP RANK ---
-naturalsmp.vip:
+vip:
+  permission: naturalsmp.vip
+  console-name: "VIP"
+  display-name: "&aVIP"
   prefix: " "
   weight: 200
   permissions:
@@ -117,10 +125,13 @@ naturalsmp.vip:
     - redprotect.limits.blocks.50000
     - redprotect.limits.claim.20
   inheritance:
-    - naturalsmp.midi
+    - midi
 
 # --- MVP RANK ---
-naturalsmp.mvp:
+mvp:
+  permission: naturalsmp.mvp
+  console-name: "MVP"
+  display-name: "&bMVP"
   prefix: " "
   weight: 300
   permissions:
@@ -134,10 +145,13 @@ naturalsmp.mvp:
     - redprotect.limits.blocks.150000
     - redprotect.limits.claim.40
   inheritance:
-    - naturalsmp.vip
+    - vip
 
 # --- NATURE RANK ---
-naturalsmp.nature:
+nature:
+  permission: naturalsmp.nature
+  console-name: "Nature"
+  display-name: "&eNature"
   prefix: " "
   weight: 400
   permissions:
@@ -148,14 +162,17 @@ naturalsmp.nature:
     - redprotect.limits.blocks.500000
     - redprotect.limits.claim.80
   inheritance:
-    - naturalsmp.mvp
+    - mvp
 
 # --- ADMIN ---
-naturalsmp.admin:
+admin:
+  permission: naturalsmp.admin
+  console-name: "Admin"
+  display-name: "&cAdmin"
   prefix: " "
   weight: 1000
   permissions:
     - naturalsmp.*
     - "*"
   inheritance:
-    - naturalsmp.nature
+    - nature

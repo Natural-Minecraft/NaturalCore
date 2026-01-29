@@ -210,6 +210,15 @@ public final class NaturalCore extends JavaPlugin {
         // 12. Permissions Module
         this.permissionManager = new id.naturalsmp.naturalcore.permissions.PermissionManager(this);
 
+        // Rank Editor (v1.9.9)
+        RankEditorGUI rankEditor = new RankEditorGUI(this);
+        getServer().getPluginManager().registerEvents(rankEditor, this);
+        registerCmd("rankeditor", (sender, cmd, label, args) -> {
+            if (sender instanceof Player)
+                rankEditor.openMainMenu((Player) sender);
+            return true;
+        });
+
         BroadcastCommand bcCmd = new BroadcastCommand();
         registerCmd("bc", bcCmd);
         registerCmd("bcworld", bcCmd);

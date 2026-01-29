@@ -47,7 +47,11 @@ public class PermissionManager {
                 continue;
 
             RankConfig rank = new RankConfig();
-            rank.permission = key;
+            rank.id = key; // Simple ID (e.g. "vip")
+            rank.permission = section.getString("permission", "naturalsmp." + key); // Fallback if missing
+            rank.consoleName = section.getString("console-name", key.toUpperCase());
+            rank.displayName = ChatUtils.colorize(section.getString("display-name", "&7" + key));
+
             rank.prefix = section.getString("prefix");
             rank.suffix = section.getString("suffix");
             rank.weight = section.getInt("weight", 0);
@@ -55,8 +59,10 @@ public class PermissionManager {
             rank.disabledPermissions = section.getStringList("disabled-perms");
             rank.inheritance = section.getStringList("inheritance");
 
-            ranks.put(key, rank);
+            ranks.put(rank.id, rank); // Map by ID now
             registerBukkitPermission(rank);
+
+            plugin.getLogger().info("Loaded Rank: " + rank.consoleName + " (ID: " + rank.id + ")");
         }
     }
 
@@ -90,17 +96,17 @@ public class PermissionManager {
         }
 
         for (RankConfig rank : ranks.values()) {
-            // Group name is usually the suffix of the permission (e.g. naturalsmp.midi ->
-            // midi)
-            String groupName = rank.permission.contains(".")
-                    ? rank.permission.substring(rank.permission.lastIndexOf(".") + 1)
-                    : rank.permission;
+            // Group name is the ID (vip, midi, etc.)
+            String groupName = rank.id;
 
             lp.getGroupManager().modifyGroup(groupName, group -> {
                 // Metadata
                 if (rank.prefix != null) {
                     group.data().add(PrefixNode.builder(rank.prefix, rank.weight).build());
                 }
+
+                // Add display name as a meta value if needed, or specific logic
+                // For now, we mainly sync prefix and weight
 
                 group.data().add(WeightNode.builder(rank.weight).build());
 
@@ -118,11 +124,9 @@ public class PermissionManager {
 
                 // Add inheritance
                 if (rank.inheritance != null) {
-                    for (String parentPerm : rank.inheritance) {
-                        String parentGroup = parentPerm.contains(".")
-                                ? parentPerm.substring(parentPerm.lastIndexOf(".") + 1)
-                                : parentPerm;
-                        group.data().add(InheritanceNode.builder(parentGroup).build());
+                    for (String parentId : rank.inheritance) {
+                        // inheritance list now contains IDs (e.g. "default") from config
+                        group.data().add(InheritanceNode.builder(parentId).build());
                     }
                 }
             });
@@ -135,8 +139,49 @@ public class PermissionManager {
         return ranks;
     }
 
+    public void addPermission(String rankId, String permission) {
+        RankConfig rank = ranks.get(rankId);
+        if (rank != null && !rank.permissions.contains(permission)) {
+            rank.permissions.add(permission);
+            saveRank(rank);
+            syncToLuckPerms();
+        }
+    }
+
+    public void saveRank(RankConfig rank) {
+        YamlConfiguration config = YamlConfiguration.loadConfiguration(configFile);
+        // Use ID as key
+        ConfigurationSection section = config.getConfigurationSection(rank.id);
+        if (section == null) {
+            section = config.createSection(rank.id);
+        }
+
+        section.set("permission", rank.permission);
+        section.set("console-name", rank.consoleName);
+        section.set("display-name", rank.displayName.replace("§", "&"));
+        section.set("prefix", rank.prefix);
+        section.set("suffix", rank.suffix);
+        section.set("weight", rank.weight);
+        section.set("permissions", rank.permissions);
+        section.set("disabled-perms", rank.disabledPermissions);
+        section.set("inheritance", rank.inheritance);
+
+        try {
+            config.save(configFile);
+            // Re-register to apply changes immediately
+            registerBukkitPermission(rank);
+        } catch (java.io.IOException e) {
+            plugin.getLogger().severe("Failed to save rank-config.yml!");
+            e.printStackTrace();
+        }
+    }
+
     public static class RankConfig {
+        public String id;
         public String permission;
+        public String consoleName;
+        public String displayName;
+
         public String prefix;
         public String suffix;
         public int weight;

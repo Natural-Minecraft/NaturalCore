@@ -341,6 +341,10 @@ commands:
     aliases: [p, stats]
 
   # --- v1.7 COMMANDS ---
+  rankeditor:
+    description: Edit rank permissions in-game
+    aliases: [re, redit]
+    permission: naturalsmp.admin
   chatcolor:
     description: Buka menu warna chat
     aliases: [color, ccolor]
