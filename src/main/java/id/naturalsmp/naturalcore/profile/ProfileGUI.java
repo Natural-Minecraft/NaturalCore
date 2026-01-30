@@ -36,8 +36,7 @@ public class ProfileGUI implements Listener {
         viewer.playSound(viewer.getLocation(), Sound.BLOCK_ENDER_CHEST_OPEN, 0.5f, 1.0f); // Sound Effect
 
         // 1. Open Placeholder Loading GUI
-        Inventory inv = GUIUtils.createGUI(new ProfileHolder(), 54,
-                "&#00AAFF❂ &#00AAFFᴘʀᴏꜰɪʟᴇ &8(Loading...)");
+        Inventory inv = GUIUtils.createGUI(new ProfileHolder(), 54, "❂ ɴᴀᴛᴜʀᴀʟ ᴘʀᴏꜰɪʟᴇ ❂");
 
         // Fill loading state
         ItemStack loading = createItem(Material.CLOCK, "&e&lLoading Data...", "&7Please wait...");
@@ -104,12 +103,8 @@ public class ProfileGUI implements Listener {
                     return; // Player closed GUI or switched
                 }
 
-                // Update Title (Hack: Re-open or just update items if title update impossible
-                // without flicker)
-                // For smooth UX, we just update items. Title remains "Loading..." briefly or we
-                // can't change it easily on 1.16+ without packets.
-                // Re-opening inventory causes a flicker, so we just populate the existing one.
-                // Ideally, we'd start with correct title but empty items.
+                // Update visual title (if possible via NMS but we keep it static for stability)
+                // For profile, let's keep it clean.
 
                 // Clear loading item
                 inv.setItem(22, null);

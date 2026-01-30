@@ -1,7 +1,15 @@
-# ==========================================
-#       NATURAL CORE - MESSAGES
-# ==========================================
-# Semua pesan yang ditampilkan ke player
+```yaml
+# ======================================================
+#                   NATURALCORE MESSAGES
+# ======================================================
+
+prefix:
+  moderation: "&6&lMOD &8» "
+  admin: "&c&lADM &8» "
+  general: "&b&lSMP &8» "
+
+messages:
+  # ======================================================
 
 # --- GLOBAL ---
 global:
@@ -230,6 +238,8 @@ warp:
   warp-icon-set: "&aIcon warp '&f%name%&a' diubah menjadi %icon%"
   teleporting-title: "%displayname%"
   teleporting-subtitle: "&7Teleporting..."
+  profile:
+    gui-title: "❂ ɴᴀᴛᴜʀᴀʟ ᴘʀᴏꜰɪʟᴇ ❂"
 
 # --- GUI ---
 gui:
@@ -283,7 +293,7 @@ gui:
       nature: "PAPER"
       nature-cmd: 1004
   admin:
-    title: "&#00AAFF⚙ &#00AAFFɴᴀᴄᴏʀᴇ &#55FF55ᴀᴅmin &#55FF55⚙"
+    title: "&#00AAFF⚙ &#00AAFFɴᴀᴄᴏʀᴇ &#55FF55ᴀᴅᴍɪɴ &#55FF55⚙"
   menu:
     title: "&#00AAFF❂ &#00AAFFɴᴀᴛᴜʀᴀʟ &#55FF55ᴍᴇɴᴜ &#55FF55❂"
   start:
@@ -304,69 +314,72 @@ item-edit:
 
 # --- RANKS GUI ---
 ranks:
-  gui-title: "&#00FFD4&lＮＡＴＵＲＡＬ &8| &#FFAA00&lＲＡＮＫＳ"
+  gui-title: "❂ ɴᴀᴛᴜʀᴀʟ ʀᴀɴᴋꜱ ❂"
   midi:
-    name: "<#00AAFF> <b>MIDI</b>"
+    name: "&r &9&lMIDI"
     lore:
       - "&8&m-------------------------------"
       - "&7Rank pemula dengan fitur esensial."
       - ""
       - "<#00AAFF><b>KEUNTUNGAN:</b>"
-      - " <#00AAFF></#00AAFF> <b>5x</b> <gray>Sethome Slots"
-      - " <#00AAFF></#00AAFF> <b>/ec</b> <gray>Akses Enderchest"
-      - " <#00AAFF></#00AAFF> <b>/back</b> <gray>Kembali ke lokasi mati"
-      - " <#00AAFF></#00AAFF> <b>Unlimited</b> <gray>Emoji Chat Access"
-      - " <#00AAFF></#00AAFF> <b>Blue</b> <gray>Chat Color Access"
+      - " <reset></reset> <b>5x</b> <gray>Sethome Slots"
+      - " <reset></reset> <b>3x</b> <gray>RedProtect Claims"
+      - " <reset></reset> <b>10k</b> <gray>Claim Blocks Limit"
+      - " <reset></reset> <b>/ec</b> <gray>Akses Enderchest"
+      - " <reset></reset> <b>/back</b> <gray>Kembali ke lokasi mati"
+      - " <reset></reset> <b>Unlimited</b> <gray>Emoji Chat Access"
+      - " <reset></reset> <b>Blue</b> <gray>Chat Color Access"
       - ""
       - "&8&m-------------------------------"
       - "<#00FFD4><b>➥ KLIK UNTUK INFO LENGKAP</b>"
   vip:
-    name: "<#55FF55> <b>VIP</b>"
+    name: "&r &a&lVIP"
     lore:
       - "&8&m-------------------------------"
       - "&7Rank menengah untuk player aktif."
       - ""
       - "<#55FF55><b>KEUNTUNGAN:</b>"
-      - " <#55FF55></#55FF55> <b>15x</b> <gray>Sethome Slots"
-      - " <#55FF55></#55FF55> <b>/hat</b> <gray>Pakai item di kepala"
-      - " <#55FF55></#55FF55> <b>/trash</b> <gray>Buang item instan"
-      - " <#55FF55></#55FF55> <b>/nick</b> <gray>Ganti nama panggilan"
-      - " <#55FF55></#55FF55> <b>Resource World</b> <gray>Access"
-      - " <#55FF55></#55FF55> <b>Green</b> <gray>Chat Color Access"
-      - " <#55FF55></#55FF55> <white>Termasuk semua fitur <b>MIDI</b>"
+      - " <reset></reset> <b>10x</b> <gray>Sethome Slots"
+      - " <reset></reset> <b>6x</b> <gray>RedProtect Claims"
+      - " <reset></reset> <b>25k</b> <gray>Claim Blocks Limit"
+      - " <reset></reset> <b>/feed</b> <gray>Mengisi rasa lapar"
+      - " <reset></reset> <b>/craft</b> <gray>Meja crafting portable"
+      - " <reset></reset> <b>/god</b> <gray>Mode kebal (1 jam/hari)"
+      - " <reset></reset> <b>Green</b> <gray>Chat Color Access"
       - ""
       - "&8&m-------------------------------"
       - "<#00FFD4><b>➥ KLIK UNTUK INFO LENGKAP</b>"
   mvp:
-    name: "<#FFFF55> <b>MVP</b>"
+    name: "&r &b&lMVP"
     lore:
       - "&8&m-------------------------------"
       - "&7Rank profesional untuk builder."
       - ""
       - "<#FFFF55><b>KEUNTUNGAN:</b>"
-      - " <#FFFF55></#FFFF55> <b>30x</b> <gray>Sethome Slots"
-      - " <#FFFF55></#FFFF55> <b>/fly</b> <gray>Akses Terbang"
-      - " <#FFFF55></#FFFF55> <b>/craft</b> <gray>Virtual Workbench"
-      - " <#FFFF55></#FFFF55> <b>/anvil</b> <gray>Virtual Anvil"
-      - " <#FFFF55></#FFFF55> <b>/ptime</b> <gray>Atur waktu pribadi"
-      - " <#FFFF55></#FFFF55> <b>/pweather</b> <gray>Atur cuaca pribadi"
-      - " <#FFFF55></#FFFF55> <white>Termasuk semua fitur <b>VIP</b>"
+      - " <reset></reset> <b>20x</b> <gray>Sethome Slots"
+      - " <reset></reset> <b>12x</b> <gray>RedProtect Claims"
+      - " <reset></reset> <b>50k</b> <gray>Claim Blocks Limit"
+      - " <reset></reset> <b>/fly</b> <gray>Terbang di survival"
+      - " <reset></reset> <b>/heal</b> <gray>Memulihkan darah"
+      - " <reset></reset> <b>/anvil</b> <gray>Anvil portable"
+      - " <reset></reset> <b>Gold</b> <gray>Chat Color Access"
       - ""
       - "&8&m-------------------------------"
       - "<#00FFD4><b>➥ KLIK UNTUK INFO LENGKAP</b>"
   nature:
-    name: "<gradient:#00AAFF:#55FF55> <b>NATURE</b></gradient>"
+    name: "&r &d&lNATURE"
     lore:
       - "&8&m-------------------------------"
       - "&7Rank tertinggi, penguasa alam."
       - ""
       - "<gradient:#00AAFF:#55FF55><b>KEUNTUNGAN:</b></gradient>"
-      - " <#00AAFF></#55FF55> <b>Priority</b> <gray>Server Join"
-      - " <#00AAFF></#55FF55> <b>Immunity</b> <gray>Temperature Extreme"
-      - " <#00AAFF></#55FF55> <b>No Cooldown</b> <gray>Home & TPA"
-      - " <#00AAFF></#55FF55> <b>WorldGuard</b> <gray>Bypass Flags"
-      - " <#00AAFF></#55FF55> <b>Exclusive</b> <gray>Nature Cosmetic"
-      - " <#00AAFF></#55FF55> <white>Termasuk semua fitur <b>MVP</b>"
+      - " <reset></reset> <b>Unlimited</b> <gray>Sethome Slots"
+      - " <reset></reset> <b>24x</b> <gray>RedProtect Claims"
+      - " <reset></reset> <b>100k</b> <gray>Claim Blocks Limit"
+      - " <reset></reset> <b>/nick</b> <gray>Ganti nama tampilan"
+      - " <reset></reset> <b>/repair</b> <gray>Perbaiki item gratis"
+      - " <reset></reset> <b>/invsee</b> <gray>Lihat inventory orang"
+      - " <reset></reset> <b>All</b> <gray>Chat Color Access"
       - ""
       - "&8&m-------------------------------"
       - "<#00FFD4><b>➥ KLIK UNTUK INFO LENGKAP</b>"

@@ -52,9 +52,9 @@ public class VanishManager implements Listener {
             p.setSleepingIgnored(true);
             p.setPlayerListName(null); // Remove from TAB for self too/cleaner behavior
 
-            p.sendMessage(ConfigUtils.getString("messages.prefix.moderation")
+            p.sendMessage(ConfigUtils.getString("prefix.moderation")
                     + ConfigUtils.getString("messages.moderation.vanish-enabled"));
-            p.sendTitle("", ChatUtils.colorize("&b&lVANISHED"), 0, 40, 10);
+            p.sendTitle("", ChatUtils.colorize("&b&lᴠᴀɴɪsʜᴇᴅ"), 0, 40, 10);
 
             plugin.getLogger().info(p.getName() + " is now VANISHED 👻");
         } else {
@@ -81,7 +81,7 @@ public class VanishManager implements Listener {
             }
             p.setSleepingIgnored(false);
 
-            p.sendMessage(ConfigUtils.getString("messages.prefix.moderation")
+            p.sendMessage(ConfigUtils.getString("prefix.moderation")
                     + ConfigUtils.getString("messages.moderation.vanish-disabled"));
 
             plugin.getLogger().info(p.getName() + " is now UN-VANISHED ✨");

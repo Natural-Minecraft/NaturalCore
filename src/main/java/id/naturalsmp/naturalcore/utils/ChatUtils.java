@@ -18,8 +18,10 @@ public class ChatUtils {
 
     private static final net.kyori.adventure.text.minimessage.MiniMessage MINI_MESSAGE = net.kyori.adventure.text.minimessage.MiniMessage
             .miniMessage();
-    private static final net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer LEGACY_SERIALIZER = net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer
+    private static final net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer AMPERSAND_SERIALIZER = net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer
             .legacyAmpersand();
+    private static final net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer SECTION_SERIALIZER = net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer
+            .legacySection();
 
     /**
      * Mengubah kode warna (&a, &l) dan Hex Color (&#RRGGBB) menjadi warna asli.
@@ -31,13 +33,8 @@ public class ChatUtils {
         // Jika mengandung < (MiniMessage)
         if (message.contains("<")) {
             try {
-                return net.md_5.bungee.api.ChatColor.translateAlternateColorCodes('&',
-                        net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer.legacySection()
-                                .serialize(MINI_MESSAGE.deserialize(message)));
-            } catch (Exception e) {
-                // Fallback jika MiniMessage gagal (mungkin karena mixed legacy color)
-                // Kita bersihkan dulu legacy color sebelum coba parsing ulang jika perlu,
-                // tapi cara termudah adalah lanjut ke legacy colorization biasa.
+                return SECTION_SERIALIZER.serialize(MINI_MESSAGE.deserialize(message));
+            } catch (Exception ignored) {
             }
         }
 
@@ -59,14 +56,11 @@ public class ChatUtils {
     public static String serialize(net.kyori.adventure.text.Component component) {
         if (component == null)
             return "";
-        return net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer.legacySection()
-                .serialize(component);
+        return SECTION_SERIALIZER.serialize(component);
     }
 
     /**
      * Mengubah string menjadi Component yang SANGAT aman untuk fase Login.
-     * Menggunakan format § (legacy) dan mematikan semua fitur Adventure yang
-     * kompleks.
      */
     public static net.kyori.adventure.text.Component toLoginSafeComponent(String message) {
         if (message == null || message.isEmpty())
@@ -75,9 +69,8 @@ public class ChatUtils {
         // 1. Colorize with legacy handling
         String colored = colorize(message).replace("&", "§");
 
-        // 2. Convert to component via legacy serializer to ensure it's "flat"
-        return net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer.legacySection()
-                .deserialize(colored);
+        // 2. Convert to component via legacy serializer
+        return SECTION_SERIALIZER.deserialize(colored);
     }
 
     /**
@@ -100,26 +93,18 @@ public class ChatUtils {
         }
 
         net.kyori.adventure.text.Component component;
-        // Jika mengandung < (MiniMessage)
         if (message.contains("<")) {
             try {
                 component = MINI_MESSAGE.deserialize(message);
             } catch (Exception e) {
-                // Fallback ke legacy jika MiniMessage gagal
-                component = net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer.legacySection()
-                        .deserialize(colorize(message).replace("&", "§"));
+                component = SECTION_SERIALIZER.deserialize(colorize(message).replace("&", "§"));
             }
         } else {
-            // Fallback ke legacy colorization lalu ke component
-            component = net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer.legacySection()
-                    .deserialize(colorize(message).replace("&", "§"));
+            component = SECTION_SERIALIZER.deserialize(colorize(message).replace("&", "§"));
         }
 
-        // Flatten component to legacy for maximum compatibility (prevents
-        // DecoderException in Login stage)
-        return net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer.legacySection()
-                .deserialize(net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer.legacySection()
-                        .serialize(component));
+        // Flatten for compatibility
+        return SECTION_SERIALIZER.deserialize(SECTION_SERIALIZER.serialize(component));
     }
 
     /**
@@ -130,11 +115,10 @@ public class ChatUtils {
             return "";
 
         String stripped = stripColor(text);
-        int totalWidth = 320; // Standard MC chat width in pixels
+        int totalWidth = 320;
         int textWidth = 0;
 
         for (char c : stripped.toCharArray()) {
-            // Very basic pixel width estimation for standard fonts
             if (c == 'i' || c == '!' || c == '.' || c == ',')
                 textWidth += 2;
             else if (c == 'l' || c == '\'' || c == ';')
@@ -146,20 +130,14 @@ public class ChatUtils {
             else if (c == ' ')
                 textWidth += 4;
             else
-                textWidth += 6; // Default character width
+                textWidth += 6;
         }
 
-        int centerPos = totalWidth / 2;
-        int halfTextWidth = textWidth / 2;
-        int paddingWidth = centerPos - halfTextWidth;
-
+        int paddingWidth = (totalWidth / 2) - (textWidth / 2);
         if (paddingWidth <= 0)
             return text;
 
-        int spaceWidth = 4; // Width of a single space
-        int spaceCount = paddingWidth / spaceWidth;
-
-        return " ".repeat(Math.max(0, spaceCount)) + text;
+        return " ".repeat(paddingWidth / 4) + text;
     }
 
     public static java.util.List<String> colorize(java.util.List<String> list) {

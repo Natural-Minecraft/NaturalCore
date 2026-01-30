@@ -37,17 +37,39 @@ import id.naturalsmp.naturalcore.moderation.VanishListener;
 import id.naturalsmp.naturalcore.moderation.ModerationCommand;
 
 import id.naturalsmp.naturalcore.general.RTPCommand;
-import id.naturalsmp.naturalcore.chat.EmojiManager;
-import id.naturalsmp.naturalcore.chat.SocialListener;
-import id.naturalsmp.naturalcore.chat.EmojiCommand;
-import id.naturalsmp.naturalcore.chat.MessageManager;
-import id.naturalsmp.naturalcore.chat.PrivateMessageCommand;
-import id.naturalsmp.naturalcore.utility.WorldUtilCommand;
-import id.naturalsmp.naturalcore.utility.EssentialPerksCommand;
-import id.naturalsmp.naturalcore.utility.NaturalLaggCommand;
+import id.naturalsmp.naturalcore.chat.*;
+import id.naturalsmp.naturalcore.general.StartCommand;
+import id.naturalsmp.naturalcore.staff.StaffChatCommand;
+import id.naturalsmp.naturalcore.staff.StaffModeCommand;
+import id.naturalsmp.naturalcore.utility.CleanCommand;
+import id.naturalsmp.naturalcore.utility.MenuCommand;
 import id.naturalsmp.naturalcore.topup.TopupSuccessGUI;
 import id.naturalsmp.naturalcore.topup.TopupCommand;
 
+import id.naturalsmp.naturalcore.afk.AFKManager;
+import id.naturalsmp.naturalcore.announcement.BroadcastManager;
+import id.naturalsmp.naturalcore.chat.tags.TagsManager;
+import id.naturalsmp.naturalcore.combat.CombatManager;
+import id.naturalsmp.naturalcore.hud.HUDManager;
+import id.naturalsmp.naturalcore.maintenance.MaintenanceCommand;
+import id.naturalsmp.naturalcore.maintenance.MaintenanceListener;
+import id.naturalsmp.naturalcore.maintenance.MaintenanceManager;
+import id.naturalsmp.naturalcore.permissions.PermissionManager;
+import id.naturalsmp.naturalcore.playtime.PlaytimeManager;
+import id.naturalsmp.naturalcore.profile.ProfileGUI;
+import id.naturalsmp.naturalcore.profile.ProfileManager;
+import id.naturalsmp.naturalcore.season.SeasonResetManager;
+import id.naturalsmp.naturalcore.staff.StaffGUI;
+import id.naturalsmp.naturalcore.staff.StaffManager;
+import id.naturalsmp.naturalcore.tier.TierGUI;
+import id.naturalsmp.naturalcore.tier.TierManager;
+import id.naturalsmp.naturalcore.trade.TradeGUI;
+import id.naturalsmp.naturalcore.trade.TradeManager;
+import id.naturalsmp.naturalcore.utility.BackupManager;
+import id.naturalsmp.naturalcore.utility.NaturalLaggManager;
+import id.naturalsmp.naturalcore.utility.ServerHealthManager;
+import id.naturalsmp.naturalcore.utility.ServerStatusGUI;
+import id.naturalsmp.naturalcore.utils.ConfigUpdater;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -67,29 +89,28 @@ public final class NaturalCore extends JavaPlugin {
     private EmojiManager emojiManager;
     private SeasonManager seasonManager;
     private BannerManager bannerManager;
-    private id.naturalsmp.naturalcore.profile.ProfileManager profileManager;
-    private id.naturalsmp.naturalcore.profile.ProfileGUI profileGUI;
-    private id.naturalsmp.naturalcore.home.HomeGUI homeGUI;
-    private id.naturalsmp.naturalcore.chat.tags.TagsManager tagsManager;
-    private id.naturalsmp.naturalcore.afk.AFKManager afkManager;
-    private id.naturalsmp.naturalcore.tier.TierManager tierManager;
-    private id.naturalsmp.naturalcore.tier.TierGUI tierGUI;
+    private ProfileManager profileManager;
+    private ProfileGUI profileGUI;
+    private TagsManager tagsManager;
+    private AFKManager afkManager;
+    private TierManager tierManager;
+    private TierGUI tierGUI;
     private id.naturalsmp.naturalcore.chat.ChatColorManager chatColorManager;
-    private id.naturalsmp.naturalcore.season.SeasonResetManager seasonResetManager;
-    private id.naturalsmp.naturalcore.hud.HUDManager hudManager;
-    private id.naturalsmp.naturalcore.maintenance.MaintenanceManager maintenanceManager;
-    private id.naturalsmp.naturalcore.permissions.PermissionManager permissionManager;
-    private id.naturalsmp.naturalcore.staff.StaffManager staffManager;
-    private id.naturalsmp.naturalcore.staff.StaffGUI staffGUI;
-    private id.naturalsmp.naturalcore.utility.NaturalLaggManager laggManager;
-    private id.naturalsmp.naturalcore.utility.ServerHealthManager healthManager;
-    private id.naturalsmp.naturalcore.utility.ServerStatusGUI statusGUI;
-    private id.naturalsmp.naturalcore.trade.TradeManager tradeManager;
-    private id.naturalsmp.naturalcore.trade.TradeGUI tradeGUI;
-    private id.naturalsmp.naturalcore.combat.CombatManager combatManager;
-    private id.naturalsmp.naturalcore.playtime.PlaytimeManager playtimeManager;
-    private id.naturalsmp.naturalcore.announcement.BroadcastManager broadcastManager;
-    private id.naturalsmp.naturalcore.utility.BackupManager backupManager;
+    private SeasonResetManager seasonResetManager;
+    private HUDManager hudManager;
+    private MaintenanceManager maintenanceManager;
+    private PermissionManager permissionManager;
+    private StaffManager staffManager;
+    private StaffGUI staffGUI;
+    private NaturalLaggManager laggManager;
+    private ServerHealthManager healthManager;
+    private ServerStatusGUI statusGUI;
+    private TradeManager tradeManager;
+    private TradeGUI tradeGUI;
+    private CombatManager combatManager;
+    private PlaytimeManager playtimeManager;
+    private BroadcastManager broadcastManager;
+    private BackupManager backupManager;
 
     @Override
     public void onEnable() {
@@ -152,7 +173,6 @@ public final class NaturalCore extends JavaPlugin {
         this.spawnManager = new SpawnManager(this);
         SpawnCommand spawnCmd = new SpawnCommand(spawnManager);
         registerCmd("spawn", spawnCmd);
-        registerCmd("spawn", spawnCmd);
         registerCmd("setspawn", spawnCmd);
         getServer().getPluginManager().registerEvents(new SpawnListener(this), this);
 
@@ -192,10 +212,9 @@ public final class NaturalCore extends JavaPlugin {
         registerCmd("restartcancel", new RestartCancelCommand());
 
         // 10. Maintenance Module
-        this.maintenanceManager = new id.naturalsmp.naturalcore.maintenance.MaintenanceManager(this);
-        registerCmd("maintenance", new id.naturalsmp.naturalcore.maintenance.MaintenanceCommand(maintenanceManager));
-        getServer().getPluginManager().registerEvents(
-                new id.naturalsmp.naturalcore.maintenance.MaintenanceListener(maintenanceManager), this);
+        this.maintenanceManager = new MaintenanceManager(this);
+        registerCmd("maintenance", new MaintenanceCommand(maintenanceManager));
+        getServer().getPluginManager().registerEvents(new MaintenanceListener(maintenanceManager), this);
 
         // Plugin Messaging
         getServer().getMessenger().registerOutgoingPluginChannel(this, "natural:main");
@@ -364,17 +383,16 @@ public final class NaturalCore extends JavaPlugin {
             getLogger().info("PlaceholderAPI ditemukan. Expansion terdaftar.");
         }
 
-        // 17. Emoji System (NEW - Terinspirasi ChatEmojis)
+        // 17. Emoji System (NEW)
         this.emojiManager = new EmojiManager(this);
         registerCmd("emoji", new EmojiCommand(this));
         getLogger().info("Emoji System: ENABLED");
-        // Emoji GUI Register
-        getServer().getPluginManager().registerEvents(new id.naturalsmp.naturalcore.chat.EmojiGUI(this), this);
+        getServer().getPluginManager().registerEvents(new EmojiGUI(this), this);
 
         // 17B. ChatColor System (v1.7)
-        this.chatColorManager = new id.naturalsmp.naturalcore.chat.ChatColorManager(this);
-        registerCmd("chatcolor", new id.naturalsmp.naturalcore.chat.ChatColorCommand(this));
-        getServer().getPluginManager().registerEvents(new id.naturalsmp.naturalcore.chat.ChatColorGUI(this), this);
+        this.chatColorManager = new ChatColorManager(this);
+        registerCmd("chatcolor", new ChatColorCommand(this));
+        getServer().getPluginManager().registerEvents(new ChatColorGUI(this), this);
 
         // 18. Messaging System
         getServer().getPluginManager().registerEvents(new ChatListener(this), this);
@@ -384,7 +402,7 @@ public final class NaturalCore extends JavaPlugin {
         getServer().getPluginManager().registerEvents(new ChatPreviewGUI(), this);
         getServer().getPluginManager().registerEvents(new GlobalNotificationListener(this), this);
         getServer().getPluginManager().registerEvents(new GuiSoundListener(), this);
-        this.hudManager = new id.naturalsmp.naturalcore.hud.HUDManager(this);
+        this.hudManager = new HUDManager(this);
         this.messageManager = new MessageManager();
         PrivateMessageCommand pmCmd = new PrivateMessageCommand(this);
         registerCmd("msg", pmCmd);
@@ -404,11 +422,11 @@ public final class NaturalCore extends JavaPlugin {
         registerCmd("nick", perksCmd);
 
         // 19B. New Utility Commands (v1.8.5)
-        registerCmd("menu", new id.naturalsmp.naturalcore.utility.MenuCommand(this));
+        registerCmd("menu", new MenuCommand(this));
         EnvironmentCommand envCmd = new EnvironmentCommand();
         registerCmd("ptime", envCmd);
         registerCmd("pweather", envCmd);
-        registerCmd("start", new id.naturalsmp.naturalcore.general.StartCommand(this));
+        registerCmd("start", new StartCommand(this));
 
         // 20. v1.7 Utilities
         this.laggManager = new id.naturalsmp.naturalcore.utility.NaturalLaggManager(this);
@@ -424,9 +442,9 @@ public final class NaturalCore extends JavaPlugin {
 
         NaturalLaggCommand laggCmd = new NaturalLaggCommand(this);
         registerCmd("lagg", laggCmd);
-        registerCmd("clean", new id.naturalsmp.naturalcore.utility.CleanCommand(this));
-        registerCmd("staffmode", new id.naturalsmp.naturalcore.staff.StaffModeCommand(this));
-        registerCmd("staffchat", new id.naturalsmp.naturalcore.staff.StaffChatCommand(this));
+        registerCmd("clean", new CleanCommand(this));
+        registerCmd("staffmode", new StaffModeCommand(this));
+        registerCmd("staffchat", new StaffChatCommand(this));
         registerCmd("staff", new id.naturalsmp.naturalcore.staff.StaffCommand(this, staffGUI));
         registerCmd("trade", new id.naturalsmp.naturalcore.trade.TradeCommand(this));
         registerCmd("playtime", new id.naturalsmp.naturalcore.playtime.PlaytimeCommand(this));

@@ -165,6 +165,15 @@ public class PermissionManager {
         }
     }
 
+    public void setWeight(String rankId, int weight) {
+        RankConfig rank = ranks.get(rankId);
+        if (rank != null) {
+            rank.weight = weight;
+            saveRank(rank);
+            syncToLuckPerms();
+        }
+    }
+
     public void saveRank(RankConfig rank) {
         YamlConfiguration config = YamlConfiguration.loadConfiguration(configFile);
         // Use ID as key

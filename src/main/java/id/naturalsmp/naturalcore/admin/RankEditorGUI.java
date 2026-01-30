@@ -29,13 +29,14 @@ public class RankEditorGUI implements Listener {
 
     private final NaturalCore plugin;
     private final Map<UUID, String> pendingPermissionInput = new HashMap<>();
+    private final Map<UUID, String> pendingWeightInput = new HashMap<>();
 
     public RankEditorGUI(NaturalCore plugin) {
         this.plugin = plugin;
     }
 
     public void openMainMenu(Player p) {
-        Inventory inv = GUIUtils.createGUI(new EditorHolder("MAIN"), 27, "&8Rank Editor");
+        Inventory inv = GUIUtils.createGUI(new EditorHolder("MAIN"), 27, "❂ ʀᴀɴᴋ ᴇᴅɪᴛᴏʀ ❂");
 
         int slot = 10;
         for (PermissionManager.RankConfig rank : plugin.getPermissionManager().getRanks().values()) {
@@ -71,7 +72,7 @@ public class RankEditorGUI implements Listener {
         if (rank == null)
             return;
 
-        Inventory inv = GUIUtils.createGUI(new EditorHolder(rankId), 27, "&8Editing: " + rank.consoleName);
+        Inventory inv = GUIUtils.createGUI(new EditorHolder(rankId), 27, "❂ ᴇᴅɪᴛɪɴɢ: " + rank.id.toUpperCase() + " ❂");
 
         // Center Info
         ItemStack info = new ItemStack(Material.BOOK);
@@ -88,10 +89,46 @@ public class RankEditorGUI implements Listener {
         // Add Permission Button
         ItemStack addBtn = new ItemStack(Material.LIME_DYE);
         ItemMeta addMeta = addBtn.getItemMeta();
-        addMeta.displayName(ChatUtils.toComponent("&a&lAdd Permission"));
-        addMeta.lore(List.of(ChatUtils.toComponent("&7Click to type permission in chat")));
-        addBtn.setItemMeta(addMeta);
-        inv.setItem(11, addBtn);
+        if (addMeta != null) {
+            addMeta.displayName(ChatUtils.toComponent("&a&lAdd Permission"));
+            addMeta.lore(List.of(ChatUtils.toComponent("&7Click to type permission in chat")));
+            addBtn.setItemMeta(addMeta);
+        }
+        inv.setItem(10, addBtn);
+
+        // Set Weight Button
+        ItemStack weightBtn = new ItemStack(Material.ANVIL);
+        ItemMeta weightMeta = weightBtn.getItemMeta();
+        if (weightMeta != null) {
+            weightMeta.displayName(ChatUtils.toComponent("&e&lSet Weight"));
+            weightMeta.lore(List.of(ChatUtils.toComponent("&7Current: &f" + rank.weight),
+                    ChatUtils.toComponent("&7Click to change")));
+            weightBtn.setItemMeta(weightMeta);
+        }
+        inv.setItem(11, weightBtn);
+
+        // Permissions List (Pagination 7 per item)
+        List<String> perms = rank.permissions;
+        int startIndex = 13;
+        for (int i = 0; i < perms.size(); i += 7) {
+            if (startIndex > 16)
+                break; // Max 4 paper items (13, 14, 15, 16)
+            int end = Math.min(i + 7, perms.size());
+            List<String> chunk = perms.subList(i, end);
+
+            ItemStack paper = new ItemStack(Material.PAPER);
+            ItemMeta pMeta = paper.getItemMeta();
+            if (pMeta != null) {
+                pMeta.displayName(ChatUtils.toComponent("&f&lPermissions &7(#" + (i / 7 + 1) + ")"));
+                List<Component> pLore = new ArrayList<>();
+                for (String perm : chunk) {
+                    pLore.add(ChatUtils.toComponent("&8- &7" + perm));
+                }
+                pMeta.lore(pLore);
+                paper.setItemMeta(pMeta);
+            }
+            inv.setItem(startIndex++, paper);
+        }
 
         // Back Button
         inv.setItem(22, GUIUtils.createItem(Material.ARROW, "&cBack", List.of()));
@@ -141,11 +178,16 @@ public class RankEditorGUI implements Listener {
             // Rank Detail View
             String rankId = holder.type;
 
-            if (e.getSlot() == 11) { // Add Permission
+            if (e.getSlot() == 10) { // Add Permission
                 p.closeInventory();
                 pendingPermissionInput.put(p.getUniqueId(), rankId);
                 p.sendMessage(ChatUtils.colorize("&a&lEDIT &8» &7Type permissions to add in chat (or 'cancel'):"));
                 p.playSound(p.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, 1f, 1f);
+            } else if (e.getSlot() == 11) { // Set Weight
+                p.closeInventory();
+                pendingWeightInput.put(p.getUniqueId(), rankId);
+                p.sendMessage(ChatUtils.colorize("&e&lEDIT &8» &7Type new weight (number) (or 'cancel'):"));
+                p.playSound(p.getLocation(), Sound.BLOCK_ANVIL_USE, 1f, 1f);
             } else if (e.getSlot() == 22) { // Back
                 openMainMenu(p);
             }
@@ -168,6 +210,25 @@ public class RankEditorGUI implements Listener {
                     e.getPlayer().sendMessage(ChatUtils.colorize("&aPermission added: &f" + msg));
                     openRankDetail(e.getPlayer(), rankId); // Reopen GUI
                 });
+            }
+        } else if (pendingWeightInput.containsKey(e.getPlayer().getUniqueId())) {
+            e.setCancelled(true);
+            String rankId = pendingWeightInput.remove(e.getPlayer().getUniqueId());
+            String msg = e.getMessage();
+
+            if (msg.equalsIgnoreCase("cancel")) {
+                e.getPlayer().sendMessage(ChatUtils.colorize("&cCancelled."));
+            } else {
+                try {
+                    int weight = Integer.parseInt(msg);
+                    Bukkit.getScheduler().runTask(plugin, () -> {
+                        plugin.getPermissionManager().setWeight(rankId, weight);
+                        e.getPlayer().sendMessage(ChatUtils.colorize("&aWeight updated to: &f" + weight));
+                        openRankDetail(e.getPlayer(), rankId);
+                    });
+                } catch (NumberFormatException ex) {
+                    e.getPlayer().sendMessage(ChatUtils.colorize("&cInvalid number!"));
+                }
             }
         }
     }
