@@ -72,12 +72,6 @@ public class TipsManager {
     }
 
     private void broadcastTip() {
-        // Run async? No, sending messages usually main thread safe but better safe.
-        // Actually scheduler sync is fine.
-        task.runTaskTimer(plugin, interval * 20L, interval * 20L);
-    }
-
-    private void broadcastTip() {
         if (tips.isEmpty())
             return;
 
