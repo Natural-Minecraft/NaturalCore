@@ -3,8 +3,12 @@ package id.naturalsmp.naturalcore.utils;
 import id.naturalsmp.naturalcore.NaturalCore;
 import org.bukkit.Bukkit;
 import org.bukkit.Sound;
+import org.bukkit.configuration.file.FileConfiguration;
+import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
+import org.bukkit.scheduler.BukkitRunnable;
 
+import java.io.File;
 import java.util.List;
 import java.util.Random;
 
@@ -12,25 +16,11 @@ public class TipsManager {
 
     private final NaturalCore plugin;
     private List<String> tips;
-    private long intervalHooks;
-    private int stayDurationTicks;
+    private FileConfiguration tipsConfig;
+    private BukkitRunnable task;
+    private int interval;
+    private boolean soundEnabled;
     private String soundName;
-    private org.bukkit.configuration.file.FileConfiguration tipsConfig;
-
-    private long lastRun = System.currentTimeMillis();
-    private TipState state = TipState.IDLE;
-
-    private String currentTip = "";
-
-    private int animationFrame = 0;
-    private final int MAX_FRAMES = 20; // Length of transition
-
-    public enum TipState {
-        IDLE,
-        SLIDING_IN, // Transition Main -> Tip
-        STATIC, // Showing Tip
-        SLIDING_OUT // Transition Tip -> Main
-    }
 
     public TipsManager(NaturalCore plugin) {
         this.plugin = plugin;
@@ -38,99 +28,58 @@ public class TipsManager {
     }
 
     public void reload() {
+        // Load text/tips.yml
         File file = new File(plugin.getDataFolder(), "text/tips.yml");
         if (!file.exists()) {
             plugin.saveResource("text/tips.yml", false);
         }
-        tipsConfig = org.bukkit.configuration.file.YamlConfiguration.loadConfiguration(file);
+        tipsConfig = YamlConfiguration.loadConfiguration(file);
 
-        this.tips = tipsConfig.getStringList("tips");
-        this.intervalHooks = tipsConfig.getInt("settings.interval", 300) * 1000L;
-        this.stayDurationTicks = tipsConfig.getInt("settings.duration", 4) * 20;
-        this.soundName = tipsConfig.getString("settings.sound", "BLOCK_NOTE_BLOCK_HAT");
+        this.tips = tipsConfig.getStringList("tips.messages");
+        this.interval = tipsConfig.getInt("tips.interval", 300);
+        this.soundEnabled = tipsConfig.getBoolean("tips.sound.enabled", true);
+        this.soundName = tipsConfig.getString("tips.sound.name", "BLOCK_NOTE_BLOCK_PLING");
+
+        startBroadcast();
     }
 
-    public void tick() {
-        long now = System.currentTimeMillis();
+    private void startBroadcast() {
+        if (task != null) {
+            task.cancel();
+        }
 
-        if (state == TipState.IDLE) {
-            if (now - lastRun > intervalHooks) {
-                if (!tips.isEmpty()) {
-                    currentTip = tips.get(new Random().nextInt(tips.size()));
-                    state = TipState.SLIDING_IN;
-                    animationFrame = 0;
-                    lastRun = now;
+        if (tips == null || tips.isEmpty()) {
+            return;
+        }
+
+        task = new BukkitRunnable() {
+            @Override
+            public void run() {
+                broadcastTip();
+            }
+        };
+        // Run async? No, sending messages usually main thread safe but better safe.
+        // Actually scheduler sync is fine.
+        task.runTaskTimer(plugin, interval * 20L, interval * 20L);
+    }
+
+    private void broadcastTip() {
+        if (tips.isEmpty())
+            return;
+
+        String tipRaw = tips.get(new Random().nextInt(tips.size()));
+        String prefix = ConfigUtils.getString("prefix.tips", "&b&lTIPS &8» &f");
+        String message = ChatUtils.colorize(prefix + tipRaw);
+
+        for (Player p : Bukkit.getOnlinePlayers()) {
+            p.sendMessage(message);
+            if (soundEnabled) {
+                try {
+                    Sound sound = Sound.valueOf(soundName);
+                    p.playSound(p.getLocation(), sound, 1.0f, 1.0f);
+                } catch (IllegalArgumentException ignored) {
                 }
             }
-        } else if (state == TipState.SLIDING_IN) {
-            animationFrame++;
-            if (animationFrame % 2 == 0)
-                playSound();
-            if (animationFrame >= MAX_FRAMES) {
-                state = TipState.STATIC;
-                animationFrame = 0;
-            }
-        } else if (state == TipState.STATIC) {
-            animationFrame++;
-            if (animationFrame >= stayDurationTicks) {
-                state = TipState.SLIDING_OUT;
-                animationFrame = 0;
-            }
-        } else if (state == TipState.SLIDING_OUT) {
-            animationFrame++;
-            if (animationFrame % 2 == 0)
-                playSound();
-            if (animationFrame >= MAX_FRAMES) {
-                state = TipState.IDLE;
-                animationFrame = 0;
-            }
         }
-    }
-
-    private void playSound() {
-        try {
-            Sound s = Sound.valueOf(soundName);
-            for (Player p : Bukkit.getOnlinePlayers()) {
-                p.playSound(p.getLocation(), s, 0.5f, 2.0f);
-            }
-        } catch (Exception ignored) {
-        }
-    }
-
-    public String getDisplay(String mainBarText) {
-        if (state == TipState.IDLE)
-            return null;
-
-        String cleanMain = ChatUtils.colorize(mainBarText);
-        String cleanTip = ChatUtils.colorize(currentTip);
-
-        if (state == TipState.SLIDING_IN) {
-            float progress = (float) animationFrame / MAX_FRAMES;
-            int cutLen = (int) (cleanMain.length() * progress);
-            int revealLen = (int) (cleanTip.length() * progress);
-
-            String partMain = ChatUtils.colorAwareSubstring(cleanMain, cutLen, cleanMain.length());
-            String partTip = ChatUtils.colorAwareSubstring(cleanTip, 0, revealLen);
-
-            return partMain + "     " + partTip;
-
-        } else if (state == TipState.STATIC) {
-            return cleanTip;
-        } else if (state == TipState.SLIDING_OUT) {
-            float progress = (float) animationFrame / MAX_FRAMES;
-            int cutLen = (int) (cleanTip.length() * progress);
-            int revealLen = (int) (cleanMain.length() * progress);
-
-            String partTip = ChatUtils.colorAwareSubstring(cleanTip, cutLen, cleanTip.length());
-            String partMain = ChatUtils.colorAwareSubstring(cleanMain, 0, revealLen);
-
-            return partTip + "     " + partMain;
-        }
-
-        return null;
-    }
-
-    public TipState getState() {
-        return state;
     }
 }

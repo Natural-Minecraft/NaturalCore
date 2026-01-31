@@ -43,7 +43,6 @@ public class NaturalLaggCommand implements CommandExecutor {
 
             plugin.getLaggManager().startCleanup(15); // Default start time 15s to sync animation
             ConfigUtils.sendGeneral(sender, "messages.lagg.starting-clear");
-            plugin.getLaggManager().clearItems(sender);
             return true;
         }
 

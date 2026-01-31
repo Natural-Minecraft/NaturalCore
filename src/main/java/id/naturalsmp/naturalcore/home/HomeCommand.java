@@ -42,9 +42,9 @@ public class HomeCommand implements CommandExecutor {
 
             // Jika belum punya home ini (home baru), tapi sudah limit -> Block
             if (!homeManager.hasHome(p, name) && current >= max) {
-                p.sendMessage(prefix + ConfigUtils.getString("messages.home.home-limit")
-                        .replace("%current%", String.valueOf(current))
-                        .replace("%max%", String.valueOf(max)));
+                ConfigUtils.sendMessage(p, "prefix.home", "messages.home.home-limit",
+                        "%current%", String.valueOf(current),
+                        "%max%", String.valueOf(max));
                 return true;
             }
 
@@ -52,11 +52,7 @@ public class HomeCommand implements CommandExecutor {
             homeManager.setHome(p, name, p.getLocation());
 
             // FIX: Support %home% DAN %name% agar config fleksibel
-            String msg = ConfigUtils.getString("messages.home.home-set")
-                    .replace("%home%", name)
-                    .replace("%name%", name);
-
-            p.sendMessage(prefix + msg);
+            ConfigUtils.sendMessage(p, "prefix.home", "messages.home.home-set", "%home%", name, "%name%", name);
             return true;
         }
 

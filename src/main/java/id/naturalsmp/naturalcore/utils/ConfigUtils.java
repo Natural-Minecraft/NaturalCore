@@ -176,6 +176,18 @@ public class ConfigUtils {
 
     // --- SMART MESSAGING (CLEAN CODE) ---
 
+    public static void sendGeneral(org.bukkit.command.CommandSender sender, String path, String... placeholders) {
+        sendMessage(sender, "prefix.general", path, placeholders);
+    }
+
+    public static void sendAdmin(org.bukkit.command.CommandSender sender, String path, String... placeholders) {
+        sendMessage(sender, "prefix.admin", path, placeholders);
+    }
+
+    public static void sendMod(org.bukkit.command.CommandSender sender, String path, String... placeholders) {
+        sendMessage(sender, "prefix.moderation", path, placeholders);
+    }
+
     public static void sendGeneral(org.bukkit.entity.Player p, String path, String... placeholders) {
         sendMessage(p, "prefix.general", path, placeholders);
     }
@@ -190,6 +202,11 @@ public class ConfigUtils {
 
     public static void sendMessage(org.bukkit.entity.Player p, String prefixPath, String path,
             String... placeholders) {
+        sendMessage((org.bukkit.command.CommandSender) p, prefixPath, path, placeholders);
+    }
+
+    public static void sendMessage(org.bukkit.command.CommandSender sender, String prefixPath, String path,
+            String... placeholders) {
         String msg = getString(path);
         if (msg == null || msg.isEmpty())
             return;
@@ -202,6 +219,6 @@ public class ConfigUtils {
         }
 
         String prefix = getString(prefixPath, "");
-        p.sendMessage(prefix + msg);
+        sender.sendMessage(prefix + msg);
     }
 }
