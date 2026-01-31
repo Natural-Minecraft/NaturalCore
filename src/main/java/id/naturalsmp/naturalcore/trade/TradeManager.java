@@ -2,6 +2,8 @@ package id.naturalsmp.naturalcore.trade;
 
 import id.naturalsmp.naturalcore.NaturalCore;
 import id.naturalsmp.naturalcore.utils.ChatUtils;
+import id.naturalsmp.naturalcore.utils.ConfigUtils;
+import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
 import java.util.HashMap;

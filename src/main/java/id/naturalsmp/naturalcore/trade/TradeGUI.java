@@ -2,6 +2,7 @@ package id.naturalsmp.naturalcore.trade;
 
 import id.naturalsmp.naturalcore.NaturalCore;
 import id.naturalsmp.naturalcore.utils.ChatUtils;
+import id.naturalsmp.naturalcore.utils.ConfigUtils;
 import id.naturalsmp.naturalcore.utils.GUIUtils;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;

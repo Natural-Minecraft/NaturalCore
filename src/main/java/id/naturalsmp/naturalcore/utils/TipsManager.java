@@ -58,6 +58,20 @@ public class TipsManager {
                 broadcastTip();
             }
         };
+        task.runTaskTimer(plugin, interval * 20L, interval * 20L);
+    }
+
+    public void tick() {
+        // No-op: handled by internal scheduler
+    }
+
+    public String getDisplay(String season) {
+        if (tips == null || tips.isEmpty())
+            return "";
+        return tips.get(new Random().nextInt(tips.size()));
+    }
+
+    private void broadcastTip() {
         // Run async? No, sending messages usually main thread safe but better safe.
         // Actually scheduler sync is fine.
         task.runTaskTimer(plugin, interval * 20L, interval * 20L);
