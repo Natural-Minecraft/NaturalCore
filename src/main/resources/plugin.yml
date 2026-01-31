@@ -114,6 +114,14 @@ commands:
     description: Gamemode
     aliases: [gm]
     permission: naturalsmp.gamemode
+  gms:
+    description: Mode Survival
+  gmc:
+    description: Mode Creative
+  gma:
+    description: Mode Adventure
+  gmsp:
+    description: Mode Spectator
   creative:
     description: Mode Creative
     aliases: [gmc, creativemode]
