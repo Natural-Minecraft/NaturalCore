@@ -127,7 +127,11 @@ Fitur bagi owner/admin untuk mensimulasikan dan mengirim notifikasi donasi.
 ### 🛡️ Admin & Moderation
 | Command | Aliases | Description | Permission |
 | :--- | :--- | :--- | :--- |
-| `/nacore` | - | Main Admin Command | `naturalsmp.admin` |
+| `/nacore` | - | Main Admin Command / Open Admin GUI | `naturalsmp.admin` |
+| `/nacore admin reload` | `/nacore reload` | **Deep Reload** all systems & configs | `naturalsmp.admin` |
+| `/nacore admin ranksync` | - | Sync ranks to LuckPerms | `naturalsmp.admin` |
+| `/nacore admin status` | - | View detailed server health status | `naturalsmp.admin` |
+| `/nacore admin backup` | - | Trigger manual database backup | `naturalsmp.admin` |
 | `/gamemode` | `gm`, `gmc`, `gms` | Ganti mode permainan | `naturalsmp.gamemode` |
 | `/invsee` | - | Cek isi tas player | `naturalsmp.invsee` |
 | `/endersee` | - | Cek enderchest player | `naturalsmp.endersee` |
@@ -138,6 +142,20 @@ Fitur bagi owner/admin untuk mensimulasikan dan mengirim notifikasi donasi.
 | `/season` | - | Atur musim/suhu (Season) | `naturalsmp.season.admin` |
 | `/banner` | - | Atur Interactive Board | `naturalsmp.admin.banner` |
 | `/maintenance` | `mt` | Kontrol Mode Maintenance | `naturalsmp.maintenance.admin` |
+
+---
+
+## ⚙️ Deep Reload System
+Perintah `/nacore reload` atau `/nacore admin reload` melakukan penyegaran sistem secara menyeluruh (**Deep Refresh**), meliputi:
+*   **config.yml**: Settings utama (AFK, Mentions, dll).
+*   **messages.yml**: Seluruh pesan dan notifikasi GUI.
+*   **Module Configs**: Emojis, Chat Tags, Tiers, dan Rank logic.
+*   **Dynamic Data**: Warps, Spawn, dan data Season.
+*   **Visuals**: HUD (Action Bar/Boss Bar) dan Chat Color logic.
+*   **NaturalLagg**: Konfigurasi pembersihan otomatis.
+
+> [!IMPORTANT]
+> Gunakan perintah ini setiap kali melakukan perubahan pada file `.yml` agar perubahan langsung diterapkan tanpa membutuhkan restart server.
 
 ---
 
