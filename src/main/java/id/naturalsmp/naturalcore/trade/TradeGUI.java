@@ -32,40 +32,72 @@ public class TradeGUI implements Listener {
     }
 
     public void openTradeGUI(Player p, TradeSession session) {
-        Inventory inv = GUIUtils.createGUI(new TradeHolder(session), 54,
-                "&#6CCAFE&lＴＲＡＤＥ &8| &f" + session.getOther(p).getName());
+        Inventory inv = GUIUtils.createGUI(new TradeHolder(session), 54, "❂ ɴᴀᴛᴜʀᴀʟ ᴛʀᴀᴅᴇ ❂");
 
         renderTrade(inv, p, session);
         p.openInventory(inv);
     }
 
     private void renderTrade(Inventory inv, Player viewer, TradeSession session) {
+        // 1. Clear Inventory for fresh render (be careful with player items)
+        // We'll only clear the non-player slots
+        for (int i = 0; i < 54; i++) {
+            boolean isAllowed = false;
+            for (int s : p1Slots)
+                if (s == i) {
+                    isAllowed = true;
+                    break;
+                }
+            for (int s : p2Slots)
+                if (s == i) {
+                    isAllowed = true;
+                    break;
+                }
+            if (!isAllowed)
+                inv.setItem(i, null);
+        }
+
+        // 2. Borders & Separator
+        ItemStack border = GUIUtils.createFiller(Material.BLACK_STAINED_GLASS_PANE);
         ItemStack separator = GUIUtils.createFiller(Material.GRAY_STAINED_GLASS_PANE);
+
+        // Middle column
         for (int i = 4; i < 54; i += 9)
             inv.setItem(i, separator);
 
-        // Confirmation Status
         boolean isP1 = viewer.equals(session.getPlayer1());
-        boolean myConfirmed = session.isConfirmed(viewer);
-        boolean otherConfirmed = session.isConfirmed(session.getOther(viewer));
 
-        ItemStack confirmBtn = createItem(myConfirmed ? Material.LIME_STAINED_GLASS : Material.RED_STAINED_GLASS,
-                myConfirmed ? "&a&lAKAN SELESAI" : "&c&lKLIK UNTUK KONFIRMASI",
-                "&7Status kamu: " + (myConfirmed ? "&aConfirmed" : "&cWaiting"),
-                "&7Status lawan: " + (otherConfirmed ? "&aConfirmed" : "&cWaiting"));
+        // P1 Confirmation (Slot 45)
+        ItemStack p1Confirm = createItem(
+                session.isConfirmed(session.getPlayer1()) ? Material.LIME_STAINED_GLASS : Material.RED_STAINED_GLASS,
+                "&#55FF55&lKONFIRMASI: &f" + session.getPlayer1().getName(),
+                "&7Status: " + (session.isConfirmed(session.getPlayer1()) ? "&aConfirmed" : "&cWaiting"));
+        inv.setItem(48, p1Confirm);
 
-        inv.setItem(48, confirmBtn); // Viewer side confirm
-        inv.setItem(50, createItem(Material.GOLD_INGOT, "&#FFEE00&lVAULT MONEY",
-                "&7Uang yang ditawarkan:",
-                "&fKamu: &eRp " + (int) session.getMoney(viewer),
-                "&fLawan: &eRp " + (int) session.getMoney(session.getOther(viewer)),
+        // P2 Confirmation (Slot 53)
+        ItemStack p2Confirm = createItem(
+                session.isConfirmed(session.getPlayer2()) ? Material.LIME_STAINED_GLASS : Material.RED_STAINED_GLASS,
+                "&#55FF55&lKONFIRMASI: &f" + session.getPlayer2().getName(),
+                "&7Status: " + (session.isConfirmed(session.getPlayer2()) ? "&aConfirmed" : "&cWaiting"));
+        inv.setItem(50, p2Confirm);
+
+        // Money Display & Button (Slots 46, 52)
+        inv.setItem(46, createItem(Material.GOLD_INGOT, "&#FFEE00&lVAULT MONEY: &f" + session.getPlayer1().getName(),
+                "&7Uang ditawarkan: &eRp " + (int) session.getMoney(session.getPlayer1()),
                 "",
-                "&bLeft-Click to +1000",
-                "&bRight-Click to +10000"));
+                "&#00AAFF&l➥ KLIK UNTUK SET NOMINAL"));
 
-        // Sync items from session map to inventory
-        // (This part is complex because we need to map session items to GUI slots)
-        // For simplicity: Players just put items into the GUI slots, and we track them.
+        inv.setItem(52, createItem(Material.GOLD_INGOT, "&#FFEE00&lVAULT MONEY: &f" + session.getPlayer2().getName(),
+                "&7Uang ditawarkan: &eRp " + (int) session.getMoney(session.getPlayer2()),
+                "",
+                "&#00AAFF&l➥ KLIK UNTUK SET NOMINAL"));
+
+        // Information Help (Slot 49)
+        inv.setItem(49, createItem(Material.BOOK, "&#6CCAFE&lINFORMATION",
+                "&71. Masukkan item ke slot kosong.",
+                "&72. Klik ikon emas untuk setor uang.",
+                "&73. Klik blok kaca untuk konfirmasi.",
+                "&74. Transaksi akan otomatis selesai."));
     }
 
     @EventHandler
@@ -82,31 +114,27 @@ public class TradeGUI implements Listener {
         e.setCancelled(true);
 
         ItemStack item = e.getCurrentItem();
-        if (slot == 48) { // Confirm
-            session.setConfirmed(player, !session.isConfirmed(player));
-            player.playSound(player.getLocation(), Sound.BLOCK_NOTE_BLOCK_PLING, 1f, 2f);
-            updateBoth(session);
+        if (slot == 48 || slot == 50) { // Confirm Buttons
+            // Only allow confirming if it's your side
+            boolean isP1Btn = (slot == 48);
+            boolean isPlayerP1 = player.equals(session.getPlayer1());
 
-            if (session.bothConfirmed()) {
-                completeTrade(session);
+            if (isP1Btn == isPlayerP1) {
+                session.setConfirmed(player, !session.isConfirmed(player));
+                player.playSound(player.getLocation(), Sound.BLOCK_NOTE_BLOCK_PLING, 1f, 2f);
+                updateBoth(session);
+
+                if (session.bothConfirmed()) {
+                    completeTrade(session);
+                }
             }
-        } else if (slot == 50) { // Money
-            double current = session.getMoney(player);
-            double add = e.isLeftClick() ? 1000 : 10000;
+        } else if (slot == 46 || slot == 52) { // Money Buttons
+            boolean isP1Btn = (slot == 46);
+            boolean isPlayerP1 = player.equals(session.getPlayer1());
 
-            // Check balance (Vault)
-            double balance = plugin.getVaultManager().getEconomy() != null
-                    ? plugin.getVaultManager().getEconomy().getBalance(player)
-                    : 0;
-            if (current + add > balance) {
-                player.sendMessage(ChatUtils.colorize("&cSaldo Rp tidak cukup!"));
-                return;
+            if (isP1Btn == isPlayerP1) {
+                plugin.getTradeManager().startCustomMoneyInput(player, session);
             }
-
-            session.setMoney(player, current + add);
-            session.setConfirmed(player, false);
-            session.setConfirmed(session.getOther(player), false);
-            updateBoth(session);
         } else {
             // Check if slot is in player's allowed side
             boolean isP1 = player.equals(session.getPlayer1());
@@ -166,8 +194,8 @@ public class TradeGUI implements Listener {
         p1.closeInventory();
         p2.closeInventory();
 
-        p1.sendMessage(ChatUtils.colorize("&6&lTrade &8» &aTransaksi berhasil!"));
-        p2.sendMessage(ChatUtils.colorize("&6&lTrade &8» &aTransaksi berhasil!"));
+        ConfigUtils.sendGeneral(p1, "messages.trade.success");
+        ConfigUtils.sendGeneral(p2, "messages.trade.success");
         p1.playSound(p1.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, 1f, 1f);
         p2.playSound(p2.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, 1f, 1f);
 
@@ -199,8 +227,8 @@ public class TradeGUI implements Listener {
         Player other = session.getOther(closer);
 
         // Cancel trade and return items
-        closer.sendMessage(ChatUtils.colorize("&6&lTrade &8» &cTransaksi dibatalkan."));
-        other.sendMessage(ChatUtils.colorize("&6&lTrade &8» &e" + closer.getName() + " &cdibatalkan transaksi."));
+        ConfigUtils.sendGeneral(closer, "messages.trade.cancelled");
+        ConfigUtils.sendGeneral(other, "messages.trade.cancelled-other", "%player%", closer.getName());
 
         // Return items to respective owners
         returnItems(closer.getOpenInventory().getTopInventory(),

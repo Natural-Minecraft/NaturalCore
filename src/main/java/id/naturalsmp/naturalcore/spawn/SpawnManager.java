@@ -50,9 +50,7 @@ public class SpawnManager {
 
         p.teleport(spawnLocation);
         p.playSound(p.getLocation(), Sound.ENTITY_ENDERMAN_TELEPORT, 1f, 1f);
-        p.sendTitle(ChatUtils.colorize("&a&lSPAWN"), ChatUtils.colorize("&7Teleporting..."), 0, 20, 10);
-
-        p.sendMessage(prefix + ConfigUtils.getString("messages.spawn.spawn-teleport"));
+        ConfigUtils.sendMessage(p, "prefix.spawn", "messages.spawn.spawn-teleport");
     }
 
     // --- FILE HANDLING (spawn.yml) ---

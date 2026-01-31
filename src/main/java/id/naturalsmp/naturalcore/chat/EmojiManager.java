@@ -55,12 +55,12 @@ public class EmojiManager {
         emojiRegistry.clear();
 
         // Save default config jika belum ada
-        if (!new File(plugin.getDataFolder(), "chatemojis.yml").exists()) {
-            plugin.saveResource("chatemojis.yml", false);
+        if (!new File(plugin.getDataFolder(), "text/chatemojis.yml").exists()) {
+            plugin.saveResource("text/chatemojis.yml", false);
         }
 
         // Load config
-        emojiFile = new File(plugin.getDataFolder(), "chatemojis.yml");
+        emojiFile = new File(plugin.getDataFolder(), "text/chatemojis.yml");
         emojiConfig = YamlConfiguration.loadConfiguration(emojiFile);
 
         // Check if enabled

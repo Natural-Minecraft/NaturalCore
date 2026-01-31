@@ -66,13 +66,11 @@ public class PlayerUtilCommand implements CommandExecutor {
             target.setSaturation(20);
             target.setFireTicks(0);
 
-            target.sendMessage(prefix + ConfigUtils.getString("messages.essentials.heal-success"));
+            ConfigUtils.sendGeneral(target, "messages.essentials.heal-success");
             target.playSound(target.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, 1f, 1f);
 
-            if (!sender.equals(target)) {
-                sender.sendMessage(
-                        prefix + ConfigUtils.getString("messages.essentials.heal-other").replace("%target%",
-                                target.getName()));
+            if (!target.equals(sender)) {
+                ConfigUtils.sendGeneral(sender, "messages.essentials.heal-other", "%player%", target.getName());
             }
             return true;
         }
@@ -85,13 +83,11 @@ public class PlayerUtilCommand implements CommandExecutor {
             target.setFoodLevel(20);
             target.setSaturation(20);
 
-            target.sendMessage(prefix + ConfigUtils.getString("messages.essentials.feed-success"));
+            ConfigUtils.sendGeneral(target, "messages.essentials.feed-success");
             target.playSound(target.getLocation(), Sound.ENTITY_GENERIC_EAT, 1f, 1f);
 
-            if (!sender.equals(target)) {
-                sender.sendMessage(
-                        prefix + ConfigUtils.getString("messages.essentials.feed-other").replace("%target%",
-                                target.getName()));
+            if (!target.equals(sender)) {
+                ConfigUtils.sendGeneral(sender, "messages.essentials.feed-other", "%player%", target.getName());
             }
             return true;
         }
@@ -101,18 +97,15 @@ public class PlayerUtilCommand implements CommandExecutor {
             if (!sender.hasPermission("naturalsmp.fly"))
                 return noPerm(sender);
 
-            boolean flight = !target.getAllowFlight();
-            target.setAllowFlight(flight);
+            boolean newStatus = !target.getAllowFlight();
+            target.setAllowFlight(newStatus);
 
-            String status = flight ? "ENABLED" : "DISABLED";
-            String msgTarget = flight ? "messages.essentials.fly-enabled" : "messages.essentials.fly-disabled";
+            String msgPath = newStatus ? "messages.essentials.fly-enabled" : "messages.essentials.fly-disabled";
+            ConfigUtils.sendGeneral(target, msgPath);
 
-            target.sendMessage(prefix + ConfigUtils.getString(msgTarget));
-
-            if (!sender.equals(target)) {
-                sender.sendMessage(prefix + ConfigUtils.getString("messages.essentials.fly-other")
-                        .replace("%target%", target.getName())
-                        .replace("%status%", status));
+            if (!target.equals(sender)) {
+                ConfigUtils.sendGeneral(sender, "messages.essentials.fly-other", "%player%", target.getName(),
+                        "%status%", newStatus ? "enabled" : "disabled");
             }
             return true;
         }

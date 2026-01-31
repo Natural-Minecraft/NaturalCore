@@ -72,14 +72,38 @@ public class ModerationCommand implements CommandExecutor {
             if (!p.hasPermission("naturalsmp.god"))
                 return noPerm(p);
 
-            if (godPlayers.contains(p.getUniqueId())) {
-                godPlayers.remove(p.getUniqueId());
-                p.sendMessage(prefix + ConfigUtils.getString("messages.moderation.god-disabled"));
+            // Check if a target player is specified
+            Player target = p;
+            boolean newStatus;
+
+            if (args.length > 0) {
+                if (!p.hasPermission("naturalsmp.god.other")) {
+                    return noPerm(p);
+                }
+                target = Bukkit.getPlayer(args[0]);
+                if (target == null) {
+                    ConfigUtils.sendMod(p, "messages.global.player-not-found");
+                    return true;
+                }
+            }
+
+            if (godPlayers.contains(target.getUniqueId())) {
+                godPlayers.remove(target.getUniqueId());
+                target.setInvulnerable(false); // Disable invulnerability
+                newStatus = false;
             } else {
-                godPlayers.add(p.getUniqueId());
-                p.setHealth(p.getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue());
-                p.setFoodLevel(20);
-                p.sendMessage(prefix + ConfigUtils.getString("messages.moderation.god-enabled"));
+                godPlayers.add(target.getUniqueId());
+                target.setHealth(target.getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue());
+                target.setFoodLevel(20);
+                target.setInvulnerable(true); // Enable invulnerability
+                newStatus = true;
+            }
+
+            ConfigUtils.sendMod(target,
+                    newStatus ? "messages.moderation.god-enabled" : "messages.moderation.god-disabled");
+            if (!target.equals(sender)) {
+                ConfigUtils.sendMod(sender, "messages.moderation.god-other", "%player%", target.getName(), "%status%",
+                        newStatus ? "enabled" : "disabled");
             }
             return true;
         }
@@ -101,7 +125,7 @@ public class ModerationCommand implements CommandExecutor {
     }
 
     private boolean noPerm(CommandSender s) {
-        s.sendMessage(ConfigUtils.getString("messages.global.no-permission"));
+        ConfigUtils.sendMod((Player) s, "messages.global.no-permission");
         return true;
     }
 }

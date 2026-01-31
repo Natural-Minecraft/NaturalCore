@@ -44,7 +44,7 @@ public class MenuUtilCommand implements CommandExecutor {
                 return true;
             }
             p.openWorkbench(null, true);
-            p.sendMessage(ChatUtils.colorize(prefix + ConfigUtils.getString("messages.utils.craft-opened")));
+            ConfigUtils.sendGeneral(p, "messages.utils.craft-opened");
             p.playSound(p.getLocation(), org.bukkit.Sound.BLOCK_WOODEN_BUTTON_CLICK_ON, 1f, 1f);
             return true;
         }

@@ -42,10 +42,10 @@ public class EconomyCommand implements CommandExecutor {
             }
 
             double bal = eco.getBalance(target);
-            sender.sendMessage(prefix + ConfigUtils.getString("messages.economy.balance-check")
-                    .replace("%target%", target.getName())
-                    .replace("%symbol%", symbol)
-                    .replace("%amount%", ChatUtils.format(bal)));
+            ConfigUtils.sendMessage(sender, "prefix.economy", "messages.economy.balance-check",
+                    "%target%", target.getName(),
+                    "%symbol%", symbol,
+                    "%amount%", ChatUtils.format(bal));
             return true;
         }
 
@@ -78,10 +78,10 @@ public class EconomyCommand implements CommandExecutor {
             eco.withdrawPlayer(target, current);
             eco.depositPlayer(target, amount);
 
-            sender.sendMessage(prefix + ConfigUtils.getString("messages.economy.balance-set")
-                    .replace("%target%", target.getName())
-                    .replace("%symbol%", symbol)
-                    .replace("%amount%", ChatUtils.format(amount)));
+            ConfigUtils.sendMessage(sender, "prefix.economy", "messages.economy.balance-set",
+                    "%target%", target.getName(),
+                    "%symbol%", symbol,
+                    "%amount%", ChatUtils.format(amount));
             return true;
         }
 
@@ -111,10 +111,10 @@ public class EconomyCommand implements CommandExecutor {
 
             eco.withdrawPlayer(target, amount);
 
-            sender.sendMessage(prefix + ConfigUtils.getString("messages.economy.balance-take")
-                    .replace("%target%", target.getName())
-                    .replace("%symbol%", symbol)
-                    .replace("%amount%", ChatUtils.format(amount)));
+            ConfigUtils.sendMessage(sender, "prefix.economy", "messages.economy.balance-take",
+                    "%target%", target.getName(),
+                    "%symbol%", symbol,
+                    "%amount%", ChatUtils.format(amount));
             return true;
         }
 
@@ -149,13 +149,14 @@ public class EconomyCommand implements CommandExecutor {
 
             eco.withdrawPlayer(p, amount);
             eco.depositPlayer(target, amount);
-
-            p.sendMessage(prefix + ConfigUtils.getString("messages.economy.pay-sent")
-                    .replace("%symbol%", symbol).replace("%amount%", ChatUtils.format(amount))
-                    .replace("%target%", target.getName()));
-            target.sendMessage(prefix + ConfigUtils.getString("messages.economy.pay-received")
-                    .replace("%symbol%", symbol).replace("%amount%", ChatUtils.format(amount))
-                    .replace("%player%", p.getName()));
+            ConfigUtils.sendMessage(p, "prefix.economy", "messages.economy.pay-sent",
+                    "%symbol%", symbol,
+                    "%amount%", ChatUtils.format(amount),
+                    "%target%", target.getName());
+            ConfigUtils.sendMessage(target, "prefix.economy", "messages.economy.pay-received",
+                    "%symbol%", symbol,
+                    "%amount%", ChatUtils.format(amount),
+                    "%player%", p.getName());
             return true;
         }
 

@@ -32,7 +32,7 @@ public class WarpCommand implements CommandExecutor, TabCompleter {
     public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label,
             @NotNull String[] args) {
         if (!(sender instanceof Player)) {
-            sender.sendMessage(ConfigUtils.getString("messages.global.only-player"));
+            ConfigUtils.sendGeneral(sender, "messages.global.only-player");
             return true;
         }
         Player p = (Player) sender;
@@ -54,8 +54,8 @@ public class WarpCommand implements CommandExecutor, TabCompleter {
         if (label.equalsIgnoreCase("setwarp")) {
             if (!p.hasPermission("naturalsmp.admin"))
                 return noPerm(p);
-            if (args.length == 0) {
-                p.sendMessage(ConfigUtils.getString("messages.global.usage").replace("%usage%", "/setwarp <nama>"));
+            if (args.length < 1) {
+                ConfigUtils.sendMessage(p, "prefix.general", "messages.global.usage", "%usage%", "/setwarp <nama>");
                 return true;
             }
             if (wm.getWarp(args[0]) != null) {
@@ -63,9 +63,7 @@ public class WarpCommand implements CommandExecutor, TabCompleter {
                 return true;
             }
             wm.createWarp(args[0], p.getLocation());
-            String prefix = ConfigUtils.getString("prefix.warp");
-            p.sendMessage(ChatUtils
-                    .colorize(prefix + ConfigUtils.getString("messages.warp.warp-set").replace("%name%", args[0])));
+            ConfigUtils.sendMessage(p, "prefix.warp", "messages.warp.warp-set", "%name%", args[0]);
             p.playSound(p.getLocation(), Sound.BLOCK_NOTE_BLOCK_PLING, 1f, 2f);
             return true;
         }
@@ -77,15 +75,11 @@ public class WarpCommand implements CommandExecutor, TabCompleter {
             if (args.length == 0)
                 return true;
             if (wm.getWarp(args[0]) == null) {
-                String prefix = ConfigUtils.getString("prefix.warp");
-                p.sendMessage(ChatUtils.colorize(
-                        prefix + ConfigUtils.getString("messages.warp.warp-not-found").replace("%name%", args[0])));
+                ConfigUtils.sendMessage(p, "prefix.warp", "messages.warp.warp-not-found", "%name%", args[0]);
                 return true;
             }
             wm.deleteWarp(args[0]);
-            String prefix = ConfigUtils.getString("prefix.warp");
-            p.sendMessage(ChatUtils
-                    .colorize(prefix + ConfigUtils.getString("messages.warp.warp-deleted").replace("%name%", args[0])));
+            ConfigUtils.sendMessage(p, "prefix.warp", "messages.warp.warp-deleted", "%name%", args[0]);
             return true;
         }
 
@@ -97,9 +91,7 @@ public class WarpCommand implements CommandExecutor, TabCompleter {
                 return true;
             Warp w = wm.getWarp(args[0]);
             if (w == null) {
-                String prefix = ConfigUtils.getString("prefix.warp");
-                p.sendMessage(ChatUtils.colorize(
-                        prefix + ConfigUtils.getString("messages.warp.warp-not-found").replace("%name%", args[0])));
+                ConfigUtils.sendMessage(p, "prefix.warp", "messages.warp.warp-not-found", "%name%", args[0]);
                 return true;
             }
             Material hand = p.getInventory().getItemInMainHand().getType();
@@ -107,10 +99,8 @@ public class WarpCommand implements CommandExecutor, TabCompleter {
                 hand = Material.GRASS_BLOCK;
             w.setIcon(hand);
             wm.saveWarps();
-            String prefix = ConfigUtils.getString("prefix.warp");
-            p.sendMessage(ChatUtils.colorize(prefix + ConfigUtils.getString("messages.warp.warp-icon-set")
-                    .replace("%name%", w.getId())
-                    .replace("%icon%", hand.name())));
+            ConfigUtils.sendMessage(p, "prefix.warp", "messages.warp.warp-icon-set", "%name%", w.getId(), "%icon%",
+                    hand.name());
             return true;
         }
 
@@ -142,7 +132,7 @@ public class WarpCommand implements CommandExecutor, TabCompleter {
     }
 
     private boolean noPerm(Player p) {
-        p.sendMessage(ConfigUtils.getString("messages.global.no-permission"));
+        ConfigUtils.sendGeneral(p, "messages.global.no-permission");
         return true;
     }
 

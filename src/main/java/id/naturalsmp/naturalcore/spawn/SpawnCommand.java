@@ -43,7 +43,7 @@ public class SpawnCommand implements CommandExecutor, TabCompleter {
             spawnManager.setSpawn(p.getLocation());
 
             // Pesan dengan Prefix
-            p.sendMessage(prefix + ConfigUtils.getString("messages.spawn.spawn-set"));
+            ConfigUtils.sendMessage(p, "prefix.spawn", "messages.spawn.spawn-set");
             p.playSound(p.getLocation(), Sound.BLOCK_NOTE_BLOCK_PLING, 1f, 2f);
             return true;
         }

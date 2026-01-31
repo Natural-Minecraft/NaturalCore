@@ -47,8 +47,9 @@ public class NaturalCoreCommand implements CommandExecutor, TabCompleter {
             if (p.hasPermission("naturalsmp.admin")) {
                 new NaturalCoreGUI(plugin).openGUI(p);
             } else {
-                sender.sendMessage(ChatUtils.colorize("&6NaturalCore v" + plugin.getDescription().getVersion()));
-                sender.sendMessage(ChatUtils.colorize("&7Gunakan &e/nacore help &7untuk bantuan."));
+                ConfigUtils.sendGeneral(p, "messages.global.version", "%version%",
+                        plugin.getDescription().getVersion());
+                ConfigUtils.sendGeneral(p, "messages.global.help-hint");
             }
             return true;
         }
@@ -113,7 +114,12 @@ public class NaturalCoreCommand implements CommandExecutor, TabCompleter {
         }
 
         if (sub.equals("ver") || sub.equals("version")) {
-            sender.sendMessage(ChatUtils.colorize("&6NaturalCore v" + plugin.getDescription().getVersion()));
+            if (sender instanceof Player p) {
+                ConfigUtils.sendGeneral(p, "messages.global.version", "%version%",
+                        plugin.getDescription().getVersion());
+            } else {
+                sender.sendMessage("NaturalCore v" + plugin.getDescription().getVersion());
+            }
             return true;
         }
 
@@ -156,7 +162,11 @@ public class NaturalCoreCommand implements CommandExecutor, TabCompleter {
     }
 
     private boolean noPerm(CommandSender s) {
-        s.sendMessage(ConfigUtils.getString("messages.global.no-permission"));
+        if (s instanceof Player p) {
+            ConfigUtils.sendGeneral(p, "messages.global.no-permission");
+        } else {
+            s.sendMessage("You don't have permission.");
+        }
         return true;
     }
 

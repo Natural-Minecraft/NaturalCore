@@ -25,8 +25,11 @@ import java.util.List;
 public class HomeGUI implements Listener {
 
     private final NaturalCore plugin;
-    // Title menggunakan Hex Color sesuai request
-    private final String GUI_TITLE = ConfigUtils.getString("messages.gui.home.title");
+    // NamespacedKey for PDC
+    private final org.bukkit.NamespacedKey HOME_NAME_KEY = new org.bukkit.NamespacedKey(NaturalCore.getInstance(),
+            "home_name");
+    // Title menggunakan Small Caps premium
+    private final String GUI_TITLE = "❂ ɴᴀᴛᴜʀᴀʟ ʜᴏᴍᴇꜱ ❂";
 
     public HomeGUI(NaturalCore plugin) {
         this.plugin = plugin;
@@ -132,6 +135,9 @@ public class HomeGUI implements Listener {
                 }
             }
             meta.lore(lore);
+            // Store home name in PDC to avoid color code parsing issues
+            meta.getPersistentDataContainer().set(HOME_NAME_KEY, org.bukkit.persistence.PersistentDataType.STRING,
+                    name);
             item.setItemMeta(meta);
         }
         return item;
@@ -189,20 +195,18 @@ public class HomeGUI implements Listener {
 
         // 3. Klik Item Home (Slot 2-6)
         if (slot >= 2 && slot <= 6) {
-            if (e.getCurrentItem().getType() == Material.RED_BED) {
-                // Ambil nama home dari Display Name item (Hapus kode warna)
-                // Use Component extraction if necessary, otherwise use
-                // getItemMeta().getDisplayName() (deprecated shim) or ChatUtils logic
-                // Relying on legacy getDisplayName() for now since default API often patches
-                // it.
-                // Assuming ChatUtils.stripColor handles null/legacy string.
+            String homeName = e.getCurrentItem().getItemMeta().getPersistentDataContainer().get(HOME_NAME_KEY,
+                    org.bukkit.persistence.PersistentDataType.STRING);
+
+            if (homeName == null) {
+                // Fallback to old behavior if PDC not found (for transition)
                 @SuppressWarnings("deprecation")
                 String displayName = e.getCurrentItem().getItemMeta().getDisplayName();
-                String homeName = ChatUtils.stripColor(displayName);
-
-                p.closeInventory();
-                p.performCommand("home " + homeName); // Cara paling aman memanggil teleport logic
+                homeName = ChatUtils.stripColor(displayName);
             }
+
+            p.closeInventory();
+            p.performCommand("home " + homeName);
         }
     }
 

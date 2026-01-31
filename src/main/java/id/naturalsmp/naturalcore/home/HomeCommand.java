@@ -27,7 +27,6 @@ public class HomeCommand implements CommandExecutor {
             return true;
         Player p = (Player) sender;
         String cmd = label.toLowerCase();
-        String prefix = ConfigUtils.getString("prefix.admin");
 
         // --- SETHOME ---
         if (cmd.equals("sethome")) {
@@ -68,18 +67,13 @@ public class HomeCommand implements CommandExecutor {
 
             String name = (args.length > 0) ? args[0] : "home";
             if (!homeManager.hasHome(p, name)) {
-                p.sendMessage(prefix + ConfigUtils.getString("messages.home.home-not-found"));
+                ConfigUtils.sendMessage(p, "prefix.home", "messages.home.home-not-found");
                 return true;
             }
 
             homeManager.deleteHome(p, name);
 
-            // FIX: Support %home% DAN %name%
-            String msg = ConfigUtils.getString("messages.home.home-deleted")
-                    .replace("%home%", name)
-                    .replace("%name%", name);
-
-            p.sendMessage(prefix + msg);
+            ConfigUtils.sendMessage(p, "prefix.home", "messages.home.home-deleted", "%name%", name);
             return true;
         }
 
@@ -90,10 +84,10 @@ public class HomeCommand implements CommandExecutor {
 
             Set<String> list = homeManager.getHomes(p);
             if (list.isEmpty()) {
-                p.sendMessage(ConfigUtils.getString("messages.home.list-empty"));
+                ConfigUtils.sendMessage(p, "prefix.home", "messages.home.list-empty");
             } else {
-                p.sendMessage(ConfigUtils.getString("messages.home.home-list")
-                        .replace("%homes%", String.join(", ", list)));
+                ConfigUtils.sendMessage(p, "prefix.home", "messages.home.home-list", "%homes%",
+                        String.join(", ", list));
             }
             return true;
         }
@@ -109,7 +103,7 @@ public class HomeCommand implements CommandExecutor {
                 if (homeManager.hasHome(p, name)) {
                     homeManager.teleportHome(p, name);
                 } else {
-                    p.sendMessage(prefix + ConfigUtils.getString("messages.home.home-not-found"));
+                    ConfigUtils.sendMessage(p, "prefix.home", "messages.home.home-not-found", "%name%", name);
                 }
                 return true;
             }
@@ -123,7 +117,7 @@ public class HomeCommand implements CommandExecutor {
     }
 
     private boolean noPerm(Player p) {
-        p.sendMessage(ConfigUtils.getString("messages.global.no-permission"));
+        ConfigUtils.sendGeneral(p, "messages.global.no-permission");
         return true;
     }
 }

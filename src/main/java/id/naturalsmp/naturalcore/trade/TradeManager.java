@@ -13,9 +13,11 @@ public class TradeManager {
     private final NaturalCore plugin;
     private final Map<UUID, UUID> pendingRequests = new HashMap<>(); // target -> sender
     private final Map<UUID, TradeSession> activeSessions = new HashMap<>(); // player -> session
+    private final Map<UUID, TradeSession> pendingMoneyInput = new HashMap<>();
 
     public TradeManager(NaturalCore plugin) {
         this.plugin = plugin;
+        Bukkit.getPluginManager().registerEvents(new TradeChatListener(), plugin);
     }
 
     public void sendRequest(Player sender, Player target) {
@@ -29,10 +31,10 @@ public class TradeManager {
         }
 
         pendingRequests.put(target.getUniqueId(), sender.getUniqueId());
-        sender.sendMessage(ChatUtils.colorize("&6&lTrade &8» &7Undangan transaksi dikirim ke &e" + target.getName()));
-        target.sendMessage(
-                ChatUtils.colorize("&6&lTrade &8» &e" + sender.getName() + " &7ingin bertransaksi denganmu."));
-        target.sendMessage(ChatUtils.colorize("&7Gunakan &f/trade accept " + sender.getName() + " &7untuk memulai."));
+        String prefix = ConfigUtils.getString("prefix.general");
+        ConfigUtils.sendGeneral(sender, "messages.trade.request-sent", "%player%", target.getName());
+        ConfigUtils.sendGeneral(target, "messages.trade.request-received", "%player%", sender.getName());
+        ConfigUtils.sendGeneral(target, "messages.trade.accept-usage", "%player%", sender.getName());
     }
 
     public void acceptRequest(Player target, Player sender) {
@@ -63,5 +65,56 @@ public class TradeManager {
 
     public TradeSession getSession(Player p) {
         return activeSessions.get(p.getUniqueId());
+    }
+
+    public void startCustomMoneyInput(Player p, TradeSession session) {
+        pendingMoneyInput.put(p.getUniqueId(), session);
+        p.closeInventory();
+        ConfigUtils.sendGeneral(p, "messages.trade.input-money");
+        ConfigUtils.sendGeneral(p, "messages.trade.input-cancel");
+    }
+
+    private class TradeChatListener implements org.bukkit.event.Listener {
+        @org.bukkit.event.EventHandler
+        public void onChat(org.bukkit.event.player.AsyncPlayerChatEvent e) {
+            Player p = e.getPlayer();
+            if (!pendingMoneyInput.containsKey(p.getUniqueId()))
+                return;
+
+            e.setCancelled(true);
+            TradeSession session = pendingMoneyInput.remove(p.getUniqueId());
+            String message = e.getMessage().trim();
+
+            if (message.equalsIgnoreCase("cancel")) {
+                ConfigUtils.sendGeneral(p, "messages.trade.input-cancelled");
+                Bukkit.getScheduler().runTask(plugin, () -> plugin.getTradeGUI().openTradeGUI(p, session));
+                return;
+            }
+
+            try {
+                double amount = Double.parseDouble(message);
+                if (amount < 0)
+                    throw new NumberFormatException();
+
+                // Check balance
+                double balance = plugin.getVaultManager().getEconomy().getBalance(p);
+                if (amount > balance) {
+                    ConfigUtils.sendGeneral(p, "messages.trade.insufficient-balance", "%max%",
+                            String.valueOf((int) balance));
+                } else {
+                    session.setMoney(p, amount);
+                    session.setConfirmed(p, false);
+                    session.setConfirmed(session.getOther(p), false);
+                    ConfigUtils.sendGeneral(p, "messages.trade.money-set", "%amount%", String.valueOf((int) amount));
+                }
+            } catch (NumberFormatException ex) {
+                p.sendMessage(ChatUtils.colorize("&cJumlah tidak valid! Gunakan angka saja."));
+            }
+
+            Bukkit.getScheduler().runTask(plugin, () -> {
+                plugin.getTradeGUI().openTradeGUI(p, session);
+                plugin.getTradeGUI().openTradeGUI(session.getOther(p), session);
+            });
+        }
     }
 }

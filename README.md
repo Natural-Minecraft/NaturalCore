@@ -1,13 +1,23 @@
-# NaturalCore v2.0.2 (Phoenix Edition)
+# NaturalCore v2.0.3 (Wild Spirit Edition)
 
 Plugin inti (core) premium untuk server **NaturalSMP**, mengelola seluruh aspek penting server dengan stabilitas ultra-tinggi dan estetika premium.
+
+## ✨ Fitur Baru v2.0.3 (The Trade & Home Fix)
+
+### 🤝 Premium Trade Overhaul
+*   **Custom Money Input**: Sekarang bisa mengetik jumlah nominal uang (Rp) langsung di chat saat bertransaksi.
+*   **Small Caps UI**: Judul GUI Trade kini lebih elegan dengan font Small Caps.
+*   **Interactive Design**: Layout baru dengan separator yang lebih jelas dan tombol konfirmasi yang lebih intuitif.
+
+### 🏠 Home System Fix
+*   **Persistent Data (PDC)**: Nama home kini disimpan secara internal (PDC), mengatasi masalah 'Home not found' akibat kode warna atau formatting.
+*   **Prefix Consistency**: Semua pesan home kini menggunakan prefix `SMP »` yang konsisten.
+*   **Small Caps GUI**: Judul GUI Home kini lebih seragam.
 
 ## ✨ Fitur Baru v2.0.2 (The Polish Update)
 
 ### 💎 Aesthetics & Bug Fixes
 *   **Professional Small Caps**: Seluruh judul GUI (Profile, Ranks, Editor, Admin) kini menggunakan font Small Caps premium yang elegan.
-*   **Vanish Prefix Fix**: Memperbaiki bug di mana pesan log command moderation (seperti `/v`) menampilkan `null`. Sekarang menggunakan prefix `MOD »`.
-*   **Rank GUI Polish**: Penambahan pemisah `&r` pada icon rank Unicode untuk tampilan yang lebih tajam dan bersih.
 
 ### ⚙️ Rank Editor Advanced
 *   **Permission Pagination**: List permissions di `/rankeditor` kini dikelompokkan per 7 baris untuk keterbacaan yang lebih baik.

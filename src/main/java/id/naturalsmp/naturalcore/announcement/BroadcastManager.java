@@ -22,7 +22,7 @@ public class BroadcastManager {
 
     public BroadcastManager(NaturalCore plugin) {
         this.plugin = plugin;
-        this.configFile = new File(plugin.getDataFolder(), "announcements.yml");
+        this.configFile = new File(plugin.getDataFolder(), "text/announcements.yml");
         loadConfig();
         startTask();
     }

@@ -127,7 +127,7 @@ public final class NaturalCore extends JavaPlugin {
                 &e  |  \\| |/ _` | __| | | | '__/ _` | |
                 &e  | |\\  | (_| | |_| |_| | | | (_| | |
                 &e  |_| \\_|\\__,_|\\__|\\__,_|_|  \\__,_|_|
-                &6&l     -= NATURAL CORE v2.0.2 =-
+                &6&l     -= NATURAL CORE v2.0.3 =-
                 &7       Developed for NaturalSMP
                 """;
         for (String line : banner.split("\n")) {
@@ -139,6 +139,16 @@ public final class NaturalCore extends JavaPlugin {
         id.naturalsmp.naturalcore.utils.ConfigUpdater.updateConfig(this, "config.yml");
         id.naturalsmp.naturalcore.utils.ConfigUpdater.updateConfig(this, "messages.yml");
         id.naturalsmp.naturalcore.utils.ConfigUpdater.updateConfig(this, "essentials_disabled_commands.yml");
+
+        // Init text folder if not exists
+        File textFolder = new File(getDataFolder(), "text");
+        if (!textFolder.exists())
+            textFolder.mkdirs();
+
+        // Migrate or Save text resources
+        saveTextResource("announcements.yml");
+        saveTextResource("chatemojis.yml");
+        saveTextResource("tips.yml");
 
         // 2B. Init Backup System (v2.0)
         this.backupManager = new id.naturalsmp.naturalcore.utility.BackupManager(this);
@@ -493,6 +503,13 @@ public final class NaturalCore extends JavaPlugin {
         // Selesai
         getLogger().info(
                 ChatUtils.colorize("&6&lNaturalCore v" + getDescription().getVersion() + " &asudah aktif sepenuhnya!"));
+    }
+
+    private void saveTextResource(String name) {
+        File file = new File(getDataFolder(), "text/" + name);
+        if (!file.exists()) {
+            saveResource("text/" + name, false);
+        }
     }
 
     public void reload() {

@@ -16,9 +16,7 @@ public class WorldUtilCommand implements CommandExecutor {
         if (!(sender instanceof Player))
             return true;
         Player p = (Player) sender;
-        World w = p.getWorld();
         String cmd = label.toLowerCase();
-        String prefix = ConfigUtils.getString("prefix.player");
 
         if (!p.hasPermission("naturalsmp.time")) {
             p.sendMessage(ConfigUtils.getString("messages.global.no-permission"));
@@ -26,23 +24,23 @@ public class WorldUtilCommand implements CommandExecutor {
         }
 
         switch (cmd) {
-            case "day":
-                w.setTime(1000);
-                p.sendMessage(prefix + ConfigUtils.getString("messages.utils.time-day"));
-                break;
-            case "night":
-                w.setTime(13000);
-                p.sendMessage(prefix + ConfigUtils.getString("messages.utils.time-night"));
-                break;
-            case "sun":
-                w.setStorm(false);
-                w.setThundering(false);
-                p.sendMessage(prefix + ConfigUtils.getString("messages.utils.weather-sun"));
-                break;
-            case "rain":
-                w.setStorm(true);
-                p.sendMessage(prefix + ConfigUtils.getString("messages.utils.weather-rain"));
-                break;
+            case "day" -> {
+                p.getWorld().setTime(1000);
+                ConfigUtils.sendGeneral(p, "messages.utils.time-day");
+            }
+            case "night" -> {
+                p.getWorld().setTime(13000);
+                ConfigUtils.sendGeneral(p, "messages.utils.time-night");
+            }
+            case "sun" -> {
+                p.getWorld().setStorm(false);
+                p.getWorld().setThundering(false);
+                ConfigUtils.sendGeneral(p, "messages.utils.weather-sun");
+            }
+            case "rain" -> {
+                p.getWorld().setStorm(true);
+                ConfigUtils.sendGeneral(p, "messages.utils.weather-rain");
+            }
         }
         return true;
     }

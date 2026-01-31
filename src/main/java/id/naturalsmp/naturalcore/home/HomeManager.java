@@ -136,17 +136,13 @@ public class HomeManager implements Listener {
     // 2. Teleport Home (Dipakai Command & GUI)
     public void teleportHome(Player p, String name) {
         Location loc = getHome(p, name);
-        if (loc != null) {
-            p.teleport(loc);
-            p.playSound(p.getLocation(), Sound.ENTITY_ENDERMAN_TELEPORT, 1f, 1f);
-
-            String msg = ConfigUtils.getString("messages.home.home-teleport", "&aTeleporting to &e%location%...");
-            String prefix = ConfigUtils.getString("prefix.home", ConfigUtils.getString("prefix.player"));
-
-            p.sendMessage(ChatUtils.colorize(prefix + msg.replace("%location%", name)));
-        } else {
-            p.sendMessage(ChatUtils.colorize("&cHome &e" + name + " &ctidak ditemukan!"));
+        if (loc == null) {
+            ConfigUtils.sendMessage(p, "prefix.home", "messages.home.home-not-found", "%name%", name);
+            return;
         }
+        p.teleport(loc);
+        p.playSound(p.getLocation(), Sound.ENTITY_ENDERMAN_TELEPORT, 1f, 1f);
+        ConfigUtils.sendMessage(p, "prefix.home", "messages.home.home-teleport", "%location%", name);
     }
 
     // --- LIMITS ---

@@ -159,13 +159,11 @@ public class NaturalCoreGUI implements Listener {
             }
             case COMMAND_BLOCK -> { // Reset Season
                 p.closeInventory();
-                p.sendMessage(ChatUtils.toComponent(
-                        "&6&lNaturalCore &8» &7Gunakan &e/nacore admin resetseason confirm &7di chat untuk konfirmasi."));
+                ConfigUtils.sendAdmin(p, "messages.admin.resetseason-confirm");
                 p.playSound(p.getLocation(), Sound.BLOCK_ANVIL_LAND, 1f, 1f);
             }
             case NETHER_STAR -> { // Info
-                p.sendMessage(ChatUtils.toComponent("&6&lNaturalCore &8» &7Anda sedang menggunakan sistem &fCore v"
-                        + plugin.getDescription().getVersion()));
+                ConfigUtils.sendAdmin(p, "messages.global.version", "%version%", plugin.getDescription().getVersion());
                 p.playSound(p.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, 0.5f, 2f);
             }
             default -> {

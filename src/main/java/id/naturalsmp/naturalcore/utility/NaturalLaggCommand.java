@@ -37,16 +37,17 @@ public class NaturalLaggCommand implements CommandExecutor {
         if (args[0].equalsIgnoreCase("clear") || args[0].equalsIgnoreCase("clean")) {
             // /lagg clear - Trigger NaturalLagg cleanup
             if (!sender.hasPermission("naturalsmp.admin")) { // Admin only for cleanup
-                sender.sendMessage(ConfigUtils.getString("messages.global.no-permission"));
+                ConfigUtils.sendGeneral(sender, "messages.global.no-permission");
                 return true;
             }
 
             plugin.getLaggManager().startCleanup(15); // Default start time 15s to sync animation
-            sender.sendMessage(ChatUtils.colorize("&6&lNaturalLagg &8» &7Memulai proses pembersihan item..."));
+            ConfigUtils.sendGeneral(sender, "messages.lagg.starting-clear");
+            plugin.getLaggManager().clearItems(sender);
             return true;
         }
 
-        sender.sendMessage(ChatUtils.colorize("&cUsage: /lagg [clear]"));
+        ConfigUtils.sendGeneral(sender, "messages.lagg.usage");
         return true;
     }
 

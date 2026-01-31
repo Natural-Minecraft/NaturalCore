@@ -15,6 +15,7 @@ public class TipsManager {
     private long intervalHooks;
     private int stayDurationTicks;
     private String soundName;
+    private org.bukkit.configuration.file.FileConfiguration tipsConfig;
 
     private long lastRun = System.currentTimeMillis();
     private TipState state = TipState.IDLE;
@@ -37,10 +38,16 @@ public class TipsManager {
     }
 
     public void reload() {
-        this.tips = ConfigUtils.getStringList("tips.list");
-        this.intervalHooks = ConfigUtils.getInt("tips.interval", 300) * 1000L;
-        this.stayDurationTicks = ConfigUtils.getInt("tips.duration", 4) * 20;
-        this.soundName = ConfigUtils.getString("tips.sound", "BLOCK_NOTE_BLOCK_HAT");
+        File file = new File(plugin.getDataFolder(), "text/tips.yml");
+        if (!file.exists()) {
+            plugin.saveResource("text/tips.yml", false);
+        }
+        tipsConfig = org.bukkit.configuration.file.YamlConfiguration.loadConfiguration(file);
+
+        this.tips = tipsConfig.getStringList("tips");
+        this.intervalHooks = tipsConfig.getInt("settings.interval", 300) * 1000L;
+        this.stayDurationTicks = tipsConfig.getInt("settings.duration", 4) * 20;
+        this.soundName = tipsConfig.getString("settings.sound", "BLOCK_NOTE_BLOCK_HAT");
     }
 
     public void tick() {

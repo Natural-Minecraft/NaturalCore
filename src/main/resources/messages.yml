@@ -3,21 +3,16 @@
 #                   NATURALCORE MESSAGES
 # ======================================================
 
-prefix:
-  moderation: "&6&lMOD &8» "
-  admin: "&c&lADM &8» "
-  general: "&b&lSMP &8» "
-
 messages:
   # ======================================================
 
-# --- GLOBAL ---
 global:
-  no-permission: "&c&lNaturalSMP &8» &cMaaf, kamu tidak punya akses."
-  reload-success: "&a&l✔ &7Konfigurasi berhasil dimuat ulang!"
-  player-not-found: "&c&l✘ &7Pemain &f%player% &ctidak ditemukan/offline."
-  only-player: "&cPerintah ini hanya dapat digunakan oleh pemain!"
-  usage: "&cUsage: %usage%"
+  no-permission: "&cMaaf, kamu tidak punya akses."
+  player-not-found: "&7Pemain &f%player% &ctidak ditemukan/offline."
+  usage: "&#FF5555&l⚠ &cGunakan: &f%usage%"
+  version: "&#00AAFF&lNatural&#55FF55&lCore &av%version% &7- Premium Version"
+  only-player: "&#FF5555&l✘ &cHanya player yang dapat menggunakan perintah ini."
+  help-hint: "&#6CCAFE&lINFO &8┃ &7Gunakan &e/nacore help &7untuk bantuan."
 
 # --- ADMIN MODULE ---
 admin:
@@ -230,12 +225,12 @@ teleport:
   tp-coords: "&7Teleportasi ke &f%x%, %y%, %z%&7."
   tp-coords-other: "&7Memindahkan &f%target% &7ke &f%x%, %y%, %z%&7."
 
-# --- WARP ---
-warp:
-  warp-set: "&aWarp '&f%name%&a' berhasil dibuat!"
-  warp-deleted: "&cWarp '&f%name%&c' telah dihapus."
-  warp-not-found: "&cWarp '&f%name%&c' tidak ditemukan!"
-  warp-icon-set: "&aIcon warp '&f%name%&a' diubah menjadi %icon%"
+  warp:
+    warp-set: "&aWarp '&f%name%&a' berhasil dibuat!"
+    warp-deleted: "&cWarp '&f%name%&c' telah dihapus."
+    warp-not-found: "&cWarp '&f%name%&c' tidak ditemukan!"
+    warp-icon-set: "&aIcon warp '&f%name%&a' diubah menjadi %icon%"
+    hold-item-icon: "&cPegang item di tangan untuk menjadikannya icon!"
   teleporting-title: "%displayname%"
   teleporting-subtitle: "&7Teleporting..."
   profile:
@@ -383,3 +378,19 @@ ranks:
       - ""
       - "&8&m-------------------------------"
       - "<#00FFD4><b>➥ KLIK UNTUK INFO LENGKAP</b>"
+
+  trade:
+    request-sent: "&#00AAFF&l❂ &7Undangan transaksi dikirim ke &e%player%"
+    request-received: "&#00AAFF&l❂ &e%player% &7ingin bertransaksi denganmu."
+    accept-usage: "&#00AAFF&l❂ &7Gunakan &f/trade accept %player% &7untuk memulai."
+    input-money: "&#00AAFF&l❂ &7Ketik jumlah &eRp &7yang ingin kamu tawarkan:"
+    input-cancel: "&#00AAFF&l❂ &7Ketik &ccancel &7untuk membatalkan."
+    input-cancelled: "&#FF5555&l✘ &cInput dibatalkan."
+    insufficient-balance: "&#FF5555&l⚠ &cSaldo tidak cukup! (Maks: &eRp %max%&c)"
+    money-set: "&#55FF55&l✔ &aSet tawaran uang ke &eRp %amount%"
+    cancelled-other: "&#FF5555&l✘ &e%player% &7membatalkan transaksi."
+
+  lagg:
+    starting-clear: "&#6CCAFE&lINFO &8┃ &7Memulai proses pembersihan item..."
+    usage: "&#FF5555&l⚠ &cGunakan: &f/lagg [clear]"
+  

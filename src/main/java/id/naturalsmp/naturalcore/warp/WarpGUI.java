@@ -259,22 +259,22 @@ public class WarpGUI implements Listener {
             if (e.getClick().isRightClick() && !e.isShiftClick()) {
                 plugin.getWarpManager().deleteWarp(w.getId());
                 p.playSound(p.getLocation(), Sound.BLOCK_ANVIL_BREAK, 1f, 1f);
-                p.sendMessage(ChatUtils.colorize("&c&lWARP &8» &fWarp &c" + w.getId() + " &ftelah dihapus!"));
+                ConfigUtils.sendMessage(p, "prefix.warp", "messages.warp.warp-deleted", "%name%", w.getId());
                 openGUI(p, true);
             }
             // UPDATE ICON: Shift + Klik Kanan
             else if (e.isShiftClick() && e.getClick().isRightClick()) {
                 ItemStack hand = p.getInventory().getItemInMainHand();
                 if (hand == null || hand.getType() == Material.AIR) {
-                    p.sendMessage(ChatUtils.colorize("&cPegang item di tangan untuk menjadikannya icon!"));
+                    ConfigUtils.sendGeneral(p, "messages.warp.hold-item-icon");
                     return;
                 }
                 w.setIcon(hand.getType());
                 plugin.getWarpManager().saveWarpToFile(w);
 
                 p.playSound(p.getLocation(), Sound.BLOCK_NOTE_BLOCK_PLING, 1f, 2f);
-                p.sendMessage(ChatUtils.colorize("&a&lWARP &8» &fIcon warp &e" + w.getId() + " &fdiubah menjadi &b"
-                        + hand.getType().name()));
+                ConfigUtils.sendMessage(p, "prefix.warp", "messages.warp.warp-icon-set", "%name%", w.getId(), "%icon%",
+                        hand.getType().name());
                 openGUI(p, true); // Refresh GUI
             }
             return;

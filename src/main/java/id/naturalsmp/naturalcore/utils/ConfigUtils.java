@@ -173,4 +173,35 @@ public class ConfigUtils {
     public static List<String> getMessageList(String path) {
         return getMessages().getStringList(path);
     }
+
+    // --- SMART MESSAGING (CLEAN CODE) ---
+
+    public static void sendGeneral(org.bukkit.entity.Player p, String path, String... placeholders) {
+        sendMessage(p, "prefix.general", path, placeholders);
+    }
+
+    public static void sendAdmin(org.bukkit.entity.Player p, String path, String... placeholders) {
+        sendMessage(p, "prefix.admin", path, placeholders);
+    }
+
+    public static void sendMod(org.bukkit.entity.Player p, String path, String... placeholders) {
+        sendMessage(p, "prefix.moderation", path, placeholders);
+    }
+
+    public static void sendMessage(org.bukkit.entity.Player p, String prefixPath, String path,
+            String... placeholders) {
+        String msg = getString(path);
+        if (msg == null || msg.isEmpty())
+            return;
+
+        // Apply placeholders (pairs: key, value)
+        for (int i = 0; i < placeholders.length; i += 2) {
+            if (i + 1 < placeholders.length) {
+                msg = msg.replace(placeholders[i], placeholders[i + 1]);
+            }
+        }
+
+        String prefix = getString(prefixPath, "");
+        p.sendMessage(prefix + msg);
+    }
 }
