@@ -1,6 +1,17 @@
-# NaturalCore v2.0.0 (Phoenix Edition)
+# NaturalCore v2.0.2 (Phoenix Edition)
 
 Plugin inti (core) premium untuk server **NaturalSMP**, mengelola seluruh aspek penting server dengan stabilitas ultra-tinggi dan estetika premium.
+
+## ✨ Fitur Baru v2.0.2 (The Polish Update)
+
+### 💎 Aesthetics & Bug Fixes
+*   **Professional Small Caps**: Seluruh judul GUI (Profile, Ranks, Editor, Admin) kini menggunakan font Small Caps premium yang elegan.
+*   **Vanish Prefix Fix**: Memperbaiki bug di mana pesan log command moderation (seperti `/v`) menampilkan `null`. Sekarang menggunakan prefix `MOD »`.
+*   **Rank GUI Polish**: Penambahan pemisah `&r` pada icon rank Unicode untuk tampilan yang lebih tajam dan bersih.
+
+### ⚙️ Rank Editor Advanced
+*   **Permission Pagination**: List permissions di `/rankeditor` kini dikelompokkan per 7 baris untuk keterbacaan yang lebih baik.
+*   **Weight Management**: Penambahan fungsionalitas untuk mengubah **Weight** rank secara langsung melalui GUI dengan input chat.
 
 ## ✨ Fitur Baru v2.0.0 (The Phoenix Update)
 

@@ -20,6 +20,7 @@ import id.naturalsmp.naturalcore.utility.EnvironmentCommand;
 
 import id.naturalsmp.naturalcore.general.*;
 import id.naturalsmp.naturalcore.teleport.TeleportManager;
+import id.naturalsmp.naturalcore.utility.*;
 
 import id.naturalsmp.naturalcore.teleport.TeleportCommand;
 import id.naturalsmp.naturalcore.teleport.TeleportListener;
@@ -83,6 +84,7 @@ public final class NaturalCore extends JavaPlugin {
     private WarpManager warpManager;
     private SpawnManager spawnManager;
     private HomeManager homeManager;
+    private id.naturalsmp.naturalcore.home.HomeGUI homeGUI;
     private VanishManager vanishManager;
     private TeleportManager teleportManager;
     private MessageManager messageManager;
@@ -125,7 +127,7 @@ public final class NaturalCore extends JavaPlugin {
                 &e  |  \\| |/ _` | __| | | | '__/ _` | |
                 &e  | |\\  | (_| | |_| |_| | | | (_| | |
                 &e  |_| \\_|\\__,_|\\__|\\__,_|_|  \\__,_|_|
-                &6&l     -= NATURAL CORE v2.0.0 =-
+                &6&l     -= NATURAL CORE v2.0.2 =-
                 &7       Developed for NaturalSMP
                 """;
         for (String line : banner.split("\n")) {

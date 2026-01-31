@@ -17,6 +17,7 @@ default:
     - naturalsmp.info
     - naturalsmp.tpa
     - naturalsmp.spawn
+    - naturalsmp.chat.color
     - naturalsmp.home.use
     - naturalsmp.home.limit.default
     - naturaldungeon.party
