@@ -43,7 +43,7 @@ public class StartGUI implements Listener {
         ItemStack dungeon = new ItemStack(Material.DIAMOND_SWORD);
         dungeon.addUnsafeEnchantment(Enchantment.SHARPNESS, 1);
         ItemMeta dMeta = dungeon.getItemMeta();
-        dMeta.displayName(ChatUtils.toComponent("&#FF5555&l⚔ DUNGEON"));
+        dMeta.displayName(ChatUtils.toComponent("&#FF4444&l⚔ ᴅᴜɴɢᴇᴏɴ")); // Red/Gold
         List<Component> dLore = new ArrayList<>();
         dLore.add(ChatUtils.toComponent("&7Uji keberanianmu di dunia"));
         dLore.add(ChatUtils.toComponent("&7penuh monster dan loot berharga!"));
@@ -55,11 +55,11 @@ public class StartGUI implements Listener {
         inv.setItem(2, dungeon);
 
         // 2. Survival (Slot 4)
-        inv.setItem(4, createItem(Material.GRASS_BLOCK, "&#55FF55&l🌳 SURVIVAL",
+        inv.setItem(4, createItem(Material.GRASS_BLOCK, "&#55FF55&l🌳 ꜱᴜʀᴠɪᴠᴀʟ",
                 "&7Mulailah petualanganmu di", "&7dunia survival utama.", "", "&#FFAA00&l➥ KLIK UNTUK MASUK"));
 
         // 3. Resource (Slot 6)
-        inv.setItem(6, createItem(Material.DIAMOND_HOE, "&#FFFF55&l⛏ RESOURCE",
+        inv.setItem(6, createItem(Material.DIAMOND_HOE, "&#FFEE55&l⛏ ʀᴇꜱᴏᴜʀᴄᴇ",
                 "&7Dunia khusus untuk mencari", "&7material tanpa merusak survival.", "",
                 "&#FFAA00&l➥ KLIK UNTUK MASUK"));
 
