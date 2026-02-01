@@ -71,6 +71,16 @@ public class PermissionManager {
             rank.permissions = rankSection.getStringList("permissions");
             rank.inheritance = rankSection.getString("inherit");
 
+            // GUI related fields (for /ranks)
+            if (rankSection.contains("gui")) {
+                ConfigurationSection guiSec = rankSection.getConfigurationSection("gui");
+                if (guiSec != null) {
+                    rank.guiItem = guiSec.getString("item", "PAPER");
+                    rank.guiName = guiSec.getString("name", rank.displayName);
+                    rank.guiBenefits = guiSec.getStringList("benefits");
+                }
+            }
+
             ranks.put(rank.id, rank);
             registerBukkitPermission(rank);
         }
@@ -192,6 +202,13 @@ public class PermissionManager {
             rSec.set("weight", rank.weight);
             rSec.set("permissions", rank.permissions);
             rSec.set("inherit", rank.inheritance);
+
+            if (rank.guiItem != null) {
+                ConfigurationSection g = rSec.createSection("gui");
+                g.set("item", rank.guiItem);
+                g.set("name", rank.guiName.replace("§", "&"));
+                g.set("benefits", rank.guiBenefits);
+            }
         }
         try {
             config.save(configFile);
@@ -207,5 +224,10 @@ public class PermissionManager {
         public int weight;
         public List<String> permissions;
         public String inheritance;
+
+        // GUI Display Info
+        public String guiItem;
+        public String guiName;
+        public List<String> guiBenefits;
     }
 }

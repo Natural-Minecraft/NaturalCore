@@ -2,8 +2,10 @@
 #                   NATURALCORE MESSAGES
 # ======================================================
 
-messages:
-  # ======================================================
+prefix:
+  general: "&#00AAFF&lNatural&#55FF55&lCore &8┃ &f"
+  admin: "&6&lAdmin &8» &f"
+  social: "&d&lSocial &8» &f"
 
 global:
   no-permission: "&cMaaf, kamu tidak punya akses."
@@ -13,9 +15,26 @@ global:
   version: "&#00AAFF&lNatural&#55FF55&lCore &av%version% &7- Premium Version"
   only-player: "&#FF5555&l✘ &cHanya player yang dapat menggunakan perintah ini."
   help-hint: "&#6CCAFE&lINFO &8┃ &7Gunakan &e/nacore help &7untuk bantuan."
+  sub-command-not-found: "&cSub-command tidak ditemukan. Cek /nacore help."
+  version-console: "NaturalCore v%version%"
 
-# --- ADMIN MODULE ---
+# --- ADMINISTRATIVE TOOLING ---
 admin:
+  reload:
+    starting: "&6&lNaturalCore &8» &fRefreshing system..."
+    success: "&6&lNaturalCore &8» &aAll system configurations have been deep-refreshed!"
+  ranksync:
+    starting: "&6&lPermissions &8» &fSyncing to LuckPerms..."
+    success: "&6&lPermissions &8» &aSync complete! 🔑"
+  resetseason:
+    warning: "&c&lWARNING! &7Reset 50% Tier & AuraSkills."
+    confirm: "&c&lWARNING! &7Reset 50% Tier & AuraSkills. Gunakan /nacore admin resetseason confirm untuk konfirmasi."
+  backup:
+    starting: "&6&lBackup &8» &fCreating manual backup..."
+    success: "&6&lBackup &8» &aDone!"
+  rank:
+    error-duration: "&#FF5555&l⚠ &cError: Durasi harus berupa angka (hari)."
+    error-invalid: "&#FF5555&l⚠ &cError: Rank tidak valid! (midi, vip, mvp, nature)"
   kickall:
     usage: "&cUsage: /kickall confirm <alasan>"
     confirm-required: "&cSilahkan ketik &aConfirmation &csebelum reason"
@@ -32,12 +51,13 @@ admin:
     shout-format: "&a&lShout &b> &e%message%"
   restart:
     confirm-required: "&8&l| &cSilahkan ketik &aConfirmation &cterlebih dahulu"
-    warning-header: "&#ff0000&m&l-----------===============-----------"
-    warning-title: "                 <gradient:#ff0000:#ff8c00><b>WARNING</b></gradient>"
-    warning-body: |-
-       <center>&cServer akan melakukan restart otomatis</center>
-             <center>&cdalam waktu &a%time% &cdetik</center>
-    warning-footer: "&#ff0000&m&l-----------===============-----------"
+    time-error: "&#FF5555&l⚠ &cError: Waktu harus berupa angka (detik)."
+    already-running: "&#FF5555&l⚠ &cError: Ada restart yang sedang berjalan! Gunakan /restartcancel dulu."
+    save-data: "❂ Menyimpan data dunia..."
+    warning-header: "&8&m--------------------------------"
+    warning-title: "      ⚠ SERVER RESTART ⚠"
+    warning-body: "  Server akan restart dalam &e%time% &7detik."
+    warning-footer: "&8&m--------------------------------"
     countdown-title: "<gradient:#ff0000:#ff8c00><b>! RESTART !</b></gradient>"
     countdown-subtitle: "&fServer restart dalam &e%time% &fdetik"
     saving-data: "&#ffaa00&l💾 SAVING DATA..."
@@ -48,7 +68,7 @@ admin:
       &7Server sedang melakukan pemeliharaan rutin.
       &7Silahkan coba kembali dalam &e3-5 menit&7.
       
-      &8» &bdiscord.gg/naturalsmp
+      &8» &bdc.naturalsmp.my.id
   maintenance:
     countdown: "&6&lMaintenance &8» &7Server akan masuk ke mode maintenance dalam &e%time%&7 detik."
     kick-reason: |-
@@ -58,120 +78,38 @@ admin:
       &7Hanya staf yang diizinkan masuk saat ini.
       
       &8» &bhttps://dc.naturalsmp.my.id/
-    bossbar-title: "<gradient:#FFAA00:#FFFF55><b>Mode Maintenance Aktif</b></gradient>"
+    bossbar-title: "Mode Maintenance Aktif"
 
-# --- SOCIAL ---
+# --- SOCIAL & PLAYER INTERACTION ---
 social:
   join-message: "&8[&a+&8] &7%displayname%"
   quit-message: "&8[&c-&8] &7%displayname%"
-  nature-join:
+  first-join-message: 
     - ""
-    - "  <gradient:#00AAFF:#55FF55>&l» Welcome to NaturalSMP! «</gradient>"
-    - "  &b%displayname% &7telah kembali ke alam."
+    - "  <gradient:#FF55FF:#FF00FF><b>✨ NEW PLAYER ✨</b></gradient>"
+    - "  &fSelamat datang &b%displayname% &fdi &aNaturalSMP&f!"
+    - "  &7Semoga betah bermain bersama kami! &e(#%count%)"
     - ""
-  first-join-message: "&d&lNEW &8┃ &fWelcome &d%displayname% &7to the server! &e(#%count%)"
   motd:
     - "&8&m--------------------------------"
     - " &6&lWelcome to NaturalSMP!"
     - " &7Selamat bermain, %player%!"
     - "&8&m--------------------------------"
+  notifications:
+    death:
+      - "&8[&c&l☠&8] &7%player% &fakhirnya tumbang oleh alam."
+      - "&8[&c&l☠&8] &7%player% &fterlalu asik bermain dengan ajal."
+      - "&8[&c&l☠&8] &7%player% &flupa caranya bernafas."
+      - "&8[&c&l☠&8] &7%player% &ftewas mengenaskan."
+    kill:
+      - "&8[&6&l⚔&8] &b%killer% &7mengakhiri riwayat &e%victim%&7."
+      - "&8[&6&l⚔&8] &b%killer% &7mengirim &e%victim% &7kembali ke spawn!"
+      - "&8[&6&l⚔&8] &b%killer% &7membuktikan kekuatannya pada &e%victim%&7."
+    achievement:
+      - "&8[&a&l✦&8] &b%player% &7telah meraih pencapaian: &e%achievement%&7!"
+      - "&8[&a&l✦&8] &b%player% &7baru saja mencatat sejarah: &e%achievement%&7!"
 
-# --- FUN ---
-fun:
-  gg-message: "&8[&b&lGG&8] &f%displayname% &7mengatakan &bGood Game!"
-  noob-message: "&8[&c&lNOOB&8] &f%displayname% &7berteriak &cNOOB!"
-  cooldown-msg: "&e&l⚠ &7Tunggu &c%time% detik &7lagi."
-  fireball-launch: "&#FF5500&l🔥 &7Fireball diluncurkan!"
-  firework-launch: "&#FF55FF&l🎆 &7Kembang api diluncurkan!"
-  jump-success: "&#55FF55&l⚡ &7Jump!"
-
-# --- UTILITIES ---
-utils:
-  msg-no-reply: "&#FFAA00&l❂ &7Tidak ada orang untuk &#FFAA00&lbalas&7."
-  msg-player-only: "&#FF5555&l❂ &cConsole tidak memiliki akses sosial."
-  repair-success: "&#55FF55&l⚒ &7Item berhasil diperbaiki menjadi &#55FF55&lGress&7!"
-  hat-success: "&#00AAFF&l🎩 &7Item sekarang terpasang sebagai &#00AAFF&lTopi&7."
-  hat-fail: "&#FF5555&l🎩 &7Pegang item untuk dijadikan &#FF5555&lTopi&7!"
-  nick-set: "&#55FF55&l✧ &7Nickname kamu kini: &r{nick}"
-  nick-reset: "&#AAAAAA&l✧ &7Nickname dikembalikan ke &#AAAAAA&ndefault&7."
-  nick-too-short: "&#FF5555&l⚠ &cNama terlalu pendek! Minimal 4 huruf."
-  time-day: "&#FFCC00&l☀ &7Waktu server disetel ke &#FFCC00&lSiang&7."
-  time-night: "&#5555FF&l☾ &7Waktu server disetel ke &#5555FF&lMalam&7."
-  weather-sun: "&#FFCC00&l☀ &7Cuaca sekarang berubah menjadi &#FFCC00&lCerah&7."
-  weather-rain: "&#55FFFF&l☂ &7Hujan mulai membasahi bumi..."
-  clean-success: "&#55FF55&l✨ &aInventory berhasil &#55FF55&lDibersihkan&7!"
-  chatcolor-locked: "&#FF5555&l🔒 &cKamu tidak memiliki izin untuk warna ini!"
-  chatcolor-style-locked: "&#FF5555&l🔒 &cMembutuhkan Rank &#55FF55&lNature&c!"
-  trash-opened: "&#FF5555&l🗑 &7Membuka &#FF5555&lTempat Sampah&7..."
-  craft-opened: "&#FFAA00&l⚒ &7Membuka &#FFAA00&lWorkbench Virtual&7..."
-  anvil-opened: "&#AAAAAA&l🔨 &7Membuka &#AAAAAA&lAnvil Virtual&7..."
-  back-success: "&#55FF55&l⚡ &7Berhasil kembali ke lokasi sebelumnya."
-  back-fail: "&#FF5555&l⚡ &cTidak ada lokasi teleportasi tersisa!"
-  back-no-rank: "&#FF5555&l⚡ &cKamu butuh rank &#FF55FF&lMIDI &cuntuk teleport ke lokasi non-mati!"
-  otp-success: "&#00AAFF&l✈ &7Teleportasi ke &#00AAFF&l%player%&7."
-  otp-offline-cache: "&#00AAFF&l✈ &7Teleport ke lokasi terakhir &#00AAFF&l%player%&7."
-  otp-offline-bed: "&#00AAFF&l✈ &1Teleport ke Spawn Bed &#00AAFF&l%player%&7."
-  otp-fail: "&#FF5555&l✘ &cData lokasi &#f%player% &ctidak ditemukan!"
-  otp-usage: "&#FF5555&l⚠ &cGunakan: &#f/otp <player>"
-  ptime:
-    success: "&#00AAFF&l❂ &7Waktu &f%target% &7diubah menjadi &#ffff55%time%&7."
-    reset: "&#00AAFF&l❂ &7Waktu &f%target% &7dikembalikan ke waktu server."
-  pweather:
-    success: "&#00AAFF&l❂ &7Cuaca &f%target% &7diubah menjadi &#ffff55%weather%&7."
-    reset: "&#00AAFF&l❂ &7Cuaca &f%target% &7dikembalikan ke cuaca server."
-
-  lagg:
-    cleanup-start: "&#FF5555&l❂ &7Memulai pembersihan item global..."
-    cleanup-complete: "&#55FF55&l✔ CLEANUP COMPLETE &7(Removed %count% items)"
-    warning-minute: "&#FFAA00&l⚠ &7Pembersihan item dalam &e%time% &7menit."
-    warning-second: "&#FFAA00&l⚠ &7Pembersihan item dalam &e%time% &7detik."
-    action-bar:
-      countdown: "&#FF5555&l%scroll% &fCLEARING ITEMS IN &#FF5555&l%time%s &f%scroll%"
-
-# --- DEATH MESSAGES ---
-death:
-  title: "      &#FF5555&l☠ &#FF0000&lK A M U   M A T I &#FF5555&l☠"
-  location: "      &#AAAAAA&l📍 &7Lokasi: &#FF5555%x%, %y%, %z%"
-  world: "      &#AAAAAA&l🌍 &7Dunia: &#FF5555%world%"
-  back-button: "          &6&l⚡ &e&l[ KEMBALI KE LOKASI ] &6&l⚡"
-  back-hover: "&eKlik untuk teleport ke lokasi kematian"
-
-# --- NOTIFICATIONS (Aesthetic) ---
-notifications:
-  death:
-    - "&8[&c&l☠&8] &7%player% &fakhirnya tumbang oleh alam."
-    - "&8[&c&l☠&8] &7%player% &fterlalu asik bermain dengan ajal."
-    - "&8[&c&l☠&8] &7%player% &flupa caranya bernafas."
-    - "&8[&c&l☠&8] &7%player% &ftewas mengenaskan."
-  kill:
-    - "&8[&6&l⚔&8] &b%killer% &7mengakhiri riwayat &e%victim%&7."
-    - "&8[&6&l⚔&8] &b%killer% &7mengirim &e%victim% &7kembali ke spawn!"
-    - "&8[&6&l⚔&8] &b%killer% &7membuktikan kekuatannya pada &e%victim%&7."
-  achievement:
-    - "&8[&a&l✦&8] &b%player% &7telah meraih pencapaian: &e%achievement%&7!"
-    - "&8[&a&l✦&8] &b%player% &7baru saja mencatat sejarah: &e%achievement%&7!"
-
-# --- RTP ---
-rtp:
-  resource: "&#55FF55&l❂ &7Menuju dunia &#55FF55Resource&7... &#8(Harap tunggu)"
-  survival: "&#55FF55&l❂ &7Teleportasi Random &#55FF55Survival&7..."
-  already-here: "&#FF5555&l⚠ &cKamu sudah berada di dunia ini!"
-
-# --- ESSENTIALS ---
-essentials:
-  gamemode-changed: "&7Gamemode diubah ke &b%mode%&7."
-  gamemode-changed-other: "&7Gamemode &f%target% &7diubah ke &b%mode%&7."
-  fly-enabled: "&b&l✈ &7Flight mode &aENABLED&7."
-  fly-disabled: "&b&l✈ &7Flight mode &cDISABLED&7."
-  fly-other: "&b&l✈ &7Flight mode &f%target% &7telah &e%status%&7."
-  heal-success: "&d&l❤ &7Kamu telah dipulihkan."
-  heal-other: "&d&l❤ &7Telah memulihkan &f%target%&7."
-  feed-success: "&6&l🍗 &7Rasa lapar dihilangkan."
-  feed-other: "&6&l🍗 &7Telah memberi makan &f%target%&7."
-  invsee-open: "&7Membuka inventory &f%target%&7."
-  endersee-open: "&7Membuka enderchest &f%target%&7."
-
-# --- ECONOMY ---
+# --- ECONOMY SYSTEM ---
 economy:
   invalid-amount: "&cMasukan jumlah angka yang valid!"
   invalid-currency: "&cMata uang salah. Gunakan: &f%aliases%"
@@ -184,31 +122,7 @@ economy:
   give-success-sender: "&7Berhasil mengirim &e%symbol% %amount% &7ke &f%target%&7."
   give-success-target: "&7Kamu menerima &e%symbol% %amount% &7dari Admin!"
 
-# --- MODERATION ---
-moderation:
-  god-enabled: "&aGod Mode &eAKTIF&a."
-  god-disabled: "&cGod Mode &eNONAKTIF&c."
-  vanish-enabled: "&aVanish &eAKTIF &7(Kamu sekarang menghilang)."
-  vanish-disabled: "&cVanish &eNONAKTIF &7(Kamu terlihat kembali)."
-
-# --- SPAWN ---
-spawn:
-  spawn-set: "&aLokasi spawn utama berhasil diatur!"
-  spawn-teleport: "&aBerhasil teleport ke Spawn!"
-  spawn-not-set: "&cLokasi Spawn belum diatur oleh Admin!"
-
-# --- HOME ---
-home:
-  home-set: "&a&l✔ &7Home &f%name% &7berhasil dibuat!"
-  home-teleport: "&7Teleport ke home &b%name%&7..."
-  home-deleted: "&c&l🗑 &7Home &f%name% &7telah dihapus."
-  home-not-found: "&c&l✘ &7Home &f%name% &7tidak ditemukan!"
-  home-limit: "&c&l⚠ &7Limit home tercapai! &8(&f%current%&8/&c%max%&8)"
-  home-list: "&7Daftar Home kamu: &f%homes%"
-  list-empty: "&cKamu belum punya home! Gunakan /sethome <nama>"
-  home-exist: "&cHome dengan nama tersebut sudah ada!"
-
-# --- TELEPORT ---
+# --- TELEPORTATION & WORLD ---
 teleport:
   tp-success: "&7Teleportasi ke &f%target%&7."
   tphere-success: "&7Menarik &f%target% &7ke lokasimu."
@@ -225,173 +139,151 @@ teleport:
   tp-self: "&cTidak bisa teleport ke diri sendiri!"
   tp-coords: "&7Teleportasi ke &f%x%, %y%, %z%&7."
   tp-coords-other: "&7Memindahkan &f%target% &7ke &f%x%, %y%, %z%&7."
-
-  warp:
-    warp-set: "&aWarp '&f%name%&a' berhasil dibuat!"
-    warp-deleted: "&cWarp '&f%name%&c' telah dihapus."
-    warp-not-found: "&cWarp '&f%name%&c' tidak ditemukan!"
-    warp-icon-set: "&aIcon warp '&f%name%&a' diubah menjadi %icon%"
-    hold-item-icon: "&cPegang item di tangan untuk menjadikannya icon!"
   teleporting-title: "%displayname%"
   teleporting-subtitle: "&7Teleporting..."
-  profile:
-    gui-title: "❂ ɴᴀᴛᴜʀᴀʟ ᴘʀᴏꜰɪʟᴇ ❂"
-
-# --- GUI ---
-gui:
-  warp:
-    title: "&#00AAFF❂ &#00AAFFɴᴀᴛᴜʀᴀʟ &#55FF55ᴡᴀʀᴘꜱ &#55FF55❂"
-    editor-title: "&c&lWARP EDITOR (Klik Kanan Hapus)"
-    item-lore:
-      - "&8%id%"
-      - ""
-      - "&7Warp menuju &#00AAFF%name%"
-      - ""
-      - "&#55FF55&l➥ KLIK UNTUK TELEPORT"
-      - ""
+  back-success: "&#55FF55&l⚡ &7Berhasil kembali ke lokasi sebelumnya."
+  back-fail: "&#FF5555&l⚡ &cTidak ada lokasi teleportasi tersisa!"
+  back-no-rank: "&#FF5555&l⚡ &cKamu butuh rank &#FF55FF&lMIDI &cuntuk teleport ke lokasi non-mati!"
+  otp-success: "&#00AAFF&l✈ &7Teleportasi ke &#00AAFF&l%player%&7."
+  otp-usage: "&#FF5555&l⚠ &cGunakan: &#f/otp <player>"
+  spawn:
+    set: "&aLokasi spawn utama berhasil diatur!"
+    teleport: "&aBerhasil teleport ke Spawn!"
+    not-set: "&cLokasi Spawn belum diatur oleh Admin!"
   home:
-    title: "&#00AAFF🏠 &#00AAFFɴᴀᴛᴜʀᴀʟ &#55FF55ʜᴏᴍᴇꜱ &#55FF55🏠"
-    item-name: "&#00AAFF&l❂ &#f%name%"
-    item-lore:
-      - "&8%name%"
-      - ""
-      - "&7Dunia: &#55FF55%world%"
-      - "&7Koordinat: &#55FF55%x%, %y%, %z%"
-      - ""
-      - "&#55FF55&l➥ KLIK UNTUK TELEPORT"
+    set: "&a&l✔ &7Home &f%name% &7berhasil dibuat!"
+    teleport: "&7Teleport ke home &b%name%&7..."
+    deleted: "&c&l🗑 &7Home &f%name% &7telah dihapus."
+    not-found: "&c&l✘ &7Home &f%name% &7tidak ditemukan!"
+    limit: "&c&l⚠ &7Limit home tercapai! &8(&f%current%&8/&c%max%&8)"
+    list: "&7Daftar Home kamu: &f%homes%"
+    empty: "&cKamu belum punya home! Gunakan /sethome <nama>"
+    exist: "&cHome dengan nama tersebut sudah ada!"
+  warp:
+    set: "&aWarp '&f%name%&a' berhasil dibuat!"
+    deleted: "&cWarp '&f%name%&c' telah dihapus."
+    not-found: "&cWarp '&f%name%&c' tidak ditemukan!"
+    icon-set: "&aIcon warp '&f%name%&a' diubah menjadi %icon%"
+    hold-item: "&cPegang item di tangan untuk menjadikannya icon!"
+  rtp:
+    resource: "&#55FF55&l❂ &7Menuju dunia &#55FF55Resource&7... &#8(Harap tunggu)"
+    survival: "&#55FF55&l❂ &7Teleportasi Random &#55FF55Survival&7..."
+    already-here: "&#FF5555&l⚠ &cKamu sudah berada di dunia ini!"
+
+# --- UTILITIES ---
+utils:
+  nick-set: "&#55FF55&l✧ &7Nickname kamu kini: &r{nick}"
+  nick-reset: "&#AAAAAA&l✧ &7Nickname dikembalikan ke &#AAAAAA&ndefault&7."
+  nick-too-short: "&#FF5555&l⚠ &cNama terlalu pendek! Minimal 4 huruf."
+  repair-success: "&#55FF55&l⚒ &7Item berhasil diperbaiki menjadi &#55FF55&lGress&7!"
+  hat-success: "&a&l✔ &7Item berhasil dipasang sebagai topi!"
+  hat-fail: "&cKamu harus memegang item untuk dijadikan topi!"
+  clean-success: "&a&l✔ &7Inventory berhasil dibersihkan! (Armor tetap aman)"
+  msg-no-reply: "&#FFAA00&l❂ &7Tidak ada orang untuk &#FFAA00&lbalas&7."
+  msg-player-only: "&#FF5555&l❂ &cConsole tidak memiliki akses sosial."
+  trash-opened: "&#FF5555&l🗑 &7Membuka &#FF5555&lTempat Sampah&7..."
+  craft-opened: "&#FFAA00&l⚒ &7Membuka &#FFAA00&lWorkbench Virtual&7..."
+  anvil-opened: "&#AAAAAA&l🔨 &7Membuka &#AAAAAA&lAnvil Virtual&7..."
+  item-edit:
+    name-changed: "&#55FF55&l⚔ &7Nama item diubah menjadi: &r%name%"
+    lore-added: "&#55FF55&l⚔ &7Lore berhasil ditambahkan."
+    lore-set: "&#55FF55&l⚔ &7Lore baris %line% diubah."
+    lore-cleared: "&#FF5555&l⚔ &7Semua lore dihapus."
+    give-success: "&#55FF55&l🎁 &7Memberikan &e%amount%x %item% &7kepada &f%player%&7."
+  visuals:
+    time-day: "&#FFCC00&l☀ &7Waktu server disetel ke &#FFCC00&lSiang&7."
+    time-night: "&#5555FF&l☾ &7Waktu server disetel ke &#5555FF&lMalam&7."
+    weather-sun: "&#FFCC00&l☀ &7Cuaca sekarang berubah menjadi &#FFCC00&lCerah&7."
+    weather-rain: "&#55FFFF&l☂ &7Hujan mulai membasahi bumi..."
+    ptime-success: "&#00AAFF&l❂ &7Waktu &f%target% &7diubah menjadi &#ffff55%time%&7."
+    ptime-reset: "&#00AAFF&l❂ &7Waktu &f%target% &7dikembalikan ke waktu server."
+    pweather-success: "&#00AAFF&l❂ &7Cuaca &f%target% &7diubah menjadi &#ffff55%weather%&7."
+    pweather-reset: "&#00AAFF&l❂ &7Cuaca &f%target% &7dikembalikan ke cuaca server."
+  essentials:
+    gamemode-changed: "&7Gamemode diubah ke &b%mode%&7."
+    gamemode-changed-other: "&7Gamemode &f%target% &7diubah ke &b%mode%&7."
+    fly-enabled: "&b&l✈ &7Flight mode &aENABLED&7."
+    fly-disabled: "&b&l✈ &7Flight mode &cDISABLED&7."
+    fly-other: "&b&l✈ &7Flight mode &f%target% &7telah &e%status%&7."
+    heal-success: "&d&l❤ &7Kamu telah dipulihkan."
+    heal-other: "&d&l❤ &7Telah memulihkan &f%target%&7."
+    feed-success: "&6&l🍗 &7Rasa lapar dihilangkan."
+    feed-other: "&6&l🍗 &7Telah memberi makan &f%target%&7."
+    invsee-open: "&7Membuka inventory &f%target%&7."
+    endersee-open: "&7Membuka enderchest &f%target%&7."
+
+# --- SYSTEM & LAGG ---
+system:
+  lagg:
+    cleanup-start: "&#FF5555&l❂ &7Memulai pembersihan item global..."
+    cleanup-complete: "&#55FF55&l✔ CLEANUP COMPLETE &7(Removed %count% items)"
+    warning-minute: "&#FFAA00&l⚠ &7Pembersihan item dalam &e%time% &7menit."
+    warning-second: "&#FFAA00&l⚠ &7Pembersihan item dalam &e%time% &7detik."
+    action-bar:
+      countdown: "&#FF5555&l%scroll% &fCLEARING ITEMS IN &#FF5555&l%time%s &f%scroll%"
+  death:
+    title: "      ☠ K A M U   M A T I ☠"
+    location: "      📍 Lokasi: %x%, %y%, %z%"
+    world: "      🌍 Dunia: %world%"
+    back-button: "          ⚡ [ KEMBALI KE LOKASI ] ⚡"
+    back-hover: "&eKlik untuk teleport ke lokasi kematian"
+
+# --- CHAT & FUN ---
+chat:
+  gg-message: "&8[&b&lGG&8] &f%displayname% &7mengatakan &bGood Game!"
+  noob-message: "&8[&c&lNOOB&8] &f%displayname% &7berteriak &cNOOB!"
+  cooldown: "&e&l⚠ &7Tunggu &c%time% detik &7lagi."
+  color:
+    locked: "&#FF5555&l🔒 &cKamu tidak memiliki izin untuk warna ini!"
+    style-locked: "&#FF5555&l🔒 &cMembutuhkan Rank &#55FF55&lNature&c!"
+
+fun:
+  fireball-launch: "&#FF5500&l🔥 &7Fireball diluncurkan!"
+  firework-launch: "&#FF55FF&l🎆 &7Kembang api diluncurkan!"
+  jump-success: "&#55FF55&l⚡ &7Jump!"
+
+# --- GUI TITLES ---
+gui:
+  admin: "Natural Admin"
+  menu: "Natural Menu"
+  start:
+    title: "❂ Natural Server ❂"
+  profile: "Profile Statistics"
+  warp:
+    title: "Natural Warps"
+    editor: "Warp Editor"
+  home:
+    title: "Natural Homes"
   baltop:
-    title: "&#00AAFF❂ &#00AAFFɴᴀᴛᴜʀᴀʟ &#55FF55ᴛᴏᴘ 10 &#55FF55❂"
-    item-name: "&#FFAA00&l#%rank% &#f%player%"
+    title: "Eco Leaderboard"
+    item-name: "&#FFD400&l#%rank% &7- &#FFFFFF&l%player%"
     item-lore:
       - ""
-      - "&7Saldo: &#55FF55%symbol% %amount%"
+      - "&8» &fKekayaan: &a%symbol%%amount%"
       - ""
+  staff: "&#6CCAFE&lSTAFF &8| &#FFFFFF&lDASHBOARD"
+  moderation: "&#CC0000&lMODERATION &8» &f%target%"
+  ranks:
+    title: "&8&lNatural Rank Progression"
+    top: "&8&l🏆 TOP GLOBAL SEASON 🏆"
   chatcolor:
-    title: "&#00AAFF🎨 &#00AAFFᴄʜᴀᴛ &#55FF55ᴄᴏʟᴏʀ &#55FF55🎨"
-    locked-lore: "&#FF5555&l✘ &#FF5555Locked (Membutuhkan Rank)"
-    selected-lore: "&#55FF55&l✔ &#55FF55&lSELECTED"
-    click-select: "&#FFAA00&l➥ Klik untuk Memilih"
-    # Kategori Baru
+    title: "Chat Colors"
     category:
       default: "&#AAAAAA⬛ &#AAAAAAᴅᴇꜰᴀᴜʟᴛ"
       midi: "&#FF55FF❂ &#FF55FFᴍɪᴅɪ"
       vip: "&#55FF55❂ &#55FF55ᴠɪᴘ"
       mvp: "&#00AAFF❂ &#00AAFFᴍᴠᴘ"
       nature: "&#FFAA00❂ &#FFAA00ɴᴀᴛᴜʀᴇ"
-    # Placeholder Icons (Bisa diisi ID ItemsAdder nanti)
-    icons:
-      midi: "PAPER"
-      midi-cmd: 1001
-      vip: "PAPER"
-      vip-cmd: 1002
-      mvp: "PAPER"
-      mvp-cmd: 1003
-      nature: "PAPER"
-      nature-cmd: 1004
-  admin:
-    title: "&#00AAFF⚙ &#00AAFFɴᴀᴄᴏʀᴇ &#55FF55ᴀᴅᴍɪɴ &#55FF55⚙"
-  menu:
-    title: "&#00AAFF❂ &#00AAFFɴᴀᴛᴜʀᴀʟ &#55FF55ᴍᴇɴᴜ &#55FF55❂"
-  start:
-    title: "&#00AAFF❂ &#00AAFFᴘɪʟɪʜ &#55FF55ᴅᴜɴɪᴀ &#55FF55❂"
 
-# --- ESSENTIALS ---
-essentials:
-  gamemode-changed: "&#55FF55&l🎮 &7Gamemode kamu diubah ke %mode%&7."
-  gamemode-changed-other: "&#55FF55&l🎮 &7Gamemode &f%target% &7diubah ke %mode%&7."
-
-# --- ITEM EDIT ---
-item-edit:
-  name-changed: "&#55FF55&l⚔ &7Nama item diubah menjadi: &r%name%"
-  lore-added: "&#55FF55&l⚔ &7Lore berhasil ditambahkan."
-  lore-set: "&#55FF55&l⚔ &7Lore baris %line% diubah."
-  lore-cleared: "&#FF5555&l⚔ &7Semua lore dihapus."
-  give-success: "&#55FF55&l🎁 &7Memberikan &e%amount%x %item% &7kepada &f%player%&7."
-
-# --- RANKS GUI ---
-ranks:
-  gui-title: "❂ ɴᴀᴛᴜʀᴀʟ ʀᴀɴᴋꜱ ❂"
-  midi:
-    name: "&r &9&lMIDI"
-    lore:
-      - "&8&m-------------------------------"
-      - "&7Rank pemula dengan fitur esensial."
-      - ""
-      - "<#00AAFF><b>KEUNTUNGAN:</b>"
-      - " <reset></reset> <b>5x</b> <gray>Sethome Slots"
-      - " <reset></reset> <b>3x</b> <gray>RedProtect Claims"
-      - " <reset></reset> <b>10k</b> <gray>Claim Blocks Limit"
-      - " <reset></reset> <b>/ec</b> <gray>Akses Enderchest"
-      - " <reset></reset> <b>/back</b> <gray>Kembali ke lokasi mati"
-      - " <reset></reset> <b>Unlimited</b> <gray>Emoji Chat Access"
-      - " <reset></reset> <b>Blue</b> <gray>Chat Color Access"
-      - ""
-      - "&8&m-------------------------------"
-      - "<#00FFD4><b>➥ KLIK UNTUK INFO LENGKAP</b>"
-  vip:
-    name: "&r &a&lVIP"
-    lore:
-      - "&8&m-------------------------------"
-      - "&7Rank menengah untuk player aktif."
-      - ""
-      - "<#55FF55><b>KEUNTUNGAN:</b>"
-      - " <reset></reset> <b>10x</b> <gray>Sethome Slots"
-      - " <reset></reset> <b>6x</b> <gray>RedProtect Claims"
-      - " <reset></reset> <b>25k</b> <gray>Claim Blocks Limit"
-      - " <reset></reset> <b>/feed</b> <gray>Mengisi rasa lapar"
-      - " <reset></reset> <b>/craft</b> <gray>Meja crafting portable"
-      - " <reset></reset> <b>/god</b> <gray>Mode kebal (1 jam/hari)"
-      - " <reset></reset> <b>Green</b> <gray>Chat Color Access"
-      - ""
-      - "&8&m-------------------------------"
-      - "<#00FFD4><b>➥ KLIK UNTUK INFO LENGKAP</b>"
-  mvp:
-    name: "&r &b&lMVP"
-    lore:
-      - "&8&m-------------------------------"
-      - "&7Rank profesional untuk builder."
-      - ""
-      - "<#FFFF55><b>KEUNTUNGAN:</b>"
-      - " <reset></reset> <b>20x</b> <gray>Sethome Slots"
-      - " <reset></reset> <b>12x</b> <gray>RedProtect Claims"
-      - " <reset></reset> <b>50k</b> <gray>Claim Blocks Limit"
-      - " <reset></reset> <b>/fly</b> <gray>Terbang di survival"
-      - " <reset></reset> <b>/heal</b> <gray>Memulihkan darah"
-      - " <reset></reset> <b>/anvil</b> <gray>Anvil portable"
-      - " <reset></reset> <b>Gold</b> <gray>Chat Color Access"
-      - ""
-      - "&8&m-------------------------------"
-      - "<#00FFD4><b>➥ KLIK UNTUK INFO LENGKAP</b>"
-  nature:
-    name: "&r &d&lNATURE"
-    lore:
-      - "&8&m-------------------------------"
-      - "&7Rank tertinggi, penguasa alam."
-      - ""
-      - "<gradient:#00AAFF:#55FF55><b>KEUNTUNGAN:</b></gradient>"
-      - " <reset></reset> <b>Unlimited</b> <gray>Sethome Slots"
-      - " <reset></reset> <b>24x</b> <gray>RedProtect Claims"
-      - " <reset></reset> <b>100k</b> <gray>Claim Blocks Limit"
-      - " <reset></reset> <b>/nick</b> <gray>Ganti nama tampilan"
-      - " <reset></reset> <b>/repair</b> <gray>Perbaiki item gratis"
-      - " <reset></reset> <b>/invsee</b> <gray>Lihat inventory orang"
-      - " <reset></reset> <b>All</b> <gray>Chat Color Access"
-      - ""
-      - "&8&m-------------------------------"
-      - "<#00FFD4><b>➥ KLIK UNTUK INFO LENGKAP</b>"
-
-  trade:
-    request-sent: "&#00AAFF&l❂ &7Undangan transaksi dikirim ke &e%player%"
-    request-received: "&#00AAFF&l❂ &e%player% &7ingin bertransaksi denganmu."
-    accept-usage: "&#00AAFF&l❂ &7Gunakan &f/trade accept %player% &7untuk memulai."
-    input-money: "&#00AAFF&l❂ &7Ketik jumlah &eRp &7yang ingin kamu tawarkan:"
-    input-cancel: "&#00AAFF&l❂ &7Ketik &ccancel &7untuk membatalkan."
-    input-cancelled: "&#FF5555&l✘ &cInput dibatalkan."
-    insufficient-balance: "&#FF5555&l⚠ &cSaldo tidak cukup! (Maks: &eRp %max%&c)"
-    money-set: "&#55FF55&l✔ &aSet tawaran uang ke &eRp %amount%"
-    cancelled-other: "&#FF5555&l✘ &e%player% &7membatalkan transaksi."
-
-  lagg:
-    starting-clear: "&#6CCAFE&lINFO &8┃ &7Memulai proses pembersihan item..."
-    usage: "&#FF5555&l⚠ &cGunakan: &f/lagg [clear]"
+# --- TRADE SYSTEM ---
+trade:
+  request-sent: "&#00AAFF&l❂ &7Undangan transaksi dikirim ke &e%player%"
+  request-received: "&#00AAFF&l❂ &e%player% &7ingin bertransaksi denganmu."
+  accept-usage: "&#00AAFF&l❂ &7Gunakan &f/trade accept %player% &7untuk memulai."
+  input-money: "&#00AAFF&l❂ &7Ketik jumlah &eRp &7yang ingin kamu tawarkan:"
+  input-cancel: "&#00AAFF&l❂ &7Ketik &ccancel &7untuk membatalkan."
+  input-cancelled: "&#FF5555&l✘ &cInput dibatalkan."
+  insufficient-balance: "&#FF5555&l⚠ &cSaldo tidak cukup! (Maks: &eRp %max%&c)"
+  money-set: "&#55FF55&l✔ &aSet tawaran uang ke &eRp %amount%"
+  cancelled-other: "&#FF5555&l✘ &e%player% &7membatalkan transaksi."
   

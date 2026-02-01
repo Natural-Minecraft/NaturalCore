@@ -33,8 +33,8 @@ public class WarpGUI implements Listener {
     public void openGUI(Player player, boolean isEditor) {
         // Title Estetik (Gradient Simulation)
         String title = isEditor
-                ? "&c&lWARP &4&lEDITOR &8| &7Admin Mode"
-                : "&x&0&0&A&A&F&F&lN&x&1&1&B&B&F&F&la&x&2&2&C&C&F&F&lt&x&3&3&D&D&F&F&lu&x&4&4&E&E&F&F&lr&x&5&5&F&F&F&F&la&x&6&6&F&F&F&F&ll &x&7&7&F&F&F&F&lW&x&8&8&F&F&F&F&la&x&9&9&F&F&F&F&lr&x&A&A&F&F&F&F&lp&x&B&B&F&F&F&F&ls";
+                ? ConfigUtils.getMessage("gui.warp.editor")
+                : ConfigUtils.getMessage("gui.warp.title");
 
         Inventory inv = GUIUtils.createGUI(new WarpHolder(), 54, title);
 

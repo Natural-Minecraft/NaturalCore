@@ -4,7 +4,6 @@ import id.naturalsmp.naturalcore.admin.NaturalCoreGUI;
 import id.naturalsmp.naturalcore.economy.EconomyCommand;
 import id.naturalsmp.naturalcore.moderation.ModerationCommand;
 import id.naturalsmp.naturalcore.utility.PlayerUtilCommand;
-import id.naturalsmp.naturalcore.utils.ChatUtils;
 import id.naturalsmp.naturalcore.utils.ConfigUtils;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -61,7 +60,7 @@ public class NaturalCoreCommand implements CommandExecutor, TabCompleter {
             if (!sender.hasPermission("naturalsmp.admin"))
                 return noPerm(sender);
             if (args.length < 2) {
-                ConfigUtils.sendUsage(sender, "/nacore admin <reload|resetseason|gui|status>");
+                ConfigUtils.sendUsage(sender, "/nacore admin <reload|ranksync|resetseason|gui|status>");
                 return true;
             }
             String adminSub = args[1].toLowerCase();
@@ -69,17 +68,17 @@ public class NaturalCoreCommand implements CommandExecutor, TabCompleter {
 
             switch (adminSub) {
                 case "reload" -> {
-                    sender.sendMessage(ChatUtils.colorize("&6&lNaturalCore &8» &fRefreshing system..."));
+                    ConfigUtils.sendAdmin(sender, "messages.admin.reload.starting");
                     performDeepReload(sender);
                 }
                 case "ranksync" -> {
-                    sender.sendMessage(ChatUtils.colorize("&6&lPermissions &8» &fSyncing to LuckPerms..."));
+                    ConfigUtils.sendAdmin(sender, "messages.admin.ranksync.starting");
                     plugin.getPermissionManager().syncToLuckPerms();
-                    sender.sendMessage(ChatUtils.colorize("&6&lPermissions &8» &aSync complete! 🔑"));
+                    ConfigUtils.sendAdmin(sender, "messages.admin.ranksync.success");
                 }
                 case "resetseason" -> {
                     if (adminArgs.length < 1 || !adminArgs[0].equalsIgnoreCase("confirm")) {
-                        sender.sendMessage(ChatUtils.colorize("&c&lWARNING! &7Reset 50% Tier & AuraSkills."));
+                        ConfigUtils.sendAdmin(sender, "messages.admin.resetseason.warning");
                         ConfigUtils.sendUsage(sender, "/nacore admin resetseason confirm");
                     } else {
                         plugin.getSeasonResetManager().performFullReset(sender);
@@ -91,9 +90,9 @@ public class NaturalCoreCommand implements CommandExecutor, TabCompleter {
                 }
                 case "backup" -> {
                     if (plugin.getBackupManager() != null) {
-                        sender.sendMessage(ChatUtils.colorize("&6&lBackup &8» &fCreating manual backup..."));
+                        ConfigUtils.sendAdmin(sender, "messages.admin.backup.starting");
                         plugin.getBackupManager().createBackup("ManualBackup");
-                        sender.sendMessage(ChatUtils.colorize("&6&lBackup &8» &aDone!"));
+                        ConfigUtils.sendAdmin(sender, "messages.admin.backup.success");
                     }
                 }
                 case "restart" -> {
@@ -104,7 +103,8 @@ public class NaturalCoreCommand implements CommandExecutor, TabCompleter {
                     if (sender instanceof Player p)
                         new NaturalCoreGUI(plugin).openGUI(p);
                 }
-                default -> ConfigUtils.sendError(sender, "Admin sub-command tidak ditemukan.");
+                default ->
+                    ConfigUtils.sendError(sender, ConfigUtils.getMessage("messages.global.sub-command-not-found"));
             }
             return true;
         }
@@ -146,6 +146,14 @@ public class NaturalCoreCommand implements CommandExecutor, TabCompleter {
                 modUtil.onCommand(sender, command, sub, proxyArgs);
                 return true;
             }
+            case "ranksync" -> {
+                if (sender.hasPermission("naturalsmp.admin")) {
+                    ConfigUtils.sendAdmin(sender, "messages.admin.ranksync.starting");
+                    plugin.getPermissionManager().syncToLuckPerms();
+                    ConfigUtils.sendAdmin(sender, "messages.admin.ranksync.success");
+                }
+                return true;
+            }
             case "spawn" -> {
                 new id.naturalsmp.naturalcore.spawn.SpawnCommand(plugin.getSpawnManager()).onCommand(sender, command,
                         sub, proxyArgs);
@@ -164,7 +172,7 @@ public class NaturalCoreCommand implements CommandExecutor, TabCompleter {
 
     private void performDeepReload(CommandSender sender) {
         plugin.reload();
-        sender.sendMessage(ChatUtils.colorize("&aAll system configurations have been deep-refreshed!"));
+        ConfigUtils.sendAdmin(sender, "messages.admin.reload.success");
     }
 
     private boolean noPerm(CommandSender s) {

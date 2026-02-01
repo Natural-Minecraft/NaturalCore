@@ -185,13 +185,13 @@ public class ConfigUtils {
     }
 
     public static void sendError(org.bukkit.command.CommandSender sender, String msg) {
-        String format = getString("messages.global.error", "&#FF5555&l⚠ &cError: &f%usage%");
-        sender.sendMessage(ChatUtils.colorize(format.replace("%usage%", msg)));
+        String prefix = getPrefix("prefix.general");
+        sender.sendMessage(prefix + ChatUtils.colorize("&cError: &f" + msg));
     }
 
     public static void sendUsage(org.bukkit.command.CommandSender sender, String usage) {
-        String format = getString("messages.global.usage", "&#FF5555&l⚠ &cGunakan: &f%usage%");
-        sender.sendMessage(ChatUtils.colorize(format.replace("%usage%", usage)));
+        String prefix = getPrefix("prefix.general");
+        sender.sendMessage(prefix + ChatUtils.colorize("&eGunakan: &f" + usage));
     }
 
     public static void sendMod(org.bukkit.command.CommandSender sender, String path, String... placeholders) {
@@ -211,9 +211,9 @@ public class ConfigUtils {
     }
 
     public static String getPrefix(String prefixPath) {
-        String prefix = getString(prefixPath, null);
+        String prefix = getString("messages." + prefixPath, null);
         if (prefix == null && prefixPath.equals("prefix.player")) {
-            prefix = getString("prefix.general", "");
+            prefix = getString("messages.prefix.general", "");
         }
         return prefix != null ? prefix : "";
     }

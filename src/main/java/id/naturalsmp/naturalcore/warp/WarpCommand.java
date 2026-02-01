@@ -59,11 +59,12 @@ public class WarpCommand implements CommandExecutor, TabCompleter {
                 return true;
             }
             if (wm.getWarp(args[0]) != null) {
-                p.sendMessage(ConfigUtils.getString("messages.home.home-exist")); // Reuse or add warp specific
+                p.sendMessage(ConfigUtils.getString("messages.teleport.home.exist")); // Reuse home exist for now or add
+                                                                                      // warp-exist
                 return true;
             }
             wm.createWarp(args[0], p.getLocation());
-            ConfigUtils.sendMessage(p, "prefix.warp", "messages.warp.warp-set", "%name%", args[0]);
+            ConfigUtils.sendMessage(p, "prefix.warp", "messages.teleport.warp.set", "%name%", args[0]);
             p.playSound(p.getLocation(), Sound.BLOCK_NOTE_BLOCK_PLING, 1f, 2f);
             return true;
         }
@@ -75,11 +76,11 @@ public class WarpCommand implements CommandExecutor, TabCompleter {
             if (args.length == 0)
                 return true;
             if (wm.getWarp(args[0]) == null) {
-                ConfigUtils.sendMessage(p, "prefix.warp", "messages.warp.warp-not-found", "%name%", args[0]);
+                ConfigUtils.sendMessage(p, "prefix.warp", "messages.teleport.warp.not-found", "%name%", args[0]);
                 return true;
             }
             wm.deleteWarp(args[0]);
-            ConfigUtils.sendMessage(p, "prefix.warp", "messages.warp.warp-deleted", "%name%", args[0]);
+            ConfigUtils.sendMessage(p, "prefix.warp", "messages.teleport.warp.deleted", "%name%", args[0]);
             return true;
         }
 
@@ -91,7 +92,7 @@ public class WarpCommand implements CommandExecutor, TabCompleter {
                 return true;
             Warp w = wm.getWarp(args[0]);
             if (w == null) {
-                ConfigUtils.sendMessage(p, "prefix.warp", "messages.warp.warp-not-found", "%name%", args[0]);
+                ConfigUtils.sendMessage(p, "prefix.warp", "messages.teleport.warp.not-found", "%name%", args[0]);
                 return true;
             }
             Material hand = p.getInventory().getItemInMainHand().getType();
@@ -99,7 +100,7 @@ public class WarpCommand implements CommandExecutor, TabCompleter {
                 hand = Material.GRASS_BLOCK;
             w.setIcon(hand);
             wm.saveWarps();
-            ConfigUtils.sendMessage(p, "prefix.warp", "messages.warp.warp-icon-set", "%name%", w.getId(), "%icon%",
+            ConfigUtils.sendMessage(p, "prefix.warp", "messages.teleport.warp.icon-set", "%name%", w.getId(), "%icon%",
                     hand.name());
             return true;
         }
@@ -114,15 +115,15 @@ public class WarpCommand implements CommandExecutor, TabCompleter {
             if (w == null) {
                 String prefix = ConfigUtils.getString("prefix.warp");
                 p.sendMessage(ChatUtils.colorize(
-                        prefix + ConfigUtils.getString("messages.warp.warp-not-found").replace("%name%", args[0])));
+                        prefix + ConfigUtils.getString("messages.teleport.warp.not-found").replace("%name%", args[0])));
                 return true;
             }
             p.teleport(w.getLocation());
             p.playSound(p.getLocation(), Sound.ENTITY_ENDERMAN_TELEPORT, 1f, 1f);
 
-            String title = ConfigUtils.getString("messages.warp.teleporting-title")
+            String title = ConfigUtils.getString("messages.teleport.warp.teleporting-title")
                     .replace("%displayname%", w.getDisplayName());
-            String subTitle = ConfigUtils.getString("messages.warp.teleporting-subtitle");
+            String subTitle = ConfigUtils.getString("messages.teleport.warp.teleporting-subtitle");
 
             p.sendTitle(title, subTitle, 0, 20, 10);
             return true;

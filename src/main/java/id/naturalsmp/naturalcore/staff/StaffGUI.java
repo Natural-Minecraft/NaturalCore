@@ -2,6 +2,7 @@ package id.naturalsmp.naturalcore.staff;
 
 import id.naturalsmp.naturalcore.NaturalCore;
 import id.naturalsmp.naturalcore.utils.ChatUtils;
+import id.naturalsmp.naturalcore.utils.ConfigUtils;
 import id.naturalsmp.naturalcore.utils.GUIUtils;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
@@ -29,7 +30,7 @@ public class StaffGUI implements Listener {
 
     public void openMainGUI(Player staff) {
         Inventory inv = GUIUtils.createGUI(new StaffHolder(), 54,
-                "&#6CCAFE&lＳＴＡＦＦ &8| &#FFFFFF&lＤＡＳＨＢＯＡＲＤ");
+                ConfigUtils.getMessage("gui.staff"));
 
         // Decoration
         ItemStack blueGlass = GUIUtils.createFiller(Material.BLUE_STAINED_GLASS_PANE);
@@ -144,7 +145,7 @@ public class StaffGUI implements Listener {
 
     public void openModerationGUI(Player staff, Player target) {
         Inventory inv = GUIUtils.createGUI(new StaffHolder(), 27,
-                "&#CC0000&lＭＯＤＥＲＡＴＩＯＮ &8» &f" + target.getName());
+                ConfigUtils.getMessage("gui.moderation").replace("%target%", target.getName()));
 
         // Options
         inv.setItem(11, GUIUtils.createItem(Material.ICE, "&#00D4FF&lFREEZE PLAYER",

@@ -165,11 +165,11 @@ public class NaturalLaggManager implements Listener {
     private void broadcastWarning(int seconds) {
         String msg;
         if (seconds >= 60) {
-            msg = ConfigUtils.getString("messages.lagg.warning-minute",
+            msg = ConfigUtils.getString("messages.system.lagg.warning-minute",
                     "&#FFAA00&l⚠ &7Pembersihan item dalam &e%time% &7menit.");
             msg = msg.replace("%time%", String.valueOf(seconds / 60));
         } else {
-            msg = ConfigUtils.getString("messages.lagg.warning-second",
+            msg = ConfigUtils.getString("messages.system.lagg.warning-second",
                     "&#FFAA00&l⚠ &7Pembersihan item dalam &e%time% &7detik.");
             msg = msg.replace("%time%", String.valueOf(seconds));
         }
@@ -306,19 +306,18 @@ public class NaturalLaggManager implements Listener {
 
         if (state == LaggState.SUCCESS_SLIDING_IN || state == LaggState.SUCCESS_STATIC
                 || (state == LaggState.SLIDING_OUT && cleanedCount > 0)) {
-            String msg = ConfigUtils.getString("messages.lagg.cleanup-complete",
+            String msg = ConfigUtils.getString("messages.system.lagg.cleanup-complete",
                     "&#55FF55&l✔ CLEANUP COMPLETE &7(Removed %count% items)");
             return ChatUtils.colorize(msg.replace("%count%", String.valueOf(cleanedCount)));
         }
 
         // Default: Countdown Content
-        String arrows = "»»»»»";
-        int offset = (animationFrame / 2) % arrows.length(); // Slow down arrow anim
+        String arrows = "⚑⚑⚑⚑⚑";
+        int offset = (animationFrame / 2) % arrows.length();
         String scroll = arrows.substring(offset) + arrows.substring(0, offset);
-        String msg = ConfigUtils.getString("messages.lagg.action-bar.countdown",
-                "&#FF5555&l%scroll% &fCLEARING ITEMS IN &#FF5555&l%time%s &f%scroll%");
+        String msg = ConfigUtils.getString("messages.system.lagg.action-bar.countdown",
+                "&#FF5555&l%scroll% &fPEMBERSIHAN DALAM &#FF5555&l%time%s &f%scroll%");
 
-        // Use the master countdown variable
         return ChatUtils
                 .colorize(msg.replace("%scroll%", scroll).replace("%time%", String.valueOf(autoRemovalCountdown)));
     }

@@ -2,6 +2,7 @@ package id.naturalsmp.naturalcore.tier;
 
 import id.naturalsmp.naturalcore.NaturalCore;
 import id.naturalsmp.naturalcore.utils.ChatUtils;
+import id.naturalsmp.naturalcore.utils.ConfigUtils;
 import id.naturalsmp.naturalcore.utils.GUIUtils;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
@@ -33,7 +34,7 @@ public class TierTopGUI implements Listener {
 
     public void openGUI(Player viewer) {
         viewer.playSound(viewer.getLocation(), Sound.ITEM_BOOK_PAGE_TURN, 1.0f, 1.5f); // Crisp sound
-        Inventory inv = GUIUtils.createGUI(new TierTopHolder(), 54, "&8&l🏆 TOP GLOBAL SEASON 🏆");
+        Inventory inv = GUIUtils.createGUI(new TierTopHolder(), 54, ConfigUtils.getMessage("gui.ranks.top"));
 
         // Get Top 10
         Map<String, Integer> top = tierManager.getTopPlayers(10);

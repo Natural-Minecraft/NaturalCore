@@ -57,35 +57,46 @@ public class HUDManager implements Listener {
         }
     }
 
+    private String lastDisplayedHUD = "";
+    private String targetHUD = "";
+    private float overlapProgress = 0f;
+
     private void updateHUD(Player player) {
         // 1. Get Base HUD (Season + Mana + Tips)
         String baseHUD = plugin.getSeasonManager().getTemperatureActionBar(player);
 
-        // 2. ClearLagg Override (High Priority with Transition)
+        // 2. ClearLagg Override (High Priority)
         String laggHUD = plugin.getLaggManager().getDisplay(baseHUD);
 
-        String finalMessage = "";
+        // 3. Combat Info Priority
+        String combatHUD = null;
+        CombatInfo ci = combatTracker.get(player.getUniqueId());
+        if (ci != null && System.currentTimeMillis() - ci.lastHit < 4000) {
+            if (ci.entity.isValid() && !ci.entity.isDead()) {
+                double hp = ci.entity.getHealth();
+                double max = ci.entity.getMaxHealth();
+                int percent = (int) ((hp / max) * 100);
+                String heartStr = getHearts(hp, max);
+                combatHUD = ChatUtils
+                        .colorize("&8[&f" + ci.entity.getName() + "&8] " + heartStr + " &7" + percent + "%");
+            }
+        }
 
-        if (laggHUD != null) {
-            finalMessage = laggHUD;
+        // --- TRANSITION LOGIC ---
+        String currentTarget = (laggHUD != null) ? laggHUD : (combatHUD != null ? combatHUD : baseHUD);
+
+        if (!currentTarget.equals(targetHUD)) {
+            targetHUD = currentTarget;
+            overlapProgress = 0f; // Reset transition
+        }
+
+        String finalMessage;
+        if (overlapProgress < 1.0f) {
+            overlapProgress += 0.1f; // Transition lasts ~10 ticks (0.5s)
+            finalMessage = lerpHUD(lastDisplayedHUD, targetHUD, overlapProgress);
         } else {
-            // 3. Combat Info Priority
-            CombatInfo ci = combatTracker.get(player.getUniqueId());
-            if (ci != null && System.currentTimeMillis() - ci.lastHit < 4000) { // 4s Fade out
-                if (ci.entity.isValid() && !ci.entity.isDead()) {
-                    double hp = ci.entity.getHealth();
-                    double max = ci.entity.getMaxHealth();
-                    int percent = (int) ((hp / max) * 100);
-                    String heartStr = getHearts(hp, max);
-                    finalMessage = ChatUtils
-                            .colorize("&8[&f" + ci.entity.getName() + "&8] " + heartStr + " &7" + percent + "%");
-                }
-            }
-
-            // 4. Fallback to Base HUD
-            if (finalMessage.isEmpty()) {
-                finalMessage = baseHUD;
-            }
+            finalMessage = targetHUD;
+            lastDisplayedHUD = targetHUD;
         }
 
         if (finalMessage != null && !finalMessage.isEmpty()) {
@@ -93,10 +104,24 @@ public class HUDManager implements Listener {
         }
     }
 
+    private String lerpHUD(String oldH, String newH, float progress) {
+        if (oldH == null || oldH.isEmpty())
+            return newH;
+        if (progress > 0.8f)
+            return newH;
+        if (progress < 0.2f)
+            return oldH;
+
+        // Simple "Glitch" or "Wipe" transition effect
+        int split = (int) (newH.length() * progress);
+        return ChatUtils.colorAwareSubstring(newH, 0, split)
+                + ChatUtils.colorAwareSubstring(oldH, split, oldH.length());
+    }
+
     private String getHearts(double hp, double max) {
         StringBuilder sb = new StringBuilder("&c");
         int total = 10;
-        int filled = (int) Math.ceil((hp / max) * total);
+        int filled = (int) Math.round((hp / max) * total);
         for (int i = 0; i < total; i++) {
             if (i < filled)
                 sb.append("❤");

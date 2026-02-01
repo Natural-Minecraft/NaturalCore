@@ -270,6 +270,9 @@ public final class NaturalCore extends JavaPlugin {
         SocialListener socialListener = new SocialListener(this);
         getServer().getPluginManager().registerEvents(socialListener, this);
 
+        registerCmd("rankaddtemp", new RankAddTempCommand());
+        registerCmd("addtemp", new RankAddTempCommand());
+
         registerCmd("rankeditor", (sender, cmd, label, args) -> {
             if (sender instanceof Player)
                 rankEditor.openMainMenu((Player) sender);
@@ -409,9 +412,7 @@ public final class NaturalCore extends JavaPlugin {
         registerCmd("chatcolor", new ChatColorCommand(this));
         getServer().getPluginManager().registerEvents(new ChatColorGUI(this), this);
 
-        // 18. Messaging System
         getServer().getPluginManager().registerEvents(new ChatListener(this), this);
-        getServer().getPluginManager().registerEvents(new SocialListener(this), this);
         // MentionListener is now integrated into ChatListener (Adventure API)
         getServer().getPluginManager().registerEvents(new ChatTabCompleter(), this);
         getServer().getPluginManager().registerEvents(new ChatPreviewGUI(), this);

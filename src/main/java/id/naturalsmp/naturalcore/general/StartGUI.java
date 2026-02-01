@@ -31,7 +31,7 @@ public class StartGUI implements Listener {
     }
 
     public void openGUI(Player player) {
-        String title = ConfigUtils.getString("messages.gui.start.title");
+        String title = ConfigUtils.getMessage("gui.start.title");
         Inventory inv = GUIUtils.createGUI(new StartHolder(), 9, title);
 
         // Fill background with grey glass
@@ -97,7 +97,7 @@ public class StartGUI implements Listener {
 
         switch (e.getRawSlot()) {
             case 2 -> p.performCommand("dungeon");
-            case 4 -> p.performCommand("naturalcore:rtp");
+            case 4 -> p.performCommand("rtp");
             case 6 -> p.performCommand("rsc");
         }
     }

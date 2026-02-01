@@ -30,27 +30,32 @@ public class ChatUtils {
         if (message == null || message.isEmpty())
             return "";
 
-        // Jika mengandung < (MiniMessage)
-        if (message.contains("<")) {
+        String result = message;
+
+        // 1. Process MiniMessage tag if present
+        if (result.contains("<")) {
             try {
-                return SECTION_SERIALIZER.serialize(MINI_MESSAGE.deserialize(message));
+                result = SECTION_SERIALIZER.serialize(MINI_MESSAGE.deserialize(result));
             } catch (Exception ignored) {
             }
         }
 
-        Matcher matcher = HEX_PATTERN.matcher(message);
+        // 2. Process Hex Color (&#RRGGBB)
+        Matcher matcher = HEX_PATTERN.matcher(result);
         StringBuilder buffer = new StringBuilder();
-
         while (matcher.find()) {
             try {
                 String hexCode = matcher.group(1);
                 matcher.appendReplacement(buffer, ChatColor.of("#" + hexCode).toString());
             } catch (Exception e) {
-                matcher.appendReplacement(buffer, "");
+                matcher.appendReplacement(buffer, Matcher.quoteReplacement(matcher.group()));
             }
         }
+        result = matcher.appendTail(buffer).toString();
 
-        return ChatColor.translateAlternateColorCodes('&', matcher.appendTail(buffer).toString());
+        // 3. Process Legacy Colors (&a, &l, etc)
+        // We use Matcher.quoteReplacement to avoid issues if result contains $ or \
+        return ChatColor.translateAlternateColorCodes('&', result);
     }
 
     public static String serialize(net.kyori.adventure.text.Component component) {
@@ -67,7 +72,7 @@ public class ChatUtils {
             return net.kyori.adventure.text.Component.empty();
 
         // 1. Colorize with legacy handling
-        String colored = colorize(message).replace("&", "§");
+        String colored = colorize(message);
 
         // 2. Convert to component via legacy serializer
         return SECTION_SERIALIZER.deserialize(colored);
@@ -80,7 +85,7 @@ public class ChatUtils {
         if (message == null || message.isEmpty())
             return net.kyori.adventure.text.Component.empty();
 
-        // Handle <center> tags
+        // Handle <center> tags (Legacy support)
         if (message.contains("<center>")) {
             int start = message.indexOf("<center>");
             int end = message.indexOf("</center>");
@@ -92,19 +97,11 @@ public class ChatUtils {
             }
         }
 
-        net.kyori.adventure.text.Component component;
-        if (message.contains("<")) {
-            try {
-                component = MINI_MESSAGE.deserialize(message);
-            } catch (Exception e) {
-                component = SECTION_SERIALIZER.deserialize(colorize(message).replace("&", "§"));
-            }
-        } else {
-            component = SECTION_SERIALIZER.deserialize(colorize(message).replace("&", "§"));
-        }
+        // 1. Colorize first (to handle mixed & codes and <tags>)
+        String colored = colorize(message);
 
-        // Flatten for compatibility
-        return SECTION_SERIALIZER.deserialize(SECTION_SERIALIZER.serialize(component));
+        // 2. Deserialize as Section because colorize() returns section symbols
+        return SECTION_SERIALIZER.deserialize(colored);
     }
 
     /**

@@ -46,17 +46,13 @@ public class RankGUI implements Listener {
         // --- DYNAMIC RANK ITEMS ---
         Map<String, PermissionManager.RankConfig> ranks = plugin.getPermissionManager().getRanks();
 
-        // Filter and Sort by weight if possible, but for now just display MIDI, VIP,
-        // MVP, NATURE in order
-        // We look for keys "midi", "vip", etc.
         int[] slots = { 10, 12, 14, 16 };
-        String[] keys = { "midi", "vip", "mvp", "nature" };
-        Material[] mats = { Material.LAPIS_LAZULI, Material.EMERALD, Material.GOLD_INGOT, Material.DIAMOND };
-
-        for (int i = 0; i < keys.length; i++) {
-            String key = keys[i];
-            if (ranks.containsKey(key)) {
-                inv.setItem(slots[i], createRankItem(mats[i], key));
+        // We look for ranks that HAVE gui settings
+        int slotIndex = 0;
+        for (PermissionManager.RankConfig rank : ranks.values()) {
+            if (rank.guiItem != null && slotIndex < slots.length) {
+                inv.setItem(slots[slotIndex], createRankItem(rank));
+                slotIndex++;
             }
         }
 
@@ -66,25 +62,25 @@ public class RankGUI implements Listener {
         p.openInventory(inv);
     }
 
-    private ItemStack createRankItem(Material mat, String rankKey) {
-        // We use the messages.yml paths (ranks.midi, etc) for lore/display because they
-        // are prettier
-        String baseKey = rankKey.contains(".") ? rankKey.substring(rankKey.lastIndexOf(".") + 1) : rankKey;
-        String path = "ranks." + baseKey;
-
-        String name = ConfigUtils.getMessage(path + ".name");
-        List<String> lore = ConfigUtils.getMessageList(path + ".lore");
+    private ItemStack createRankItem(PermissionManager.RankConfig rank) {
+        Material mat = Material.matchMaterial(rank.guiItem);
+        if (mat == null)
+            mat = Material.PAPER;
 
         ItemStack item = new ItemStack(mat);
         ItemMeta meta = item.getItemMeta();
         if (meta != null) {
-            meta.displayName(ChatUtils.toComponent(name));
+            meta.displayName(ChatUtils.toComponent(rank.guiName));
 
             List<Component> componentLore = new ArrayList<>();
-            for (String s : lore)
+            componentLore.add(Component.empty());
+            for (String s : rank.guiBenefits) {
                 componentLore.add(ChatUtils.toComponent(s));
-            meta.lore(componentLore);
+            }
+            componentLore.add(Component.empty());
+            componentLore.add(ChatUtils.toComponent("&eKlik untuk melihat/beli!"));
 
+            meta.lore(componentLore);
             item.setItemMeta(meta);
         }
         return item;
@@ -118,10 +114,17 @@ public class RankGUI implements Listener {
         if (e.getSlot() == 22) {
             p.closeInventory();
             p.playSound(p.getLocation(), Sound.BLOCK_IRON_DOOR_CLOSE, 1f, 1.2f);
-        } else if (e.getSlot() == 10 || e.getSlot() == 12 || e.getSlot() == 14 || e.getSlot() == 16) {
-            p.playSound(p.getLocation(), Sound.ENTITY_EXPERIENCE_ORB_PICKUP, 1f, 1f);
-            p.sendMessage(ChatUtils.toComponent(
-                    "&6&lNaturalSMP &8» &7Silahkan hubungi administrator atau kunjungi &estore.naturalsmp.id &7untuk pembelian!"));
+        } else {
+            // Clicked a rank item (Slots 10, 12, 14, 16 are typical)
+            if (e.getClickedInventory() != e.getInventory())
+                return;
+
+            Material type = e.getCurrentItem().getType();
+            if (type != Material.GRAY_STAINED_GLASS_PANE && type != Material.AIR) {
+                p.playSound(p.getLocation(), Sound.ENTITY_EXPERIENCE_ORB_PICKUP, 1f, 1f);
+                p.sendMessage(ChatUtils.toComponent(
+                        "&6&lNaturalSMP &8» &7Silahkan hubungi administrator atau kunjungi &estore.naturalsmp.id &7untuk pembelian!"));
+            }
         }
     }
 

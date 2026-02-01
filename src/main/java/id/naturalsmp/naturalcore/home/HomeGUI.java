@@ -29,7 +29,7 @@ public class HomeGUI implements Listener {
     private final org.bukkit.NamespacedKey HOME_NAME_KEY = new org.bukkit.NamespacedKey(NaturalCore.getInstance(),
             "home_name");
     // Title menggunakan Small Caps premium
-    private final String GUI_TITLE = "❂ ɴᴀᴛᴜʀᴀʟ ʜᴏᴍᴇꜱ ❂";
+    private final String GUI_TITLE = ConfigUtils.getMessage("gui.home.title");
 
     public HomeGUI(NaturalCore plugin) {
         this.plugin = plugin;
@@ -47,7 +47,7 @@ public class HomeGUI implements Listener {
 
         // Validasi jika kosong
         if (homes.isEmpty()) {
-            p.sendMessage(ConfigUtils.getString("messages.home.list-empty"));
+            p.sendMessage(ConfigUtils.getString("messages.teleport.home.empty"));
             return;
         }
 

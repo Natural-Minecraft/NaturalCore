@@ -165,7 +165,7 @@ spawn:
 # ==========================================
 rtp:
   survival-world: "world"
-  resource-world: "Resources"
+  resource-world: "resource"
 
 settings:
   restart-alert-time: 10

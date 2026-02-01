@@ -31,7 +31,7 @@ public class TierGUI implements Listener {
 
     public void openGUI(Player p) {
         p.playSound(p.getLocation(), Sound.UI_BUTTON_CLICK, 0.5f, 1.2f); // Sound Effect Open
-        Inventory inv = GUIUtils.createGUI(new TierHolder(), 27, "&8&lNatural Rank Progression");
+        Inventory inv = GUIUtils.createGUI(new TierHolder(), 27, ConfigUtils.getMessage("gui.ranks.title"));
 
         Tier current = tierManager.getCurrentTier(p);
         Tier next = tierManager.getNextTier(p);

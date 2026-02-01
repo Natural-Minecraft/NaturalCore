@@ -38,7 +38,7 @@ public class NaturalCoreGUI implements Listener {
 
         // Standard 54 slots (6 rows) for more "Large Dashboard" feel
         Inventory inv = GUIUtils.createGUI(new AdminHolder(), 54,
-                "&#00FFD4&lＮＡＴＵＲＡＬ &8| &#00D4FF&lＡＤＭＩＮ");
+                ConfigUtils.getMessage("gui.admin"));
 
         // --- GLASSMORPHISM FILLER (Frosted Border Effect) ---
         ItemStack cyanGlass = GUIUtils.createFiller(Material.CYAN_STAINED_GLASS_PANE);
@@ -159,7 +159,7 @@ public class NaturalCoreGUI implements Listener {
             }
             case COMMAND_BLOCK -> { // Reset Season
                 p.closeInventory();
-                ConfigUtils.sendAdmin(p, "messages.admin.resetseason-confirm");
+                ConfigUtils.sendAdmin(p, "messages.admin.resetseason.confirm");
                 p.playSound(p.getLocation(), Sound.BLOCK_ANVIL_LAND, 1f, 1f);
             }
             case NETHER_STAR -> { // Info

@@ -11,6 +11,14 @@ ranks:
     display: "&7Member"
     prefix: " "
     weight: 0
+    gui:
+      item: COAL
+      name: "&7&lMEMBER"
+      benefits:
+        - "&8» &fRank Default Player"
+        - "&8» &fHome Limit: &e3 Home"
+        - "&8» &fBlock Claim Limit: &410.000 Blok"
+        - "&8» &fClaim Limit: &45 Claim"
     permissions:
     - naturalsmp.help
     - naturalsmp.list
@@ -92,6 +100,17 @@ ranks:
     prefix: " "
     weight: 100
     inherit: member
+    gui:
+      item: LAPIS_LAZULI
+      name: " &d&lMIDI"
+      benefits:
+        - "&8» &fAkses &e/back &7(Teleport Ke Tempat Sebelumnya)"
+        - "&8» &fAkses &e/chatcolor &7(Ubah Warna Chat)"
+        - "&8» &fAkses ColorChat &r &d&lMIDI"
+        - "&8» &fHome Limit: &e5 Home"
+        - "&8» &fKematian tidak mengurangi EXP"
+        - "&8» &fBlock Claim Limit: &425.000 Blok"
+        - "&8» &fClaim Limit: &410 Claim"
     permissions:
       - naturalsmp.enderchest
       - naturalsmp.back
@@ -106,6 +125,18 @@ ranks:
     prefix: " "
     weight: 200
     inherit: midi
+    gui:
+      item: IRON_INGOT
+      name: " &a&lVIP"
+      benefits:
+        - "&8» &fSemua Fitur &d&lMIDI"
+        - "&8» &fAkses &e/hat &7(Item di Kepala!)"
+        - "&8» &fAkses &e/trash &7(Tempat Sampah)"
+        - "&8» &fAkses &e/resource &7(Dunia Resource)"
+        - "&8» &fAkses ColorChat &r &a&lVIP"
+        - "&8» &fHome Limit: &e10 Home"
+        - "&8» &fBlock Claim Limit: &450.000 Blok"
+        - "&8» &fClaim Limit: &420 Claim"
     permissions:
       - naturalsmp.hat
       - naturalsmp.trash
@@ -121,6 +152,17 @@ ranks:
     prefix: " "
     weight: 300
     inherit: vip
+    gui:
+      item: GOLD_INGOT
+      name: " &b&lMVP"
+      benefits:
+        - "&8» &fSemua Fitur &a&lVIP"
+        - "&8» &fAkses &e/nick &7(Nama Samaran)"
+        - "&8» &fAkses &e/fly &7(Terbang di Survival)"
+        - "&8» &fAkses ColorChat &r &b&lMVP"
+        - "&8» &fHome Limit: &e20 Home"
+        - "&8» &fBlock Claim Limit: &4150.000 Blok"
+        - "&8» &fClaim Limit: &440 Claim"
     permissions:
       - naturalsmp.fly
       - naturalsmp.craft
@@ -132,41 +174,22 @@ ranks:
       - redprotect.limits.blocks.150000
       - redprotect.limits.claim.40
 
-  tiktok:
-    display: "&aVIP"
-    prefix: " "
-    weight: 321
-    inherit: mvp
-    permissions:
-      - naturalsmp.priority
-      - naturalsmp.tiktok
-
-  youtube:
-    display: "&aVIP"
-    prefix: " "
-    weight: 321
-    inherit: mvp
-    permissions:
-      - naturalsmp.priority
-      - naturalsmp.youtube
-
-  helper:
-    display: "&bHelper"
-    prefix: " "
-    weight: 350
-    inherit: mvp
-    permissions:
-      - naturalsmp.helper.kick
-      - naturalsmp.helper.mute
-      - naturalsmp.helper.tempmute
-      - naturalsmp.helper.unmute
-      - naturalsmp.helper.warn
-
   nature:
-    display: "&eNature"
+    display: "&e&lNATURE"
     prefix: " "
     weight: 400
     inherit: mvp
+    gui:
+      item: DIAMOND
+      name: " &e&lNATURE"
+      benefits:
+        - "&8» &fSemua Fitur &b&lMVP"
+        - "&8» &fChat Color Style (&kMagic&f, &lBold&f, dll)"
+        - "&8» &fAkses ColorChat &r &e&lNATURE"
+        - "&8» &fNature Join Announcement"
+        - "&8» &fPriority Join (Server Full)"
+        - "&8» &fBlock Claim Limit: &4500.000 Blok"
+        - "&8» &fClaim Limit: &480 Claim"
     permissions:
       - naturalsmp.priority
       - naturalsmp.temperature.immune

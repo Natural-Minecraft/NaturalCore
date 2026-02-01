@@ -37,25 +37,40 @@ public class SocialListener implements Listener {
     public void onJoin(PlayerJoinEvent e) {
         Player p = e.getPlayer();
 
-        // Hide if join while vanished (if persistence added) - currently handled by
-        // VanishManager hideVanishedFrom
+        // 1. Vanish Check
         if (plugin.getVanishManager().isVanished(p)) {
             e.joinMessage(null);
             return;
         }
 
-        // --- JOIN MESSAGE ---
+        // 2. First Join Check
+        if (!p.hasPlayedBefore()) {
+            e.joinMessage(null);
+            List<String> lines = ConfigUtils.getStringList("messages.social.first-join-message");
+            int playerCount = Bukkit.getOfflinePlayers().length;
+            for (String line : lines) {
+                GUIUtils.broadcast(ChatUtils.colorize(
+                        line.replace("%displayname%", p.getName()).replace("%count%", String.valueOf(playerCount))));
+            }
+            for (Player online : Bukkit.getOnlinePlayers()) {
+                online.playSound(online.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, 1f, 1f);
+                online.playSound(online.getLocation(), Sound.ENTITY_FIREWORK_ROCKET_LAUNCH, 1f, 1.2f);
+            }
+            return;
+        }
+
+        // 3. Nature Rank Broadcast (Priority)
         if (p.hasPermission("naturalsmp.nature")) {
             e.joinMessage(null);
             List<String> lines = ConfigUtils.getStringList("messages.social.nature-join");
             for (String line : lines) {
                 GUIUtils.broadcast(ChatUtils.formatMessage(p, line));
             }
-            // Sound Effect for Nature Join
             for (Player online : Bukkit.getOnlinePlayers()) {
                 online.playSound(online.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, 1f, 0.5f);
             }
         } else {
+            // 4. Default Join
             String joinMsg = ConfigUtils.getString("messages.social.join-message");
             e.joinMessage(ChatUtils.toComponent(ChatUtils.formatMessage(p, joinMsg)));
         }
