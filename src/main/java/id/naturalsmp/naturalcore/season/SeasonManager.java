@@ -226,7 +226,7 @@ public class SeasonManager {
 
         // --- TIPS INTEGRATION ---
         String tipsOverride = tipsManager.getDisplay(msg);
-        return (tipsOverride != null) ? tipsOverride : msg;
+        return (tipsOverride != null && !tipsOverride.isEmpty()) ? tipsOverride : msg;
     }
 
     private void handleTempEffects(Player p, double temp) {

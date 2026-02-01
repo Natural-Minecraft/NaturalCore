@@ -35,7 +35,7 @@ public class TipsManager {
         }
         tipsConfig = YamlConfiguration.loadConfiguration(file);
 
-        this.tips = tipsConfig.getStringList("tips.messages");
+        this.tips = tipsConfig.getStringList("tips");
         this.interval = tipsConfig.getInt("tips.interval", 300);
         this.soundEnabled = tipsConfig.getBoolean("tips.sound.enabled", true);
         this.soundName = tipsConfig.getString("tips.sound.name", "BLOCK_NOTE_BLOCK_PLING");
@@ -67,7 +67,7 @@ public class TipsManager {
 
     public String getDisplay(String season) {
         if (tips == null || tips.isEmpty())
-            return "";
+            return null;
         return tips.get(new Random().nextInt(tips.size()));
     }
 
