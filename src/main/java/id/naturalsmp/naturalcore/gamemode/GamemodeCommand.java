@@ -35,7 +35,7 @@ public class GamemodeCommand implements CommandExecutor, TabCompleter {
         // Direct Shortcuts
         if (cmd.equals("gmc") || cmd.startsWith("creative"))
             mode = GameMode.CREATIVE;
-        else if (cmd.equals("gms") || cmd.startsWith("survival"))
+        else if (cmd.equals("gms"))
             mode = GameMode.SURVIVAL;
         else if (cmd.equals("gma") || cmd.startsWith("adventure"))
             mode = GameMode.ADVENTURE;

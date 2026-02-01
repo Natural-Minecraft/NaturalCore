@@ -126,10 +126,7 @@ commands:
     description: Mode Creative
     aliases: [gmc, creativemode]
     permission: naturalsmp.gamemode.creative
-  survival:
-    description: Mode Survival
-    aliases: [gms, survivalmode]
-    permission: naturalsmp.gamemode.survival
+  # Note: /survival is now handled by RTPCommand (RTP only, not gamemode)
   adventure:
     description: Mode Adventure
     aliases: [gma, adventuremode]

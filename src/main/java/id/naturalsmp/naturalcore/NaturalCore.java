@@ -322,7 +322,7 @@ public final class NaturalCore extends JavaPlugin {
         registerCmd("gma", gmCmd);
         registerCmd("gmsp", gmCmd);
         registerCmd("creative", gmCmd);
-        registerCmd("survival", gmCmd);
+        // Note: /survival is now handled by RTPCommand exclusively
         registerCmd("adventure", gmCmd);
         registerCmd("spectator", gmCmd);
 
