@@ -17,7 +17,9 @@ public class RTPCommand implements CommandExecutor {
         if (!(sender instanceof Player))
             return true;
         Player p = (Player) sender;
-        String prefix = ConfigUtils.getString("prefix.player");
+        String prefix = ConfigUtils.getString("prefix.general");
+        if (prefix == null)
+            prefix = ChatUtils.colorize("&#00AAFF&lNatural&#55FF55&lSMP &8» &f");
 
         // --- /RESOURCE ---
         if (label.equalsIgnoreCase("resource") || label.equalsIgnoreCase("rsc")) {
@@ -30,7 +32,7 @@ public class RTPCommand implements CommandExecutor {
             if (resourceWorld == null)
                 resourceWorld = "Resource";
 
-            p.sendMessage(ChatUtils.colorize(prefix + ConfigUtils.getString("messages.rtp.resource")));
+            p.sendMessage(ChatUtils.toComponent(prefix + ConfigUtils.getString("messages.rtp.resource")));
             Bukkit.dispatchCommand(Bukkit.getConsoleSender(),
                     "betterrtp:betterrtp player " + p.getName() + " " + resourceWorld);
             return true;
@@ -42,7 +44,7 @@ public class RTPCommand implements CommandExecutor {
             if (survivalWorld == null)
                 survivalWorld = "world";
 
-            p.sendMessage(ChatUtils.colorize(prefix + ConfigUtils.getString("messages.rtp.survival")));
+            p.sendMessage(ChatUtils.toComponent(prefix + ConfigUtils.getString("messages.rtp.survival")));
             Bukkit.dispatchCommand(Bukkit.getConsoleSender(),
                     "betterrtp:betterrtp player " + p.getName() + " " + survivalWorld);
             return true;
