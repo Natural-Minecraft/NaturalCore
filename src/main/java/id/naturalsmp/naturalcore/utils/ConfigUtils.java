@@ -184,6 +184,16 @@ public class ConfigUtils {
         sendMessage(sender, "prefix.admin", path, placeholders);
     }
 
+    public static void sendError(org.bukkit.command.CommandSender sender, String msg) {
+        String format = getString("messages.global.usage", "&#FF5555&l⚠ &cError: &f%usage%");
+        sender.sendMessage(ChatUtils.colorize(format.replace("%usage%", msg)));
+    }
+
+    public static void sendUsage(org.bukkit.command.CommandSender sender, String usage) {
+        String format = getString("messages.global.usage", "&#FF5555&l⚠ &cGunakan: &f%usage%");
+        sender.sendMessage(ChatUtils.colorize(format.replace("%usage%", usage)));
+    }
+
     public static void sendMod(org.bukkit.command.CommandSender sender, String path, String... placeholders) {
         sendMessage(sender, "prefix.moderation", path, placeholders);
     }

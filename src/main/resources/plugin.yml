@@ -206,11 +206,6 @@ commands:
     aliases: [ilore, itemlore]
     permission: naturalsmp.lore
 
-  lore:
-    description: Edit item lore
-    aliases: [ilore, itemlore]
-    permission: naturalsmp.lore
-
   # --- FUN ---
   fireball:
     description: Tembakkan fireball

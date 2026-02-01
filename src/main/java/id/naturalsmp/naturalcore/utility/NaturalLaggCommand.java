@@ -46,7 +46,7 @@ public class NaturalLaggCommand implements CommandExecutor {
             return true;
         }
 
-        ConfigUtils.sendGeneral(sender, "messages.lagg.usage");
+        ConfigUtils.sendUsage(sender, "/lagg [clear]");
         return true;
     }
 

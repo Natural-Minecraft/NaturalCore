@@ -25,12 +25,14 @@ public class TipsManager {
 
     // Animation States
     public enum TipState {
-        IDLE, REVEALING
+        IDLE, REVEALING, STAYING
     }
 
     private TipState state = TipState.IDLE;
     private int animationFrame = 0;
+    private int stayTicks = 0;
     private final int MAX_FRAMES = 25; // Reveal speed
+    private int durationTicks = 80; // 4 seconds default stay
 
     public TipsManager(NaturalCore plugin) {
         this.plugin = plugin;
@@ -49,11 +51,11 @@ public class TipsManager {
         this.interval = tipsConfig.getInt("settings.interval", 300);
         this.soundEnabled = tipsConfig.getBoolean("settings.sound.enabled", true);
         this.soundName = tipsConfig.getString("settings.sound.name", "BLOCK_NOTE_BLOCK_HAT");
+        this.durationTicks = tipsConfig.getInt("settings.duration", 4) * 20;
 
-        // Pick initial tip (no reveal for initial load to avoid noise on startup)
-        if (tips != null && !tips.isEmpty()) {
-            this.currentTip = tips.get(new Random().nextInt(tips.size()));
-        }
+        // Reset state
+        this.state = TipState.IDLE;
+        this.currentTip = null;
 
         startBroadcast();
     }
@@ -80,13 +82,20 @@ public class TipsManager {
         if (state == TipState.REVEALING && currentTip != null) {
             animationFrame++;
             if (animationFrame >= MAX_FRAMES) {
-                state = TipState.IDLE;
+                state = TipState.STAYING;
+                stayTicks = 0;
                 animationFrame = 0;
             }
 
             // Sound feedback every 2 animation ticks
             if (animationFrame % 2 == 0 && soundEnabled) {
                 playTickSound();
+            }
+        } else if (state == TipState.STAYING) {
+            stayTicks += 2; // HUD ticks at 2L
+            if (stayTicks >= durationTicks) {
+                state = TipState.IDLE;
+                currentTip = null;
             }
         }
     }
@@ -113,7 +122,7 @@ public class TipsManager {
     }
 
     public String getDisplay(String season) {
-        if (currentTip == null)
+        if (currentTip == null || state == TipState.IDLE)
             return null;
 
         String coloredTip = ChatUtils.colorize(currentTip);

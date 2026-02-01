@@ -54,8 +54,7 @@ public class EconomyCommand implements CommandExecutor {
             if (!sender.hasPermission("naturalsmp.economy.admin"))
                 return noPerm(sender);
             if (args.length < 2) {
-                sender.sendMessage(
-                        ConfigUtils.getString("messages.global.usage").replace("%usage%", "/setbal <player> <amount>"));
+                ConfigUtils.sendUsage(sender, "/setbal <player> <amount>");
                 return true;
             }
             Player target = Bukkit.getPlayer(args[0]);
@@ -130,7 +129,8 @@ public class EconomyCommand implements CommandExecutor {
             }
             Player target = Bukkit.getPlayer(args[0]);
             if (target == null || target.equals(p)) {
-                p.sendMessage(ConfigUtils.getString("messages.global.player-not-found").replace("%player%", args[0]));
+                ConfigUtils.sendError(p,
+                        ConfigUtils.getString("messages.global.player-not-found").replace("%player%", args[0]));
                 return true;
             }
 
@@ -164,7 +164,7 @@ public class EconomyCommand implements CommandExecutor {
     }
 
     private boolean noPerm(CommandSender s) {
-        s.sendMessage(ConfigUtils.getString("messages.global.no-permission"));
+        ConfigUtils.sendGeneral(s, "messages.global.no-permission");
         return true;
     }
 }

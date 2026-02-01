@@ -61,7 +61,7 @@ public class NaturalCoreCommand implements CommandExecutor, TabCompleter {
             if (!sender.hasPermission("naturalsmp.admin"))
                 return noPerm(sender);
             if (args.length < 2) {
-                sender.sendMessage(ChatUtils.colorize("&cUsage: /nacore admin <reload|resetseason|gui>"));
+                ConfigUtils.sendUsage(sender, "/nacore admin <reload|resetseason|gui|status>");
                 return true;
             }
             String adminSub = args[1].toLowerCase();
@@ -80,7 +80,7 @@ public class NaturalCoreCommand implements CommandExecutor, TabCompleter {
                 case "resetseason" -> {
                     if (adminArgs.length < 1 || !adminArgs[0].equalsIgnoreCase("confirm")) {
                         sender.sendMessage(ChatUtils.colorize("&c&lWARNING! &7Reset 50% Tier & AuraSkills."));
-                        sender.sendMessage(ChatUtils.colorize("&7Gunakan: &f/nacore admin resetseason confirm"));
+                        ConfigUtils.sendUsage(sender, "/nacore admin resetseason confirm");
                     } else {
                         plugin.getSeasonResetManager().performFullReset(sender);
                     }
@@ -100,13 +100,15 @@ public class NaturalCoreCommand implements CommandExecutor, TabCompleter {
                     if (sender instanceof Player p)
                         new NaturalCoreGUI(plugin).openGUI(p);
                 }
-                default -> sender.sendMessage(ChatUtils.colorize("&cAdmin sub-command tidak ditemukan."));
+                default -> ConfigUtils.sendError(sender, "Admin sub-command tidak ditemukan.");
             }
             return true;
         }
 
         // --- GLOBAL RELOAD (Legacy Support) ---
-        if (sub.equals("reload")) {
+        if (sub.equals("reload"))
+
+        {
             if (!sender.hasPermission("naturalsmp.admin"))
                 return noPerm(sender);
             performDeepReload(sender);
@@ -152,7 +154,7 @@ public class NaturalCoreCommand implements CommandExecutor, TabCompleter {
             }
         }
 
-        sender.sendMessage(ChatUtils.colorize("&cSub-command tidak ditemukan. Cek /nacore help."));
+        ConfigUtils.sendError(sender, "Sub-command tidak ditemukan. Cek /nacore help.");
         return true;
     }
 
