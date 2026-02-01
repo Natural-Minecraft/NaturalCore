@@ -9,6 +9,7 @@ global:
   no-permission: "&cMaaf, kamu tidak punya akses."
   player-not-found: "&7Pemain &f%player% &ctidak ditemukan/offline."
   usage: "&#FF5555&l⚠ &cGunakan: &f%usage%"
+  error: "&#FF5555&l⚠ &cError: &f%usage%"
   version: "&#00AAFF&lNatural&#55FF55&lCore &av%version% &7- Premium Version"
   only-player: "&#FF5555&l✘ &cHanya player yang dapat menggunakan perintah ini."
   help-hint: "&#6CCAFE&lINFO &8┃ &7Gunakan &e/nacore help &7untuk bantuan."

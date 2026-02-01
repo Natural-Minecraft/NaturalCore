@@ -96,6 +96,10 @@ public class NaturalCoreCommand implements CommandExecutor, TabCompleter {
                         sender.sendMessage(ChatUtils.colorize("&6&lBackup &8» &aDone!"));
                     }
                 }
+                case "restart" -> {
+                    new id.naturalsmp.naturalcore.admin.RestartAlertCommand().onCommand(sender, command, "restart",
+                            adminArgs);
+                }
                 case "gui" -> {
                     if (sender instanceof Player p)
                         new NaturalCoreGUI(plugin).openGUI(p);

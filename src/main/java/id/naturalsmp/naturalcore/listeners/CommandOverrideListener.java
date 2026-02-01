@@ -15,35 +15,32 @@ public class CommandOverrideListener implements Listener {
 
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     public void onPlayerCommand(PlayerCommandPreprocessEvent event) {
-        String message = event.getMessage().toLowerCase();
-        if (isRestartCommand(message)) {
+        String msg = event.getMessage();
+        if (msg.startsWith("/"))
+            msg = msg.substring(1);
+        String[] parts = msg.split(" ");
+        String cmd = parts[0].toLowerCase();
+
+        if (cmd.equals("restart") || cmd.equals("spigot:restart")) {
             if (event.getPlayer().hasPermission("naturalcs.restartalert")) {
                 event.setCancelled(true);
-                // Dispatch NaturalCore restart with 30s default
-                Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "nacore admin restart 30");
+                String time = parts.length > 1 ? parts[1] : "30";
+                Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "nacore admin restart " + time);
             }
         }
     }
 
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     public void onServerCommand(ServerCommandEvent event) {
-        String message = event.getCommand().toLowerCase();
-        if (isRestartCommand(message)) {
+        String msg = event.getCommand();
+        String[] parts = msg.split(" ");
+        String cmd = parts[0].toLowerCase();
+
+        if (cmd.equals("restart") || cmd.equals("spigot:restart")) {
             event.setCancelled(true);
-            // Dispatch NaturalCore restart with 30s default
-            Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "nacore admin restart 30");
+            String time = parts.length > 1 ? parts[1] : "30";
+            Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "nacore admin restart " + time);
         }
     }
 
-    private boolean isRestartCommand(String command) {
-        // Remove leading / if present (PlayerCommandPreprocessEvent has it,
-        // ServerCommandEvent doesn't)
-        if (command.startsWith("/")) {
-            command = command.substring(1);
-        }
-
-        // Check for exactly 'restart' or 'spigot:restart'
-        return command.equals("restart") || command.startsWith("restart ") ||
-                command.equals("spigot:restart") || command.startsWith("spigot:restart ");
-    }
 }

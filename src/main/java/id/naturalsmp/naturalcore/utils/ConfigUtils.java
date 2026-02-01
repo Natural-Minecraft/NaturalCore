@@ -185,7 +185,7 @@ public class ConfigUtils {
     }
 
     public static void sendError(org.bukkit.command.CommandSender sender, String msg) {
-        String format = getString("messages.global.usage", "&#FF5555&l⚠ &cError: &f%usage%");
+        String format = getString("messages.global.error", "&#FF5555&l⚠ &cError: &f%usage%");
         sender.sendMessage(ChatUtils.colorize(format.replace("%usage%", msg)));
     }
 
