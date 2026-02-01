@@ -483,6 +483,8 @@ public final class NaturalCore extends JavaPlugin {
         getServer().getPluginManager().registerEvents(new id.naturalsmp.naturalcore.staff.StaffListener(this), this);
         getServer().getPluginManager().registerEvents(new id.naturalsmp.naturalcore.staff.StaffToolListener(this),
                 this);
+        getServer().getPluginManager()
+                .registerEvents(new id.naturalsmp.naturalcore.listeners.CommandOverrideListener(this), this);
         getServer().getPluginManager().registerEvents(new id.naturalsmp.naturalcore.combat.CombatListener(this), this);
 
         // 24. Tier System (v1.8)

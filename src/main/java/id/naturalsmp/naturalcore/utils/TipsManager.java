@@ -21,6 +21,16 @@ public class TipsManager {
     private int interval;
     private boolean soundEnabled;
     private String soundName;
+    private String currentTip = null;
+
+    // Animation States
+    public enum TipState {
+        IDLE, REVEALING
+    }
+
+    private TipState state = TipState.IDLE;
+    private int animationFrame = 0;
+    private final int MAX_FRAMES = 25; // Reveal speed
 
     public TipsManager(NaturalCore plugin) {
         this.plugin = plugin;
@@ -36,9 +46,14 @@ public class TipsManager {
         tipsConfig = YamlConfiguration.loadConfiguration(file);
 
         this.tips = tipsConfig.getStringList("tips");
-        this.interval = tipsConfig.getInt("tips.interval", 300);
-        this.soundEnabled = tipsConfig.getBoolean("tips.sound.enabled", true);
-        this.soundName = tipsConfig.getString("tips.sound.name", "BLOCK_NOTE_BLOCK_PLING");
+        this.interval = tipsConfig.getInt("settings.interval", 300);
+        this.soundEnabled = tipsConfig.getBoolean("settings.sound.enabled", true);
+        this.soundName = tipsConfig.getString("settings.sound.name", "BLOCK_NOTE_BLOCK_HAT");
+
+        // Pick initial tip (no reveal for initial load to avoid noise on startup)
+        if (tips != null && !tips.isEmpty()) {
+            this.currentTip = tips.get(new Random().nextInt(tips.size()));
+        }
 
         startBroadcast();
     }
@@ -55,39 +70,63 @@ public class TipsManager {
         task = new BukkitRunnable() {
             @Override
             public void run() {
-                broadcastTip();
+                updateCurrentTip();
             }
         };
         task.runTaskTimer(plugin, interval * 20L, interval * 20L);
     }
 
     public void tick() {
-        // No-op: handled by internal scheduler
+        if (state == TipState.REVEALING && currentTip != null) {
+            animationFrame++;
+            if (animationFrame >= MAX_FRAMES) {
+                state = TipState.IDLE;
+                animationFrame = 0;
+            }
+
+            // Sound feedback every 2 animation ticks
+            if (animationFrame % 2 == 0 && soundEnabled) {
+                playTickSound();
+            }
+        }
+    }
+
+    private void updateCurrentTip() {
+        if (tips != null && !tips.isEmpty()) {
+            this.currentTip = tips.get(new Random().nextInt(tips.size()));
+            this.state = TipState.REVEALING;
+            this.animationFrame = 0;
+        } else {
+            this.currentTip = null;
+            this.state = TipState.IDLE;
+        }
+    }
+
+    private void playTickSound() {
+        try {
+            Sound sound = Sound.valueOf(soundName);
+            for (Player p : Bukkit.getOnlinePlayers()) {
+                p.playSound(p.getLocation(), sound, 0.4f, 2.0f);
+            }
+        } catch (Exception ignored) {
+        }
     }
 
     public String getDisplay(String season) {
-        if (tips == null || tips.isEmpty())
+        if (currentTip == null)
             return null;
-        return tips.get(new Random().nextInt(tips.size()));
-    }
 
-    private void broadcastTip() {
-        if (tips.isEmpty())
-            return;
+        String coloredTip = ChatUtils.colorize(currentTip);
 
-        String tipRaw = tips.get(new Random().nextInt(tips.size()));
-        String prefix = ConfigUtils.getString("prefix.tips", "&b&lTIPS &8» &f");
-        String message = ChatUtils.colorize(prefix + tipRaw);
+        if (state == TipState.REVEALING) {
+            float progress = (float) animationFrame / MAX_FRAMES;
+            // Easing for smooth reveal
+            float ease = 1 - (float) Math.pow(1 - progress, 3);
+            int revealLen = (int) (ChatUtils.stripColor(coloredTip).length() * ease);
 
-        for (Player p : Bukkit.getOnlinePlayers()) {
-            p.sendMessage(message);
-            if (soundEnabled) {
-                try {
-                    Sound sound = Sound.valueOf(soundName);
-                    p.playSound(p.getLocation(), sound, 1.0f, 1.0f);
-                } catch (IllegalArgumentException ignored) {
-                }
-            }
+            return ChatUtils.colorAwareSubstring(coloredTip, 0, revealLen);
         }
+
+        return coloredTip;
     }
 }
