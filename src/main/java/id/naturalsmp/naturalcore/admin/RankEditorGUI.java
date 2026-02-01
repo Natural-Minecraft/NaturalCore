@@ -43,10 +43,14 @@ public class RankEditorGUI implements Listener {
             ItemStack icon = new ItemStack(Material.PAPER);
             ItemMeta meta = icon.getItemMeta();
             if (meta != null) {
-                // Use display name if available, else console name
                 String name = (rank.displayName != null && !rank.displayName.isEmpty()) ? rank.displayName
-                        : rank.consoleName;
+                        : rank.id;
                 meta.displayName(ChatUtils.toComponent(name));
+
+                // Store ID in PDC for reliable clicking
+                meta.getPersistentDataContainer().set(new org.bukkit.NamespacedKey(plugin, "rank_id"),
+                        org.bukkit.persistence.PersistentDataType.STRING, rank.id);
+
                 List<Component> lore = new ArrayList<>();
                 lore.add(ChatUtils.toComponent("&7ID: &f" + rank.id));
                 lore.add(ChatUtils.toComponent("&7Weight: &f" + rank.weight));
@@ -148,31 +152,15 @@ public class RankEditorGUI implements Listener {
             return;
 
         if (holder.type.equals("MAIN")) {
-            // Clicked a rank?
             ItemMeta meta = current.getItemMeta();
-            // Simple hack: parse ID from Lore or NBT.
-            // Since we didn't store NBT, let's just find by display name match or better:
-            // we should have stored ID in PDC.
-            // For simplicity in this quick implementation, I will iterate ranks to find
-            // match by display name/console name logic
-            // Or better: use Slot mapping if necessary.
-            // Actually, simplest way: store ID in lore hidden? No, visual check.
-            // Let's use the ID from the Lore "ID: ..."
-            if (meta.hasLore()) {
-                // Component lore parsing can be tricky.
-                // Let's assume the user clicked valid item.
-                // Or we could have mapped slots.
-                // Re-finding rank logic:
-                for (PermissionManager.RankConfig rank : plugin.getPermissionManager().getRanks().values()) {
-                    String name = (rank.displayName != null && !rank.displayName.isEmpty()) ? rank.displayName
-                            : rank.consoleName;
-                    // Strip colors for comparison might be safer
-                    if (ChatUtils.serialize(meta.displayName())
-                            .equals(ChatUtils.serialize(ChatUtils.toComponent(name)))) {
-                        openRankDetail(p, rank.id);
-                        return;
-                    }
-                }
+            if (meta == null)
+                return;
+
+            String rankId = meta.getPersistentDataContainer().get(new org.bukkit.NamespacedKey(plugin, "rank_id"),
+                    org.bukkit.persistence.PersistentDataType.STRING);
+
+            if (rankId != null) {
+                openRankDetail(p, rankId);
             }
         } else {
             // Rank Detail View

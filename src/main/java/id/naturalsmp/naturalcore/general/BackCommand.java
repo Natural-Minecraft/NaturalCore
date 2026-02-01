@@ -29,11 +29,11 @@ public class BackCommand implements CommandExecutor {
         String prefix = ConfigUtils.getString("prefix.player");
         Location backLoc;
 
-        if (p.hasPermission("naturalsmp.back")) {
-            // VIP Permission: Can go back to any last location (Death or Teleport)
+        if (plugin.getPermissionManager().isAtLeast(p, "midi")) {
+            // MIDI Rank or higher: Can go back to any last location (Death or Teleport)
             backLoc = plugin.getTeleportManager().getLastLocation(p);
         } else {
-            // Default: Can ONLY go back to last DEATH location
+            // Default/Member: Can ONLY go back to last DEATH location
             backLoc = plugin.getTeleportManager().getLastDeathLocation(p);
             if (backLoc == null) {
                 // Check if they have a generic last location but not death

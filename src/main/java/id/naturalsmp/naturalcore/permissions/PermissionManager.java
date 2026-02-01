@@ -16,7 +16,6 @@ import org.bukkit.permissions.Permission;
 import org.bukkit.permissions.PermissionDefault;
 
 import java.io.File;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -24,80 +23,76 @@ public class PermissionManager {
 
     private final NaturalCore plugin;
     private final File configFile;
-    private final Map<String, RankConfig> ranks = new HashMap<>();
+    private final Map<String, RankConfig> ranks = new java.util.LinkedHashMap<>();
 
     public PermissionManager(NaturalCore plugin) {
         this.plugin = plugin;
-        this.configFile = new File(plugin.getDataFolder(), "rank-config.yml");
+        this.configFile = new File(plugin.getDataFolder(), "ranks.yml");
 
         if (!configFile.exists()) {
-            plugin.saveResource("rank-config.yml", false);
+            plugin.saveResource("ranks.yml", false);
         }
 
-        loadPermissions();
-
-        // --- REALTIME LUCKPERMS SYNC (v2.0) ---
+        loadRanks();
         setupLuckPermsListener();
     }
 
     private void setupLuckPermsListener() {
         try {
-            net.luckperms.api.LuckPerms lp = net.luckperms.api.LuckPermsProvider.get();
+            LuckPerms lp = LuckPermsProvider.get();
             lp.getEventBus().subscribe(plugin, net.luckperms.api.event.user.UserDataRecalculateEvent.class, e -> {
-                org.bukkit.entity.Player p = org.bukkit.Bukkit.getPlayer(e.getUser().getUniqueId());
+                org.bukkit.entity.Player p = Bukkit.getPlayer(e.getUser().getUniqueId());
                 if (p != null && p.isOnline()) {
-                    // Update metadata real-time if rank changed (V2.0 Logging)
-                    plugin.getLogger().info("Rank change detected for " + p.getName() + " - metadata updated.");
+                    plugin.getLogger().info("Rank change detected for " + p.getName());
                 }
             });
         } catch (Exception ignored) {
         }
     }
 
-    public void loadPermissions() {
+    public void loadRanks() {
         YamlConfiguration config = YamlConfiguration.loadConfiguration(configFile);
         ranks.clear();
 
-        for (String key : config.getKeys(false)) {
-            ConfigurationSection section = config.getConfigurationSection(key);
-            if (section == null)
+        ConfigurationSection section = config.getConfigurationSection("ranks");
+        if (section == null)
+            return;
+
+        for (String key : section.getKeys(false)) {
+            ConfigurationSection rankSection = section.getConfigurationSection(key);
+            if (rankSection == null)
                 continue;
 
             RankConfig rank = new RankConfig();
-            rank.id = key; // Simple ID (e.g. "vip")
-            rank.permission = section.getString("permission", "naturalsmp." + key); // Fallback if missing
-            rank.consoleName = section.getString("console-name", key.toUpperCase());
-            rank.displayName = ChatUtils.colorize(section.getString("display-name", "&7" + key));
+            rank.id = key;
+            rank.displayName = ChatUtils.colorize(rankSection.getString("display", "&7" + key));
+            rank.prefix = rankSection.getString("prefix", "");
+            rank.weight = rankSection.getInt("weight", 0);
+            rank.permissions = rankSection.getStringList("permissions");
+            rank.inheritance = rankSection.getString("inherit");
 
-            rank.prefix = section.getString("prefix");
-            rank.suffix = section.getString("suffix");
-            rank.weight = section.getInt("weight", 0);
-            rank.permissions = section.getStringList("permissions");
-            rank.disabledPermissions = section.getStringList("disabled-perms");
-            rank.inheritance = section.getStringList("inheritance");
-
-            ranks.put(rank.id, rank); // Map by ID now
+            ranks.put(rank.id, rank);
             registerBukkitPermission(rank);
-
-            plugin.getLogger().info("Loaded Rank: " + rank.consoleName + " (ID: " + rank.id + ")");
         }
+        plugin.getLogger().info("Loaded " + ranks.size() + " ranks from ranks.yml");
     }
 
     private void registerBukkitPermission(RankConfig rank) {
-        Permission perm = Bukkit.getPluginManager().getPermission(rank.permission);
+        String permName = "naturalsmp.rank." + rank.id;
+        Permission perm = Bukkit.getPluginManager().getPermission(permName);
         if (perm == null) {
-            perm = new Permission(rank.permission, PermissionDefault.FALSE);
+            perm = new Permission(permName, PermissionDefault.FALSE);
             Bukkit.getPluginManager().addPermission(perm);
         }
 
-        // Set children permissions (True)
-        for (String child : rank.permissions) {
-            perm.getChildren().put(child, true);
+        // Apply children
+        for (String p : rank.permissions) {
+            perm.getChildren().put(p, true);
         }
 
-        // Set disabled permissions (False)
-        for (String disabled : rank.disabledPermissions) {
-            perm.getChildren().put(disabled, false);
+        // Apply inheritance if exists
+        if (rank.inheritance != null && ranks.containsKey(rank.inheritance)) {
+            perm.getChildren().put("naturalsmp.rank." + rank.inheritance, true);
         }
 
         perm.recalculatePermissibles();
@@ -108,48 +103,61 @@ public class PermissionManager {
         try {
             lp = LuckPermsProvider.get();
         } catch (Exception e) {
-            plugin.getLogger().warning("LuckPerms API not found. Skipping metadata sync.");
+            plugin.getLogger().warning("LuckPerms API not found. Skipping sync.");
             return;
         }
 
         for (RankConfig rank : ranks.values()) {
-            // Group name is the ID (vip, midi, etc.)
-            String groupName = rank.id;
+            lp.getGroupManager().createAndLoadGroup(rank.id).thenAcceptAsync(group -> {
+                // Clear existing nodes to avoid duplicates/conflicts during sync
+                group.data().clear();
 
-            lp.getGroupManager().modifyGroup(groupName, group -> {
-                // Metadata
-                if (rank.prefix != null) {
+                // Add Weight
+                group.data().add(WeightNode.builder(rank.weight).build());
+
+                // Add Prefix
+                if (rank.prefix != null && !rank.prefix.isEmpty()) {
                     group.data().add(PrefixNode.builder(rank.prefix, rank.weight).build());
                 }
 
-                // Add display name as a meta value if needed, or specific logic
-                // For now, we mainly sync prefix and weight
-
-                group.data().add(WeightNode.builder(rank.weight).build());
-
-                // Allowed Permissions
+                // Add Permissions
                 for (String p : rank.permissions) {
-                    group.data().add(Node.builder(p).value(true).build());
+                    group.data().add(Node.builder(p).build());
                 }
 
-                // Disabled Permissions (Negated nodes)
-                if (rank.disabledPermissions != null) {
-                    for (String p : rank.disabledPermissions) {
-                        group.data().add(Node.builder(p).value(false).build());
-                    }
-                }
-
-                // Add inheritance
+                // Add Inheritance
                 if (rank.inheritance != null) {
-                    for (String parentId : rank.inheritance) {
-                        // inheritance list now contains IDs (e.g. "default") from config
-                        group.data().add(InheritanceNode.builder(parentId).build());
-                    }
+                    group.data().add(InheritanceNode.builder(rank.inheritance).build());
                 }
+
+                lp.getGroupManager().saveGroup(group);
             });
         }
+        plugin.getLogger().info("Ranks synced to LuckPerms groups successfully! 🔑");
+    }
 
-        plugin.getLogger().info("Successfully synced rank-config.yml metadata to LuckPerms! 🔑💎");
+    public RankConfig getHighestRank(org.bukkit.entity.Player player) {
+        RankConfig highest = null;
+        for (RankConfig rank : ranks.values()) {
+            if (player.hasPermission("naturalsmp.rank." + rank.id)) {
+                if (highest == null || rank.weight > highest.weight) {
+                    highest = rank;
+                }
+            }
+        }
+        return highest;
+    }
+
+    public boolean isAtLeast(org.bukkit.entity.Player player, String rankId) {
+        RankConfig target = ranks.get(rankId);
+        if (target == null)
+            return false;
+
+        RankConfig current = getHighestRank(player);
+        if (current == null)
+            return false;
+
+        return current.weight >= target.weight;
     }
 
     public Map<String, RankConfig> getRanks() {
@@ -158,9 +166,9 @@ public class PermissionManager {
 
     public void addPermission(String rankId, String permission) {
         RankConfig rank = ranks.get(rankId);
-        if (rank != null && !rank.permissions.contains(permission)) {
+        if (rank != null) {
             rank.permissions.add(permission);
-            saveRank(rank);
+            saveToConfig();
             syncToLuckPerms();
         }
     }
@@ -169,50 +177,35 @@ public class PermissionManager {
         RankConfig rank = ranks.get(rankId);
         if (rank != null) {
             rank.weight = weight;
-            saveRank(rank);
+            saveToConfig();
             syncToLuckPerms();
         }
     }
 
-    public void saveRank(RankConfig rank) {
-        YamlConfiguration config = YamlConfiguration.loadConfiguration(configFile);
-        // Use ID as key
-        ConfigurationSection section = config.getConfigurationSection(rank.id);
-        if (section == null) {
-            section = config.createSection(rank.id);
+    private void saveToConfig() {
+        YamlConfiguration config = new YamlConfiguration();
+        ConfigurationSection section = config.createSection("ranks");
+        for (RankConfig rank : ranks.values()) {
+            ConfigurationSection rSec = section.createSection(rank.id);
+            rSec.set("display", rank.displayName.replace("§", "&"));
+            rSec.set("prefix", rank.prefix);
+            rSec.set("weight", rank.weight);
+            rSec.set("permissions", rank.permissions);
+            rSec.set("inherit", rank.inheritance);
         }
-
-        section.set("permission", rank.permission);
-        section.set("console-name", rank.consoleName);
-        section.set("display-name", rank.displayName.replace("§", "&"));
-        section.set("prefix", rank.prefix);
-        section.set("suffix", rank.suffix);
-        section.set("weight", rank.weight);
-        section.set("permissions", rank.permissions);
-        section.set("disabled-perms", rank.disabledPermissions);
-        section.set("inheritance", rank.inheritance);
-
         try {
             config.save(configFile);
-            // Re-register to apply changes immediately
-            registerBukkitPermission(rank);
         } catch (java.io.IOException e) {
-            plugin.getLogger().severe("Failed to save rank-config.yml!");
             e.printStackTrace();
         }
     }
 
     public static class RankConfig {
         public String id;
-        public String permission;
-        public String consoleName;
         public String displayName;
-
         public String prefix;
-        public String suffix;
         public int weight;
         public List<String> permissions;
-        public List<String> disabledPermissions;
-        public List<String> inheritance;
+        public String inheritance;
     }
 }

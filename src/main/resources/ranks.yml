@@ -1,0 +1,176 @@
+# ==========================================
+#      NATURAL CORE - RANK SYSTEM
+# ==========================================
+# Tips:
+# 1. Jalankan '/nacore admin ranksync' setelah mengubah file ini.
+# 2. Rank di bawah akan otomatis dibuat menjadi Group di LuckPerms.
+# 3. Hierarchy: Rank di bawah mewarisi (inherit) rank di atasnya.
+
+ranks:
+  member:
+    display: "&7Member"
+    prefix: " "
+    weight: 0
+    permissions:
+    - naturalsmp.help
+    - naturalsmp.list
+    - naturalsmp.info
+    - naturalsmp.tpa
+    - naturalsmp.spawn
+    - naturalsmp.chat.color
+    - naturalsmp.home.use
+    - naturalsmp.home.limit.default
+    - naturaldungeon.party
+    - naturaldungeon.dungeon
+    - excellentshop.chestshop.create
+    - excellentshop.auction.command.unclaimed
+    - excellentshop.auction.command.selling
+    - excellentshop.auction.command.sell
+    - excellentshop.auction.command.open
+    - excellentshop.auction.command.history
+    - excellentshop.auction.command.expired
+    - bankplus.open
+    - bankplus.use
+    - emf.user
+    - emf.use_rod
+    - emf.top
+    - emf.toggle
+    - emf.shop
+    - emf.next
+    - emf.journal
+    - emf.help
+    - emf.gui
+    - emf.applybaits
+    - redprotect.command.addadmin
+    - redprotect.command.addleader
+    - redprotect.command.addmember
+    - redprotect.command.blocklimit
+    - redprotect.command.border
+    - redprotect.command.can-purge
+    - redprotect.command.claim
+    - redprotect.command.claimlimit
+    - redprotect.command.delete
+    - redprotect.command.deltp
+    - redprotect.command.expand-vert
+    - redprotect.command.flag
+    - redprotect.command.help
+    - redprotect.command.info
+    - redprotect.command.infowand
+    - redprotect.command.kick
+    - redprotect.command.laccept
+    - redprotect.command.ldeny
+    - redprotect.command.list
+    - redprotect.command.list-areas
+    - redprotect.command.near
+    - redprotect.command.priority
+    - redprotect.command.purge-limit
+    - redprotect.command.regen
+    - redprotect.command.regenall
+    - redprotect.command.removeadmin
+    - redprotect.command.removeall
+    - redprotect.command.removeleader
+    - redprotect.command.removemember
+    - redprotect.command.rename
+    - redprotect.command.select-we
+    - redprotect.command.settp
+    - redprotect.command.start
+    - redprotect.command.teleport
+    - redprotect.command.user
+    - redprotect.command.wand
+    - redprotect.command.welcome
+    - redprotect.limits.blocks.10000
+    - redprotect.limits.claim.5
+    - veinminer.blocks
+    - veinminer.settings
+    - veinminer.toggle
+    - voicechat.speak
+    - voicechat.listen
+    - voicechat.groups
+
+  midi:
+    display: "&dMidi"
+    prefix: " "
+    weight: 100
+    inherit: member
+    permissions:
+      - naturalsmp.enderchest
+      - naturalsmp.back
+      - naturalsmp.emoji.unlimited
+      - naturalsmp.color.midi
+      - naturalsmp.home.limit.midi
+      - redprotect.limits.blocks.25000
+      - redprotect.limits.claim.10
+
+  vip:
+    display: "&aVIP"
+    prefix: " "
+    weight: 200
+    inherit: midi
+    permissions:
+      - naturalsmp.hat
+      - naturalsmp.trash
+      - naturalsmp.resource
+      - naturalsmp.nick
+      - naturalsmp.color.vip
+      - naturalsmp.home.limit.vip
+      - redprotect.limits.blocks.50000
+      - redprotect.limits.claim.20
+
+  mvp:
+    display: "&bMVP"
+    prefix: " "
+    weight: 300
+    inherit: vip
+    permissions:
+      - naturalsmp.fly
+      - naturalsmp.craft
+      - naturalsmp.anvil
+      - naturalsmp.ptime
+      - naturalsmp.pweather
+      - naturalsmp.color.mvp
+      - naturalsmp.home.limit.mvp
+      - redprotect.limits.blocks.150000
+      - redprotect.limits.claim.40
+
+  tiktok:
+    display: "&aVIP"
+    prefix: " "
+    weight: 321
+    inherit: mvp
+    permissions:
+      - naturalsmp.priority
+      - naturalsmp.tiktok
+
+  youtube:
+    display: "&aVIP"
+    prefix: " "
+    weight: 321
+    inherit: mvp
+    permissions:
+      - naturalsmp.priority
+      - naturalsmp.youtube
+
+  helper:
+    display: "&bHelper"
+    prefix: " "
+    weight: 350
+    inherit: mvp
+    permissions:
+      - naturalsmp.helper.kick
+      - naturalsmp.helper.mute
+      - naturalsmp.helper.tempmute
+      - naturalsmp.helper.unmute
+      - naturalsmp.helper.warn
+
+  nature:
+    display: "&eNature"
+    prefix: " "
+    weight: 400
+    inherit: mvp
+    permissions:
+      - naturalsmp.priority
+      - naturalsmp.temperature.immune
+      - naturalsmp.color.nature
+      - naturalsmp.home.limit.nature
+      - redprotect.limits.blocks.500000
+      - redprotect.limits.claim.80

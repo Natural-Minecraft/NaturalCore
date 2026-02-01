@@ -571,8 +571,8 @@ public final class NaturalCore extends JavaPlugin {
             hudManager.reload();
         if (seasonManager != null)
             seasonManager.loadData();
-        if (laggManager != null)
-            laggManager.loadConfig();
+        if (permissionManager != null)
+            permissionManager.loadRanks();
 
         getLogger().info(ChatUtils.colorize("&6&lNaturalCore &aAll system configurations reloaded successfully!"));
     }
