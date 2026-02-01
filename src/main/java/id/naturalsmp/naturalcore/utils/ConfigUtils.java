@@ -21,8 +21,8 @@ public class ConfigUtils {
     private static File messagesFile;
     private static FileConfiguration seasonConfig;
     private static File seasonFile;
-    private static FileConfiguration disabledCommandsConfig;
-    private static File disabledCommandsFile;
+    private static FileConfiguration commandsConfig;
+    private static File commandsFile;
 
     // --- CONFIG.YML HELPERS ---
 
@@ -47,12 +47,12 @@ public class ConfigUtils {
         return seasonConfig;
     }
 
-    // --- DISABLED COMMANDS HELPERS ---
-    public static FileConfiguration getDisabledCommandsConfig() {
-        if (disabledCommandsConfig == null) {
-            loadDisabledCommands();
+    // --- COMMANDS.YML HELPERS ---
+    public static FileConfiguration getCommandsConfig() {
+        if (commandsConfig == null) {
+            loadCommands();
         }
-        return disabledCommandsConfig;
+        return commandsConfig;
     }
 
     /**
@@ -79,13 +79,13 @@ public class ConfigUtils {
         seasonConfig = YamlConfiguration.loadConfiguration(seasonFile);
     }
 
-    private static void loadDisabledCommands() {
+    private static void loadCommands() {
         NaturalCore plugin = NaturalCore.getInstance();
-        if (!new File(plugin.getDataFolder(), "essentials_disabled_commands.yml").exists()) {
-            plugin.saveResource("essentials_disabled_commands.yml", false);
+        if (!new File(plugin.getDataFolder(), "commands.yml").exists()) {
+            plugin.saveResource("commands.yml", false);
         }
-        disabledCommandsFile = new File(plugin.getDataFolder(), "essentials_disabled_commands.yml");
-        disabledCommandsConfig = YamlConfiguration.loadConfiguration(disabledCommandsFile);
+        commandsFile = new File(plugin.getDataFolder(), "commands.yml");
+        commandsConfig = YamlConfiguration.loadConfiguration(commandsFile);
     }
 
     /**
@@ -95,7 +95,7 @@ public class ConfigUtils {
         NaturalCore.getInstance().reloadConfig();
         loadMessages(); // Reload messages.yml juga
         loadSeason(); // Reload season.yml juga
-        loadDisabledCommands(); // Reload disabled commands juga
+        loadCommands(); // Reload commands.yml juga
     }
 
     // --- STRING GETTERS ---
@@ -210,9 +210,12 @@ public class ConfigUtils {
         sendMessage(p, "prefix.moderation", path, placeholders);
     }
 
-    public static void sendMessage(org.bukkit.entity.Player p, String prefixPath, String path,
-            String... placeholders) {
-        sendMessage((org.bukkit.command.CommandSender) p, prefixPath, path, placeholders);
+    public static String getPrefix(String prefixPath) {
+        String prefix = getString(prefixPath, null);
+        if (prefix == null && prefixPath.equals("prefix.player")) {
+            prefix = getString("prefix.general", "");
+        }
+        return prefix != null ? prefix : "";
     }
 
     public static void sendMessage(org.bukkit.command.CommandSender sender, String prefixPath, String path,
@@ -228,7 +231,7 @@ public class ConfigUtils {
             }
         }
 
-        String prefix = getString(prefixPath, "");
+        String prefix = getPrefix(prefixPath);
         sender.sendMessage(prefix + msg);
     }
 }

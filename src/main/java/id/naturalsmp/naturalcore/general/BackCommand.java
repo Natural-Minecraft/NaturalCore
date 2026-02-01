@@ -39,7 +39,8 @@ public class BackCommand implements CommandExecutor {
                 // Check if they have a generic last location but not death
                 // and explain they need permission
                 if (plugin.getTeleportManager().getLastLocation(p) != null) {
-                    p.sendMessage(ConfigUtils.getString("messages.global.no-permission"));
+                    p.sendMessage(ChatUtils.colorize(prefix + ConfigUtils.getString("messages.utils.back-no-rank")));
+                    p.playSound(p.getLocation(), Sound.BLOCK_NOTE_BLOCK_BASS, 1f, 0.5f);
                     return true;
                 }
             }

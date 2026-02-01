@@ -106,6 +106,7 @@ utils:
   anvil-opened: "&#AAAAAA&l🔨 &7Membuka &#AAAAAA&lAnvil Virtual&7..."
   back-success: "&#55FF55&l⚡ &7Berhasil kembali ke lokasi sebelumnya."
   back-fail: "&#FF5555&l⚡ &cTidak ada lokasi teleportasi tersisa!"
+  back-no-rank: "&#FF5555&l⚡ &cKamu butuh rank &#FF55FF&lMIDI &cuntuk teleport ke lokasi non-mati!"
   otp-success: "&#00AAFF&l✈ &7Teleportasi ke &#00AAFF&l%player%&7."
   otp-offline-cache: "&#00AAFF&l✈ &7Teleport ke lokasi terakhir &#00AAFF&l%player%&7."
   otp-offline-bed: "&#00AAFF&l✈ &1Teleport ke Spawn Bed &#00AAFF&l%player%&7."

@@ -23,6 +23,7 @@ prefix:
   warp: "&#00AAFF&lNatural&#55FF55&lWarp &8» &f"
   home: "&#00AAFF&lNatural&#55FF55&lHome &8» &f"
   teleport: "&#00AAFF&lNatural&#55FF55&lTeleport &8» &f"
+  player: "&#00AAFF&lNatural&#55FF55&lSMP &8» &f"
 
 # ==========================================
 #          NATURAL LAGG SETTINGS

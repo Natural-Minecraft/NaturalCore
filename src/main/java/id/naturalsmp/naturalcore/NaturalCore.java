@@ -140,7 +140,8 @@ public final class NaturalCore extends JavaPlugin {
         saveDefaultConfig();
         id.naturalsmp.naturalcore.utils.ConfigUpdater.updateConfig(this, "config.yml");
         id.naturalsmp.naturalcore.utils.ConfigUpdater.updateConfig(this, "messages.yml");
-        id.naturalsmp.naturalcore.utils.ConfigUpdater.updateConfig(this, "essentials_disabled_commands.yml");
+        id.naturalsmp.naturalcore.utils.ConfigUpdater.updateConfig(this, "commands.yml");
+        generateEssentialsConfig(); // Generate reference for EssentialsX
 
         // Init text folder if not exists
         File textFolder = new File(getDataFolder(), "text");
@@ -507,6 +508,39 @@ public final class NaturalCore extends JavaPlugin {
         // Selesai
         getLogger().info(
                 ChatUtils.colorize("&6&lNaturalCore v" + getDescription().getVersion() + " &asudah aktif sepenuhnya!"));
+    }
+
+    private void generateEssentialsConfig() {
+        File file = new File(getDataFolder(), "essentials_config.yml");
+        getLogger().info("Generating EssentialsX disabled-commands list...");
+
+        org.bukkit.configuration.file.YamlConfiguration config = new org.bukkit.configuration.file.YamlConfiguration();
+        java.util.List<String> disabled = new java.util.ArrayList<>();
+
+        // Get all commands from plugin.yml
+        java.util.Map<String, java.util.Map<String, Object>> cmdMap = getDescription().getCommands();
+        if (cmdMap != null) {
+            for (String cmd : cmdMap.keySet()) {
+                disabled.add(cmd.toLowerCase());
+                // Add aliases too
+                Object aliases = cmdMap.get(cmd).get("aliases");
+                if (aliases instanceof java.util.List) {
+                    for (Object alias : (java.util.List<?>) aliases) {
+                        disabled.add(alias.toString().toLowerCase());
+                    }
+                }
+            }
+        }
+
+        // Remove duplicates and sort
+        disabled = disabled.stream().distinct().sorted().collect(java.util.stream.Collectors.toList());
+
+        config.set("disabled-commands", disabled);
+        try {
+            config.save(file);
+        } catch (java.io.IOException e) {
+            e.printStackTrace();
+        }
     }
 
     private void saveTextResource(String name) {

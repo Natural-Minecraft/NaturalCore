@@ -23,7 +23,7 @@ public class CommandDisablerListener implements Listener {
         if (e.getPlayer().hasPermission("naturalsmp.admin"))
             return;
 
-        List<String> disabled = ConfigUtils.getDisabledCommandsConfig().getStringList("disabled-commands");
+        List<String> disabled = ConfigUtils.getCommandsConfig().getStringList("disabled-commands");
         if (disabled == null || disabled.isEmpty())
             return;
 
@@ -32,7 +32,7 @@ public class CommandDisablerListener implements Listener {
 
         if (disabled.contains(cmd)) {
             e.setCancelled(true);
-            String prefix = ConfigUtils.getString("prefix.player");
+            String prefix = ConfigUtils.getPrefix("prefix.player");
             e.getPlayer().sendMessage(
                     ChatUtils.colorize(prefix + "&cMaaf, perintah ini sedang dinonaktifkan oleh administrator."));
         }

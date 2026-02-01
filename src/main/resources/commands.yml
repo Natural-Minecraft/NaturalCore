@@ -1,0 +1,9 @@
+# ==========================================
+#      NATURAL CORE - COMMAND SETTINGS
+# ==========================================
+# Daftar command yang dinonaktifkan secara internal oleh NaturalCore.
+# Admin (naturalsmp.admin) tetap bisa menggunakan command ini.
+
+disabled-commands: []
+# - test
+# - help
