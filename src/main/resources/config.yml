@@ -1,7 +1,7 @@
 # ==========================================
 #      NATURAL CORE - CONFIGURATION
 # ==========================================
-config-version: 1.8.0
+config-version: 2.0.5
 
 # Catatan: Konfigurasi sekarang terpisah:
 # - config.yml     : Pengaturan utama (ini)
@@ -170,3 +170,18 @@ rtp:
 settings:
   restart-alert-time: 10
   broadcast-cooldown: 5
+
+# ==========================================
+#          RANK PRICE DATABASE
+# ==========================================
+# Fetch rank prices from MySQL for the /ranks GUI
+rank_price_database:
+  enabled: true
+  host: localhost
+  port: 3306
+  database: "nsmp_website"
+  username: "nsmp_website"
+  password: ""
+  table: "products"
+  # Uses existing 'products' table from store.naturalsmp.id
+  # Filters by type='rank', id format: "rank-vip", "rank-mvp", etc.

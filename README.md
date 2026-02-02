@@ -1,6 +1,23 @@
-# NaturalCore v2.0.3 (Wild Spirit Edition)
+# NaturalCore v2.0.5 (Shop & Ranks Edition)
 
 Plugin inti (core) premium untuk server **NaturalSMP**, mengelola seluruh aspek penting server dengan stabilitas ultra-tinggi dan estetika premium.
+
+## ✨ Fitur Baru v2.0.5 (Shop & Ranks Overhaul)
+
+### 🛒 Rank Shop GUI
+*   **MySQL Integration**: Harga rank kini diambil langsung dari database `products` (sinkron dengan store website).
+*   **Discount Display**: Tampilan harga diskon dengan format coret (strikethrough) dan persentase potongan.
+*   **Monthly Info**: Informasi durasi 30 hari (bulanan) ditampilkan di setiap item rank.
+
+### 🔧 Unified Topup Command
+*   **Single Command**: `/topupnotification <player> <amount> [transaction_id]`
+*   **Coin Mode**: Jika `<amount>` adalah angka, berikan NaturalCoin.
+*   **Rank Mode**: Jika `<amount>` adalah `midi|vip|mvp|nature`, berikan rank 30 hari via LuckPerms.
+*   **Removed**: `/rankaddtemp` dan `/addtemp` sudah digabung ke command ini.
+
+### 🎬 HUD Animation
+*   **Cinema Scroll**: Animasi Action Bar "Fixed Window Tape" dengan lebar 45 karakter.
+*   **Smoother Transitions**: Transisi easing smoothStep untuk pergerakan yang lebih halus.
 
 ## ✨ Fitur Baru v2.0.3 (The Trade & Home Fix)
 

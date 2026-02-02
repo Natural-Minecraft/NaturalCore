@@ -73,6 +73,8 @@ import id.naturalsmp.naturalcore.utility.NaturalLaggManager;
 import id.naturalsmp.naturalcore.utility.ServerHealthManager;
 import id.naturalsmp.naturalcore.utility.ServerStatusGUI;
 import id.naturalsmp.naturalcore.utils.ConfigUpdater;
+import id.naturalsmp.naturalcore.database.RankPriceDatabase;
+import org.bukkit.Bukkit;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -115,6 +117,7 @@ public final class NaturalCore extends JavaPlugin {
     private PlaytimeManager playtimeManager;
     private BroadcastManager broadcastManager;
     private BackupManager backupManager;
+    private RankPriceDatabase rankPriceDatabase;
 
     @Override
     public void onEnable() {
@@ -254,12 +257,16 @@ public final class NaturalCore extends JavaPlugin {
             }
         });
 
-        // 11. Ranks Module
+        // 11. Rank Price Database (MySQL)
+        this.rankPriceDatabase = new RankPriceDatabase(this);
+        this.rankPriceDatabase.fetchPrices();
+
+        // 12. Ranks Module
         id.naturalsmp.naturalcore.admin.RankGUI rankGUI = new id.naturalsmp.naturalcore.admin.RankGUI(this);
         getServer().getPluginManager().registerEvents(rankGUI, this);
         registerCmd("ranks", new id.naturalsmp.naturalcore.admin.RankCommand(rankGUI));
 
-        // 12. Permissions Module
+        // 13. Permissions Module
         this.permissionManager = new id.naturalsmp.naturalcore.permissions.PermissionManager(this);
 
         // Rank Editor (v1.9.9)
@@ -269,9 +276,6 @@ public final class NaturalCore extends JavaPlugin {
         // Social System (v1.9.9)
         SocialListener socialListener = new SocialListener(this);
         getServer().getPluginManager().registerEvents(socialListener, this);
-
-        registerCmd("rankaddtemp", new RankAddTempCommand());
-        registerCmd("addtemp", new RankAddTempCommand());
 
         registerCmd("rankeditor", (sender, cmd, label, args) -> {
             if (sender instanceof Player)
@@ -721,6 +725,10 @@ public final class NaturalCore extends JavaPlugin {
 
     public id.naturalsmp.naturalcore.utility.BackupManager getBackupManager() {
         return backupManager;
+    }
+
+    public RankPriceDatabase getRankPriceDatabase() {
+        return rankPriceDatabase;
     }
 
     // --- HELPER UNTUK MENCEGAH CRASH ---
