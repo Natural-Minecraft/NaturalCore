@@ -3,7 +3,6 @@ package id.naturalsmp.naturalcore.hud.components;
 import id.naturalsmp.naturalcore.NaturalCore;
 import id.naturalsmp.naturalcore.hud.HUDPriority;
 import id.naturalsmp.naturalcore.season.Season;
-import id.naturalsmp.naturalcore.utils.ChatUtils;
 import id.naturalsmp.naturalcore.utils.ConfigUtils;
 import me.clip.placeholderapi.PlaceholderAPI;
 import net.md_5.bungee.api.ChatColor;
@@ -40,7 +39,7 @@ public class SeasonComponent extends AbstractHUDComponent {
         String manaDisplay = getManaDisplay(player);
 
         // Premium format: Season | Temp | Mana with elegant separators
-        return seasonGradient + seasonName + " &8║ " + tempDisplay + " &8║ " + manaDisplay;
+        return seasonGradient + seasonName + " &7| " + tempDisplay + " &7| " + manaDisplay;
     }
 
     private String getSeasonGradient(Season season) {
@@ -105,8 +104,8 @@ public class SeasonComponent extends AbstractHUDComponent {
 
         if (Bukkit.getPluginManager().isPluginEnabled("PlaceholderAPI")) {
             // Using AuraSkills placeholders specifically
-            mana = PlaceholderAPI.setPlaceholders(player, "%auraskills_mana%");
-            maxMana = PlaceholderAPI.setPlaceholders(player, "%auraskills_max_mana%");
+            mana = PlaceholderAPI.setPlaceholders(player, "%auraskills_mana_int%");
+            maxMana = PlaceholderAPI.setPlaceholders(player, "%auraskills_max_mana_int%");
 
             // Clean up if placeholders didn't resolve or returned empty
             if (mana == null || mana.isEmpty() || mana.equals("%auraskills_mana%"))
