@@ -30,8 +30,8 @@ public class HUDManager implements Listener {
     // Global tick counter
     private int globalTick = 0;
 
-    // Transition settings
-    private static final int TRANSITION_DURATION = 15; // ~0.75 seconds
+    // Transition settings - LONGER for more visible scrolling
+    private static final int TRANSITION_DURATION = 30; // ~1.5 seconds (slowed down)
 
     public HUDManager(NaturalCore plugin) {
         this.plugin = plugin;

@@ -4,12 +4,16 @@ import id.naturalsmp.naturalcore.utils.ChatUtils;
 
 /**
  * Handles smooth animations for ActionBar transitions.
- * Provides methods for scroll, fade, and reveal effects.
+ * Provides true horizontal scrolling effects with visible gaps.
  */
 public class ActionBarAnimator {
 
+    // ActionBar approximate width in characters
+    private static final int ACTIONBAR_WIDTH = 60;
+
     /**
-     * Scroll transition: Push old text left, new text enters from right.
+     * Scroll transition: Old text slides LEFT, new text enters from RIGHT.
+     * Creates a clear horizontal scrolling effect with visible gap.
      * 
      * @param oldText  The current text being displayed
      * @param newText  The new text to transition to
@@ -26,21 +30,49 @@ public class ActionBarAnimator {
         if (progress <= 0.0f)
             return oldText;
 
-        // Apply easing for smooth motion
+        // Apply smooth easing
         float eased = easeOutCubic(progress);
 
-        // Calculate visible portion
-        int oldEnd = (int) (ChatUtils.getVisualLength(oldText) * (1 - eased));
-        String visibleOld = ChatUtils.colorAwareSubstring(oldText, 0, oldEnd);
+        // Strip colors for accurate length calculation
+        int oldLen = ChatUtils.getVisualLength(oldText);
+        int newLen = ChatUtils.getVisualLength(newText);
 
-        // Spacer between texts
-        String spacer = "   ";
+        // Create visible gap with separator
+        String gap = "     &8⋄     "; // Visual separator with spacing
+        int gapLen = 11; // Approximate visual length
 
-        // Build combined view
-        int newStart = (int) (ChatUtils.getVisualLength(newText) * (1 - eased));
-        String visibleNew = ChatUtils.colorAwareSubstring(newText, newStart, newText.length());
+        // Calculate total scroll distance
+        // Old text needs to scroll completely off screen to the left
+        // New text starts completely off screen to the right
+        int totalScrollDistance = oldLen + gapLen + newLen;
 
-        return visibleOld + spacer + visibleNew;
+        // Current scroll offset (how far we've scrolled from start)
+        int scrollOffset = (int) (eased * totalScrollDistance);
+
+        // Build the full scrolling timeline string
+        // [Old Text] [Gap] [New Text]
+        String timeline = oldText + ChatUtils.colorize(gap) + newText;
+
+        // Calculate what portion of the timeline is visible in the "window"
+        // The "window" is the ActionBar display area
+        int windowStart = scrollOffset;
+
+        // Extract visible portion
+        String visiblePortion = ChatUtils.colorAwareSubstring(timeline, windowStart, timeline.length());
+
+        // Pad with spaces if needed to maintain visual stability
+        int visibleLen = ChatUtils.getVisualLength(visiblePortion);
+        if (visibleLen < ACTIONBAR_WIDTH && progress < 0.9f) {
+            // Add padding to the right for early frames
+            int paddingNeeded = Math.min(ACTIONBAR_WIDTH - visibleLen, 20);
+            StringBuilder padded = new StringBuilder(visiblePortion);
+            for (int i = 0; i < paddingNeeded; i++) {
+                padded.append(" ");
+            }
+            return padded.toString();
+        }
+
+        return visiblePortion;
     }
 
     /**
