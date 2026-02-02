@@ -261,4 +261,8 @@ public class SeasonManager {
     public Season getCurrentSeason() {
         return currentSeason;
     }
+
+    public id.naturalsmp.naturalcore.utils.TipsManager getTipsManager() {
+        return tipsManager;
+    }
 }
