@@ -2,22 +2,21 @@
 
 Plugin inti (core) premium untuk server **NaturalSMP**, mengelola seluruh aspek penting server dengan stabilitas ultra-tinggi dan estetika premium.
 
-## ✨ Fitur Baru v2.0.5 (Shop & Ranks Overhaul)
+## ✨ Fitur Baru v2.0.5 (Shop & Ranks Edition)
 
-### 🛒 Rank Shop GUI
-*   **MySQL Integration**: Harga rank kini diambil langsung dari database `products` (sinkron dengan store website).
-*   **Discount Display**: Tampilan harga diskon dengan format coret (strikethrough) dan persentase potongan.
-*   **Monthly Info**: Informasi durasi 30 hari (bulanan) ditampilkan di setiap item rank.
+### 🛒 Rank Shop & In-Game Purchase
+*   **MySQL Integration**: Harga rank kini diambil langsung dari database `products` website (RP & NC).
+*   **In-Game NC Purchase**: Sekarang bisa membeli rank langsung menggunakan **NaturalCoin** via `/ranks` dengan menu konfirmasi.
+*   **Dynamic Discounts**: Tampilan harga diskon dengan format coret (strikethrough) dan persentase potongan.
+*   **Monthly Info**: Informasi durasi 30 hari (bulanan) otomatis.
+
+### 🎬 Adaptive HUD Manager
+*   **Context-Aware Transitions**: Transisi **Instant Pop-up** untuk combat, temperature, dan biome agar lebih responsif.
+*   **Cinema Scroll**: Animasi scrolling khusus untuk **Tips** dan **ClearLagg** agar tetap bisa dibaca dengan nyaman.
 
 ### 🔧 Unified Topup Command
-*   **Single Command**: `/topupnotification <player> <amount> [transaction_id]`
-*   **Coin Mode**: Jika `<amount>` adalah angka, berikan NaturalCoin.
-*   **Rank Mode**: Jika `<amount>` adalah `midi|vip|mvp|nature`, berikan rank 30 hari via LuckPerms.
-*   **Removed**: `/rankaddtemp` dan `/addtemp` sudah digabung ke command ini.
-
-### 🎬 HUD Animation
-*   **Cinema Scroll**: Animasi Action Bar "Fixed Window Tape" dengan lebar 45 karakter.
-*   **Smoother Transitions**: Transisi easing smoothStep untuk pergerakan yang lebih halus.
+*   **Single Command**: `/topupnotification <player> <amount|rank> [tx_id]`
+*   **Versatile**: Menangani pemberian NaturalCoin maupun Rank sementara secara otomatis.
 
 ## ✨ Fitur Baru v2.0.3 (The Trade & Home Fix)
 

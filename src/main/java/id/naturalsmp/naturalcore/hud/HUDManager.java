@@ -30,9 +30,6 @@ public class HUDManager implements Listener {
     // Global tick counter
     private int globalTick = 0;
 
-    // Transition settings - LONGER for more visible scrolling
-    private static final int TRANSITION_DURATION = 60; // ~3 seconds (slowed down)
-
     public HUDManager(NaturalCore plugin) {
         this.plugin = plugin;
         registerComponents();
@@ -146,14 +143,21 @@ public class HUDManager implements Listener {
         }
 
         // If transitioning
-        if (state.transitioning && state.transitionFrame < TRANSITION_DURATION) {
+        int duration = (newComponent != null) ? newComponent.getTransitionDuration() : 2;
+
+        // If duration is short (e.g. 2 ticks), just pop up instantly
+        if (duration <= 2) {
+            state.transitioning = false;
+            state.displayedContent = newContent;
+            return newContent;
+        }
+
+        if (state.transitioning && state.transitionFrame < duration) {
             state.transitionFrame++;
-            float progress = (float) state.transitionFrame / TRANSITION_DURATION;
+            float progress = (float) state.transitionFrame / duration;
 
-            // Check if component supports transition
-            boolean useTransition = (newComponent == null || newComponent.supportsTransition());
-
-            if (useTransition && state.previousContent != null && !state.previousContent.isEmpty()) {
+            // Check if component exists
+            if (state.previousContent != null && !state.previousContent.isEmpty()) {
                 state.displayedContent = ActionBarAnimator.scrollTransition(
                         state.previousContent,
                         newContent,
@@ -162,7 +166,7 @@ public class HUDManager implements Listener {
                 state.displayedContent = newContent;
             }
 
-            if (state.transitionFrame >= TRANSITION_DURATION) {
+            if (state.transitionFrame >= duration) {
                 state.transitioning = false;
                 state.displayedContent = newContent;
             }

@@ -70,8 +70,5 @@ public class TemperatureWarningComponent extends AbstractHUDComponent {
         }
     }
 
-    @Override
-    public boolean supportsTransition() {
-        return false; // Blink effect handles its own visual updates
     }
 }

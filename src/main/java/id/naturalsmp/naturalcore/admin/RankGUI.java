@@ -20,6 +20,7 @@ import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.jetbrains.annotations.NotNull;
+import su.nightexpress.coinsengine.api.CoinsEngineAPI;
 
 import java.text.DecimalFormat;
 import java.util.ArrayList;
@@ -73,7 +74,9 @@ public class RankGUI implements Listener {
         for (int i = 0; i < RANK_ORDER.length; i++) {
             String rankId = RANK_ORDER[i];
             double priceRP = priceDb.getPriceRP(rankId);
+            double priceNC = priceDb.getPriceNC(rankId);
             double discountedRP = priceDb.getDiscountedPriceRP(rankId);
+            double discountedNC = priceDb.getDiscountedPriceNC(rankId);
             int discount = priceDb.getDiscount(rankId);
 
             PermissionManager.RankConfig rankConfig = ranks.get(rankId);
@@ -86,7 +89,9 @@ public class RankGUI implements Listener {
                     RANK_COLORS[i],
                     rankId.toUpperCase(),
                     priceRP,
+                    priceNC,
                     discountedRP,
+                    discountedNC,
                     discount,
                     benefits));
         }
@@ -100,8 +105,8 @@ public class RankGUI implements Listener {
         p.openInventory(inv);
     }
 
-    private ItemStack createRankItem(Material mat, String color, String rankName, double priceRP,
-            double discountedRP, int discount, List<String> benefits) {
+    private ItemStack createRankItem(Material mat, String color, String rankName, double priceRP, double priceNC,
+            double discountedRP, double discountedNC, int discount, List<String> benefits) {
         ItemStack item = new ItemStack(mat);
         ItemMeta meta = item.getItemMeta();
         if (meta != null) {
@@ -125,11 +130,15 @@ public class RankGUI implements Listener {
                 componentLore.add(
                         ChatUtils.toComponent("&8• &7&mRp " + priceFormat.format(priceRP) + "&r &c-" + discount + "%"));
                 componentLore.add(ChatUtils.toComponent("&8• &a&lRp " + priceFormat.format(discountedRP)));
+                componentLore.add(ChatUtils.toComponent("&8• &7&m" + priceFormat.format(priceNC) + " NC"));
+                componentLore.add(ChatUtils.toComponent("&8• &6&l" + priceFormat.format(discountedNC) + " NC"));
             } else {
                 componentLore.add(ChatUtils.toComponent("&8• &fRp " + priceFormat.format(priceRP)));
+                componentLore.add(ChatUtils.toComponent("&8• &6" + priceFormat.format(priceNC) + " NC"));
             }
             componentLore.add(Component.empty());
-            componentLore.add(ChatUtils.toComponent("&aKlik untuk info pembelian!"));
+            componentLore.add(ChatUtils.toComponent("&aKlik untuk membeli dengan NaturalCoin!"));
+            componentLore.add(ChatUtils.toComponent("&7(Atau kunjungi store untuk Rupiah)"));
 
             meta.lore(componentLore);
             item.setItemMeta(meta);
@@ -190,11 +199,98 @@ public class RankGUI implements Listener {
             p.closeInventory();
             p.playSound(p.getLocation(), Sound.BLOCK_IRON_DOOR_CLOSE, 1f, 1.2f);
         } else if (isRankSlot(slot)) {
-            p.playSound(p.getLocation(), Sound.ENTITY_EXPERIENCE_ORB_PICKUP, 1f, 1f);
-            p.sendMessage(ChatUtils.toComponent(
-                    "&6&lNaturalSMP &8» &7Kunjungi &estore.naturalsmp.id &7untuk pembelian rank!"));
-            p.closeInventory();
+            String rankId = RANK_ORDER[getRankIndex(slot)];
+            openConfirmationGUI(p, rankId);
         }
+    }
+
+    private int getRankIndex(int slot) {
+        for (int i = 0; i < RANK_SLOTS.length; i++) {
+            if (RANK_SLOTS[i] == slot)
+                return i;
+        }
+        return -1;
+    }
+
+    private void openConfirmationGUI(Player p, String rankId) {
+        p.playSound(p.getLocation(), Sound.UI_BUTTON_CLICK, 1f, 1f);
+        Inventory inv = GUIUtils.createGUI(new ConfirmationHolder(rankId), 27, "&8Konfirmasi Pembelian");
+
+        ItemStack glass = GUIUtils.createFiller(Material.GRAY_STAINED_GLASS_PANE);
+        for (int i = 0; i < 27; i++)
+            inv.setItem(i, glass);
+
+        double price = plugin.getRankPriceDatabase().getDiscountedPriceNC(rankId);
+        String color = RANK_COLORS[getRankIndexById(rankId)];
+
+        ItemStack info = createItem(RANK_MATERIALS[getRankIndexById(rankId)],
+                color + "<b>" + rankId.toUpperCase() + " RANK</b>",
+                List.of("&7Apakah kamu yakin ingin membeli",
+                        "&7rank ini seharga &6" + priceFormat.format(price) + " NC&7?",
+                        "",
+                        "&8• &7Durasi: &e30 Hari"));
+        inv.setItem(13, info);
+
+        inv.setItem(11, createItem(Material.EMERALD_BLOCK, "&a&lKONFIRMASI", List.of("&7Klik untuk membeli rank.")));
+        inv.setItem(15, createItem(Material.REDSTONE_BLOCK, "&c&lBATAL", List.of("&7Klik untuk membatalkan.")));
+
+        p.openInventory(inv);
+    }
+
+    private int getRankIndexById(String rankId) {
+        for (int i = 0; i < RANK_ORDER.length; i++) {
+            if (RANK_ORDER[i].equalsIgnoreCase(rankId))
+                return i;
+        }
+        return 0;
+    }
+
+    @EventHandler
+    public void onConfirmClick(InventoryClickEvent e) {
+        if (!(e.getInventory().getHolder() instanceof ConfirmationHolder holder))
+            return;
+        e.setCancelled(true);
+
+        if (e.getCurrentItem() == null)
+            return;
+        Player p = (Player) e.getWhoClicked();
+        String rankId = holder.getRankId();
+
+        if (e.getSlot() == 11) {
+            // Confirm
+            processPurchase(p, rankId);
+        } else if (e.getSlot() == 15) {
+            // Cancel
+            openGUI(p);
+        }
+    }
+
+    private void processPurchase(Player p, String rankId) {
+        double price = plugin.getRankPriceDatabase().getDiscountedPriceNC(rankId);
+
+        // Use CoinsEngineAPI to check balance and deduct
+        double balance = CoinsEngineAPI.getBalance(p.getUniqueId(),
+                CoinsEngineAPI.getCurrency("naturalcoin"));
+
+        if (balance < price) {
+            p.sendMessage(ChatUtils.colorize("&6&lNaturalSMP &8» &cSaldo NaturalCoin tidak cukup!"));
+            p.playSound(p.getLocation(), Sound.ENTITY_VILLAGER_NO, 1f, 1f);
+            p.closeInventory();
+            return;
+        }
+
+        // Deduct
+        CoinsEngineAPI.removeBalance(p.getUniqueId(),
+                CoinsEngineAPI.getCurrency("naturalcoin"), price);
+
+        // Grant Rank
+        String txId = "IG-" + (System.currentTimeMillis() / 1000);
+        Bukkit.dispatchCommand(Bukkit.getConsoleSender(),
+                "topupnotification " + p.getName() + " " + rankId + " " + txId);
+
+        p.sendMessage(ChatUtils.colorize("&6&lNaturalSMP &8» &aPembelian berhasil!"));
+        p.playSound(p.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, 1f, 1.2f);
+        p.closeInventory();
     }
 
     private boolean isRankSlot(int slot) {
@@ -212,6 +308,23 @@ public class RankGUI implements Listener {
     }
 
     public static class RankHolder implements InventoryHolder {
+        @Override
+        public @NotNull Inventory getInventory() {
+            return null;
+        }
+    }
+
+    public static class ConfirmationHolder implements InventoryHolder {
+        private final String rankId;
+
+        public ConfirmationHolder(String rankId) {
+            this.rankId = rankId;
+        }
+
+        public String getRankId() {
+            return rankId;
+        }
+
         @Override
         public @NotNull Inventory getInventory() {
             return null;

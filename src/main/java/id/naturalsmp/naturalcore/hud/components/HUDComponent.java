@@ -50,7 +50,12 @@ public interface HUDComponent {
      * Check if this component supports smooth transitions.
      * If true, HUDManager will animate transitions to/from this component.
      */
-    default boolean supportsTransition() {
-        return true;
+    /**
+     * Get the duration of the transition in ticks.
+     * Use 2 for instant/near-instant pop-up.
+     * Use 60 for slow scrolling.
+     */
+    default int getTransitionDuration() {
+        return 2;
     }
 }

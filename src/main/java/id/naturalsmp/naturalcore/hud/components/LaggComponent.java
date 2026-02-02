@@ -108,7 +108,7 @@ public class LaggComponent extends AbstractHUDComponent {
     }
 
     @Override
-    public boolean supportsTransition() {
-        return true;
+    public int getTransitionDuration() {
+        return 60; // Slow scrolling for clearlagg
     }
 }

@@ -132,7 +132,7 @@ public final class NaturalCore extends JavaPlugin {
                 &e  |  \\| |/ _` | __| | | | '__/ _` | |
                 &e  | |\\  | (_| | |_| |_| | | | (_| | |
                 &e  |_| \\_|\\__,_|\\__|\\__,_|_|  \\__,_|_|
-                &6&l     -= NATURAL CORE v2.0.3 =-
+                &6&l     -= NATURAL CORE v2.0.5 =-
                 &7       Developed for NaturalSMP
                 """;
         for (String line : banner.split("\n")) {

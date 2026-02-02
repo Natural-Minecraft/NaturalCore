@@ -108,4 +108,9 @@ public class TipsComponent extends AbstractHUDComponent {
         // Premium tip styling with gradient icon
         return ChatUtils.colorize("<gradient:#FFD700:#FFA500>💡 TIPS</gradient> &8» &f" + currentTip);
     }
+
+    @Override
+    public int getTransitionDuration() {
+        return 60; // Slow scrolling for tips
+    }
 }

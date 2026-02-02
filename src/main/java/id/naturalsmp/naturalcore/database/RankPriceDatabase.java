@@ -34,9 +34,10 @@ public class RankPriceDatabase {
     private String password;
     private String table;
 
-    // Cached prices (rank_id -> price in RP)
+    // Cached prices (rank_id -> price in RP/NC)
     // Format: "midi" -> 15000.0, "vip" -> 25000.0
     private final Map<String, Double> pricesRP = new HashMap<>();
+    private final Map<String, Double> pricesNC = new HashMap<>();
     private final Map<String, String> rankNames = new HashMap<>();
     private final Map<String, Integer> discounts = new HashMap<>();
 
@@ -103,11 +104,12 @@ public class RankPriceDatabase {
         try {
             // Query products table for ranks only
             // id format: "rank-vip", "rank-mvp", etc.
-            String query = "SELECT id, name, price, discount FROM " + table + " WHERE type = 'rank'";
+            String query = "SELECT id, name, price, price_virtual, discount FROM " + table + " WHERE type = 'rank'";
             PreparedStatement stmt = connection.prepareStatement(query);
             ResultSet rs = stmt.executeQuery();
 
             pricesRP.clear();
+            pricesNC.clear();
             rankNames.clear();
             discounts.clear();
 
@@ -115,12 +117,14 @@ public class RankPriceDatabase {
                 String productId = rs.getString("id").toLowerCase(); // e.g. "rank-vip"
                 String name = rs.getString("name");
                 double price = rs.getDouble("price");
+                double priceNCValue = rs.getDouble("price_virtual");
                 int discount = rs.getInt("discount");
 
                 // Extract rank ID from product ID (e.g., "rank-vip" -> "vip")
                 String rankId = productId.replace("rank-", "").replace("-plus", "");
 
                 pricesRP.put(rankId, price);
+                pricesNC.put(rankId, priceNCValue);
                 rankNames.put(rankId, name);
                 discounts.put(rankId, discount);
             }
@@ -136,6 +140,7 @@ public class RankPriceDatabase {
 
     private void setFallbackPrices() {
         pricesRP.clear();
+        pricesNC.clear();
         rankNames.clear();
         discounts.clear();
 
@@ -144,6 +149,12 @@ public class RankPriceDatabase {
         pricesRP.put("vip", 25000.0);
         pricesRP.put("mvp", 50000.0);
         pricesRP.put("nature", 100000.0);
+
+        // Fallback prices (NC) - estimated
+        pricesNC.put("midi", 50.0);
+        pricesNC.put("vip", 100.0);
+        pricesNC.put("mvp", 250.0);
+        pricesNC.put("nature", 500.0);
 
         rankNames.put("midi", "MIDI RANK");
         rankNames.put("vip", "VIP RANK");
@@ -160,11 +171,27 @@ public class RankPriceDatabase {
         return pricesRP.getOrDefault(rankId.toLowerCase(), 0.0);
     }
 
+    public double getPriceNC(String rankId) {
+        return pricesNC.getOrDefault(rankId.toLowerCase(), 0.0);
+    }
+
     /**
-     * Get discounted price if discount is available.
+     * Get discounted price (RP) if discount is available.
      */
     public double getDiscountedPriceRP(String rankId) {
         double price = getPriceRP(rankId);
+        int discount = discounts.getOrDefault(rankId.toLowerCase(), 0);
+        if (discount > 0) {
+            return price * (100 - discount) / 100.0;
+        }
+        return price;
+    }
+
+    /**
+     * Get discounted price (NC) if discount is available.
+     */
+    public double getDiscountedPriceNC(String rankId) {
+        double price = getPriceNC(rankId);
         int discount = discounts.getOrDefault(rankId.toLowerCase(), 0);
         if (discount > 0) {
             return price * (100 - discount) / 100.0;
