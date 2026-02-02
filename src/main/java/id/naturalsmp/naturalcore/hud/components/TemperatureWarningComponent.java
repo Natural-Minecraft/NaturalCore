@@ -7,16 +7,16 @@ import org.bukkit.entity.Player;
 
 /**
  * Displays a slow-blinking warning when temperature is dangerous.
- * Critical priority to warn players of imminent danger.
+ * Premium styling with gradient effects and clear danger indicators.
  */
 public class TemperatureWarningComponent extends AbstractHUDComponent {
 
-    private static final double COLD_THRESHOLD = 0.0; // Below 0°C
-    private static final double HOT_THRESHOLD = 45.0; // Above 45°C
+    private static final double COLD_THRESHOLD = 0.0; // Below 0°C = freezing
+    private static final double HOT_THRESHOLD = 45.0; // Above 45°C = overheating
 
-    // Slow blink: 1 second ON, 0.5 second OFF (30 ticks total cycle)
-    private static final int BLINK_ON_DURATION = 20; // 1 second
-    private static final int BLINK_CYCLE = 30; // 1.5 second cycle
+    // Slow blink: 1.5s ON, 0.5s OFF (40 ticks total cycle)
+    private static final int BLINK_ON_DURATION = 30; // 1.5 seconds
+    private static final int BLINK_CYCLE = 40; // 2 second cycle
 
     public TemperatureWarningComponent(NaturalCore plugin) {
         super(plugin, "temp_warning", HUDPriority.CRITICAL);
@@ -39,21 +39,39 @@ public class TemperatureWarningComponent extends AbstractHUDComponent {
         // Slow blink effect
         int blinkPhase = tick % BLINK_CYCLE;
         if (blinkPhase >= BLINK_ON_DURATION) {
-            return null; // Hidden phase of blink
+            // During OFF phase, show dimmed version instead of nothing
+            return getDimmedWarning(temp);
         }
 
-        // Determine warning type
+        // Full warning during ON phase
+        return getFullWarning(temp, tick);
+    }
+
+    private String getFullWarning(double temp, int tick) {
         if (temp < COLD_THRESHOLD) {
-            return ChatUtils
-                    .colorize("&b⚠ &3&lTEMPERATURE DANGEROUS! &b⚠ &7(Freezing: " + String.format("%.1f", temp) + "°C)");
+            // Freezing - ice blue gradient
+            String icon = (tick % 20 < 10) ? "❄" : "🥶";
+            return ChatUtils.colorize("<gradient:#00BFFF:#87CEEB>" + icon + " FREEZING! " + icon + "</gradient> &8» &b"
+                    + String.format("%.1f", temp) + "°C");
         } else {
-            return ChatUtils.colorize(
-                    "&c⚠ &4&lTEMPERATURE DANGEROUS! &c⚠ &7(Overheating: " + String.format("%.1f", temp) + "°C)");
+            // Overheating - fire gradient
+            String icon = (tick % 20 < 10) ? "🔥" : "🥵";
+            return ChatUtils.colorize("<gradient:#FF4500:#FF6347>" + icon + " OVERHEATING! " + icon
+                    + "</gradient> &8» &c" + String.format("%.1f", temp) + "°C");
+        }
+    }
+
+    private String getDimmedWarning(double temp) {
+        // Dimmed version for blink OFF phase - keeps context visible
+        if (temp < COLD_THRESHOLD) {
+            return ChatUtils.colorize("&8❄ &7FREEZING... &8" + String.format("%.1f", temp) + "°C");
+        } else {
+            return ChatUtils.colorize("&8🔥 &7OVERHEATING... &8" + String.format("%.1f", temp) + "°C");
         }
     }
 
     @Override
     public boolean supportsTransition() {
-        return false; // Blink effect handles its own transitions
+        return false; // Blink effect handles its own visual updates
     }
 }

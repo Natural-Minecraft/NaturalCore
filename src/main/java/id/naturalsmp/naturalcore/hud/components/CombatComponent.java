@@ -13,7 +13,7 @@ import java.util.UUID;
 
 /**
  * Displays combat information when a player is fighting.
- * Shows target name and health bar.
+ * Premium visuals with gradient health bar and pulse effects.
  */
 public class CombatComponent extends AbstractHUDComponent {
 
@@ -43,9 +43,24 @@ public class CombatComponent extends AbstractHUDComponent {
         double hp = info.entity.getHealth();
         double max = info.entity.getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue();
         int percent = (int) ((hp / max) * 100);
-        String hearts = buildHealthBar(hp, max);
 
-        return ChatUtils.colorize("&8⚔ &f" + info.entity.getName() + " " + hearts + " &7" + percent + "%");
+        // Build premium health bar with gradient
+        String healthBar = buildPremiumHealthBar(hp, max, percent, tick);
+
+        // Entity name with combat icon
+        String entityName = info.entity.getName();
+
+        // Pulse effect when target is critical (< 20% HP)
+        String border;
+        if (percent < 20) {
+            // Slow pulse for critical
+            border = (tick % 20 < 10) ? "&c⚔" : "&4⚔";
+        } else {
+            border = "&7⚔";
+        }
+
+        return ChatUtils.colorize(
+                border + " &f" + entityName + " " + healthBar + " " + getPercentColor(percent) + percent + "%");
     }
 
     /**
@@ -65,17 +80,42 @@ public class CombatComponent extends AbstractHUDComponent {
         return (info.entity.getHealth() / info.entity.getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue()) < 0.2;
     }
 
-    private String buildHealthBar(double hp, double max) {
-        StringBuilder sb = new StringBuilder("&c");
+    private String buildPremiumHealthBar(double hp, double max, int percent, int tick) {
+        StringBuilder sb = new StringBuilder("&8[");
         int total = 10;
         int filled = (int) Math.round((hp / max) * total);
+
+        // Gradient based on HP percentage
+        String fillColor = getHealthColor(percent);
+
         for (int i = 0; i < total; i++) {
-            if (i < filled)
-                sb.append("❤");
-            else
-                sb.append("&8❤");
+            if (i < filled) {
+                sb.append(fillColor).append("█");
+            } else {
+                sb.append("&8░");
+            }
         }
+
+        sb.append("&8]");
         return sb.toString();
+    }
+
+    private String getHealthColor(int percent) {
+        if (percent > 70)
+            return "&a"; // Green - healthy
+        if (percent > 40)
+            return "&e"; // Yellow - damaged
+        if (percent > 20)
+            return "&6"; // Orange - low
+        return "&c"; // Red - critical
+    }
+
+    private String getPercentColor(int percent) {
+        if (percent > 50)
+            return "&a";
+        if (percent > 25)
+            return "&e";
+        return "&c";
     }
 
     private record CombatInfo(LivingEntity entity, long lastHit) {

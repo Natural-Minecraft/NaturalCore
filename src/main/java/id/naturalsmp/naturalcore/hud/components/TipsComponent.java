@@ -104,6 +104,8 @@ public class TipsComponent extends AbstractHUDComponent {
     public String getContent(Player player, int tick) {
         if (currentTip == null)
             return null;
-        return ChatUtils.colorize("&e💡 TIPS: &f" + currentTip);
+
+        // Premium tip styling with gradient icon
+        return ChatUtils.colorize("<gradient:#FFD700:#FFA500>💡 TIPS</gradient> &8» &f" + currentTip);
     }
 }

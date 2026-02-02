@@ -11,7 +11,7 @@ import org.bukkit.entity.Player;
 
 /**
  * Displays the default HUD: Season icon, Temperature, and Mana.
- * Always shows as the baseline when nothing else is active.
+ * Premium visual design with gradients and icons.
  */
 public class SeasonComponent extends AbstractHUDComponent {
 
@@ -29,25 +29,85 @@ public class SeasonComponent extends AbstractHUDComponent {
         Season currentSeason = plugin.getSeasonManager().getCurrentSeason();
         Double temp = plugin.getSeasonManager().getPlayerTemperature(player);
 
+        // Get season-specific gradient colors
+        String seasonGradient = getSeasonGradient(currentSeason);
+        String seasonName = getSeasonDisplayName(currentSeason);
+        String tempDisplay = formatTemperature(temp);
+
+        // Get mana from PlaceholderAPI
+        String manaDisplay = getManaDisplay(player);
+
+        // Premium format: Season | Temp | Mana with elegant separators
+        return seasonGradient + seasonName + " &8║ " + tempDisplay + " &8║ " + manaDisplay;
+    }
+
+    private String getSeasonGradient(Season season) {
+        return switch (season) {
+            case SPRING -> "<gradient:#77DD77:#98FB98>"; // Soft green
+            case SUMMER -> "<gradient:#FFD700:#FFA500>"; // Golden orange
+            case AUTUMN -> "<gradient:#D2691E:#8B4513>"; // Brown orange
+            case WINTER -> "<gradient:#87CEEB:#4169E1>"; // Ice blue
+        };
+    }
+
+    private String getSeasonDisplayName(Season season) {
+        String icon = switch (season) {
+            case SPRING -> "🌸";
+            case SUMMER -> "☀";
+            case AUTUMN -> "🍂";
+            case WINTER -> "❄";
+        };
+
         FileConfiguration config = ConfigUtils.getSeasonConfig();
-        String format = config.getString("action-bar.format");
-        if (format == null) {
-            format = "%icon% %name% &8│ &7🌡 %temp%°C &8│ &b✦ %mana%/%max_mana%";
-        }
+        String name = config.getString("seasons." + season.name() + ".display-name", season.name());
+        return icon + " " + name + "</gradient>";
+    }
 
-        String msg = format
-                .replace("%icon%", currentSeason.getIcon())
-                .replace("%name%",
-                        config.getString("seasons." + currentSeason.name() + ".display-name", currentSeason.name()))
-                .replace("%temp%", String.format("%.1f", temp));
+    private String formatTemperature(Double temp) {
+        if (temp == null)
+            temp = 20.0;
 
-        // PlaceholderAPI for mana
-        if (Bukkit.getPluginManager().isPluginEnabled("PlaceholderAPI")) {
-            msg = PlaceholderAPI.setPlaceholders(player, msg);
+        // Color based on temperature
+        String color;
+        String icon;
+        if (temp < 0) {
+            color = "&b"; // Cyan for freezing
+            icon = "🥶";
+        } else if (temp < 10) {
+            color = "&3"; // Dark cyan for cold
+            icon = "❄";
+        } else if (temp < 25) {
+            color = "&a"; // Green for comfortable
+            icon = "🌡";
+        } else if (temp < 35) {
+            color = "&e"; // Yellow for warm
+            icon = "🌡";
+        } else if (temp < 45) {
+            color = "&6"; // Gold for hot
+            icon = "🔥";
         } else {
-            msg = msg.replace("%mana%", "N/A").replace("%max_mana%", "N/A");
+            color = "&c"; // Red for dangerous
+            icon = "🥵";
         }
 
-        return msg;
+        return color + icon + " " + String.format("%.1f", temp) + "°C";
+    }
+
+    private String getManaDisplay(Player player) {
+        String mana = "N/A";
+        String maxMana = "N/A";
+
+        if (Bukkit.getPluginManager().isPluginEnabled("PlaceholderAPI")) {
+            mana = PlaceholderAPI.setPlaceholders(player, "%mana%");
+            maxMana = PlaceholderAPI.setPlaceholders(player, "%max_mana%");
+
+            // Fallback if PAPI doesn't have mana placeholders
+            if (mana.contains("%mana%")) {
+                mana = "100";
+                maxMana = "100";
+            }
+        }
+
+        return "&b✦ &f" + mana + "&7/&f" + maxMana;
     }
 }
