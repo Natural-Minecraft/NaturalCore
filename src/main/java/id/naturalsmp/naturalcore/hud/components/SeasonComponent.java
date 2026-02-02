@@ -105,12 +105,12 @@ public class SeasonComponent extends AbstractHUDComponent {
         if (Bukkit.getPluginManager().isPluginEnabled("PlaceholderAPI")) {
             // Using AuraSkills placeholders specifically
             mana = PlaceholderAPI.setPlaceholders(player, "%auraskills_mana_int%");
-            maxMana = PlaceholderAPI.setPlaceholders(player, "%auraskills_max_mana_int%");
+            maxMana = PlaceholderAPI.setPlaceholders(player, "%auraskills_mana_max_int%");
 
             // Clean up if placeholders didn't resolve or returned empty
             if (mana == null || mana.isEmpty() || mana.equals("%auraskills_mana_int%"))
                 mana = "0";
-            if (maxMana == null || maxMana.isEmpty() || maxMana.equals("%auraskills_max_mana_int%"))
+            if (maxMana == null || maxMana.isEmpty() || maxMana.equals("%auraskills_mana_max_int%"))
                 maxMana = "0";
 
             // Calculate mana percentage for dynamic colors
