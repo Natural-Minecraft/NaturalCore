@@ -65,7 +65,7 @@ public class SeasonComponent extends AbstractHUDComponent {
         // Strip existing legacy colors to ensure the premium gradient applies cleanly
         String cleanName = ChatColor.stripColor(ChatColor.translateAlternateColorCodes('&', name));
 
-        return icon + " " + cleanName + "</gradient>";
+        return icon + " <b>" + cleanName + "</b></gradient>";
     }
 
     private String formatTemperature(Double temp) {

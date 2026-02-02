@@ -4,7 +4,7 @@ main: id.naturalsmp.naturalcore.NaturalCore
 api-version: 1.21
 author: NaturalSMP
 description: Core plugin untuk NaturalSMP Server
-depend: [Vault, DecentHolograms]
+depend: [Vault]
 softdepend: [PlaceholderAPI, CoinsEngine, AuraSkills]
 
 # ==========================================

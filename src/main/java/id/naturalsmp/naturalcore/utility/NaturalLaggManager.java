@@ -1,7 +1,5 @@
 package id.naturalsmp.naturalcore.utility;
 
-import eu.decentsoftware.holograms.api.DHAPI;
-import eu.decentsoftware.holograms.api.holograms.Hologram;
 import id.naturalsmp.naturalcore.NaturalCore;
 import id.naturalsmp.naturalcore.utils.ChatUtils;
 import id.naturalsmp.naturalcore.utils.ConfigUtils;
@@ -368,24 +366,12 @@ public class NaturalLaggManager implements Listener {
                             nearby.add(other);
                         }
                     }
-                    if (nearby.size() >= 4) {
+                    if (!nearby.isEmpty()) {
                         int total = nearby.size() + 1;
                         for (LivingEntity le : nearby)
                             le.remove();
                         base.setCustomName(ChatUtils.colorize("&e&l" + base.getName() + " &7x" + total));
                         base.setCustomNameVisible(true);
-                        if (Bukkit.getPluginManager().isPluginEnabled("DecentHolograms")) {
-                            String holoName = "merged_" + base.getUniqueId();
-                            Hologram holo = DHAPI.getHologram(holoName);
-                            if (holo == null) {
-                                holo = DHAPI.createHologram(holoName, base.getLocation().add(0, 2.2, 0), true);
-                                DHAPI.setHologramLines(holo, Arrays.asList("&#FFEE00❂ &#FFEE00&lSTACKED MOB &#FFEE00❂",
-                                        "&7Quantity: &f" + total));
-                            } else {
-                                DHAPI.moveHologram(holo, base.getLocation().add(0, 2.2, 0));
-                                DHAPI.setHologramLine(holo, 1, "&7Quantity: &f" + total);
-                            }
-                        }
                     }
                 }
             }
@@ -454,12 +440,6 @@ public class NaturalLaggManager implements Listener {
 
     @EventHandler
     public void onMobDie(EntityDeathEvent e) {
-        if (Bukkit.getPluginManager().isPluginEnabled("DecentHolograms")) {
-            String holoName = "merged_" + e.getEntity().getUniqueId();
-            if (DHAPI.getHologram(holoName) != null) {
-                DHAPI.removeHologram(holoName);
-            }
-        }
     }
 
     public LaggState getState() {
