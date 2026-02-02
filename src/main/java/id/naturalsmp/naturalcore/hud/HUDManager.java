@@ -57,18 +57,18 @@ public class HUDManager implements Listener {
         }
     }
 
-    private String lastDisplayedHUD = "";
-    private String targetHUD = "";
-    private float overlapProgress = 0f;
+    private String lastTargetHUD = "";
+    private String displayedHUD = "";
+    private int transitionFrame = 0;
+    private static final int TRANSITION_TIME = 15; // 1.5 seconds at 0.1s interval
 
     private void updateHUD(Player player) {
-        // 1. Get Base HUD (Season + Mana + Tips)
+        // 1. Fetch all possible components
         String baseHUD = plugin.getSeasonManager().getTemperatureActionBar(player);
-
-        // 2. ClearLagg Override (High Priority)
+        String tipsHUD = plugin.getSeasonManager().getTipsManager().getDisplay(baseHUD);
         String laggHUD = plugin.getLaggManager().getDisplay(baseHUD);
 
-        // 3. Combat Info Priority
+        // 2. Combat Info
         String combatHUD = null;
         CombatInfo ci = combatTracker.get(player.getUniqueId());
         if (ci != null && System.currentTimeMillis() - ci.lastHit < 4000) {
@@ -82,21 +82,39 @@ public class HUDManager implements Listener {
             }
         }
 
-        // --- TRANSITION LOGIC ---
-        String currentTarget = (laggHUD != null) ? laggHUD : (combatHUD != null ? combatHUD : baseHUD);
+        // 3. Determine actual Target based on Priority
+        String target;
+        if (laggHUD != null)
+            target = laggHUD;
+        else if (combatHUD != null)
+            target = combatHUD;
+        else if (tipsHUD != null)
+            target = tipsHUD;
+        else
+            target = (baseHUD != null) ? baseHUD : "";
 
-        if (!currentTarget.equals(targetHUD)) {
-            targetHUD = currentTarget;
-            overlapProgress = 0f; // Reset transition
+        // 4. Handle Transitions
+        if (!target.equals(lastTargetHUD)) {
+            if (displayedHUD.isEmpty()) {
+                displayedHUD = target;
+            } else {
+                // Trigger Scroll Transition
+                transitionFrame = 1;
+            }
+            lastTargetHUD = target;
         }
 
         String finalMessage;
-        if (overlapProgress < 1.0f) {
-            overlapProgress += 0.1f; // Transition lasts ~10 ticks (0.5s)
-            finalMessage = lerpHUD(lastDisplayedHUD, targetHUD, overlapProgress);
+        if (transitionFrame > 0 && transitionFrame <= TRANSITION_TIME) {
+            finalMessage = performScroll(displayedHUD, target, transitionFrame);
+            transitionFrame++;
+            if (transitionFrame > TRANSITION_TIME) {
+                displayedHUD = target;
+                transitionFrame = 0;
+            }
         } else {
-            finalMessage = targetHUD;
-            lastDisplayedHUD = targetHUD;
+            finalMessage = target;
+            displayedHUD = target;
         }
 
         if (finalMessage != null && !finalMessage.isEmpty()) {
@@ -104,18 +122,28 @@ public class HUDManager implements Listener {
         }
     }
 
-    private String lerpHUD(String oldH, String newH, float progress) {
-        if (oldH == null || oldH.isEmpty())
-            return newH;
-        if (progress > 0.8f)
-            return newH;
-        if (progress < 0.2f)
-            return oldH;
+    /**
+     * Scroll Animation: Pushes 'oldH' out to the left, bringing 'newH' in from the
+     * right.
+     */
+    private String performScroll(String oldH, String newH, int frame) {
+        float progress = (float) frame / TRANSITION_TIME;
 
-        // Simple "Glitch" or "Wipe" transition effect
-        int split = (int) (newH.length() * progress);
-        return ChatUtils.colorAwareSubstring(newH, 0, split)
-                + ChatUtils.colorAwareSubstring(oldH, split, oldH.length());
+        // Width of the display "window" (approximate char count)
+        int windowWidth = Math.max(ChatUtils.getVisualLength(oldH), ChatUtils.getVisualLength(newH));
+        if (windowWidth < 20)
+            windowWidth = 20;
+
+        // Combined string with a spacer
+        String spacer = "        "; // Approx spaces
+        String combined = oldH + spacer + newH;
+
+        // Calculate split point based on visual length
+        int totalVisual = ChatUtils.getVisualLength(combined);
+        int scrollPos = (int) (progress * (ChatUtils.getVisualLength(oldH) + ChatUtils.getVisualLength(spacer)));
+
+        // We use visual length for calculating the window
+        return ChatUtils.colorAwareSubstring(combined, scrollPos, combined.length());
     }
 
     private String getHearts(double hp, double max) {

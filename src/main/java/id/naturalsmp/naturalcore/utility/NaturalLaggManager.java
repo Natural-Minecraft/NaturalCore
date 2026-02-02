@@ -239,7 +239,7 @@ public class NaturalLaggManager implements Listener {
             }
             case SUCCESS_STATIC -> {
                 successStayTicks += 2;
-                if (successStayTicks >= 60) {
+                if (successStayTicks >= 100) { // 5 seconds
                     state = LaggState.SLIDING_OUT;
                     animationFrame = 0;
                 }
@@ -305,21 +305,13 @@ public class NaturalLaggManager implements Listener {
         }
 
         if (state == LaggState.SUCCESS_SLIDING_IN || state == LaggState.SUCCESS_STATIC
-                || (state == LaggState.SLIDING_OUT && cleanedCount > 0)) {
-            String msg = ConfigUtils.getString("messages.system.lagg.cleanup-complete",
-                    "&#55FF55&l✔ CLEANUP COMPLETE &7(Removed %count% items)");
-            return ChatUtils.colorize(msg.replace("%count%", String.valueOf(cleanedCount)));
+                || state == LaggState.SLIDING_OUT) {
+            return ChatUtils.colorize("messages.system.lagg.cleanup-complete",
+                    "&#55FF55&l✔ CLEANUP COMPLETE &7(Removed " + cleanedCount + " items)");
         }
 
         // Default: Countdown Content
-        String arrows = "⚑⚑⚑⚑⚑";
-        int offset = (animationFrame / 2) % arrows.length();
-        String scroll = arrows.substring(offset) + arrows.substring(0, offset);
-        String msg = ConfigUtils.getString("messages.system.lagg.action-bar.countdown",
-                "&#FF5555&l%scroll% &fPEMBERSIHAN DALAM &#FF5555&l%time%s &f%scroll%");
-
-        return ChatUtils
-                .colorize(msg.replace("%scroll%", scroll).replace("%time%", String.valueOf(autoRemovalCountdown)));
+        return ChatUtils.colorize("&fClearing Items in &c" + autoRemovalCountdown + "s");
     }
 
     private void performClean() {
