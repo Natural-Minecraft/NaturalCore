@@ -8,16 +8,17 @@ import id.naturalsmp.naturalcore.utils.ChatUtils;
  */
 public class ActionBarAnimator {
 
-    // ActionBar approximate width in characters
-    private static final int ACTIONBAR_WIDTH = 60;
+    // Action Bar constrained to Hotbar width (approx 40-50 chars)
+    private static final int ACTIONBAR_WIDTH = 45;
 
     /**
-     * Scroll transition: Old text slides LEFT, new text enters from RIGHT.
-     * Creates a clear horizontal scrolling effect with visible gap.
+     * Scroll transition: Slide effect using a fixed window tape.
+     * Keeps the visible width constant to prevent Minecraft from jittering the
+     * center point.
      * 
-     * @param oldText  The current text being displayed
-     * @param newText  The new text to transition to
-     * @param progress Animation progress (0.0 to 1.0)
+     * @param lastText    The current text being displayed
+     * @param currentText The new text to transition to
+     * @param progress    Animation progress (0.0 to 1.0)
      * @return The interpolated text for this frame
      */
     public static String scrollTransition(String lastText, String currentText, float progress) {
@@ -26,53 +27,48 @@ public class ActionBarAnimator {
         if (progress <= 0.0f)
             return lastText;
 
-        // Colorize both to handle MiniMessage tags before slicing
-        String oldText = ChatUtils.colorize(lastText != null ? lastText : "");
-        String newText = ChatUtils.colorize(currentText != null ? currentText : "");
+        // 1. Prepare Content
+        String oldT = ChatUtils.colorize(lastText != null ? lastText : "");
+        String newT = ChatUtils.colorize(currentText != null ? currentText : "");
+        String gap = ChatUtils.colorize("   &8♦   "); // Visual separator
 
-        float eased = easeOutCubic(progress);
+        // 2. Build the Tape
+        // [PADDING] [OLD] [GAP] [NEW] [PADDING]
+        String padding = " ".repeat(ACTIONBAR_WIDTH);
+        String tape = padding + oldT + gap + newT + padding;
 
-        int oldLen = ChatUtils.getVisualLength(oldText);
-        int newLen = ChatUtils.getVisualLength(newText);
-        String gap = "     &8⋄     ";
-        int gapLen = 11;
+        // 3. Calculate Measurements
+        int oldLen = ChatUtils.getVisualLength(oldT);
+        int newLen = ChatUtils.getVisualLength(newT);
+        int gapLen = ChatUtils.getVisualLength(gap);
+        int paddingLen = ACTIONBAR_WIDTH;
 
-        // Timeline: [OldText] [Gap] [NewText]
-        String timeline = oldText + ChatUtils.colorize(gap) + newText;
+        // 4. Determine Start and End Offsets (To center the text)
+        // We want to slice a window of size ACTIONBAR_WIDTH.
+        // To center text of length L, we need (WIDTH - L) / 2 padding on the left.
 
-        // Visual Window Behavior:
-        // We want the newText to stop at the center (ACTIONBAR_WIDTH / 2)
-        int targetCenter = ACTIONBAR_WIDTH / 2;
-        int newTextCenter = oldLen + gapLen + (newLen / 2);
+        // Start: Center OldText
+        // The OldText starts at index 'paddingLen'.
+        // We want (WIDTH - oldLen)/2 spaces before it.
+        // So we start slicing at: paddingLen - (WIDTH - oldLen)/2
+        int startOffset = paddingLen - (ACTIONBAR_WIDTH - oldLen) / 2;
 
-        // The offset needed to bring newTextCenter to targetCenter
-        int maxOffset = newTextCenter - targetCenter;
-        if (maxOffset < 0)
-            maxOffset = 0;
+        // End: Center NewText
+        // The NewText starts at index: paddingLen + oldLen + gapLen
+        // We want (WIDTH - newLen)/2 spaces before it.
+        // So we target slice start at: (paddingLen + oldLen + gapLen) - (WIDTH -
+        // newLen)/2
+        int endOffset = (paddingLen + oldLen + gapLen) - (ACTIONBAR_WIDTH - newLen) / 2;
 
-        // Total possible scroll (legacy behavior: scroll everything off)
-        int totalScrollDistance = oldLen + gapLen + newLen;
+        // 5. Interpolate
+        float eased = smoothStep(progress);
+        int currentOffset = (int) (startOffset + (endOffset - startOffset) * eased);
 
-        // current scroll based on progress
-        int scrollOffset = (int) (eased * totalScrollDistance);
+        // 6. Slice the Tape
+        // We use Math.max/min to ensure we stay within bounds (just in case)
+        currentOffset = Math.max(0, Math.min(tape.length() - ACTIONBAR_WIDTH, currentOffset));
 
-        // Stop the scroll when newText is centered
-        int windowStart = Math.min(scrollOffset, maxOffset);
-
-        String visiblePortion = ChatUtils.colorAwareSubstring(timeline, windowStart, timeline.length());
-
-        // Pad to maintain visual stability
-        int visibleLen = ChatUtils.getVisualLength(visiblePortion);
-        if (visibleLen < ACTIONBAR_WIDTH && progress < 0.9f) {
-            int paddingNeeded = Math.min(ACTIONBAR_WIDTH - visibleLen, 20);
-            StringBuilder padded = new StringBuilder(visiblePortion);
-            for (int i = 0; i < paddingNeeded; i++) {
-                padded.append(" ");
-            }
-            return padded.toString();
-        }
-
-        return visiblePortion;
+        return ChatUtils.colorAwareSubstring(tape, currentOffset, currentOffset + ACTIONBAR_WIDTH);
     }
 
     /**
