@@ -3,8 +3,10 @@ package id.naturalsmp.naturalcore.hud.components;
 import id.naturalsmp.naturalcore.NaturalCore;
 import id.naturalsmp.naturalcore.hud.HUDPriority;
 import id.naturalsmp.naturalcore.season.Season;
+import id.naturalsmp.naturalcore.utils.ChatUtils;
 import id.naturalsmp.naturalcore.utils.ConfigUtils;
 import me.clip.placeholderapi.PlaceholderAPI;
+import net.md_5.bungee.api.ChatColor;
 import org.bukkit.Bukkit;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
@@ -60,7 +62,11 @@ public class SeasonComponent extends AbstractHUDComponent {
 
         FileConfiguration config = ConfigUtils.getSeasonConfig();
         String name = config.getString("seasons." + season.name() + ".display-name", season.name());
-        return icon + " " + name + "</gradient>";
+
+        // Strip existing legacy colors to ensure the premium gradient applies cleanly
+        String cleanName = ChatColor.stripColor(ChatColor.translateAlternateColorCodes('&', name));
+
+        return icon + " " + cleanName + "</gradient>";
     }
 
     private String formatTemperature(Double temp) {
@@ -98,14 +104,15 @@ public class SeasonComponent extends AbstractHUDComponent {
         String maxMana = "N/A";
 
         if (Bukkit.getPluginManager().isPluginEnabled("PlaceholderAPI")) {
-            mana = PlaceholderAPI.setPlaceholders(player, "%mana%");
-            maxMana = PlaceholderAPI.setPlaceholders(player, "%max_mana%");
+            // Using AuraSkills placeholders specifically
+            mana = PlaceholderAPI.setPlaceholders(player, "%auraskills_mana%");
+            maxMana = PlaceholderAPI.setPlaceholders(player, "%auraskills_max_mana%");
 
-            // Fallback if PAPI doesn't have mana placeholders
-            if (mana.contains("%mana%")) {
-                mana = "100";
-                maxMana = "100";
-            }
+            // Clean up if placeholders didn't resolve or returned empty
+            if (mana == null || mana.isEmpty() || mana.equals("%auraskills_mana%"))
+                mana = "0";
+            if (maxMana == null || maxMana.isEmpty() || maxMana.equals("%auraskills_max_mana%"))
+                maxMana = "0";
         }
 
         return "&b✦ &f" + mana + "&7/&f" + maxMana;
