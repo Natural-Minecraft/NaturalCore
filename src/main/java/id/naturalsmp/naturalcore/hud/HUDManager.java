@@ -45,7 +45,6 @@ public class HUDManager implements Listener {
         components.add(new TemperatureWarningComponent(plugin));
         components.add(new LaggComponent(plugin));
         components.add(new CombatComponent(plugin));
-        components.add(new HomeReminderComponent(plugin));
         components.add(new BiomeInfoComponent(plugin));
         components.add(new TipsComponent(plugin));
         components.add(new SeasonComponent(plugin));
