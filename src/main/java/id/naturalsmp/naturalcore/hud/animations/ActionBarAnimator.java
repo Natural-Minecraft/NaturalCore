@@ -20,50 +20,50 @@ public class ActionBarAnimator {
      * @param progress Animation progress (0.0 to 1.0)
      * @return The interpolated text for this frame
      */
-    public static String scrollTransition(String oldText, String newText, float progress) {
-        if (oldText == null || oldText.isEmpty())
-            return newText;
-        if (newText == null || newText.isEmpty())
-            return oldText;
+    public static String scrollTransition(String lastText, String currentText, float progress) {
         if (progress >= 1.0f)
-            return newText;
+            return currentText;
         if (progress <= 0.0f)
-            return oldText;
+            return lastText;
 
-        // Apply smooth easing
+        // Colorize both to handle MiniMessage tags before slicing
+        String oldText = ChatUtils.colorize(lastText != null ? lastText : "");
+        String newText = ChatUtils.colorize(currentText != null ? currentText : "");
+
         float eased = easeOutCubic(progress);
 
-        // Strip colors for accurate length calculation
         int oldLen = ChatUtils.getVisualLength(oldText);
         int newLen = ChatUtils.getVisualLength(newText);
+        String gap = "     &8⋄     ";
+        int gapLen = 11;
 
-        // Create visible gap with separator
-        String gap = "     &8⋄     "; // Visual separator with spacing
-        int gapLen = 11; // Approximate visual length
-
-        // Calculate total scroll distance
-        // Old text needs to scroll completely off screen to the left
-        // New text starts completely off screen to the right
-        int totalScrollDistance = oldLen + gapLen + newLen;
-
-        // Current scroll offset (how far we've scrolled from start)
-        int scrollOffset = (int) (eased * totalScrollDistance);
-
-        // Build the full scrolling timeline string
-        // [Old Text] [Gap] [New Text]
+        // Timeline: [OldText] [Gap] [NewText]
         String timeline = oldText + ChatUtils.colorize(gap) + newText;
 
-        // Calculate what portion of the timeline is visible in the "window"
-        // The "window" is the ActionBar display area
-        int windowStart = scrollOffset;
+        // Visual Window Behavior:
+        // We want the newText to stop at the center (ACTIONBAR_WIDTH / 2)
+        int targetCenter = ACTIONBAR_WIDTH / 2;
+        int newTextCenter = oldLen + gapLen + (newLen / 2);
 
-        // Extract visible portion
+        // The offset needed to bring newTextCenter to targetCenter
+        int maxOffset = newTextCenter - targetCenter;
+        if (maxOffset < 0)
+            maxOffset = 0;
+
+        // Total possible scroll (legacy behavior: scroll everything off)
+        int totalScrollDistance = oldLen + gapLen + newLen;
+
+        // current scroll based on progress
+        int scrollOffset = (int) (eased * totalScrollDistance);
+
+        // Stop the scroll when newText is centered
+        int windowStart = Math.min(scrollOffset, maxOffset);
+
         String visiblePortion = ChatUtils.colorAwareSubstring(timeline, windowStart, timeline.length());
 
-        // Pad with spaces if needed to maintain visual stability
+        // Pad to maintain visual stability
         int visibleLen = ChatUtils.getVisualLength(visiblePortion);
         if (visibleLen < ACTIONBAR_WIDTH && progress < 0.9f) {
-            // Add padding to the right for early frames
             int paddingNeeded = Math.min(ACTIONBAR_WIDTH - visibleLen, 20);
             StringBuilder padded = new StringBuilder(visiblePortion);
             for (int i = 0; i < paddingNeeded; i++) {

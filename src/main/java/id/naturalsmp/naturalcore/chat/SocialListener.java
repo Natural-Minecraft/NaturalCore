@@ -69,10 +69,17 @@ public class SocialListener implements Listener {
             for (Player online : Bukkit.getOnlinePlayers()) {
                 online.playSound(online.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, 1f, 0.5f);
             }
-        } else {
             // 4. Default Join
             String joinMsg = ConfigUtils.getString("messages.social.join-message");
             e.joinMessage(ChatUtils.toComponent(ChatUtils.formatMessage(p, joinMsg)));
+        }
+
+        // 5. MOTD (New)
+        List<String> motd = ConfigUtils.getStringList("messages.social.motd");
+        if (motd != null && !motd.isEmpty()) {
+            for (String line : motd) {
+                p.sendMessage(ChatUtils.toComponent(ChatUtils.formatMessage(p, line)));
+            }
         }
     }
 

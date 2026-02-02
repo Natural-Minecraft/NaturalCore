@@ -15,6 +15,12 @@ commands:
   nacore:
     description: Main command plugin
     permission: naturalsmp.admin
+  rankaddtemp:
+    description: Add temporary rank to player
+    permission: naturalsmp.admin
+  addtemp:
+    description: Add temporary rank to player (Alias)
+    permission: naturalsmp.admin
   kickall:
     description: Kick seluruh player
     permission: naturalcs.kickall

@@ -41,21 +41,8 @@ public class SeasonComponent extends AbstractHUDComponent {
         // Get direction compass
         String direction = getCompassDirection(player);
 
-        // Premium format: Season | Compass | Temp | Mana
-        return seasonGradient + seasonName + " &7| " + direction + " &7| " + tempDisplay + " &7| " + manaDisplay;
-    }
-
-    private String getCompassDirection(Player player) {
-        float yaw = player.getLocation().getYaw();
-        if (yaw < 0)
-            yaw += 360;
-        yaw %= 360;
-
-        String[] directions = { "&bN", "&7NE", "&fE", "&7SE", "&bS", "&7SW", "&fW", "&7NW" };
-        int index = (int) ((yaw + 22.5) / 45) % 8;
-
-        String dirStr = directions[index];
-        return "&8〈" + dirStr + "&8〉";
+        // Premium format: Season | Temp | Mana
+        return seasonGradient + seasonName + " &7| " + tempDisplay + " &7| " + manaDisplay;
     }
 
     private String getSeasonGradient(Season season) {
