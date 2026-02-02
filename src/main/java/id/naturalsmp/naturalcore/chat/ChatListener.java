@@ -272,7 +272,7 @@ public class ChatListener implements Listener {
                                                 .append(Component.text(rank).color(NamedTextColor.GOLD)))
                                 .append(Component.newline())
                                 .append(Component.text("Tier: ").color(NamedTextColor.GRAY)
-                                                .append(Component.text(tier).color(NamedTextColor.AQUA)));
+                                                .append(legacySection.deserialize(ChatUtils.colorize(tier))));
 
                 String prefix = "";
                 if (plugin.getVaultManager() != null && plugin.getVaultManager().getChat() != null) {
