@@ -69,6 +69,4 @@ public class TemperatureWarningComponent extends AbstractHUDComponent {
             return ChatUtils.colorize("&8🔥 &7OVERHEATING... &8" + String.format("%.1f", temp) + "°C");
         }
     }
-
-    }
 }
