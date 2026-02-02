@@ -140,6 +140,9 @@ public class PermissionManager {
                     group.data().add(InheritanceNode.builder(rank.inheritance).build());
                 }
 
+                // IMPORTANT: Add the rank permission itself node so hasPermission checks work
+                group.data().add(Node.builder("naturalsmp.rank." + rank.id).build());
+
                 lp.getGroupManager().saveGroup(group);
             });
         }
@@ -158,16 +161,13 @@ public class PermissionManager {
         return highest;
     }
 
-    public boolean isAtLeast(org.bukkit.entity.Player player, String rankId) {
-        RankConfig target = ranks.get(rankId);
-        if (target == null)
-            return false;
+    if(player.isOp()||player.hasPermission("naturalsmp.admin"))return true;
 
-        RankConfig current = getHighestRank(player);
-        if (current == null)
-            return false;
+    RankConfig target = ranks.get(rankId);if(target==null)return false;
 
-        return current.weight >= target.weight;
+    RankConfig current = getHighestRank(player);if(current==null)return false;
+
+    return current.weight>=target.weight;
     }
 
     public Map<String, RankConfig> getRanks() {

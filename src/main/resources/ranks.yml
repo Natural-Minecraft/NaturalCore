@@ -20,6 +20,7 @@ ranks:
         - "&8» &fBlock Claim Limit: &410.000 Blok"
         - "&8» &fClaim Limit: &45 Claim"
     permissions:
+    - naturalsmp.back
     - naturalsmp.help
     - naturalsmp.list
     - naturalsmp.info
