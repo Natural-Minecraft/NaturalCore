@@ -24,6 +24,6 @@ public class HomeReminderComponent extends AbstractHUDComponent {
 
     @Override
     public String getContent(Player player, int tick) {
-        return ChatUtils.colorize("&e⚠ Belum ada Home! &7Gunakan &f/sethome");
+        return ChatUtils.colorize("&e⚠ Belum ada Home! &7| &fGunakan /sethome");
     }
 }

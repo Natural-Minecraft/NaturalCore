@@ -51,16 +51,20 @@ public class CombatComponent extends AbstractHUDComponent {
         String entityName = info.entity.getName();
 
         // Pulse effect when target is critical (< 20% HP)
-        String border;
+        String prefix;
+        String contentColor = "&f";
         if (percent < 20) {
-            // Slow pulse for critical
-            border = (tick % 20 < 10) ? "&c⚔" : "&4⚔";
+            // Heartbeat pulse for critical
+            boolean blink = (tick % 10 < 5);
+            prefix = blink ? "&c❤" : "&4❤";
+            contentColor = blink ? "&c" : "&f";
         } else {
-            border = "&7⚔";
+            prefix = "&7⚔";
         }
 
         return ChatUtils.colorize(
-                border + " &f" + entityName + " " + healthBar + " " + getPercentColor(percent) + percent + "%");
+                prefix + " " + contentColor + entityName + " &7| " + healthBar + " &7| " + getPercentColor(percent)
+                        + percent + "%");
     }
 
     /**

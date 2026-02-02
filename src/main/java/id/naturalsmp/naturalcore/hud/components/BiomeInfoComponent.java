@@ -48,8 +48,42 @@ public class BiomeInfoComponent extends AbstractHUDComponent {
     public String getContent(Player player, int tick) {
         Biome biome = player.getLocation().getBlock().getBiome();
         String biomeName = formatBiomeName(biome.name());
+        String icon = getBiomeIcon(biome);
+        String gradient = getBiomeGradient(biome);
 
-        return ChatUtils.colorize("&f📍 &a" + biomeName);
+        return ChatUtils.colorize(icon + " " + gradient + biomeName + "</gradient>");
+    }
+
+    private String getBiomeIcon(Biome biome) {
+        String name = biome.name();
+        if (name.contains("NETHER"))
+            return "&c🔥";
+        if (name.contains("END"))
+            return "&d🔮";
+        if (name.contains("OCEAN") || name.contains("RIVER"))
+            return "&b🌊";
+        if (name.contains("FOREST"))
+            return "&a🌳";
+        if (name.contains("DESERT"))
+            return "&e🌵";
+        if (name.contains("ICE") || name.contains("SNOW"))
+            return "&f❄";
+        if (name.contains("DEEP_DARK"))
+            return "&3💀";
+        return "&f📍";
+    }
+
+    private String getBiomeGradient(Biome biome) {
+        String name = biome.name();
+        if (name.contains("NETHER"))
+            return "<gradient:#FF4500:#8B0000>"; // Fire
+        if (name.contains("END"))
+            return "<gradient:#DA70D6:#4B0082>"; // Void
+        if (name.contains("DEEP_DARK"))
+            return "<gradient:#008B8B:#000000>"; // Sculk
+        if (name.contains("OCEAN"))
+            return "<gradient:#00BFFF:#00008B>"; // Sea
+        return "<gradient:#FFFFFF:#A9A9A9>"; // Default Silver
     }
 
     private String formatBiomeName(String name) {

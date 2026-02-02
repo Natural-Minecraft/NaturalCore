@@ -38,8 +38,24 @@ public class SeasonComponent extends AbstractHUDComponent {
         // Get mana from PlaceholderAPI
         String manaDisplay = getManaDisplay(player);
 
-        // Premium format: Season | Temp | Mana with elegant separators
-        return seasonGradient + seasonName + " &7| " + tempDisplay + " &7| " + manaDisplay;
+        // Get direction compass
+        String direction = getCompassDirection(player);
+
+        // Premium format: Season | Compass | Temp | Mana
+        return seasonGradient + seasonName + " &7| " + direction + " &7| " + tempDisplay + " &7| " + manaDisplay;
+    }
+
+    private String getCompassDirection(Player player) {
+        float yaw = player.getLocation().getYaw();
+        if (yaw < 0)
+            yaw += 360;
+        yaw %= 360;
+
+        String[] directions = { "&bN", "&7NE", "&fE", "&7SE", "&bS", "&7SW", "&fW", "&7NW" };
+        int index = (int) ((yaw + 22.5) / 45) % 8;
+
+        String dirStr = directions[index];
+        return "&8〈" + dirStr + "&8〉";
     }
 
     private String getSeasonGradient(Season season) {
@@ -108,10 +124,30 @@ public class SeasonComponent extends AbstractHUDComponent {
             maxMana = PlaceholderAPI.setPlaceholders(player, "%auraskills_max_mana_int%");
 
             // Clean up if placeholders didn't resolve or returned empty
-            if (mana == null || mana.isEmpty() || mana.equals("%auraskills_mana%"))
+            if (mana == null || mana.isEmpty() || mana.equals("%auraskills_mana_int%"))
                 mana = "0";
-            if (maxMana == null || maxMana.isEmpty() || maxMana.equals("%auraskills_max_mana%"))
+            if (maxMana == null || maxMana.isEmpty() || maxMana.equals("%auraskills_max_mana_int%"))
                 maxMana = "0";
+
+            // Calculate mana percentage for dynamic colors
+            String manaColor = "&b"; // Default color
+            try {
+                int current = (int) Double.parseDouble(mana); // handle potential floats
+                int total = (int) Double.parseDouble(maxMana);
+                double ratio = total > 0 ? (double) current / total : 0;
+
+                if (ratio >= 0.8)
+                    manaColor = "&b"; // High/Full
+                else if (ratio >= 0.5)
+                    manaColor = "&3"; // Medium high
+                else if (ratio >= 0.25)
+                    manaColor = "&e"; // Low
+                else
+                    manaColor = "&c"; // Critical
+            } catch (Exception ignored) {
+            }
+
+            return manaColor + "✦ &f" + mana + "&7/&f" + maxMana;
         }
 
         return "&b✦ &f" + mana + "&7/&f" + maxMana;
