@@ -38,9 +38,6 @@ public class SeasonComponent extends AbstractHUDComponent {
         // Get mana from PlaceholderAPI
         String manaDisplay = getManaDisplay(player);
 
-        // Get direction compass
-        String direction = getCompassDirection(player);
-
         // Premium format: Season | Temp | Mana
         return seasonGradient + seasonName + " &7| " + tempDisplay + " &7| " + manaDisplay;
     }
