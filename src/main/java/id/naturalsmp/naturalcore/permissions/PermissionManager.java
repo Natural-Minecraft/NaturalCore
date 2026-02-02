@@ -161,13 +161,19 @@ public class PermissionManager {
         return highest;
     }
 
-    if(player.isOp()||player.hasPermission("naturalsmp.admin"))return true;
+    public boolean isAtLeast(org.bukkit.entity.Player player, String rankId) {
+        if (player.isOp() || player.hasPermission("naturalsmp.admin"))
+            return true;
 
-    RankConfig target = ranks.get(rankId);if(target==null)return false;
+        RankConfig target = ranks.get(rankId);
+        if (target == null)
+            return false;
 
-    RankConfig current = getHighestRank(player);if(current==null)return false;
+        RankConfig current = getHighestRank(player);
+        if (current == null)
+            return false;
 
-    return current.weight>=target.weight;
+        return current.weight >= target.weight;
     }
 
     public Map<String, RankConfig> getRanks() {
