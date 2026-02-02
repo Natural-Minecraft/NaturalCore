@@ -1,6 +1,8 @@
 package id.naturalsmp.naturalcore.hud;
 
 import id.naturalsmp.naturalcore.NaturalCore;
+import id.naturalsmp.naturalcore.hud.animations.ActionBarAnimator;
+import id.naturalsmp.naturalcore.hud.components.*;
 import id.naturalsmp.naturalcore.utils.ChatUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.LivingEntity;
@@ -10,27 +12,65 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 
+/**
+ * Central HUD Manager that orchestrates all HUD components.
+ * Uses a priority-based system to determine which component to display.
+ * Handles smooth transitions between components.
+ */
 public class HUDManager implements Listener {
 
     private final NaturalCore plugin;
-    private final Map<UUID, CombatInfo> combatTracker = new HashMap<>();
+    private final List<HUDComponent> components = new ArrayList<>();
+
+    // Animation state per player
+    private final Map<UUID, PlayerHUDState> playerStates = new HashMap<>();
+
+    // Global tick counter
+    private int globalTick = 0;
+
+    // Transition settings
+    private static final int TRANSITION_DURATION = 15; // ~0.75 seconds
 
     public HUDManager(NaturalCore plugin) {
         this.plugin = plugin;
+        registerComponents();
         Bukkit.getPluginManager().registerEvents(this, plugin);
         startTask();
     }
 
+    private void registerComponents() {
+        // Register components in priority order (will be sorted anyway)
+        components.add(new TemperatureWarningComponent(plugin));
+        components.add(new LaggComponent(plugin));
+        components.add(new CombatComponent(plugin));
+        components.add(new TipsComponent(plugin));
+        components.add(new SeasonComponent(plugin));
+
+        // Sort by priority (highest first)
+        components.sort((a, b) -> Integer.compare(b.getPriority().getValue(), a.getPriority().getValue()));
+    }
+
     public void reload() {
-        // No config to reload yet, but method required by NaturalCore
+        // Reload tips component
+        for (HUDComponent comp : components) {
+            if (comp instanceof TipsComponent tips) {
+                tips.reload();
+            }
+        }
     }
 
     private void startTask() {
         Bukkit.getScheduler().runTaskTimer(plugin, () -> {
+            globalTick++;
+
+            // Tick all components
+            for (HUDComponent comp : components) {
+                comp.tick(globalTick);
+            }
+
+            // Update each player
             for (Player player : Bukkit.getOnlinePlayers()) {
                 updateHUD(player);
             }
@@ -53,119 +93,115 @@ public class HUDManager implements Listener {
         }
 
         if (p != null && target != null) {
-            combatTracker.put(p.getUniqueId(), new CombatInfo(target, System.currentTimeMillis()));
+            getCombatComponent().trackCombat(p, target);
         }
     }
 
-    private String lastTargetHUD = "";
-    private String displayedHUD = "";
-    private int transitionFrame = 0;
-    private static final int TRANSITION_TIME = 15; // 1.5 seconds at 0.1s interval
-
     private void updateHUD(Player player) {
-        // 1. Fetch all possible components
-        String baseHUD = plugin.getSeasonManager().getTemperatureActionBar(player);
-        String tipsHUD = plugin.getSeasonManager().getTipsManager().getDisplay(baseHUD);
-        String laggHUD = plugin.getLaggManager().getDisplay(baseHUD);
+        // Get or create player state
+        PlayerHUDState state = playerStates.computeIfAbsent(
+                player.getUniqueId(),
+                k -> new PlayerHUDState());
 
-        // 2. Combat Info
-        String combatHUD = null;
-        CombatInfo ci = combatTracker.get(player.getUniqueId());
-        if (ci != null && System.currentTimeMillis() - ci.lastHit < 4000) {
-            if (ci.entity.isValid() && !ci.entity.isDead()) {
-                double hp = ci.entity.getHealth();
-                double max = ci.entity.getMaxHealth();
-                int percent = (int) ((hp / max) * 100);
-                String heartStr = getHearts(hp, max);
-                combatHUD = ChatUtils
-                        .colorize("&8[&f" + ci.entity.getName() + "&8] " + heartStr + " &7" + percent + "%");
+        // Find the highest priority component that wants to display
+        HUDComponent activeComponent = null;
+        String content = null;
+
+        for (HUDComponent comp : components) {
+            if (comp.shouldDisplay(player)) {
+                String c = comp.getContent(player, globalTick);
+                if (c != null && !c.isEmpty()) {
+                    activeComponent = comp;
+                    content = c;
+                    break;
+                }
             }
         }
 
-        // 3. Determine actual Target based on Priority
-        String target;
-        if (laggHUD != null)
-            target = laggHUD;
-        else if (combatHUD != null)
-            target = combatHUD;
-        else if (tipsHUD != null)
-            target = tipsHUD;
-        else
-            target = (baseHUD != null) ? baseHUD : "";
+        // Fallback to empty
+        if (content == null) {
+            content = "";
+        }
 
-        // 4. Handle Transitions
-        if (!target.equals(lastTargetHUD)) {
-            if (displayedHUD.isEmpty()) {
-                displayedHUD = target;
+        // Handle transitions
+        String finalMessage = handleTransition(state, content, activeComponent);
+
+        // Send to player
+        if (finalMessage != null && !finalMessage.isEmpty()) {
+            player.sendActionBar(ChatUtils.toComponent(ChatUtils.colorize(finalMessage)));
+        }
+    }
+
+    private String handleTransition(PlayerHUDState state, String newContent, HUDComponent newComponent) {
+        // Check if target changed
+        String componentId = (newComponent != null) ? newComponent.getId() : "none";
+
+        if (!componentId.equals(state.lastComponentId)) {
+            // Target changed, start transition
+            state.previousContent = state.displayedContent;
+            state.transitionFrame = 0;
+            state.lastComponentId = componentId;
+            state.transitioning = true;
+        }
+
+        // If transitioning
+        if (state.transitioning && state.transitionFrame < TRANSITION_DURATION) {
+            state.transitionFrame++;
+            float progress = (float) state.transitionFrame / TRANSITION_DURATION;
+
+            // Check if component supports transition
+            boolean useTransition = (newComponent == null || newComponent.supportsTransition());
+
+            if (useTransition && state.previousContent != null && !state.previousContent.isEmpty()) {
+                state.displayedContent = ActionBarAnimator.scrollTransition(
+                        state.previousContent,
+                        newContent,
+                        progress);
             } else {
-                // Trigger Scroll Transition
-                transitionFrame = 1;
+                state.displayedContent = newContent;
             }
-            lastTargetHUD = target;
-        }
 
-        String finalMessage;
-        if (transitionFrame > 0 && transitionFrame <= TRANSITION_TIME) {
-            finalMessage = performScroll(displayedHUD, target, transitionFrame);
-            transitionFrame++;
-            if (transitionFrame > TRANSITION_TIME) {
-                displayedHUD = target;
-                transitionFrame = 0;
+            if (state.transitionFrame >= TRANSITION_DURATION) {
+                state.transitioning = false;
+                state.displayedContent = newContent;
             }
         } else {
-            finalMessage = target;
-            displayedHUD = target;
+            state.displayedContent = newContent;
         }
 
-        if (finalMessage != null && !finalMessage.isEmpty()) {
-            player.sendActionBar(ChatUtils.toComponent(finalMessage));
-        }
+        return state.displayedContent;
     }
 
     /**
-     * Scroll Animation: Pushes 'oldH' out to the left, bringing 'newH' in from the
-     * right.
+     * Get the combat component for external combat tracking.
      */
-    private String performScroll(String oldH, String newH, int frame) {
-        float progress = (float) frame / TRANSITION_TIME;
-
-        // Width of the display "window" (approximate char count)
-        int windowWidth = Math.max(ChatUtils.getVisualLength(oldH), ChatUtils.getVisualLength(newH));
-        if (windowWidth < 20)
-            windowWidth = 20;
-
-        // Combined string with a spacer
-        String spacer = "        "; // Approx spaces
-        String combined = oldH + spacer + newH;
-
-        // Calculate split point based on visual length
-        int totalVisual = ChatUtils.getVisualLength(combined);
-        int scrollPos = (int) (progress * (ChatUtils.getVisualLength(oldH) + ChatUtils.getVisualLength(spacer)));
-
-        // We use visual length for calculating the window
-        return ChatUtils.colorAwareSubstring(combined, scrollPos, combined.length());
+    public CombatComponent getCombatComponent() {
+        for (HUDComponent comp : components) {
+            if (comp instanceof CombatComponent c)
+                return c;
+        }
+        return null;
     }
 
-    private String getHearts(double hp, double max) {
-        StringBuilder sb = new StringBuilder("&c");
-        int total = 10;
-        int filled = (int) Math.round((hp / max) * total);
-        for (int i = 0; i < total; i++) {
-            if (i < filled)
-                sb.append("❤");
-            else
-                sb.append("&8❤");
+    /**
+     * Get the tips component for reloading.
+     */
+    public TipsComponent getTipsComponent() {
+        for (HUDComponent comp : components) {
+            if (comp instanceof TipsComponent t)
+                return t;
         }
-        return sb.toString();
+        return null;
     }
 
-    private static class CombatInfo {
-        final LivingEntity entity;
-        final long lastHit;
-
-        CombatInfo(LivingEntity entity, long lastHit) {
-            this.entity = entity;
-            this.lastHit = lastHit;
-        }
+    /**
+     * Player-specific HUD state for transitions.
+     */
+    private static class PlayerHUDState {
+        String lastComponentId = "";
+        String displayedContent = "";
+        String previousContent = "";
+        int transitionFrame = 0;
+        boolean transitioning = false;
     }
 }

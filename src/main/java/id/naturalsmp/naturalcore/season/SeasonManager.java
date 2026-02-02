@@ -265,4 +265,12 @@ public class SeasonManager {
     public id.naturalsmp.naturalcore.utils.TipsManager getTipsManager() {
         return tipsManager;
     }
+
+    /**
+     * Get the cached temperature for a player.
+     * Used by HUD components.
+     */
+    public Double getPlayerTemperature(org.bukkit.entity.Player player) {
+        return playerTemps.getOrDefault(player.getUniqueId(), 20.0);
+    }
 }

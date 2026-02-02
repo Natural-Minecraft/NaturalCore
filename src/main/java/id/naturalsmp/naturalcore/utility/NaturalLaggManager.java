@@ -469,4 +469,8 @@ public class NaturalLaggManager implements Listener {
     public int getAutoRemovalCountdown() {
         return autoRemovalCountdown;
     }
+
+    public int getCleanedCount() {
+        return cleanedCount;
+    }
 }
