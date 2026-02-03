@@ -51,7 +51,7 @@ public class BiomeInfoComponent extends AbstractHUDComponent {
         String icon = getBiomeIcon(biome);
         String gradient = getBiomeGradient(biome);
 
-        return ChatUtils.colorize(icon + " " + gradient + biomeName + "</gradient>");
+        return icon + " " + gradient + biomeName + "</gradient>";
     }
 
     private String getBiomeIcon(Biome biome) {

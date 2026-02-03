@@ -22,7 +22,7 @@ import java.util.Random;
 public class TipsComponent extends AbstractHUDComponent {
 
     private List<String> tips;
-    private int interval = 300; // seconds
+    private int interval = 120; // seconds (2 minutes)
     private boolean soundEnabled = true;
     private String soundName = "BLOCK_NOTE_BLOCK_HAT";
 
@@ -105,8 +105,8 @@ public class TipsComponent extends AbstractHUDComponent {
         if (currentTip == null)
             return null;
 
-        // Premium tip styling with gradient icon
-        return ChatUtils.colorize("<gradient:#FFD700:#FFA500>💡 TIPS</gradient> &8» &f" + currentTip);
+        // Premium tip styling with gradient icon (Raw format)
+        return "<gradient:#FFD700:#FFA500>💡 TIPS</gradient> &8» &f" + currentTip;
     }
 
     @Override

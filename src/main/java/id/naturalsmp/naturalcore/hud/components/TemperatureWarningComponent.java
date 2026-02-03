@@ -51,22 +51,22 @@ public class TemperatureWarningComponent extends AbstractHUDComponent {
         if (temp < COLD_THRESHOLD) {
             // Freezing - ice blue gradient
             String icon = (tick % 20 < 10) ? "❄" : "🥶";
-            return ChatUtils.colorize("<gradient:#00BFFF:#87CEEB>" + icon + " FREEZING! " + icon + "</gradient> &8» &b"
-                    + String.format("%.1f", temp) + "°C");
+            return "<gradient:#00BFFF:#87CEEB>" + icon + " FREEZING! " + icon + "</gradient> &8» &b"
+                    + String.format("%.1f", temp) + "°C";
         } else {
             // Overheating - fire gradient
             String icon = (tick % 20 < 10) ? "🔥" : "🥵";
-            return ChatUtils.colorize("<gradient:#FF4500:#FF6347>" + icon + " OVERHEATING! " + icon
-                    + "</gradient> &8» &c" + String.format("%.1f", temp) + "°C");
+            return "<gradient:#FF4500:#FF6347>" + icon + " OVERHEATING! " + icon
+                    + "</gradient> &8» &c" + String.format("%.1f", temp) + "°C";
         }
     }
 
     private String getDimmedWarning(double temp) {
         // Dimmed version for blink OFF phase - keeps context visible
         if (temp < COLD_THRESHOLD) {
-            return ChatUtils.colorize("&8❄ &7FREEZING... &8" + String.format("%.1f", temp) + "°C");
+            return "&8❄ &7FREEZING... &8" + String.format("%.1f", temp) + "°C";
         } else {
-            return ChatUtils.colorize("&8🔥 &7OVERHEATING... &8" + String.format("%.1f", temp) + "°C");
+            return "&8🔥 &7OVERHEATING... &8" + String.format("%.1f", temp) + "°C";
         }
     }
 }

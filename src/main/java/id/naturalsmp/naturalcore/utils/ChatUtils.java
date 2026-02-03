@@ -33,8 +33,11 @@ public class ChatUtils {
         String result = message;
 
         // 1. Process MiniMessage tag if present
-        if (result.contains("<")) {
+        // Use a more robust check to avoid processing if it looks like raw brackets but
+        // not tags
+        if (result.contains("<") && (result.contains(">") || result.contains("gradient") || result.contains("color"))) {
             try {
+                // MiniMessage deserialize will preserve legacy § codes as Literal text
                 result = SECTION_SERIALIZER.serialize(MINI_MESSAGE.deserialize(result));
             } catch (Exception ignored) {
             }
@@ -54,7 +57,6 @@ public class ChatUtils {
         result = matcher.appendTail(buffer).toString();
 
         // 3. Process Legacy Colors (&a, &l, etc)
-        // We use Matcher.quoteReplacement to avoid issues if result contains $ or \
         return ChatColor.translateAlternateColorCodes('&', result);
     }
 
@@ -218,7 +220,7 @@ public class ChatUtils {
         StringBuilder result = new StringBuilder();
         int currentVisualPos = 0;
         int physicalPos = 0;
-        String colorBuffer = "";
+        StringBuilder colorBuffer = new StringBuilder();
 
         while (physicalPos < colored.length()) {
             int codePoint = colored.codePointAt(physicalPos);
@@ -226,12 +228,26 @@ public class ChatUtils {
 
             // Check if this is a color symbol (§)
             if (codePoint == (int) ChatColor.COLOR_CHAR && physicalPos + 1 < colored.length()) {
+                // Detect Hex sequence: §x§R§R§G§G§B§B (14 characters total)
+                if (physicalPos + 13 < colored.length() && colored.charAt(physicalPos + 1) == 'x') {
+                    String fullHex = colored.substring(physicalPos, physicalPos + 14);
+                    if (currentVisualPos < visualStart) {
+                        colorBuffer.setLength(0);
+                        colorBuffer.append(fullHex);
+                    } else if (currentVisualPos < visualStart + visualWidth) {
+                        result.append(fullHex);
+                    }
+                    physicalPos += 14;
+                    continue;
+                }
+
+                // Normal Legacy code: §c
                 String code = colored.substring(physicalPos, physicalPos + 2);
                 if (currentVisualPos < visualStart) {
                     if (code.equalsIgnoreCase("§r")) {
-                        colorBuffer = "";
+                        colorBuffer.setLength(0);
                     } else {
-                        colorBuffer += code;
+                        colorBuffer.append(code);
                     }
                 } else if (currentVisualPos < visualStart + visualWidth) {
                     result.append(code);
@@ -254,12 +270,12 @@ public class ChatUtils {
 
         // Padding if shorter than requested width
         String slice = result.toString();
-        int currentLen = ChatColor.stripColor(slice).length();
+        int currentLen = stripColor(slice).length();
         if (currentLen < visualWidth) {
             slice += " ".repeat(visualWidth - currentLen);
         }
 
-        return colorBuffer + slice;
+        return colorBuffer.toString() + slice;
     }
 
     /**

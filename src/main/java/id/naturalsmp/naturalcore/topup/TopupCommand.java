@@ -103,19 +103,22 @@ public class TopupCommand implements CommandExecutor {
      */
     private void handleRankGrant(CommandSender sender, String playerName, String rank, Player target, String txId) {
         // 1. Dispatch LuckPerms Command (30 days default)
-        String lpCmd = String.format("lp user %s parent addtemp %s %dd", playerName, rank, DEFAULT_RANK_DAYS);
+        // Formatting to exactly 30d as requested
+        String lpCmd = String.format("lp user %s parent addtemp %s 30d", playerName, rank);
         Bukkit.dispatchCommand(Bukkit.getConsoleSender(), lpCmd);
 
         // 2. Broadcast and Notification
         sender.sendMessage(ChatUtils.colorize(
-                "&aBerhasil menambahkan rank &e" + rank.toUpperCase() + " &aselama &e" + DEFAULT_RANK_DAYS
-                        + " hari &ake &f" + playerName + " &7[" + txId + "]"));
+                "&aBerhasil menambahkan rank &e" + rank.toUpperCase() + " &aselama &e30 Hari (30d) &ake &f" + playerName
+                        + " &7[" + txId + "]"));
 
         if (target != null && target.isOnline()) {
+            gui.openRankGUI(target, rank, txId);
+
             GUIUtils.broadcastEmpty();
             GUIUtils.broadcast("  &b&lRANK UPGRADE &8┃ &f" + target.getName());
             GUIUtils.broadcast(
-                    "  &7Mendapatkan Rank &e&l" + rank.toUpperCase() + " &7selama &a" + DEFAULT_RANK_DAYS + " Hari&7.");
+                    "  &7Mendapatkan Rank &e&l" + rank.toUpperCase() + " &7selama &a30 Hari (30d)&7.");
             GUIUtils.broadcast("  &eTerima kasih telah mendukung server! ❤");
             GUIUtils.broadcastEmpty();
         }

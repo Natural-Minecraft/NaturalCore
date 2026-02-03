@@ -66,10 +66,53 @@ public class TopupSuccessGUI implements Listener {
                 "&#55FF55&l✔ SUDAH MASUK KE DOMPET",
                 "&8&m------------------"));
 
+        setupSideInfo(inv);
+        player.openInventory(inv);
+        playPremiumEffects(player);
+    }
+
+    public void openRankGUI(Player player, String rank, String transactionId) {
+        Inventory inv = GUIUtils.createGUI(new TopupHolder(), 27,
+                "&#00AAFF❂ &#00AAFFʀᴀɴᴋ ᴜᴘɢʀᴀᴅᴇ &#00AAFF❂");
+
+        ItemStack filler = GUIUtils.createFiller(Material.BLACK_STAINED_GLASS_PANE);
+        ItemStack accent = GUIUtils.createFiller(Material.LIGHT_BLUE_STAINED_GLASS_PANE);
+
+        for (int i = 0; i < 27; i++) {
+            if (i < 9 || i > 17 || i % 9 == 0 || i % 9 == 8) {
+                inv.setItem(i, accent);
+            } else {
+                inv.setItem(i, filler);
+            }
+        }
+
+        DateTimeFormatter dtf = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
+        String date = dtf.format(LocalDateTime.now());
+
+        inv.setItem(13, createItem(Material.NETHER_STAR, "&#00AAFF&lRANK UPGRADE BERHASIL!",
+                "&8&m------------------",
+                "&7Terima kasih, &#55FF55&l" + player.getName() + "&7!",
+                "&7Kini kamu berstatus &b" + rank.toUpperCase() + "&7.",
+                "",
+                "&#FFAA00&lDETAIL TRANSAKSI:",
+                "&7• Item: &fRank &e" + rank.toUpperCase(),
+                "&7• Durasi: &630 Hari (30d)",
+                "&7• ID: &e#" + transactionId,
+                "&7• Waktu: &7" + date,
+                "",
+                "&#55FF55&l✔ FITUR PREMIUM TERBUKA",
+                "&8&m------------------"));
+
+        setupSideInfo(inv);
+        player.openInventory(inv);
+        playPremiumEffects(player);
+    }
+
+    private void setupSideInfo(Inventory inv) {
         // Side Info - Tips
-        inv.setItem(11, createItem(Material.NETHER_STAR, "&#00AAFF&lPREMIUM SUPPORT",
-                "&7Gunakan koinmu di &b/shop &7atau",
-                "&7untuk fitur premium lainnya.",
+        inv.setItem(11, createItem(Material.BOOK, "&#00AAFF&lPREMIUM SUPPORT",
+                "&7Nikmati fitur eksklusif",
+                "&7sesuai dengan paketmu.",
                 "",
                 "&7Setiap dukungan membantu",
                 "&7server tetap online."));
@@ -80,10 +123,9 @@ public class TopupSuccessGUI implements Listener {
                 "",
                 "&7Screenshot ini sebagai",
                 "&7kenang-kenangan!"));
+    }
 
-        player.openInventory(inv);
-
-        // Premium Effects
+    private void playPremiumEffects(Player player) {
         player.playSound(player.getLocation(), Sound.UI_TOAST_CHALLENGE_COMPLETE, 1.0f, 1.2f);
         player.playSound(player.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, 0.4f, 0.8f);
         player.playSound(player.getLocation(), Sound.ENTITY_FIREWORK_ROCKET_LAUNCH, 0.3f, 1.0f);

@@ -84,6 +84,8 @@ public class RankGUI implements Listener {
                     ? rankConfig.guiBenefits
                     : List.of("&7Akses fitur eksklusif!");
 
+            boolean isOwned = p.hasPermission("group." + rankId);
+
             inv.setItem(RANK_SLOTS[i], createRankItem(
                     RANK_MATERIALS[i],
                     RANK_COLORS[i],
@@ -93,7 +95,8 @@ public class RankGUI implements Listener {
                     discountedRP,
                     discountedNC,
                     discount,
-                    benefits));
+                    benefits,
+                    isOwned));
         }
 
         // Info Item (Center)
@@ -106,7 +109,7 @@ public class RankGUI implements Listener {
     }
 
     private ItemStack createRankItem(Material mat, String color, String rankName, double priceRP, double priceNC,
-            double discountedRP, double discountedNC, int discount, List<String> benefits) {
+            double discountedRP, double discountedNC, int discount, List<String> benefits, boolean isOwned) {
         ItemStack item = new ItemStack(mat);
         ItemMeta meta = item.getItemMeta();
         if (meta != null) {
@@ -125,20 +128,27 @@ public class RankGUI implements Listener {
             }
 
             componentLore.add(Component.empty());
-            componentLore.add(ChatUtils.toComponent("&e&lHarga:"));
-            if (discount > 0) {
-                componentLore.add(
-                        ChatUtils.toComponent("&8• &7&mRp " + priceFormat.format(priceRP) + "&r &c-" + discount + "%"));
-                componentLore.add(ChatUtils.toComponent("&8• &a&lRp " + priceFormat.format(discountedRP)));
-                componentLore.add(ChatUtils.toComponent("&8• &7&m" + priceFormat.format(priceNC) + " NC"));
-                componentLore.add(ChatUtils.toComponent("&8• &6&l" + priceFormat.format(discountedNC) + " NC"));
+
+            if (isOwned) {
+                componentLore.add(ChatUtils.toComponent("&6&lSUDAH DIMILIKI"));
+                componentLore.add(ChatUtils.toComponent("&7Kamu sudah memiliki rank ini."));
             } else {
-                componentLore.add(ChatUtils.toComponent("&8• &fRp " + priceFormat.format(priceRP)));
-                componentLore.add(ChatUtils.toComponent("&8• &6" + priceFormat.format(priceNC) + " NC"));
+                componentLore.add(ChatUtils.toComponent("&e&lHarga:"));
+                if (discount > 0) {
+                    componentLore.add(
+                            ChatUtils.toComponent(
+                                    "&8• &7&mRp " + priceFormat.format(priceRP) + "&r &c-" + discount + "%"));
+                    componentLore.add(ChatUtils.toComponent("&8• &a&lRp " + priceFormat.format(discountedRP)));
+                    componentLore.add(ChatUtils.toComponent("&8• &7&m" + priceFormat.format(priceNC) + " NC"));
+                    componentLore.add(ChatUtils.toComponent("&8• &6&l" + priceFormat.format(discountedNC) + " NC"));
+                } else {
+                    componentLore.add(ChatUtils.toComponent("&8• &fRp " + priceFormat.format(priceRP)));
+                    componentLore.add(ChatUtils.toComponent("&8• &6" + priceFormat.format(priceNC) + " NC"));
+                }
+                componentLore.add(Component.empty());
+                componentLore.add(ChatUtils.toComponent("&aKlik untuk membeli dengan NaturalCoin!"));
+                componentLore.add(ChatUtils.toComponent("&7(Atau kunjungi store untuk Rupiah)"));
             }
-            componentLore.add(Component.empty());
-            componentLore.add(ChatUtils.toComponent("&aKlik untuk membeli dengan NaturalCoin!"));
-            componentLore.add(ChatUtils.toComponent("&7(Atau kunjungi store untuk Rupiah)"));
 
             meta.lore(componentLore);
             item.setItemMeta(meta);
@@ -200,6 +210,11 @@ public class RankGUI implements Listener {
             p.playSound(p.getLocation(), Sound.BLOCK_IRON_DOOR_CLOSE, 1f, 1.2f);
         } else if (isRankSlot(slot)) {
             String rankId = RANK_ORDER[getRankIndex(slot)];
+            if (p.hasPermission("group." + rankId)) {
+                p.playSound(p.getLocation(), Sound.ENTITY_VILLAGER_NO, 1f, 1f);
+                p.sendMessage(ChatUtils.colorize("&6&lNaturalSMP &8» &cKamu sudah memiliki rank ini!"));
+                return;
+            }
             openConfirmationGUI(p, rankId);
         }
     }

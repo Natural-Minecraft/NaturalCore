@@ -304,11 +304,11 @@ public class NaturalLaggManager implements Listener {
 
         if (state == LaggState.SUCCESS_SLIDING_IN || state == LaggState.SUCCESS_STATIC
                 || state == LaggState.SLIDING_OUT) {
-            return ChatUtils.colorize("&#55FF55&l✔ CLEANUP COMPLETE &7(Removed " + cleanedCount + " items)");
+            return "&#55FF55&l✔ CLEANUP COMPLETE &7(Removed " + cleanedCount + " items)";
         }
 
         // Default: Countdown Content
-        return ChatUtils.colorize("&fClearing Items in &c" + autoRemovalCountdown + "s");
+        return "&fClearing Items in &c" + autoRemovalCountdown + "s";
     }
 
     private void performClean() {

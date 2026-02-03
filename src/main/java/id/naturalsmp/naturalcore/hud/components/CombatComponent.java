@@ -62,9 +62,8 @@ public class CombatComponent extends AbstractHUDComponent {
             prefix = "&7⚔";
         }
 
-        return ChatUtils.colorize(
-                prefix + " " + contentColor + entityName + " &7| " + healthBar + " &7| " + getPercentColor(percent)
-                        + percent + "%");
+        return prefix + " " + contentColor + entityName + " &7| " + healthBar + " &7| " + getPercentColor(percent)
+                + percent + "%";
     }
 
     /**

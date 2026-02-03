@@ -65,8 +65,8 @@ public class LaggComponent extends AbstractHUDComponent {
             String sparkle = (tick % 10 < 5) ? "✨" : "⭐";
             int count = lagg.getCleanedCount();
 
-            return ChatUtils.colorize("<gradient:#55FF55:#FFFFFF:#55FF55>" + sparkle + " CLEANUP COMPLETE " + sparkle
-                    + "</gradient> &8» &fRemoved &a" + count + " &fitems");
+            return "<gradient:#55FF55:#FFFFFF:#55FF55>" + sparkle + " CLEANUP COMPLETE " + sparkle
+                    + "</gradient> &8» &fRemoved &a" + count + " &fitems";
         }
 
         // Countdown states
@@ -84,7 +84,7 @@ public class LaggComponent extends AbstractHUDComponent {
             urgencyColor = "&f&l"; // Pulse white
         }
 
-        return ChatUtils.colorize(icon + " &7ClearLagg &8» " + urgencyColor + countdown + "s " + progressBar);
+        return icon + " &7ClearLagg &8» " + urgencyColor + countdown + "s " + progressBar;
     }
 
     private String buildCountdownBar(int countdown, int tick) {
