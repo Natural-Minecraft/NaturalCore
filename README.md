@@ -1,22 +1,24 @@
-# NaturalCore v2.0.5 (Shop & Ranks Edition)
+# NaturalCore v2.0.6 (SQL & Performance Update)
 
 Plugin inti (core) premium untuk server **NaturalSMP**, mengelola seluruh aspek penting server dengan stabilitas ultra-tinggi dan estetika premium.
 
-## ✨ Fitur Baru v2.0.5 (Shop & Ranks Edition)
+## ✨ Fitur Baru v2.0.6 (SQL & Performance Update)
 
-### 🛒 Rank Shop & In-Game Purchase
-*   **MySQL Integration**: Harga rank kini diambil langsung dari database `products` website (RP & NC).
-*   **In-Game NC Purchase**: Sekarang bisa membeli rank langsung menggunakan **NaturalCoin** via `/ranks` dengan menu konfirmasi.
-*   **Dynamic Discounts**: Tampilan harga diskon dengan format coret (strikethrough) dan persentase potongan.
-*   **Monthly Info**: Informasi durasi 30 hari (bulanan) otomatis.
+### 🏦 NaturalBank SQL Migration
+*   **Database Infrastructure**: Migrasi penuh dari flatfile (YAML) ke **MySQL/MariaDB** untuk integrasi website dan stabilitas data ekonomi tingkat lanjut.
+*   **Cross-Server Ready**: Koneksi database yang dioptimasi untuk kebutuhan scaling masa depan.
+
+### 📊 HUD Manager v2 (Performance Focus)
+*   **Asynchronous Updates**: Animasi Action Bar dan Scoreboard kini diproses secara asinkron untuk CPU overhead yang minimal.
+*   **Smart Refresh**: Sistem cerdas yang hanya mengupdate HUD saat ada perubahan data signifikan (Combat, Temperature, Balance).
 
 ### 🎬 Adaptive HUD Manager
 *   **Context-Aware Transitions**: Transisi **Instant Pop-up** untuk combat, temperature, dan biome agar lebih responsif.
 *   **Cinema Scroll**: Animasi scrolling khusus untuk **Tips** dan **ClearLagg** agar tetap bisa dibaca dengan nyaman.
 
-### 🔧 Unified Topup Command
-*   **Single Command**: `/topupnotification <player> <amount|rank> [tx_id]`
-*   **Versatile**: Menangani pemberian NaturalCoin maupun Rank sementara secara otomatis.
+### 🔨 Premium Shop & Infrastructure
+*   **Rank Confirmation**: Menu konfirmasi pembelian rank otomatis dengan integrasi website saldo.
+*   **API Stability**: Perbaikan total pada database timeout handling dan inventory synchronization.
 
 ## ✨ Fitur Baru v2.0.3 (The Trade & Home Fix)
 
