@@ -273,8 +273,8 @@ public class NaturalLaggManager implements Listener {
 
             // We want it to look like it's sliding in from the right.
             // Simplified "Typewriter" or "Reveal" effect for Action Bar constraints
-            int revealLen = (int) (laggText.length() * ease);
-            return ChatUtils.colorAwareSubstring(laggText, 0, revealLen);
+            int revealLen = (int) (ChatUtils.getVisualLength(laggText) * ease);
+            return ChatUtils.getVisualSlice(laggText, 0, revealLen);
         }
 
         // Slide Out: Text exits to Left (or fades)
@@ -282,8 +282,8 @@ public class NaturalLaggManager implements Listener {
             float progress = (float) animationFrame / MAX_FRAMES;
             float ease = (float) Math.pow(progress, 3);
 
-            int cutLen = (int) (laggText.length() * ease);
-            return ChatUtils.colorAwareSubstring(laggText, cutLen, laggText.length());
+            int cutLen = (int) (ChatUtils.getVisualLength(laggText) * ease);
+            return ChatUtils.getVisualSlice(laggText, cutLen, ChatUtils.getVisualLength(laggText) - cutLen);
         }
 
         return laggText;

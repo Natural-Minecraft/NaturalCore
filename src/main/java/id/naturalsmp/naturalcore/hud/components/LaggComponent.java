@@ -31,7 +31,7 @@ public class LaggComponent extends AbstractHUDComponent {
             return;
 
         int countdown = lagg.getAutoRemovalCountdown();
-        if (lagg.getState() == NaturalLaggManager.LaggState.AUTO_REMOVAL_COUNTDOWN) {
+        if (lagg.getState() == NaturalLaggManager.LaggState.COUNTDOWN) {
             if (countdown != lastBroadcastSec) {
                 lastBroadcastSec = countdown;
                 // Play sounds to get player attention

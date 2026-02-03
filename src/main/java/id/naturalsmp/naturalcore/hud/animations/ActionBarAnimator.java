@@ -77,7 +77,7 @@ public class ActionBarAnimator {
 
         float eased = easeOutCubic(progress);
         int revealLen = (int) (ChatUtils.getVisualLength(text) * eased);
-        return ChatUtils.colorAwareSubstring(text, 0, revealLen);
+        return ChatUtils.getVisualSlice(text, 0, revealLen);
     }
 
     /**
@@ -97,7 +97,7 @@ public class ActionBarAnimator {
 
         float eased = easeInCubic(progress);
         int cutLen = (int) (ChatUtils.getVisualLength(text) * eased);
-        return ChatUtils.colorAwareSubstring(text, cutLen, text.length());
+        return ChatUtils.getVisualSlice(text, cutLen, ChatUtils.getVisualLength(text) - cutLen);
     }
 
     /**
