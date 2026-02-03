@@ -25,16 +25,29 @@ public class BiomeInfoComponent extends AbstractHUDComponent {
 
     @Override
     public boolean shouldDisplay(Player player) {
+        // 1. Ignore if in spawn world (lobby)
+        if (player.getWorld().getName().equalsIgnoreCase("world")) {
+            return false;
+        }
+
         Biome currentBiome = player.getLocation().getBlock().getBiome();
         UUID uuid = player.getUniqueId();
 
+        // 2. Handle first check (Join)
+        if (!lastBiomes.containsKey(uuid)) {
+            lastBiomes.put(uuid, currentBiome);
+            return false;
+        }
+
+        // 3. Handle Biome Change
         Biome lastBiome = lastBiomes.get(uuid);
-        if (lastBiome == null || lastBiome != currentBiome) {
+        if (lastBiome != currentBiome) {
             lastBiomes.put(uuid, currentBiome);
             displayTicks.put(uuid, DISPLAY_DURATION);
             return true;
         }
 
+        // 4. Handle Duration Display
         Integer ticks = displayTicks.get(uuid);
         if (ticks != null && ticks > 0) {
             displayTicks.put(uuid, ticks - 1);

@@ -156,15 +156,11 @@ public class HUDManager implements Listener {
             state.transitionFrame++;
             float progress = (float) state.transitionFrame / duration;
 
-            // Check if component exists
-            if (state.previousContent != null && !state.previousContent.isEmpty()) {
-                state.displayedContent = ActionBarAnimator.scrollTransition(
-                        state.previousContent,
-                        newContent,
-                        progress);
-            } else {
-                state.displayedContent = newContent;
-            }
+            // Scroll from previous (or empty) to new
+            state.displayedContent = ActionBarAnimator.scrollTransition(
+                    state.previousContent != null ? state.previousContent : "",
+                    newContent,
+                    progress);
 
             if (state.transitionFrame >= duration) {
                 state.transitioning = false;
