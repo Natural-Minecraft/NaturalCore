@@ -206,25 +206,60 @@ public class ChatUtils {
 
     /**
      * Ambil substring dengan tetap mempertahankan kode warna sebelumnya.
-     * Sangat berguna untuk animasi sliding text.
+     * VERSI BARU: Menggunakan visual index, bukan physical index.
+     * Memberikan tepat 'visualWidth' karakter yang terlihat (visual characters).
      */
-    public static String colorAwareSubstring(String input, int start, int end) {
+    public static String getVisualSlice(String input, int visualStart, int visualWidth) {
         if (input == null || input.isEmpty())
-            return "";
+            return " ".repeat(visualWidth);
 
-        // Safety bounds
-        int safeStart = Math.min(input.length(), Math.max(0, start));
-        int safeEnd = Math.min(input.length(), Math.max(safeStart, end));
+        // Colorize first to normalize all codes to §
+        String colored = colorize(input);
+        StringBuilder result = new StringBuilder();
+        int currentVisualPos = 0;
+        int physicalPos = 0;
+        String colorBuffer = "";
 
-        // Jika start di tengah-tengah '§e', majukan sedikit agar tidak pecah
-        if (safeStart > 0 && input.charAt(safeStart - 1) == ChatColor.COLOR_CHAR) {
-            safeStart--;
+        while (physicalPos < colored.length()) {
+            int codePoint = colored.codePointAt(physicalPos);
+            int charCount = Character.charCount(codePoint);
+
+            // Check if this is a color symbol (§)
+            if (codePoint == (int) ChatColor.COLOR_CHAR && physicalPos + 1 < colored.length()) {
+                String code = colored.substring(physicalPos, physicalPos + 2);
+                if (currentVisualPos < visualStart) {
+                    if (code.equalsIgnoreCase("§r")) {
+                        colorBuffer = "";
+                    } else {
+                        colorBuffer += code;
+                    }
+                } else if (currentVisualPos < visualStart + visualWidth) {
+                    result.append(code);
+                }
+                physicalPos += 2;
+                continue;
+            }
+
+            // Normal character or surrogate pair
+            if (currentVisualPos >= visualStart && currentVisualPos < visualStart + visualWidth) {
+                result.append(colored, physicalPos, physicalPos + charCount);
+            }
+
+            currentVisualPos++;
+            physicalPos += charCount;
+
+            if (currentVisualPos >= visualStart + visualWidth)
+                break;
         }
 
-        String sub = input.substring(safeStart, safeEnd);
-        String lastColors = org.bukkit.ChatColor.getLastColors(input.substring(0, safeStart));
+        // Padding if shorter than requested width
+        String slice = result.toString();
+        int currentLen = ChatColor.stripColor(slice).length();
+        if (currentLen < visualWidth) {
+            slice += " ".repeat(visualWidth - currentLen);
+        }
 
-        return lastColors + sub;
+        return colorBuffer + slice;
     }
 
     /**
@@ -233,6 +268,6 @@ public class ChatUtils {
     public static int getVisualLength(String input) {
         if (input == null)
             return 0;
-        return ChatColor.stripColor(input).length();
+        return ChatColor.stripColor(colorize(input)).length();
     }
 }

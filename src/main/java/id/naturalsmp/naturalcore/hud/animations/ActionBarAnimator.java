@@ -28,47 +28,36 @@ public class ActionBarAnimator {
             return lastText;
 
         // 1. Prepare Content
-        String oldT = ChatUtils.colorize(lastText != null ? lastText : "");
-        String newT = ChatUtils.colorize(currentText != null ? currentText : "");
-        String gap = ChatUtils.colorize("   &8♦   "); // Visual separator
+        String oldT = lastText != null ? lastText : "";
+        String newT = currentText != null ? currentText : "";
+        String gap = "   &#4facfe»   "; // Visual separator with Hex color
 
-        // 2. Build the Tape
-        // [PADDING] [OLD] [GAP] [NEW] [PADDING]
+        // 2. Build the Tape (Keep it in raw/mixed format, getVisualSlice will handle
+        // it)
         String padding = " ".repeat(ACTIONBAR_WIDTH);
         String tape = padding + oldT + gap + newT + padding;
 
-        // 3. Calculate Measurements
+        // 3. Calculate Visual Measurements
         int oldLen = ChatUtils.getVisualLength(oldT);
         int newLen = ChatUtils.getVisualLength(newT);
         int gapLen = ChatUtils.getVisualLength(gap);
         int paddingLen = ACTIONBAR_WIDTH;
 
-        // 4. Determine Start and End Offsets (To center the text)
-        // We want to slice a window of size ACTIONBAR_WIDTH.
-        // To center text of length L, we need (WIDTH - L) / 2 padding on the left.
+        // 4. Determine Start and End Offsets in Visual Space
+        // We want to slice a window of exactly ACTIONBAR_WIDTH.
 
-        // Start: Center OldText
-        // The OldText starts at index 'paddingLen'.
-        // We want (WIDTH - oldLen)/2 spaces before it.
-        // So we start slicing at: paddingLen - (WIDTH - oldLen)/2
+        // Start: Center OldText in the window
         int startOffset = paddingLen - (ACTIONBAR_WIDTH - oldLen) / 2;
 
-        // End: Center NewText
-        // The NewText starts at index: paddingLen + oldLen + gapLen
-        // We want (WIDTH - newLen)/2 spaces before it.
-        // So we target slice start at: (paddingLen + oldLen + gapLen) - (WIDTH -
-        // newLen)/2
+        // End: Center NewText in the window
         int endOffset = (paddingLen + oldLen + gapLen) - (ACTIONBAR_WIDTH - newLen) / 2;
 
-        // 5. Interpolate
+        // 5. Interpolate using smoothStep
         float eased = smoothStep(progress);
         int currentOffset = (int) (startOffset + (endOffset - startOffset) * eased);
 
-        // 6. Slice the Tape
-        // We use Math.max/min to ensure we stay within bounds (just in case)
-        currentOffset = Math.max(0, Math.min(tape.length() - ACTIONBAR_WIDTH, currentOffset));
-
-        return ChatUtils.colorAwareSubstring(tape, currentOffset, currentOffset + ACTIONBAR_WIDTH);
+        // 6. Slice the Tape using our new robust method
+        return ChatUtils.getVisualSlice(tape, currentOffset, ACTIONBAR_WIDTH);
     }
 
     /**
