@@ -100,9 +100,15 @@ public class ChatUtils {
         }
 
         // 1. Colorize first (to handle mixed & codes and <tags>)
+        // This ensures "&l" becomes a section sign code, which deserialize() respects
+        // if we are careful.
+        // HOWEVER, standard MiniMessage serializer might escape section signs.
+        // A safer hybrid approach:
+
+        // If it contains specific MiniMessage tags, use MiniMessage first, then Legacy.
         String colored = colorize(message);
 
-        // 2. Deserialize as Section because colorize() returns section symbols
+        // Use LegacySection serializer which respects § codes.
         return SECTION_SERIALIZER.deserialize(colored);
     }
 

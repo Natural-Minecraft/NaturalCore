@@ -71,6 +71,7 @@ public class SocialListener implements Listener {
             }
             // 4. Default Join
             String joinMsg = ConfigUtils.getString("messages.social.join-message");
+            // USE toComponent to safely parse both Legacy & MiniMessage
             e.joinMessage(ChatUtils.toComponent(ChatUtils.formatMessage(p, joinMsg)));
         }
 

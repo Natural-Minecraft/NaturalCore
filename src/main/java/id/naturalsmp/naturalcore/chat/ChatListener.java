@@ -33,8 +33,37 @@ public class ChatListener implements Listener {
                 this.plugin = plugin;
         }
 
+        private static final java.util.Map<java.util.UUID, Boolean> searchMode = new java.util.HashMap<>();
+
+        public static void setSearchMode(java.util.UUID uuid) {
+                searchMode.put(uuid, true);
+        }
+
         @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
         public void onChat(AsyncChatEvent event) {
+                Player player = event.getPlayer();
+
+                // SEARCH MODE INTERCEPTION
+                if (searchMode.containsKey(player.getUniqueId())) {
+                        event.setCancelled(true);
+                        searchMode.remove(player.getUniqueId());
+
+                        String query = net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer
+                                        .plainText().serialize(event.message());
+
+                        // Run on main thread because GUI opening must be sync
+                        Bukkit.getScheduler().runTask(plugin, () -> {
+                                if (query.equalsIgnoreCase("cancel")) {
+                                        player.sendMessage(
+                                                        ChatUtils.toComponent("&#FF5555&l✘ &cPencarian dibatalkan."));
+                                        new id.naturalsmp.naturalcore.utility.TutorialGUI(plugin).openGUI(player, null);
+                                } else {
+                                        new id.naturalsmp.naturalcore.utility.TutorialGUI(plugin).openGUI(player,
+                                                        query);
+                                }
+                        });
+                        return;
+                }
                 if (!ConfigUtils.getBoolean("chat.enabled"))
                         return;
 
