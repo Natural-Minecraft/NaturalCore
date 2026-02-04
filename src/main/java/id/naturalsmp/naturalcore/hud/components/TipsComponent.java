@@ -33,7 +33,7 @@ public class TipsComponent extends AbstractHUDComponent {
     private BukkitTask scheduleTask;
 
     public TipsComponent(NaturalCore plugin) {
-        super(plugin, "tips", HUDPriority.LOW);
+        super(plugin, "tips", HUDPriority.HIGH); // High priority to override Season HUD
         reload();
         startSchedule();
     }

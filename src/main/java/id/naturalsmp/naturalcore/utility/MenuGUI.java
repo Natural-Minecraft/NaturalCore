@@ -61,8 +61,8 @@ public class MenuGUI implements Listener {
         inv.setItem(33, createItem(Material.GOLD_INGOT, "&#FFFF55&l💰 TOKO VIRTUAL",
                 "&7Beli barang-barang kebutuhan", "&7langsung dari menu ini.", "", "&#FFAA00&l➥ KLIK UNTUK MEMBUKA"));
 
-        // 5. Settings / ChatColor (Slot 49)
-        inv.setItem(40, createItem(Material.BRUSH, "&#FF55FF&l🎨 CHAT COLOR",
+        // 5. Settings / ChatColor (Slot 23)
+        inv.setItem(23, createItem(Material.BRUSH, "&#FF55FF&l🎨 CHAT COLOR",
                 "&7Ubah warna dan gaya chatmu", "&7agar terlihat lebih keren.", "", "&#FFAA00&l➥ KLIK UNTUK MEMBUKA"));
 
         // 6. Basic Commands (Slot 21)
@@ -123,10 +123,8 @@ public class MenuGUI implements Listener {
         switch (e.getRawSlot()) {
             case 13 -> p.performCommand("profile");
             case 21 -> new TutorialGUI(plugin).openGUI(p, null); // Open Basic Commands
+            case 23 -> p.performCommand("chatcolor");
             case 29 -> p.performCommand("warps");
-            case 31 -> p.performCommand("homes");
-            case 33 -> p.performCommand("shop");
-            case 40 -> p.performCommand("chatcolor");
             case 48 -> p.performCommand("warp tutorial");
             case 50 -> p.sendMessage(ChatUtils.toComponent("&bDiscord: &fhttps://dc.naturalsmp.my.id/"));
         }

@@ -29,20 +29,16 @@ public class SeasonManager {
     private final Map<UUID, Double> playerTemps = new HashMap<>();
     private int temperatureTickCounter = 0;
 
-    private id.naturalsmp.naturalcore.utils.TipsManager tipsManager;
-
     public SeasonManager(NaturalCore plugin) {
         this.plugin = plugin;
         loadData();
-        this.tipsManager = new id.naturalsmp.naturalcore.utils.TipsManager(plugin); // Init Tips
+        // Tips moved to dedicated HUD Component
         startTasks();
     }
 
     public void loadData() {
         FileConfiguration config = ConfigUtils.getSeasonConfig();
         this.enabled = config.getBoolean("enabled", true);
-        if (this.tipsManager != null)
-            tipsManager.reload(); // Reload tips too
         this.seasonDuration = config.getInt("season-duration-days", 7);
         this.currentDay = config.getInt("current-day", 1);
 
@@ -81,9 +77,6 @@ public class SeasonManager {
         new BukkitRunnable() {
             @Override
             public void run() {
-                // Update Tips Logic
-                tipsManager.tick();
-
                 // Update Players
                 temperatureTickCounter++;
                 updateAllPlayers();
@@ -135,10 +128,6 @@ public class SeasonManager {
                 playerTemps.put(p.getUniqueId(), temp);
                 handleTempEffects(p, temp);
             }
-
-            // [REMOVED] Logic moved to centralized HUDManager
-            // Double cachedTemp = playerTemps.getOrDefault(p.getUniqueId(), 20.0);
-            // sendActionBar(p, cachedTemp);
         }
     }
 
@@ -169,6 +158,26 @@ public class SeasonManager {
                 || p.getEyeLocation().getBlock().getType() == Material.WATER) {
             base += config.getDouble("modifiers.in-water", -5.0);
         }
+
+        // --- DYNAMIC FLUCTUATIONS ---
+
+        // 1. Movement Heat
+        if (p.isSprinting()) {
+            base += 2.0; // Warming up from running
+        } else if (p.isConversing()) {
+            // No heat change if talking (example usage if API existed, here just
+            // placeholder or isWalking check)
+        } else {
+            // Basic movement check could be done via velocity, but Bukkit API is simpler:
+            // If player key input is active? Hard to detect.
+            // We'll stick to Sprinting for major heat, maybe check velocity magnitude next
+            // time.
+        }
+
+        // 2. Random Noise (Small fluctuation +/- 1.5)
+        // Use a consistent noise based on time to avoid jitter, or just random
+        // Random makes it feel alive/unstable
+        base += (Math.random() * 3.0) - 1.5;
 
         // Optimize: Check nearby blocks directly without allocation
         int radius = 2;
@@ -223,9 +232,7 @@ public class SeasonManager {
             msg = msg.replace("%mana%", "N/A").replace("%max_mana%", "N/A");
         }
 
-        // --- TIPS INTEGRATION ---
-        String tipsOverride = tipsManager.getDisplay(msg);
-        return (tipsOverride != null && !tipsOverride.isEmpty()) ? tipsOverride : msg;
+        return msg;
     }
 
     private void handleTempEffects(Player p, double temp) {
@@ -260,10 +267,6 @@ public class SeasonManager {
 
     public Season getCurrentSeason() {
         return currentSeason;
-    }
-
-    public id.naturalsmp.naturalcore.utils.TipsManager getTipsManager() {
-        return tipsManager;
     }
 
     /**
