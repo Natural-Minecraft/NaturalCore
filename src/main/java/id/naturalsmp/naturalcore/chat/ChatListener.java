@@ -67,8 +67,6 @@ public class ChatListener implements Listener {
                 if (!ConfigUtils.getBoolean("chat.enabled"))
                         return;
 
-                Player player = event.getPlayer();
-
                 // Get the raw message as text. We use legacySection() because it's
                 // the most standard way to get text with current formatting.
                 String messageText = legacySection.serialize(event.message());
