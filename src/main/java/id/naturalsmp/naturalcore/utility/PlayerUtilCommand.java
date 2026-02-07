@@ -34,9 +34,9 @@ public class PlayerUtilCommand implements CommandExecutor {
 
         if (target == null) {
             if (args.length > 0) {
-                // Modifikasi: Jangan fallback ke diri sendiri jika nama yang diketik salah
-                sender.sendMessage(
-                        ConfigUtils.getString("messages.global.player-not-found").replace("%player%", args[0]));
+                ConfigUtils.sendError(sender,
+                        ConfigUtils.getString("messages.global.player-not-found", "Player not found")
+                                .replace("%player%", args[0]));
                 return true;
             }
 

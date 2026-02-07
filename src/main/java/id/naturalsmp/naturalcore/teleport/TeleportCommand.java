@@ -48,10 +48,10 @@ public class TeleportCommand implements CommandExecutor {
                     Location loc = new Location(p.getWorld(), x, y, z, p.getLocation().getYaw(),
                             p.getLocation().getPitch());
                     p.teleport(loc);
-                    p.sendMessage(prefix + ConfigUtils.getString("messages.teleport.tp-coords")
-                            .replace("%x%", String.format("%.2f", x))
-                            .replace("%y%", String.format("%.2f", y))
-                            .replace("%z%", String.format("%.2f", z)));
+                    ConfigUtils.sendMessage(p, "prefix.teleport", "messages.teleport.tp-coords",
+                            "%x%", String.format("%.2f", x),
+                            "%y%", String.format("%.2f", y),
+                            "%z%", String.format("%.2f", z));
                 } catch (NumberFormatException e) {
                     p.sendMessage(ConfigUtils.getString("messages.economy.invalid-amount"));
                 }
@@ -62,8 +62,9 @@ public class TeleportCommand implements CommandExecutor {
             if (args.length == 4) {
                 Player target = Bukkit.getPlayer(args[0]);
                 if (target == null) {
-                    p.sendMessage(
-                            ConfigUtils.getString("messages.global.player-not-found").replace("%player%", args[0]));
+                    ConfigUtils.sendError(p,
+                            ConfigUtils.getString("messages.global.player-not-found", "Player not found")
+                                    .replace("%player%", args[0]));
                     return true;
                 }
                 try {
@@ -73,11 +74,11 @@ public class TeleportCommand implements CommandExecutor {
                     Location loc = new Location(target.getWorld(), x, y, z, target.getLocation().getYaw(),
                             target.getLocation().getPitch());
                     target.teleport(loc);
-                    p.sendMessage(prefix + ConfigUtils.getString("messages.teleport.tp-coords-other")
-                            .replace("%target%", target.getName())
-                            .replace("%x%", String.format("%.2f", x))
-                            .replace("%y%", String.format("%.2f", y))
-                            .replace("%z%", String.format("%.2f", z)));
+                    ConfigUtils.sendMessage(p, "prefix.teleport", "messages.teleport.tp-coords-other",
+                            "%target%", target.getName(),
+                            "%x%", String.format("%.2f", x),
+                            "%y%", String.format("%.2f", y),
+                            "%z%", String.format("%.2f", z));
                 } catch (NumberFormatException e) {
                     p.sendMessage(ConfigUtils.getString("messages.economy.invalid-amount"));
                 }
@@ -85,35 +86,35 @@ public class TeleportCommand implements CommandExecutor {
             }
 
             if (args.length == 0) {
-                p.sendMessage(ConfigUtils.getString("messages.global.usage").replace("%usage%",
-                        "/tp <player> | /tp <x> <y> <z> | /tp <p1> <p2> | /tp <p1> <x> <y> <z>"));
+                ConfigUtils.sendUsage(p, "/tp <player> | /tp <x> <y> <z> | /tp <p1> <p2> | /tp <p1> <x> <y> <z>");
                 return true;
             }
 
             Player target1 = Bukkit.getPlayer(args[0]);
             if (target1 == null) {
-                p.sendMessage(ConfigUtils.getString("messages.global.player-not-found").replace("%player%", args[0]));
+                ConfigUtils.sendError(p, ConfigUtils.getString("messages.global.player-not-found", "Player not found")
+                        .replace("%player%", args[0]));
                 return true;
             }
 
             if (args.length == 1) {
                 // /tp <player>
                 p.teleport(target1);
-                p.sendMessage(prefix
-                        + ConfigUtils.getString("messages.teleport.tp-success").replace("%target%", target1.getName()));
+                ConfigUtils.sendMessage(p, "prefix.teleport", "messages.teleport.tp-success", "%target%",
+                        target1.getName());
             } else if (args.length == 2) {
                 // /tp <p1> <p2> (Admin mindahin P1 ke P2)
                 Player target2 = Bukkit.getPlayer(args[1]);
                 if (target2 == null) {
-                    p.sendMessage(
-                            ConfigUtils.getString("messages.global.player-not-found").replace("%player%", args[1]));
+                    ConfigUtils.sendError(p,
+                            ConfigUtils.getString("messages.global.player-not-found", "Player not found")
+                                    .replace("%player%", args[1]));
                     return true;
                 }
                 target1.teleport(target2);
-                p.sendMessage(prefix
-                        + ConfigUtils.getString("messages.teleport.tp-move")
-                                .replace("%target1%", target1.getName())
-                                .replace("%target2%", target2.getName()));
+                ConfigUtils.sendMessage(p, "prefix.teleport", "messages.teleport.tp-move",
+                        "%target1%", target1.getName(),
+                        "%target2%", target2.getName());
             }
             return true;
         }
@@ -125,17 +126,18 @@ public class TeleportCommand implements CommandExecutor {
                 return true;
             }
             if (args.length == 0) {
-                p.sendMessage(ConfigUtils.getString("messages.global.usage").replace("%usage%", "/tphere <player>"));
+                ConfigUtils.sendUsage(p, "/tphere <player>");
                 return true;
             }
             Player target = Bukkit.getPlayer(args[0]);
             if (target == null) {
-                p.sendMessage(ConfigUtils.getString("messages.global.player-not-found").replace("%player%", args[0]));
+                ConfigUtils.sendError(p, ConfigUtils.getString("messages.global.player-not-found", "Player not found")
+                        .replace("%player%", args[0]));
                 return true;
             }
             target.teleport(p);
-            p.sendMessage(prefix
-                    + ConfigUtils.getString("messages.teleport.tphere-success").replace("%target%", target.getName()));
+            ConfigUtils.sendMessage(p, "prefix.teleport", "messages.teleport.tphere-success", "%target%",
+                    target.getName());
             return true;
         }
 
@@ -178,13 +180,13 @@ public class TeleportCommand implements CommandExecutor {
 
     private void handleRequest(Player sender, String[] args, boolean isTpaHere) {
         if (args.length == 0) {
-            sender.sendMessage(ConfigUtils.getString("messages.global.usage").replace("%usage%",
-                    (isTpaHere ? "/tpahere" : "/tpa") + " <player>"));
+            ConfigUtils.sendUsage(sender, (isTpaHere ? "/tpahere" : "/tpa") + " <player>");
             return;
         }
         Player target = Bukkit.getPlayer(args[0]);
         if (target == null) {
-            sender.sendMessage(ConfigUtils.getString("messages.global.player-not-found").replace("%player%", args[0]));
+            ConfigUtils.sendError(sender, ConfigUtils.getString("messages.global.player-not-found", "Player not found")
+                    .replace("%player%", args[0]));
             return;
         }
         if (target.equals(sender)) {

@@ -19,6 +19,7 @@ public class ConfigUtils {
 
     private static FileConfiguration messagesConfig;
     private static File messagesFile;
+    private static FileConfiguration internalMessagesConfig; // Cadangan internal
     private static FileConfiguration seasonConfig;
     private static File seasonFile;
     private static FileConfiguration commandsConfig;
@@ -37,6 +38,18 @@ public class ConfigUtils {
             loadMessages();
         }
         return messagesConfig;
+    }
+
+    private static FileConfiguration getInternalMessages() {
+        if (internalMessagesConfig == null) {
+            NaturalCore plugin = NaturalCore.getInstance();
+            java.io.InputStream is = plugin.getResource("messages.yml");
+            if (is != null) {
+                internalMessagesConfig = YamlConfiguration
+                        .loadConfiguration(new java.io.InputStreamReader(is, java.nio.charset.StandardCharsets.UTF_8));
+            }
+        }
+        return internalMessagesConfig;
     }
 
     // --- SEASON.YML HELPERS ---
@@ -96,6 +109,7 @@ public class ConfigUtils {
         loadMessages(); // Reload messages.yml juga
         loadSeason(); // Reload season.yml juga
         loadCommands(); // Reload commands.yml juga
+        internalMessagesConfig = null; // Clear fallback cache
     }
 
     // --- STRING GETTERS ---
@@ -105,7 +119,7 @@ public class ConfigUtils {
      * Path yang dimulai dengan "messages." akan diambil dari messages.yml
      */
     public static String getString(String path) {
-        return getString(path, null);
+        return getString(path, "");
     }
 
     /**
@@ -118,6 +132,9 @@ public class ConfigUtils {
             String msgPath = path.substring(9); // Hilangkan prefix "messages."
             if (getMessages().contains(msgPath)) {
                 result = getMessages().getString(msgPath);
+            } else if (getInternalMessages() != null && getInternalMessages().contains(msgPath)) {
+                // FALLBACK ke resource internal jika di messages.yml luar tidak ada
+                result = getInternalMessages().getString(msgPath);
             }
         } else {
             // Selain itu, ambil dari config.yml biasa
@@ -127,7 +144,7 @@ public class ConfigUtils {
         }
 
         if (result == null)
-            return def;
+            return def != null ? def : "";
         return ChatUtils.colorize(result);
     }
 
@@ -135,9 +152,16 @@ public class ConfigUtils {
      * Ambil string langsung dari messages.yml (tanpa prefix)
      */
     public static String getMessage(String path) {
-        if (!getMessages().contains(path))
-            return null;
-        return ChatUtils.colorize(getMessages().getString(path));
+        String result = null;
+        if (getMessages().contains(path)) {
+            result = getMessages().getString(path);
+        } else if (getInternalMessages() != null && getInternalMessages().contains(path)) {
+            result = getInternalMessages().getString(path);
+        }
+
+        if (result == null)
+            return "";
+        return ChatUtils.colorize(result);
     }
 
     // --- OTHER GETTERS ---

@@ -76,8 +76,8 @@ public class GamemodeCommand implements CommandExecutor, TabCompleter {
         }
 
         if (target == null) {
-            sender.sendMessage(ConfigUtils.getString("messages.global.player-not-found").replace("%player%",
-                    args.length > 0 ? args[args.length - 1] : "target"));
+            ConfigUtils.sendError(sender, ConfigUtils.getString("messages.global.player-not-found", "Player not found")
+                    .replace("%player%", args.length > 0 ? args[args.length - 1] : "target"));
             return true;
         }
 
@@ -99,15 +99,14 @@ public class GamemodeCommand implements CommandExecutor, TabCompleter {
 
         // 3. Execution
         target.setGameMode(mode);
-        String prefix = ConfigUtils.getString("prefix.admin");
 
-        target.sendMessage(prefix + ConfigUtils.getString("messages.essentials.gamemode-changed")
-                .replace("%mode%", ChatUtils.colorize("&e" + mode.name())));
+        ConfigUtils.sendAdmin(target, "messages.essentials.gamemode-changed", "%mode%",
+                ChatUtils.colorize("&e" + mode.name()));
 
         if (!sender.equals(target)) {
-            sender.sendMessage(prefix + ConfigUtils.getString("messages.essentials.gamemode-changed-other")
-                    .replace("%target%", target.getName())
-                    .replace("%mode%", ChatUtils.colorize("&e" + mode.name())));
+            ConfigUtils.sendAdmin(sender, "messages.essentials.gamemode-changed-other",
+                    "%target%", target.getName(),
+                    "%mode%", ChatUtils.colorize("&e" + mode.name()));
         }
 
         return true;

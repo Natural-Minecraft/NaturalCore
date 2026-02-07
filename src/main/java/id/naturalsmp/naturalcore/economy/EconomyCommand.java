@@ -36,8 +36,9 @@ public class EconomyCommand implements CommandExecutor {
                 target = Bukkit.getPlayer(args[0]);
 
             if (target == null) {
-                sender.sendMessage(
-                        ConfigUtils.getString("messages.global.player-not-found").replace("%player%", args[0]));
+                ConfigUtils.sendError(sender,
+                        ConfigUtils.getString("messages.global.player-not-found", "Player not found")
+                                .replace("%player%", args[0]));
                 return true;
             }
 
@@ -59,8 +60,9 @@ public class EconomyCommand implements CommandExecutor {
             }
             Player target = Bukkit.getPlayer(args[0]);
             if (target == null) {
-                sender.sendMessage(
-                        ConfigUtils.getString("messages.global.player-not-found").replace("%player%", args[0]));
+                ConfigUtils.sendError(sender,
+                        ConfigUtils.getString("messages.global.player-not-found", "Player not found")
+                                .replace("%player%", args[0]));
                 return true;
             }
 
@@ -89,14 +91,14 @@ public class EconomyCommand implements CommandExecutor {
             if (!sender.hasPermission("naturalsmp.economy.admin"))
                 return noPerm(sender);
             if (args.length < 2) {
-                sender.sendMessage(ConfigUtils.getString("messages.global.usage").replace("%usage%",
-                        "/takebal <player> <amount>"));
+                ConfigUtils.sendUsage(sender, "/takebal <player> <amount>");
                 return true;
             }
             Player target = Bukkit.getPlayer(args[0]);
             if (target == null) {
-                sender.sendMessage(
-                        ConfigUtils.getString("messages.global.player-not-found").replace("%player%", args[0]));
+                ConfigUtils.sendError(sender,
+                        ConfigUtils.getString("messages.global.player-not-found", "Player not found")
+                                .replace("%player%", args[0]));
                 return true;
             }
 
@@ -123,14 +125,14 @@ public class EconomyCommand implements CommandExecutor {
                 return true;
             Player p = (Player) sender;
             if (args.length < 2) {
-                p.sendMessage(
-                        ConfigUtils.getString("messages.global.usage").replace("%usage%", "/pay <player> <amount>"));
+                ConfigUtils.sendUsage(p, "/pay <player> <amount>");
                 return true;
             }
             Player target = Bukkit.getPlayer(args[0]);
             if (target == null || target.equals(p)) {
                 ConfigUtils.sendError(p,
-                        ConfigUtils.getString("messages.global.player-not-found").replace("%player%", args[0]));
+                        ConfigUtils.getString("messages.global.player-not-found", "Player not found")
+                                .replace("%player%", args[0]));
                 return true;
             }
 
@@ -143,7 +145,7 @@ public class EconomyCommand implements CommandExecutor {
             }
 
             if (amount <= 0 || !eco.has(p, amount)) {
-                p.sendMessage(prefix + ConfigUtils.getString("messages.economy.pay-fail"));
+                ConfigUtils.sendMessage(p, "prefix.economy", "messages.economy.pay-fail");
                 return true;
             }
 
