@@ -176,7 +176,7 @@ settings:
 # ==========================================
 # Centralized storage for maintenance, homes, warps, etc.
 database:
-  enabled: false
+  enabled: true
   host: localhost
   port: 3306
   database: "naturalsmp_core"
