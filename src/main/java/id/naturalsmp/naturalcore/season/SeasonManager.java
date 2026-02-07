@@ -29,6 +29,10 @@ public class SeasonManager {
     private final Map<UUID, Double> playerTemps = new HashMap<>();
     private int temperatureTickCounter = 0;
 
+    // Deterministic noise for realistic temperature
+    private final org.bukkit.util.noise.PerlinNoiseGenerator noiseGenerator = new org.bukkit.util.noise.PerlinNoiseGenerator(
+            new java.util.Random(12345L));
+
     public SeasonManager(NaturalCore plugin) {
         this.plugin = plugin;
         loadData();
@@ -174,10 +178,19 @@ public class SeasonManager {
             // time.
         }
 
-        // 2. Random Noise (Small fluctuation +/- 1.5)
-        // Use a consistent noise based on time to avoid jitter, or just random
-        // Random makes it feel alive/unstable
-        base += (Math.random() * 3.0) - 1.5;
+        // 2. Realistic Environmental Fluctuation (Wind/Atmosphere)
+        // Uses Perlin Noise for deterministic, shared, and smooth temperature changes.
+        // Scale: 0.02 (Changes every ~50 blocks)
+        // Time Scale: 0.005 (Changes every ~200 ticks / 10 seconds)
+        double noise = noiseGenerator.noise(
+                loc.getX() * 0.02,
+                loc.getZ() * 0.02,
+                (double) time * 0.005);
+
+        // Noise returns -1 to 1. Scale to +/- 2.0 degrees.
+        base += noise * 2.0;
+
+        // Optimize: Check nearby blocks directly without allocation
 
         // Optimize: Check nearby blocks directly without allocation
         int radius = 2;
