@@ -187,6 +187,8 @@ public final class NaturalCore extends JavaPlugin {
         SpawnCommand spawnCmd = new SpawnCommand(spawnManager);
         registerCmd("spawn", spawnCmd);
         registerCmd("setspawn", spawnCmd);
+        registerCmd("hub", spawnCmd);
+        registerCmd("lobby", spawnCmd);
         getServer().getPluginManager().registerEvents(new SpawnListener(this), this);
 
         // 6. Home Module
@@ -405,6 +407,9 @@ public final class NaturalCore extends JavaPlugin {
         registerCmd("emoji", new EmojiCommand(this));
         getLogger().info("Emoji System: ENABLED");
         getServer().getPluginManager().registerEvents(new EmojiGUI(this), this);
+
+        // 17C. AFK System
+        registerCmd("afk", new id.naturalsmp.naturalcore.afk.AFKCommand(this));
 
         // 17B. ChatColor System (v1.7)
         this.chatColorManager = new ChatColorManager(this);

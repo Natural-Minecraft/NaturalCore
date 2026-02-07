@@ -135,38 +135,31 @@ public class ChatListener implements Listener {
 
         private Component processPlaceholders(Player player, Component message) {
                 // [item]
-                if (messageContains(message, "[item]")) {
-                        ItemStack item = player.getInventory().getItemInMainHand();
-                        if (item != null && item.getType() != Material.AIR) {
-                                UUID id = ChatSnapshotManager.createItemSnapshot(player.getName(), item);
-                                message = message.replaceText(TextReplacementConfig.builder()
-                                                .match(Pattern.compile("\\[item\\]"))
-                                                .replacement(
-                                                                blueBracket(
-                                                                                Component
-                                                                                                .text(ChatUtils
-                                                                                                                .stripColor(legacySection
-                                                                                                                                .serialize(item.displayName()))
-                                                                                                                .replace("[", "")
-                                                                                                                .replace("]", "")
-                                                                                                                + " x"
-                                                                                                                + item.getAmount())
-                                                                                                .color(NamedTextColor.YELLOW)
-                                                                                                .hoverEvent(item.asHoverEvent())
+                                .match(Pattern.compile("\\[(item|i)\\]"))
+                                .replacement(
+                                                blueBracket(
+                                                                Component
+                                                                                .text(ChatUtils
+                                                                                                .stripColor(legacySection
+                                                                                                                .serialize(item.displayName()))
+                                                                                                .replace("[", "")
+                                                                                                .replace("]", "")
+                                                                                                + " x"
+                                                                                                + item.getAmount())
+                                                                                .color(NamedTextColor.YELLOW)
+                                                                                .hoverEvent(createSafeHover(item))
                                                                                                 .clickEvent(ClickEvent
                                                                                                                 .runCommand("/chatview "
                                                                                                                                 + id
                                                                                                                                 + " item"))))
                                                 .build());
-                        }
-                }
+                        }}
 
-                // [inv]
-                if (messageContains(message, "[inv]")) {
-                        UUID id = ChatSnapshotManager.createInventorySnapshot(player);
-                        message = message.replaceText(TextReplacementConfig.builder()
-                                        .match(Pattern.compile("\\[inv\\]"))
-                                        .replacement(blueBracket(Component.text("Inventory")
+        // [inv]
+        if(messageContains(message,"[inv]")){
+
+        UUID id = ChatSnapshotManager.createInventorySnapshot(
+                        player);message=message.replaceText(TextReplacementConfig.builder().match(Pattern.compile("\\[inv\\]")).replacement(blueBracket(Component.text("Inventory")
                                                         .color(NamedTextColor.YELLOW)
                                                         .hoverEvent(
                                                                         HoverEvent.showText(Component.text(
@@ -176,8 +169,8 @@ public class ChatListener implements Listener {
                                         .build());
                 }
 
-                // [ender]
-                if (messageContains(message, "[ender]")) {
+        // [ender]
+        if(messageContains(message, "[ender]")) {
                         UUID id = ChatSnapshotManager.createEnderSnapshot(player.getName(),
                                         player.getEnderChest().getContents());
                         message = message.replaceText(TextReplacementConfig.builder()
@@ -273,6 +266,22 @@ public class ChatListener implements Listener {
                 return Component.text("[").color(NamedTextColor.AQUA)
                                 .append(inner)
                                 .append(Component.text("]").color(NamedTextColor.AQUA));
+        }
+
+        private HoverEvent<?> createSafeHover(ItemStack original) {
+                // If it's a version that might cause ViaVersion issues (1.20.5+ items),
+                // we "clean" the item for the hover.
+                ItemStack clean = original.clone();
+                org.bukkit.inventory.meta.ItemMeta meta = clean.getItemMeta();
+                if (meta != null) {
+                        // Clear attribute modifiers which are the main cause of NPE in ViaVersion
+                        // rewriters
+                        if (meta.hasAttributeModifiers()) {
+                                meta.getAttributeModifiers().keySet().forEach(meta::removeAttributeModifier);
+                        }
+                        clean.setItemMeta(meta);
+                }
+                return clean.asHoverEvent();
         }
 
         private boolean messageContains(Component message, String search) {

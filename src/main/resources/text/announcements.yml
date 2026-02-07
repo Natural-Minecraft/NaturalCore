@@ -1,6 +1,6 @@
 settings:
   prefix: "&#6CCAFE&lINFO &8┃ &f"
-  interval: 300 # Seconds (5 minutes)
+  interval: 210 # Seconds (3.5 minutes)
   randomize: true
 
 messages:

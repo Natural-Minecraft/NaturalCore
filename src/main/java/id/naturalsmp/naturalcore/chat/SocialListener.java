@@ -69,9 +69,16 @@ public class SocialListener implements Listener {
             for (Player online : Bukkit.getOnlinePlayers()) {
                 online.playSound(online.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, 1f, 0.5f);
             }
-            // 4. Default Join
-            String joinMsg = ConfigUtils.getString("messages.social.join-message");
-            // USE toComponent to safely parse both Legacy & MiniMessage
+        }
+
+        // 4. Default Join (For everyone - Nature rank already cancelled theirs above if
+        // they want custom broadcast ONLY)
+        // Wait, if nature canceled e.joinMessage(null), we should only set it if it's
+        // still null or if we want it.
+        // The user said: "ubahlah jadi [+] %displayname% dengan prefix dan suffix
+        // player"
+        String joinMsg = ConfigUtils.getString("messages.social.join-message");
+        if (joinMsg != null && !joinMsg.isEmpty()) {
             e.joinMessage(ChatUtils.toComponent(ChatUtils.formatMessage(p, joinMsg)));
         }
 

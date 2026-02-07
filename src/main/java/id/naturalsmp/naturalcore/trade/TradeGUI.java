@@ -227,6 +227,9 @@ public class TradeGUI implements Listener {
         Player closer = (Player) e.getPlayer();
         Player other = session.getOther(closer);
 
+        // Mark trade as ended BEFORE closing other inventory to prevent recursion
+        plugin.getTradeManager().endTrade(session);
+
         // Cancel trade and return items
         ConfigUtils.sendGeneral(closer, "messages.trade.cancelled");
         ConfigUtils.sendGeneral(other, "messages.trade.cancelled-other", "%player%", closer.getName());
@@ -240,8 +243,6 @@ public class TradeGUI implements Listener {
                     other.equals(session.getPlayer1()) ? p1Slots : p2Slots, other);
             other.closeInventory();
         }
-
-        plugin.getTradeManager().endTrade(session);
     }
 
     private void returnItems(Inventory inv, int[] slots, Player owner) {
