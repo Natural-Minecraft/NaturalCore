@@ -277,6 +277,13 @@ commands:
   spawn:
     description: Ke spawn
     permission: naturalsmp.spawn
+  hub:
+    description: Hub server
+    aliases: [lobby]
+    permission: naturalsmp.spawn
+  afk:
+    description: Mode AFK
+    permission: naturalsmp.afk
   setspawn:
     description: Set spawn
     permission: naturalsmp.admin
