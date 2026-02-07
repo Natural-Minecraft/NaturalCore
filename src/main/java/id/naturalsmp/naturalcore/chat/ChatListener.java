@@ -135,42 +135,41 @@ public class ChatListener implements Listener {
 
         private Component processPlaceholders(Player player, Component message) {
                 // [item]
-                                .match(Pattern.compile("\\[(item|i)\\]"))
-                                .replacement(
-                                                blueBracket(
-                                                                Component
-                                                                                .text(ChatUtils
-                                                                                                .stripColor(legacySection
-                                                                                                                .serialize(item.displayName()))
-                                                                                                .replace("[", "")
-                                                                                                .replace("]", "")
-                                                                                                + " x"
-                                                                                                + item.getAmount())
-                                                                                .color(NamedTextColor.YELLOW)
-                                                                                .hoverEvent(createSafeHover(item))
-                                                                                                .clickEvent(ClickEvent
-                                                                                                                .runCommand("/chatview "
-                                                                                                                                + id
-                                                                                                                                + " item"))))
-                                                .build());
-                        }}
-
-        // [inv]
-        if(messageContains(message,"[inv]")){
-
-        UUID id = ChatSnapshotManager.createInventorySnapshot(
-                        player);message=message.replaceText(TextReplacementConfig.builder().match(Pattern.compile("\\[inv\\]")).replacement(blueBracket(Component.text("Inventory")
+                ItemStack item = player.getInventory().getItemInMainHand();
+                if (item != null && item.getType() != Material.AIR) {
+                        UUID id = ChatSnapshotManager.createItemSnapshot(player.getName(), item);
+                        message = message.replaceText(TextReplacementConfig.builder()
+                                        .match(Pattern.compile("\\[(item|i)\\]"))
+                                        .replacement(blueBracket(Component
+                                                        .text(ChatUtils.stripColor(legacySection
+                                                                        .serialize(item.displayName()))
+                                                                        .replace("[", "")
+                                                                        .replace("]", "")
+                                                                        + " x"
+                                                                        + item.getAmount())
                                                         .color(NamedTextColor.YELLOW)
-                                                        .hoverEvent(
-                                                                        HoverEvent.showText(Component.text(
-                                                                                        "Click to view inventory",
-                                                                                        NamedTextColor.GRAY)))
+                                                        .hoverEvent(createSafeHover(item))
+                                                        .clickEvent(ClickEvent
+                                                                        .runCommand("/chatview " + id + " item"))))
+                                        .build());
+                }
+
+                // [inv]
+                if (messageContains(message, "[inv]")) {
+                        UUID id = ChatSnapshotManager.createInventorySnapshot(player);
+                        message = message.replaceText(TextReplacementConfig.builder()
+                                        .match(Pattern.compile("\\[inv\\]"))
+                                        .replacement(blueBracket(Component.text("Inventory")
+                                                        .color(NamedTextColor.YELLOW)
+                                                        .hoverEvent(HoverEvent.showText(Component.text(
+                                                                        "Click to view inventory",
+                                                                        NamedTextColor.GRAY)))
                                                         .clickEvent(ClickEvent.runCommand("/chatview " + id + " inv"))))
                                         .build());
                 }
 
-        // [ender]
-        if(messageContains(message, "[ender]")) {
+                // [ender]
+                if (messageContains(message, "[ender]")) {
                         UUID id = ChatSnapshotManager.createEnderSnapshot(player.getName(),
                                         player.getEnderChest().getContents());
                         message = message.replaceText(TextReplacementConfig.builder()
