@@ -107,14 +107,37 @@ public class MaintenanceManager {
     }
 
     private void loadData() {
-        active = plugin.getConfig().getBoolean("maintenance.active", false);
-        whitelistedPlayers.addAll(plugin.getConfig().getStringList("maintenance.whitelist"));
+        if (plugin.getCoreDatabase().isEnabled()) {
+            active = plugin.getCoreDatabase().getMaintenanceActive();
+            String whitelistJson = plugin.getCoreDatabase().getMaintenanceWhitelist();
+            // Simple parsing since we don't have Gson here (or do we? check imports)
+            // For now, keep local config as backup/primary if DB disabled
+            if (whitelistJson.equals("[]")) {
+                whitelistedPlayers.addAll(plugin.getConfig().getStringList("maintenance.whitelist"));
+            } else {
+                // Basic cleanup for simple string list in TEXT column
+                String clean = whitelistJson.replace("[", "").replace("]", "").replace(" ", "");
+                if (!clean.isEmpty()) {
+                    for (String s : clean.split(",")) {
+                        whitelistedPlayers.add(s.toLowerCase());
+                    }
+                }
+            }
+        } else {
+            active = plugin.getConfig().getBoolean("maintenance.active", false);
+            whitelistedPlayers.addAll(plugin.getConfig().getStringList("maintenance.whitelist"));
+        }
     }
 
     private void saveData() {
         plugin.getConfig().set("maintenance.active", active);
         plugin.getConfig().set("maintenance.whitelist", whitelistedPlayers);
         plugin.saveConfig();
+
+        if (plugin.getCoreDatabase().isEnabled()) {
+            plugin.getCoreDatabase().setMaintenanceActive(active);
+            plugin.getCoreDatabase().setMaintenanceWhitelist(whitelistedPlayers.toString());
+        }
     }
 
     public void sendProxyUpdate() {
