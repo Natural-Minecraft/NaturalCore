@@ -11,6 +11,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.block.SignChangeEvent;
 import org.bukkit.metadata.FixedMetadataValue;
 
+import java.util.Map;
 import java.util.UUID;
 import java.util.function.Consumer;
 
