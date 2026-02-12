@@ -222,6 +222,45 @@ public class SeasonManager {
                 break;
         }
 
+        // --- WORLD BASED TEMPERATURE ---
+        switch (loc.getWorld().getEnvironment()) {
+            case NETHER:
+                base += 30.0; // Nether is HOT
+                break;
+            case THE_END:
+                base -= 10.0; // End is COLD
+                break;
+            default:
+                break;
+        }
+
+        // --- ARMOR BUFFS (Insulation) ---
+        // Leather armor neutralizes extreme temperatures (Buff)
+        // Metal armor conducts heat (Debuff in heat/cold)
+        if (p.getInventory().getArmorContents() != null) {
+            for (org.bukkit.inventory.ItemStack armor : p.getInventory().getArmorContents()) {
+                if (armor == null || armor.getType() == Material.AIR)
+                    continue;
+                String type = armor.getType().name();
+
+                if (type.contains("LEATHER")) {
+                    // Leather insulates: moves temp closer to neutral (20.0)
+                    if (base > 25.0)
+                        base -= 2.0; // Cools down in heat
+                    else if (base < 15.0)
+                        base += 2.0; // Warms up in cold
+                } else if (type.contains("IRON") || type.contains("GOLD") || type.contains("DIAMOND")
+                        || type.contains("NETHERITE")) {
+                    // Metal conducts: makes hot hotter, cold colder
+                    // Only applies if temp is already extreme to avoid annoying fluctuations
+                    if (base > 35.0)
+                        base += 1.5;
+                    else if (base < 5.0)
+                        base -= 1.5;
+                }
+            }
+        }
+
         return base;
     }
 

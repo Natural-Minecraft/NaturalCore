@@ -120,7 +120,7 @@ afk:
   display-text: "&b💤 &7Sedang Bermimpi... &b💤"
   title:
     enabled: true
-    title: "&b&lYou are now AFK"
+    title: "<gradient:#808080:#D3D3D3>YOU ARE NOW AFK</gradient>"
     subtitle: "&7Move to resume..."
 
 # ==========================================
@@ -179,8 +179,8 @@ database:
   enabled: true
   host: localhost
   port: 3306
-  database: "naturalsmp_core"
-  username: "root"
+  database: "nsmp_naturalcore"
+  username: "nsmp_NaturalCore"
   password: ""
 
 # ==========================================

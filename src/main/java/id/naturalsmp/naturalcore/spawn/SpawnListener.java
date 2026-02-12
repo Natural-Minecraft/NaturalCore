@@ -31,6 +31,27 @@ public class SpawnListener implements Listener {
         // join
         // (Misal logout di dungeon/minigame world yang sudah unlaoded)
         if (!e.getPlayer().hasPlayedBefore() || !allowed.contains(currentWorld)) {
+            // First Join Kit
+            if (!e.getPlayer().hasPlayedBefore()) {
+                p.getInventory().addItem(new org.bukkit.inventory.ItemStack(org.bukkit.Material.WOODEN_SWORD));
+                p.getInventory().addItem(new org.bukkit.inventory.ItemStack(org.bukkit.Material.WOODEN_PICKAXE));
+                p.getInventory().addItem(new org.bukkit.inventory.ItemStack(org.bukkit.Material.WOODEN_AXE));
+                p.getInventory().addItem(new org.bukkit.inventory.ItemStack(org.bukkit.Material.WOODEN_SHOVEL));
+                p.getInventory().addItem(new org.bukkit.inventory.ItemStack(org.bukkit.Material.COOKED_BEEF, 16));
+
+                // Claim Tool
+                p.getInventory().addItem(new org.bukkit.inventory.ItemStack(org.bukkit.Material.GOLDEN_SHOVEL));
+
+                // Armor
+                p.getInventory().setHelmet(new org.bukkit.inventory.ItemStack(org.bukkit.Material.LEATHER_HELMET));
+                p.getInventory()
+                        .setChestplate(new org.bukkit.inventory.ItemStack(org.bukkit.Material.LEATHER_CHESTPLATE));
+                p.getInventory().setLeggings(new org.bukkit.inventory.ItemStack(org.bukkit.Material.LEATHER_LEGGINGS));
+                p.getInventory().setBoots(new org.bukkit.inventory.ItemStack(org.bukkit.Material.LEATHER_BOOTS));
+
+                ChatUtils.send(p, "&aWelcome to NaturalSMP! You received a starter kit.");
+            }
+
             // Teleport ke spawn utama
             plugin.getSpawnManager().teleport(p);
 

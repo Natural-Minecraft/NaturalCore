@@ -27,7 +27,9 @@ public class TemperatureWarningComponent extends AbstractHUDComponent {
         Double temp = plugin.getSeasonManager().getPlayerTemperature(player);
         if (temp == null)
             return false;
-        return temp < COLD_THRESHOLD || temp > HOT_THRESHOLD;
+        // STRICT check: ONLY display if actually critical.
+        // This ensures lower priority HUDs (like Tips) can show up when temp is normal.
+        return temp <= COLD_THRESHOLD || temp >= HOT_THRESHOLD;
     }
 
     @Override

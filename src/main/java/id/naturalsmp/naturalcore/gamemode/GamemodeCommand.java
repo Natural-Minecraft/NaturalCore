@@ -100,13 +100,30 @@ public class GamemodeCommand implements CommandExecutor, TabCompleter {
         // 3. Execution
         target.setGameMode(mode);
 
-        ConfigUtils.sendAdmin(target, "messages.essentials.gamemode-changed", "%mode%",
-                ChatUtils.colorize("&e" + mode.name()));
+        // 3. Execution
+        target.setGameMode(mode);
 
+        String modeName = "&e" + mode.name();
+        String targetName = target.getName();
+
+        // Notify Target
+        String targetMsg = ConfigUtils.getString("messages.essentials.gamemode-changed",
+                "&aGamemode updated to %mode%");
+        target.sendMessage(ChatUtils.colorize(targetMsg.replace("%mode%", modeName)));
+
+        // Notify Sender (if different)
         if (!sender.equals(target)) {
-            ConfigUtils.sendAdmin(sender, "messages.essentials.gamemode-changed-other",
-                    "%target%", target.getName(),
-                    "%mode%", ChatUtils.colorize("&e" + mode.name()));
+            String senderMsg = ConfigUtils.getString("messages.essentials.gamemode-changed-other",
+                    "&aSet gamemode of %target% to %mode%");
+            sender.sendMessage(ChatUtils.colorize(senderMsg
+                    .replace("%target%", targetName)
+                    .replace("%mode%", modeName)));
+        }
+
+        // Log to Console if sender is not console
+        if (sender instanceof Player) {
+            Bukkit.getLogger().info(
+                    "[NaturalCore] " + sender.getName() + " set gamemode of " + targetName + " to " + mode.name());
         }
 
         return true;

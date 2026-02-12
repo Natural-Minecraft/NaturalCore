@@ -247,7 +247,7 @@ gui:
   admin: "Natural Admin"
   menu: "Natural Menu"
   start:
-    title: "❂ Natural Server ❂"
+    title: "<gradient:#2E8B57:#32CD32>❂ NATURAL SERVER ❂</gradient>"
   profile: "Profile Statistics"
   warp:
     title: "Natural Warps"
@@ -255,7 +255,7 @@ gui:
   home:
     title: "Natural Homes"
   baltop:
-    title: "Eco Leaderboard"
+    title: "<gradient:#ffd700:#f0e68c>❂ ECO LEADERBOARD ❂</gradient>"
     item-name: "&#FFD400&l#%rank% &7- &#FFFFFF&l%player%"
     item-lore:
       - ""
@@ -264,10 +264,10 @@ gui:
   staff: "&#6CCAFE&lSTAFF &8| &#FFFFFF&lDASHBOARD"
   moderation: "&#CC0000&lMODERATION &8» &f%target%"
   ranks:
-    title: "&8&lNatural Rank Progression"
+    title: "<gradient:#55ff00:#00aa00>❂ RANK PROGRESSION ❂</gradient>"
     top: "&8&l🏆 TOP GLOBAL SEASON 🏆"
   chatcolor:
-    title: "Chat Colors"
+    title: "<gradient:#FF69B4:#FF1493>❂ CHAT COLORS ❂</gradient>"
     category:
       default: "&#AAAAAA⬛ &#AAAAAAᴅᴇꜰᴀᴜʟᴛ"
       midi: "&#FF55FF❂ &#FF55FFᴍɪᴅɪ"
