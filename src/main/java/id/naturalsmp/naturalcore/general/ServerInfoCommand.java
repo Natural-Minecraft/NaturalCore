@@ -46,14 +46,18 @@ public class ServerInfoCommand implements CommandExecutor {
         sender.sendMessage(ChatUtils.colorize(
                 "   &#00AAFF&lɴ&#55FF55&lᴀ&#AAFF55&lᴛ&#FFFF55&lᴜ&#FFAA00&lʀ&#FF5555&lᴀ&#FF55FF&lʟ &#00AAFF&lᴄ&#55FF55&lᴏ&#AAFF55&lʀ&#FFFF55&lᴇ &7- Command Guide"));
         sender.sendMessage("");
-        sender.sendMessage(ChatUtils.colorize(" &8» &f/gm [mode] &7- Ganti gamemode"));
-        sender.sendMessage(ChatUtils.colorize(" &8» &f/list &7- Daftar player online"));
-        sender.sendMessage(ChatUtils.colorize(" &8» &f/lag &7- Cek performa server"));
-        sender.sendMessage(ChatUtils.colorize(" &8» &f/itemname &7- Ubah nama item"));
-        sender.sendMessage(ChatUtils.colorize(" &8» &f/lore &7- Ubah lore item"));
-        sender.sendMessage(ChatUtils.colorize(" &8» &f/shout &7- Berteriak global"));
-        sender.sendMessage(ChatUtils.colorize(" &8» &f/bcworld &7- Broadcast ke world"));
-        sender.sendMessage(ChatUtils.colorize(" &8» &f/freeze &7- Bekukan player"));
+        sender.sendMessage(ChatUtils.colorize(" &8» &f/spawn &7- Teleport ke spawn"));
+        sender.sendMessage(ChatUtils.colorize(" &8» &f/rtp &7- Random Teleport"));
+        sender.sendMessage(ChatUtils.colorize(" &8» &f/tpa <player> &7- Request teleport"));
+        sender.sendMessage(ChatUtils.colorize(" &8» &f/sethome <name> &7- Set home"));
+        sender.sendMessage(ChatUtils.colorize(" &8» &f/home [name] &7- Teleport ke home"));
+        sender.sendMessage(ChatUtils.colorize(" &8» &f/bal &7- Cek uang"));
+        sender.sendMessage(ChatUtils.colorize(" &8» &f/pay <player> <amount> &7- Kirim uang"));
+        sender.sendMessage(ChatUtils.colorize(" &8» &f/trade <player> &7- Trade dengan player"));
+        sender.sendMessage(ChatUtils.colorize(" &8» &f/profile &7- Cek profil & statistik"));
+        sender.sendMessage(ChatUtils.colorize(" &8» &f/tags &7- Ganti tag chat"));
+        sender.sendMessage(ChatUtils.colorize(" &8» &f/chatcolor &7- Ganti warna chat"));
+        sender.sendMessage(ChatUtils.colorize(" &8» &f/afk &7- Set status AFK"));
         sender.sendMessage("");
         sender.sendMessage(ChatUtils.colorize(" &7Type &b/nacore &7for admin tools."));
         sender.sendMessage("");

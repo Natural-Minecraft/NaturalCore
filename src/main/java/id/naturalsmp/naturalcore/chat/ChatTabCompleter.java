@@ -21,32 +21,32 @@ public class ChatTabCompleter implements Listener {
         if (buffer.startsWith("/"))
             return;
 
-        // Find the last '@'
-        int lastAtIndex = buffer.lastIndexOf("@");
-        if (lastAtIndex == -1)
+        // Find the last token to see if it starts with @
+        String[] tokens = buffer.split(" ");
+        if (tokens.length == 0)
             return;
 
-        // Check if @ is at start or preceded by space
-        if (lastAtIndex > 0 && buffer.charAt(lastAtIndex - 1) != ' ')
-            return;
+        String lastToken = tokens[tokens.length - 1];
 
-        String search = buffer.substring(lastAtIndex + 1).toLowerCase();
+        if (lastToken.startsWith("@")) {
+            String search = lastToken.substring(1).toLowerCase();
+            List<String> matches = Bukkit.getOnlinePlayers().stream()
+                    .map(Player::getName)
+                    .filter(name -> name.toLowerCase().startsWith(search))
+                    .map(name -> {
+                        // Reconstruct buffer with the new name
+                        // We need to replace the LAST token
+                        int lastIndex = buffer.lastIndexOf(lastToken);
+                        return buffer.substring(0, lastIndex) + "@" + name;
+                    })
+                    .collect(Collectors.toList());
 
-        // Don't suggest if there's a space after @
-        if (search.contains(" "))
-            return;
-
-        List<String> matches = Bukkit.getOnlinePlayers().stream()
-                .map(Player::getName)
-                .filter(name -> name.toLowerCase().startsWith(search))
-                .map(name -> buffer.substring(0, lastAtIndex) + "@" + name) // Full string replacement
-                .collect(Collectors.toList());
-
-        if (!matches.isEmpty()) {
-            event.completions(matches.stream()
-                    .map(AsyncTabCompleteEvent.Completion::completion)
-                    .collect(Collectors.toList()));
-            event.setHandled(true);
+            if (!matches.isEmpty()) {
+                event.completions(matches.stream()
+                        .map(AsyncTabCompleteEvent.Completion::completion)
+                        .collect(Collectors.toList()));
+                event.setHandled(true);
+            }
         }
     }
 

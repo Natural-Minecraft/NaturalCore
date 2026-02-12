@@ -337,44 +337,149 @@ public class NaturalLaggManager implements Listener {
         }
     }
 
+    @EventHandler
+    public void onMobDie(EntityDeathEvent e) {
+        if (!mergingEnabled)
+            return;
+        LivingEntity entity = e.getEntity();
+        if (entity instanceof Player)
+            return;
+        if (entity.hasMetadata("NPC"))
+            return;
+
+        int stackSize = getStackSize(entity);
+        if (stackSize > 1) {
+            int newSize = stackSize - 1;
+            String baseNameRaw = getStackBaseName(entity);
+
+            // Spawn replacement
+            LivingEntity newEntity = (LivingEntity) entity.getWorld().spawnEntity(entity.getLocation(),
+                    entity.getType());
+
+            // Copy Equipment
+            if (entity.getEquipment() != null && newEntity.getEquipment() != null) {
+                newEntity.getEquipment().setArmorContents(entity.getEquipment().getArmorContents());
+                newEntity.getEquipment().setItemInMainHand(entity.getEquipment().getItemInMainHand());
+                newEntity.getEquipment().setItemInOffHand(entity.getEquipment().getItemInOffHand());
+            }
+
+            // Copy Attributes if possible (Health, Damage)
+            org.bukkit.attribute.AttributeInstance oldMax = entity
+                    .getAttribute(org.bukkit.attribute.Attribute.GENERIC_MAX_HEALTH);
+            org.bukkit.attribute.AttributeInstance newMax = newEntity
+                    .getAttribute(org.bukkit.attribute.Attribute.GENERIC_MAX_HEALTH);
+            if (oldMax != null && newMax != null) {
+                newMax.setBaseValue(oldMax.getBaseValue());
+            }
+            newEntity.setHealth(newEntity.getAttribute(org.bukkit.attribute.Attribute.GENERIC_MAX_HEALTH).getValue());
+
+            // Set Name
+            updateStackName(newEntity, baseNameRaw, newSize);
+        }
+    }
+
     private void performMobMerging() {
         for (World world : Bukkit.getWorlds()) {
             if (excludedWorlds.contains(world.getName()))
                 continue;
-            List<Entity> entities = new ArrayList<>(world.getEntities());
-            Map<String, List<LivingEntity>> groups = new HashMap<>();
-            for (Entity e : entities) {
-                if (e instanceof LivingEntity le && !(e instanceof Player) && !e.hasMetadata("NPC")) {
-                    String type = le.getType().name();
-                    if (mergingBlacklist.contains(type))
+
+            List<LivingEntity> mergeable = new ArrayList<>();
+            for (Entity e : world.getEntities()) {
+                if (e instanceof LivingEntity le && !(e instanceof Player) && !e.hasMetadata("NPC") && !le.isDead()) {
+                    if (mergingBlacklist.contains(le.getType().name()))
                         continue;
-                    groups.computeIfAbsent(type, k -> new ArrayList<>()).add(le);
+                    mergeable.add(le);
                 }
             }
+
+            // Group by Signature (Type + Name)
+            Map<String, List<LivingEntity>> groups = new HashMap<>();
+            for (LivingEntity le : mergeable) {
+                String signature = le.getType().name() + "::" + getStackBaseName(le);
+                groups.computeIfAbsent(signature, k -> new ArrayList<>()).add(le);
+            }
+
             for (List<LivingEntity> group : groups.values()) {
-                if (group.size() < mergingThreshold)
+                if (group.size() < 2)
                     continue;
+
                 for (int i = 0; i < group.size(); i++) {
                     LivingEntity base = group.get(i);
-                    if (!base.isValid())
+                    if (!base.isValid() || base.isDead())
                         continue;
-                    List<LivingEntity> nearby = new ArrayList<>();
+
+                    int totalStack = getStackSize(base);
+                    List<LivingEntity> toMerge = new ArrayList<>();
+
                     for (int j = i + 1; j < group.size(); j++) {
                         LivingEntity other = group.get(j);
-                        if (other.isValid()
-                                && base.getLocation().distanceSquared(other.getLocation()) < mergingRadiusSq) {
-                            nearby.add(other);
+                        if (other.isValid() && !other.isDead() &&
+                                base.getLocation().distanceSquared(other.getLocation()) <= mergingRadiusSq) {
+
+                            toMerge.add(other);
+                            totalStack += getStackSize(other);
                         }
                     }
-                    if (!nearby.isEmpty()) {
-                        int total = nearby.size() + 1;
-                        for (LivingEntity le : nearby)
-                            le.remove();
-                        base.setCustomName(ChatUtils.colorize("&e&l" + base.getName() + " &7x" + total));
-                        base.setCustomNameVisible(true);
+
+                    if (!toMerge.isEmpty()) {
+                        String baseName = getStackBaseName(base);
+                        for (LivingEntity other : toMerge) {
+                            other.getWorld().spawnParticle(org.bukkit.Particle.CLOUD, other.getLocation().add(0, 1, 0),
+                                    5, 0.2, 0.2, 0.2, 0.05);
+                            other.remove();
+                        }
+                        updateStackName(base, baseName, totalStack);
                     }
                 }
             }
+        }
+    }
+
+    private int getStackSize(LivingEntity le) {
+        String name = le.getCustomName();
+        if (name == null)
+            return 1;
+
+        String stripped = ChatUtils.decolorize(name);
+        try {
+            java.util.regex.Matcher m = java.util.regex.Pattern.compile(" x(\\d+)$").matcher(stripped);
+            if (m.find()) {
+                return Integer.parseInt(m.group(1));
+            }
+        } catch (Exception ignored) {
+        }
+        return 1;
+    }
+
+    private String getStackBaseName(LivingEntity le) {
+        String name = le.getCustomName();
+        if (name == null) {
+            String type = le.getType().name();
+            return type.substring(0, 1).toUpperCase() + type.substring(1).toLowerCase();
+        }
+
+        // Remove the suffix from the RAW string to preserve colors
+        return name.replaceAll("(?i)( §7)? x\\d+$", "");
+    }
+
+    private void updateStackName(LivingEntity le, String baseNameRaw, int size) {
+        if (size <= 1) {
+            String typeName = le.getType().name();
+            // If baseNameRaw looks like the default type name, clear custom name
+            if (ChatUtils.decolorize(baseNameRaw).equalsIgnoreCase(typeName)) {
+                le.setCustomName(null);
+                le.setCustomNameVisible(false);
+            } else {
+                le.setCustomName(baseNameRaw);
+                le.setCustomNameVisible(true);
+            }
+        } else {
+            // Apply suffix
+            if (!baseNameRaw.contains("§") && !baseNameRaw.contains("&")) {
+                baseNameRaw = "&e" + baseNameRaw;
+            }
+            le.setCustomName(ChatUtils.colorize(baseNameRaw + " &7x" + size));
+            le.setCustomNameVisible(true);
         }
     }
 
@@ -426,7 +531,6 @@ public class NaturalLaggManager implements Listener {
 
     @EventHandler(priority = EventPriority.MONITOR)
     public void onPlayerDeath(PlayerDeathEvent e) {
-        // Mark death drops to protect them
         if (!removeDeathDrops) {
             Bukkit.getScheduler().runTaskLater(plugin, () -> {
                 for (Entity entity : e.getEntity().getNearbyEntities(3, 3, 3)) {
@@ -436,10 +540,6 @@ public class NaturalLaggManager implements Listener {
                 }
             }, 5L);
         }
-    }
-
-    @EventHandler
-    public void onMobDie(EntityDeathEvent e) {
     }
 
     public LaggState getState() {

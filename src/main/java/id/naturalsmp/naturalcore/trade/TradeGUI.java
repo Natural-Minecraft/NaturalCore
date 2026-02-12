@@ -121,6 +121,12 @@ public class TradeGUI implements Listener {
             boolean isPlayerP1 = player.equals(session.getPlayer1());
 
             if (isP1Btn == isPlayerP1) {
+                // Ensure the clicker is clicking THEIR OWN button
+                // Slot 48 (P1) -> isP1Btn=true. If P1 clicks (isPlayerP1=true) -> true == true
+                // -> ALLOW.
+                // Slot 50 (P2) -> isP1Btn=false. If P2 clicks (isPlayerP1=false) -> false ==
+                // false -> ALLOW.
+
                 session.setConfirmed(player, !session.isConfirmed(player));
                 player.playSound(player.getLocation(), Sound.BLOCK_NOTE_BLOCK_PLING, 1f, 2f);
                 updateBoth(session);

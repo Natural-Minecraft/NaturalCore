@@ -99,6 +99,34 @@ public class NaturalCoreCommand implements CommandExecutor, TabCompleter {
                     new id.naturalsmp.naturalcore.admin.RestartAlertCommand().onCommand(sender, command, "restart",
                             adminArgs);
                 }
+                case "setfirstjoinkit" -> {
+                    if (!(sender instanceof Player pKit)) {
+                        sender.sendMessage("Hanya untuk player.");
+                        return;
+                    }
+                    // Save Items
+                    List<String> kitItems = new ArrayList<>();
+                    for (org.bukkit.inventory.ItemStack item : pKit.getInventory().getStorageContents()) {
+                        if (item != null && item.getType() != org.bukkit.Material.AIR) {
+                            kitItems.add(item.getType().toString() + ":" + item.getAmount());
+                        }
+                    }
+                    plugin.getConfig().set("first-join-kit.items", kitItems);
+
+                    // Save Armor
+                    org.bukkit.inventory.ItemStack[] armor = pKit.getInventory().getArmorContents();
+                    plugin.getConfig().set("first-join-kit.armor.boots",
+                            armor[0] != null ? armor[0].getType().toString() : "AIR");
+                    plugin.getConfig().set("first-join-kit.armor.leggings",
+                            armor[1] != null ? armor[1].getType().toString() : "AIR");
+                    plugin.getConfig().set("first-join-kit.armor.chestplate",
+                            armor[2] != null ? armor[2].getType().toString() : "AIR");
+                    plugin.getConfig().set("first-join-kit.armor.helmet",
+                            armor[3] != null ? armor[3].getType().toString() : "AIR");
+
+                    plugin.saveConfig();
+                    ConfigUtils.sendGeneral(sender, "messages.global.success-set", "%feature%", "First Join Kit");
+                }
                 case "gui" -> {
                     if (sender instanceof Player p)
                         new NaturalCoreGUI(plugin).openGUI(p);

@@ -70,10 +70,48 @@ public class TradeManager {
     }
 
     public void startCustomMoneyInput(Player p, TradeSession session) {
+        // Use Sign Menu for input
         pendingMoneyInput.put(p.getUniqueId(), session);
         p.closeInventory();
-        ConfigUtils.sendGeneral(p, "messages.trade.input-money");
-        ConfigUtils.sendGeneral(p, "messages.trade.input-cancel");
+
+        new id.naturalsmp.naturalcore.utils.SignMenu(plugin).open(p,
+                new String[] { "", "^ ^ ^", "Masukan Nominal", "NaturalCoin" }, (lines) -> {
+                    String input = lines[0].trim();
+                    if (input.isEmpty())
+                        return; // Ignored
+
+                    try {
+                        double amount = Double.parseDouble(input);
+                        if (amount < 0)
+                            throw new NumberFormatException();
+
+                        // Check balance
+                        double balance = plugin.getVaultManager().getEconomy().getBalance(p);
+                        if (amount > balance) {
+                            ConfigUtils.sendGeneral(p, "messages.trade.insufficient-balance", "%max%",
+                                    String.valueOf((int) balance));
+                        } else {
+                            session.setMoney(p, amount);
+                            session.setConfirmed(p, false);
+                            session.setConfirmed(session.getOther(p), false);
+                            ConfigUtils.sendGeneral(p, "messages.trade.money-set", "%amount%",
+                                    String.valueOf((int) amount));
+                        }
+                    } catch (NumberFormatException ex) {
+                        p.sendMessage(ChatUtils.colorize("&cJumlah tidak valid! Gunakan angka saja."));
+                    }
+
+                    Bukkit.getScheduler().runTask(plugin, () -> {
+                        plugin.getTradeGUI().openTradeGUI(p, session);
+                        plugin.getTradeGUI().openTradeGUI(session.getOther(p), session);
+                    });
+
+                    pendingMoneyInput.remove(p.getUniqueId());
+
+                });
+
+        // Also keep chat listener as backup or if Sign fails?
+        // Logic handled in callback.
     }
 
     private class TradeChatListener implements org.bukkit.event.Listener {
