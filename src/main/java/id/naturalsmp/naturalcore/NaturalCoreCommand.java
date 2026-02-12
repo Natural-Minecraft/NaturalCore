@@ -101,8 +101,8 @@ public class NaturalCoreCommand implements CommandExecutor, TabCompleter {
                 }
                 case "setfirstjoinkit" -> {
                     if (!(sender instanceof Player pKit)) {
-                        sender.sendMessage("Hanya untuk player.");
-                        return;
+                        ConfigUtils.sendError(sender, "Hanya untuk player.");
+                        return true;
                     }
                     // Save Items
                     List<String> kitItems = new ArrayList<>();
