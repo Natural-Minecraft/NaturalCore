@@ -1,6 +1,10 @@
-# NaturalCore v2.0.6 (SQL & Performance Update)
+# NaturalCore v2.0.7 (Maintenance Update)
 
 Plugin inti (core) premium untuk server **NaturalSMP**, mengelola seluruh aspek penting server dengan stabilitas ultra-tinggi dan estetika premium.
+
+## ✨ Fitur Baru v2.0.7 (Maintenance Update)
+*   **Build Fixes**: Perbaikan error kompilasi pada `SignMenu` dan `NaturalLagg`.
+*   **Stability**: Peningkatan stabilitas pada sistem `First Join Kit` dan `NaturalLagg` mob stacking.
 
 ## ✨ Fitur Baru v2.0.6 (SQL & Performance Update)
 

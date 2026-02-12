@@ -59,7 +59,7 @@ public class SignMenu implements Listener {
                     player.openSign((Sign) block.getState());
                 } catch (Throwable t) {
                     // Fallback: Just tell user to type in chat if this fails
-                    ChatUtils.sendGeneral(player, "messages.trade.input-money");
+                    id.naturalsmp.naturalcore.utils.ConfigUtils.sendGeneral(player, "messages.trade.input-money");
                     inputs.remove(player.getUniqueId());
                     player.sendBlockChange(loc, oldData);
                 }

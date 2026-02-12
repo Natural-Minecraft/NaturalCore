@@ -162,6 +162,10 @@ public class ChatUtils {
         return ChatColor.stripColor(colorize(message));
     }
 
+    public static String decolorize(String message) {
+        return stripColor(message);
+    }
+
     /**
      * Format angka desimal (10000 -> 10,000).
      */
