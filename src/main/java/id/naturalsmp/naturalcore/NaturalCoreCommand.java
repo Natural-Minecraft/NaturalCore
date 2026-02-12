@@ -127,6 +127,7 @@ public class NaturalCoreCommand implements CommandExecutor, TabCompleter {
                     plugin.saveConfig();
                     ConfigUtils.sendGeneral(sender, "messages.global.success-set", "%feature%", "First Join Kit");
                     return true;
+                }
                 case "gui" -> {
                     if (sender instanceof Player p)
                         new NaturalCoreGUI(plugin).openGUI(p);
@@ -137,33 +138,31 @@ public class NaturalCoreCommand implements CommandExecutor, TabCompleter {
             return true;
         }
 
-    // --- GLOBAL RELOAD (Legacy Support) ---
-    if(sub.equals("reload"))
+        // --- GLOBAL RELOAD (Legacy Support) ---
+        if (sub.equals("reload"))
 
-    {
-        if (!sender.hasPermission("naturalsmp.admin"))
-            return noPerm(sender);
-        performDeepReload(sender);
-        return true;
-    }
-
-    if(sub.equals("ver")||sub.equals("version"))
-    {
-        if (sender instanceof Player p) {
-            ConfigUtils.sendGeneral(p, "messages.global.version", "%version%",
-                    plugin.getDescription().getVersion());
-        } else {
-            sender.sendMessage("NaturalCore v" + plugin.getDescription().getVersion());
+        {
+            if (!sender.hasPermission("naturalsmp.admin"))
+                return noPerm(sender);
+            performDeepReload(sender);
+            return true;
         }
-        return true;
-    }
 
-    // --- DYNAMIC PROXY DISPATCH ---
-    String[] proxyArgs = Arrays.copyOfRange(args, 1, args.length);
+        if (sub.equals("ver") || sub.equals("version")) {
+            if (sender instanceof Player p) {
+                ConfigUtils.sendGeneral(p, "messages.global.version", "%version%",
+                        plugin.getDescription().getVersion());
+            } else {
+                sender.sendMessage("NaturalCore v" + plugin.getDescription().getVersion());
+            }
+            return true;
+        }
 
-    // List of all mapped commands to proxy
-    switch(sub)
-    {
+        // --- DYNAMIC PROXY DISPATCH ---
+        String[] proxyArgs = Arrays.copyOfRange(args, 1, args.length);
+
+        // List of all mapped commands to proxy
+        switch (sub) {
             case "heal", "feed", "fly" -> {
                 playerUtil.onCommand(sender, command, sub, proxyArgs);
                 return true;
@@ -196,7 +195,8 @@ public class NaturalCoreCommand implements CommandExecutor, TabCompleter {
             }
         }
 
-    ConfigUtils.sendError(sender,"Sub-command tidak ditemukan. Cek /nacore help.");return true;
+        ConfigUtils.sendError(sender, "Sub-command tidak ditemukan. Cek /nacore help.");
+        return true;
     }
 
     private void performDeepReload(CommandSender sender) {
