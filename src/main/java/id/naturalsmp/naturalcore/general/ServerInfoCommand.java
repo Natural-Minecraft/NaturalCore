@@ -118,7 +118,7 @@ public class ServerInfoCommand implements CommandExecutor {
         sender.sendMessage(ChatUtils.colorize("&8&m----------------------------------------"));
         sender.sendMessage(ChatUtils.colorize(" &7Version: &f" + plugin.getDescription().getVersion()));
         sender.sendMessage(ChatUtils.colorize(" &7Authors: &fNaturalSMP Team"));
-        sender.sendMessage(ChatUtils.colorize(" &7Website: &bwww.naturalsmp.my.id"));
+        sender.sendMessage(ChatUtils.colorize(" &7Website: &bwww.naturalsmp.net"));
         sender.sendMessage(ChatUtils.colorize("&8&m----------------------------------------"));
         return true;
     }

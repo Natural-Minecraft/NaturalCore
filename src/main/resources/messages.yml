@@ -68,7 +68,7 @@ admin:
       &7Server sedang melakukan pemeliharaan rutin.
       &7Silahkan coba kembali dalam &e3-5 menit&7.
       
-      &8» &bdc.naturalsmp.my.id
+      &8» &bdc.naturalsmp.net
   maintenance:
     countdown: "&6&lMaintenance &8» &7Server akan masuk ke mode maintenance dalam &e%time%&7 detik."
     kick-reason: |-
@@ -77,7 +77,7 @@ admin:
       <gray>Server sedang dalam tahap perbaikan atau update rutin.
       Hanya staf yang diizinkan masuk untuk saat ini.</gray>
       
-      <dark_gray>» <aqua>dc.naturalsmp.my.id</aqua></dark_gray>
+      <dark_gray>» <aqua>dc.naturalsmp.net</aqua></dark_gray>
     bossbar-title: "Mode Maintenance Aktif"
 
 # --- SOCIAL & PLAYER INTERACTION ---

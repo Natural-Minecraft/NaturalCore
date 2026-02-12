@@ -126,7 +126,7 @@ public class MenuGUI implements Listener {
             case 23 -> p.performCommand("chatcolor");
             case 29 -> p.performCommand("warps");
             case 48 -> p.performCommand("warp tutorial");
-            case 50 -> p.sendMessage(ChatUtils.toComponent("&bDiscord: &fhttps://dc.naturalsmp.my.id/"));
+            case 50 -> p.sendMessage(ChatUtils.toComponent("&bDiscord: &fhttps://dc.naturalsmp.net/"));
         }
     }
 
