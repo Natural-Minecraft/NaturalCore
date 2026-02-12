@@ -1,6 +1,7 @@
 package id.naturalsmp.naturalcore.spawn;
 
 import id.naturalsmp.naturalcore.NaturalCore;
+import id.naturalsmp.naturalcore.utils.ChatUtils;
 import id.naturalsmp.naturalcore.utils.ConfigUtils;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -82,7 +83,7 @@ public class SpawnListener implements Listener {
                 } catch (Exception ignored) {
                 }
 
-                ChatUtils.send(p, "&aWelcome to NaturalSMP! You received a starter kit.");
+                p.sendMessage(ChatUtils.colorize("&aWelcome to NaturalSMP! You received a starter kit."));
             }
 
             // Teleport ke spawn utama

@@ -1,5 +1,5 @@
 name: NaturalCore
-version: 2.0.8
+version: ${project.version}
 main: id.naturalsmp.naturalcore.NaturalCore
 api-version: 1.21
 author: NaturalSMP
