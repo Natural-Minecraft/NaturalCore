@@ -36,7 +36,7 @@ public class GlobalNotificationListener implements Listener {
         String message;
         if (killer != null && killer != victim) {
             // Kill Message
-            List<String> variants = ConfigUtils.getStringList("notifications.kill");
+            List<String> variants = ConfigUtils.getMessageList("social.notifications.kill");
             if (variants.isEmpty())
                 return;
             message = variants.get(random.nextInt(variants.size()))
@@ -46,7 +46,7 @@ public class GlobalNotificationListener implements Listener {
             killer.playSound(killer.getLocation(), Sound.ENTITY_ARROW_HIT_PLAYER, 1f, 1f);
         } else {
             // Death Message
-            List<String> variants = ConfigUtils.getStringList("notifications.death");
+            List<String> variants = ConfigUtils.getMessageList("social.notifications.death");
             if (variants.isEmpty())
                 return;
             message = variants.get(random.nextInt(variants.size()))
@@ -69,7 +69,7 @@ public class GlobalNotificationListener implements Listener {
         // However, we can send our aesthetic one.
 
         Player p = e.getPlayer();
-        List<String> variants = ConfigUtils.getStringList("notifications.achievement");
+        List<String> variants = ConfigUtils.getMessageList("social.notifications.achievement");
         if (variants.isEmpty())
             return;
 

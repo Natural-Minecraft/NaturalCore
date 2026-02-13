@@ -26,7 +26,7 @@ public class BackCommand implements CommandExecutor {
             return true;
         Player p = (Player) sender;
 
-        String prefix = ConfigUtils.getString("prefix.player");
+        String prefix = ConfigUtils.getString("messages.prefix.general");
         Location backLoc;
 
         if (plugin.getPermissionManager().isAtLeast(p, "midi")) {
@@ -39,7 +39,7 @@ public class BackCommand implements CommandExecutor {
                 // Check if they have a generic last location but not death
                 // and explain they need permission
                 if (plugin.getTeleportManager().getLastLocation(p) != null) {
-                    p.sendMessage(ChatUtils.colorize(prefix + ConfigUtils.getString("messages.utils.back-no-rank")));
+                    p.sendMessage(ChatUtils.colorize(prefix + ConfigUtils.getString("messages.teleport.back-no-rank")));
                     p.playSound(p.getLocation(), Sound.BLOCK_NOTE_BLOCK_BASS, 1f, 0.5f);
                     return true;
                 }
@@ -47,13 +47,13 @@ public class BackCommand implements CommandExecutor {
         }
 
         if (backLoc == null) {
-            p.sendMessage(ChatUtils.colorize(prefix + ConfigUtils.getString("messages.utils.back-fail")));
+            p.sendMessage(ChatUtils.colorize(prefix + ConfigUtils.getString("messages.teleport.back-fail")));
             p.playSound(p.getLocation(), Sound.BLOCK_NOTE_BLOCK_BASS, 1f, 0.5f);
             return true;
         }
 
         p.teleport(backLoc);
-        p.sendMessage(ChatUtils.colorize(prefix + ConfigUtils.getString("messages.utils.back-success")));
+        p.sendMessage(ChatUtils.colorize(prefix + ConfigUtils.getString("messages.teleport.back-success")));
         p.playSound(p.getLocation(), Sound.ENTITY_ENDERMAN_TELEPORT, 1f, 1f);
         return true;
     }

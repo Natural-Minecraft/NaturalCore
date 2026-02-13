@@ -223,10 +223,10 @@ system:
     action-bar:
       countdown: "&#FF5555&l%scroll% &fCLEARING ITEMS IN &#FF5555&l%time%s &f%scroll%"
   death:
-    title: "      ☠ K A M U   M A T I ☠"
-    location: "      📍 Lokasi: %x%, %y%, %z%"
-    world: "      🌍 Dunia: %world%"
-    back-button: "          ⚡ [ KEMBALI KE LOKASI ] ⚡"
+    title: "&c&l      ☠ K A M U   M A T I ☠"
+    location: "&7      📍 Lokasi: &f%x%, %y%, %z%"
+    world: "&7      🌍 Dunia: &f%world%"
+    back-button: "&e&l          ⚡ [ KEMBALI KE LOKASI ] ⚡"
     back-hover: "&eKlik untuk teleport ke lokasi kematian"
 
 # --- CHAT & FUN ---

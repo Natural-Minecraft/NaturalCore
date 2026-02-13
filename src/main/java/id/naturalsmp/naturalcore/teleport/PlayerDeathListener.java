@@ -34,19 +34,22 @@ public class PlayerDeathListener implements Listener {
         // e.setDeathMessage(null); // Uncomment if user wants to hide vanilla message
 
         p.sendMessage("");
-        p.sendMessage(ChatUtils.colorize(ConfigUtils.getString("messages.death.title")));
-        p.sendMessage(ChatUtils.colorize(ConfigUtils.getString("messages.death.location")
+        p.sendMessage(ChatUtils.colorize(ConfigUtils.getString("messages.system.death.title")));
+        p.sendMessage(ChatUtils.colorize(ConfigUtils.getString("messages.system.death.location")
                 .replace("%x%", String.valueOf(p.getLocation().getBlockX()))
                 .replace("%y%", String.valueOf(p.getLocation().getBlockY()))
                 .replace("%z%", String.valueOf(p.getLocation().getBlockZ()))));
         p.sendMessage(ChatUtils
-                .colorize(ConfigUtils.getString("messages.death.world").replace("%world%", p.getWorld().getName())));
+                .colorize(ConfigUtils.getString("messages.system.death.world").replace("%world%",
+                        p.getWorld().getName())));
         p.sendMessage("");
 
-        TextComponent btn = new TextComponent(ChatUtils.colorize(ConfigUtils.getString("messages.death.back-button")));
+        TextComponent btn = new TextComponent(
+                ChatUtils.colorize(ConfigUtils.getString("messages.system.death.back-button")));
         btn.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/back"));
         btn.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT,
-                new ComponentBuilder(ChatUtils.colorize(ConfigUtils.getString("messages.death.back-hover"))).create()));
+                new ComponentBuilder(ChatUtils.colorize(ConfigUtils.getString("messages.system.death.back-hover")))
+                        .create()));
 
         p.spigot().sendMessage(btn);
         p.sendMessage("");
