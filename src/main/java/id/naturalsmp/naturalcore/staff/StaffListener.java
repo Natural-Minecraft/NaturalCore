@@ -19,27 +19,14 @@ public class StaffListener implements Listener {
 
     @EventHandler(priority = EventPriority.LOWEST)
     public void onJoin(PlayerJoinEvent event) {
-        Player player = event.getPlayer();
-
-        // Hide existing vanished players from the new joins
-        for (Player online : Bukkit.getOnlinePlayers()) {
-            if (plugin.getStaffManager().isVanished(online)) {
-                if (!player.hasPermission("naturalsmp.staff")) {
-                    player.hidePlayer(plugin, online);
-                }
-            }
-        }
-
-        // Handle if joining player is already in vanish state (e.g. from meta/database
-        // persistent if implemented)
-        // For now, if they have staff perm, let them see others
+        // Vanish hiding is handled by VanishListener/Manager
     }
 
     @EventHandler
     public void onQuit(PlayerQuitEvent event) {
         // Cleanup if needed
         // If they were vanished, maybe silent quit?
-        if (plugin.getStaffManager().isVanished(event.getPlayer())) {
+        if (plugin.getVanishManager().isVanished(event.getPlayer())) {
             event.setQuitMessage(null);
         }
     }

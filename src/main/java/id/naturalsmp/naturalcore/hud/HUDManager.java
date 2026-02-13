@@ -45,6 +45,7 @@ public class HUDManager implements Listener {
         components.add(new BiomeInfoComponent(plugin));
         components.add(new TipsComponent(plugin));
         components.add(new SeasonComponent(plugin));
+        components.add(new VanishHUDComponent(plugin));
 
         // Sort by priority (highest first)
         components.sort((a, b) -> Integer.compare(b.getPriority().getValue(), a.getPriority().getValue()));

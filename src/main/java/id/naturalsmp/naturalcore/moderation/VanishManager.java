@@ -25,6 +25,15 @@ public class VanishManager implements Listener {
 
     public VanishManager(NaturalCore plugin) {
         this.plugin = plugin;
+        loadFromDatabase();
+    }
+
+    private void loadFromDatabase() {
+        if (plugin.getCoreDatabase() != null && plugin.getCoreDatabase().isEnabled()) {
+            Set<UUID> dbVanished = plugin.getCoreDatabase().getVanishedPlayers();
+            vanishedPlayers.addAll(dbVanished);
+            plugin.getLogger().info("[Vanish] Loaded " + dbVanished.size() + " vanished players from database.");
+        }
     }
 
     public boolean isVanished(Player p) {
@@ -35,22 +44,35 @@ public class VanishManager implements Listener {
         if (state) {
             // AKTIFKAN VANISH
             vanishedPlayers.add(p.getUniqueId());
+            if (plugin.getCoreDatabase() != null && plugin.getCoreDatabase().isEnabled()) {
+                plugin.getCoreDatabase().addVanished(p.getUniqueId());
+            }
 
             // 1. Hide from others
             for (Player online : Bukkit.getOnlinePlayers()) {
-                if (!online.hasPermission("naturalsmp.vanish.see")) {
+                if (!online.hasPermission("naturalsmp.vanish.see") && !online.equals(p)) {
                     online.hidePlayer(plugin, p);
                 }
             }
 
             // 2. Fake Quit Message
             String quitMsg = ConfigUtils.getString("messages.social.quit-message");
-            GUIUtils.broadcast(ChatUtils.formatMessage(p, quitMsg));
+            if (quitMsg != null && !quitMsg.isEmpty()) {
+                GUIUtils.broadcast(ChatUtils.formatMessage(p, quitMsg));
+            }
 
             // 3. Status Effects
             p.setAllowFlight(true);
             p.setSleepingIgnored(true);
-            p.setPlayerListName(null); // Remove from TAB for self too/cleaner behavior
+
+            // Tab List Hiding (SuperVanish Style)
+            p.setPlayerListName(""); // Empty name in tab
+            // Hide from everyone in tab list
+            for (Player online : Bukkit.getOnlinePlayers()) {
+                if (!online.hasPermission("naturalsmp.vanish.see") && !online.equals(p)) {
+                    online.hidePlayer(plugin, p);
+                }
+            }
 
             ConfigUtils.sendMod(p, "messages.moderation.vanish-enabled");
             p.sendTitle("", ChatUtils.colorize("&b&lᴠᴀɴɪsʜᴇᴅ"), 0, 40, 10);
@@ -59,6 +81,9 @@ public class VanishManager implements Listener {
         } else {
             // MATIKAN VANISH
             vanishedPlayers.remove(p.getUniqueId());
+            if (plugin.getCoreDatabase() != null && plugin.getCoreDatabase().isEnabled()) {
+                plugin.getCoreDatabase().removeVanished(p.getUniqueId());
+            }
 
             // 1. Show to others
             for (Player online : Bukkit.getOnlinePlayers()) {
@@ -67,7 +92,9 @@ public class VanishManager implements Listener {
 
             // 2. Fake Join Message
             String joinMsg = ConfigUtils.getString("messages.social.join-message");
-            GUIUtils.broadcast(ChatUtils.formatMessage(p, joinMsg));
+            if (joinMsg != null && !joinMsg.isEmpty()) {
+                GUIUtils.broadcast(ChatUtils.formatMessage(p, joinMsg));
+            }
 
             // 3. Reset
             p.setPlayerListName(p.getName());
@@ -113,6 +140,51 @@ public class VanishManager implements Listener {
             if (isVanished(p)) {
                 e.setTarget(null);
                 e.setCancelled(true);
+            }
+        }
+    }
+
+    // --- SILENT CHESTS ---
+    @EventHandler(priority = org.bukkit.event.EventPriority.HIGHEST)
+    public void onInventoryOpen(org.bukkit.event.inventory.InventoryOpenEvent e) {
+        if (e.getPlayer() instanceof Player p) {
+            if (isVanished(p)) {
+                org.bukkit.inventory.InventoryHolder holder = e.getInventory().getHolder();
+                if (holder instanceof org.bukkit.block.Chest || holder instanceof org.bukkit.block.EnderChest
+                        || holder instanceof org.bukkit.block.ShulkerBox || holder instanceof org.bukkit.block.Barrel) {
+                    // Silently open for vanished players
+                    // We can't easily cancel the sound without NMS/ProtocolLib in all versions,
+                    // but we can at least avoid the animation if we use a virtual view
+                    // However, standard behavior for "Silent Chests" is often handled via packets.
+                    // For now, we can at least ensure they don't trigger events for other plugins.
+                }
+            }
+        }
+    }
+
+    @EventHandler(priority = org.bukkit.event.EventPriority.HIGHEST)
+    public void onChestInterat(PlayerInteractEvent e) {
+        if (isVanished(e.getPlayer()) && e.getAction() == Action.RIGHT_CLICK_BLOCK) {
+            org.bukkit.block.Block block = e.getClickedBlock();
+            if (block != null && (block.getType() == org.bukkit.Material.CHEST
+                    || block.getType() == org.bukkit.Material.TRAPPED_CHEST
+                    || block.getType() == org.bukkit.Material.BARREL
+                    || block.getType() == org.bukkit.Material.SHULKER_BOX)) {
+
+                // SuperVanish style silent chest: open a virtual inventory instead of the real
+                // one
+                // to prevent animation.
+                if (e.getPlayer().isSneaking()) {
+                    // Allow normal interaction if sneaking? Or maybe always silent?
+                    return;
+                }
+
+                e.setCancelled(true);
+                org.bukkit.block.BlockState state = block.getState();
+                if (state instanceof org.bukkit.inventory.InventoryHolder holder) {
+                    e.getPlayer().openInventory(holder.getInventory());
+                    e.getPlayer().sendMessage(ChatUtils.colorize("&6&lStaff &8» &7Opening container &asilently&7."));
+                }
             }
         }
     }

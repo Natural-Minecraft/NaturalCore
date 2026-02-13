@@ -15,7 +15,13 @@ public class VanishListener implements Listener {
 
     @EventHandler
     public void onJoin(PlayerJoinEvent e) {
-        // Minta Manager untuk menyembunyikan player vanish dari player yang baru join ini
+        // 1. Sembunyikan player vanish yang sudah online dari player baru ini
         plugin.getVanishManager().hideVanishedFrom(e.getPlayer());
+
+        // 2. Jika player yang baru join ini sendiri sedang vanish (persistent),
+        // sembunyikan dia dari player lain yang sudah online
+        if (plugin.getVanishManager().isVanished(e.getPlayer())) {
+            plugin.getVanishManager().setVanished(e.getPlayer(), true);
+        }
     }
 }

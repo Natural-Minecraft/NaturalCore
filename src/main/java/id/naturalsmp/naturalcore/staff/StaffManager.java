@@ -21,7 +21,6 @@ public class StaffManager {
 
     private final NaturalCore plugin;
     private final Set<UUID> staffModePlayers = new HashSet<>();
-    private final Set<UUID> vanishedPlayers = new HashSet<>();
     private final Map<UUID, ItemStack[]> inventoryCache = new HashMap<>();
     private final Map<UUID, ItemStack[]> armorCache = new HashMap<>();
     private final Map<UUID, GameMode> gamemodeCache = new HashMap<>();
@@ -96,29 +95,15 @@ public class StaffManager {
     }
 
     public void toggleVanish(Player player) {
-        setVanished(player, !vanishedPlayers.contains(player.getUniqueId()));
+        setVanished(player, !plugin.getVanishManager().isVanished(player));
     }
 
     public void setVanished(Player player, boolean vanish) {
-        if (vanish) {
-            vanishedPlayers.add(player.getUniqueId());
-            for (Player online : Bukkit.getOnlinePlayers()) {
-                if (!online.hasPermission("naturalsmp.staff")) {
-                    online.hidePlayer(plugin, player);
-                }
-            }
-            player.sendMessage(ChatUtils.colorize("&6&lStaff &8» &7Kamu sekarang &aMenghilang&7."));
-        } else {
-            vanishedPlayers.remove(player.getUniqueId());
-            for (Player online : Bukkit.getOnlinePlayers()) {
-                online.showPlayer(plugin, player);
-            }
-            player.sendMessage(ChatUtils.colorize("&6&lStaff &8» &7Kamu sekarang &cTerlihat&7."));
-        }
+        plugin.getVanishManager().setVanished(player, vanish);
     }
 
     public boolean isVanished(Player player) {
-        return vanishedPlayers.contains(player.getUniqueId());
+        return plugin.getVanishManager().isVanished(player);
     }
 
     public boolean isInStaffMode(Player player) {

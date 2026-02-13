@@ -106,10 +106,14 @@ public class NaturalCoreDatabase {
 
         try (PreparedStatement s1 = connection.prepareStatement(coreState);
                 PreparedStatement s2 = connection.prepareStatement(homesTable);
-                PreparedStatement s3 = connection.prepareStatement(spawnTable)) {
+                PreparedStatement s3 = connection.prepareStatement(spawnTable);
+                PreparedStatement s4 = connection.prepareStatement("CREATE TABLE IF NOT EXISTS vanished_players (" +
+                        "uuid VARCHAR(36) PRIMARY KEY, " +
+                        "vanished_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP)")) {
             s1.execute();
             s2.execute();
             s3.execute();
+            s4.execute();
         }
     }
 
@@ -161,5 +165,45 @@ public class NaturalCoreDatabase {
 
     public void setMaintenanceWhitelist(String jsonArray) {
         setState("maintenance_whitelist", jsonArray);
+    }
+
+    public void addVanished(java.util.UUID uuid) {
+        if (!connect())
+            return;
+        String query = "INSERT IGNORE INTO vanished_players (uuid) VALUES (?)";
+        try (PreparedStatement stmt = connection.prepareStatement(query)) {
+            stmt.setString(1, uuid.toString());
+            stmt.executeUpdate();
+        } catch (SQLException e) {
+            plugin.getLogger().log(Level.WARNING, "[CoreDB] Failed to add vanished player " + uuid, e);
+        }
+    }
+
+    public void removeVanished(java.util.UUID uuid) {
+        if (!connect())
+            return;
+        String query = "DELETE FROM vanished_players WHERE uuid = ?";
+        try (PreparedStatement stmt = connection.prepareStatement(query)) {
+            stmt.setString(1, uuid.toString());
+            stmt.executeUpdate();
+        } catch (SQLException e) {
+            plugin.getLogger().log(Level.WARNING, "[CoreDB] Failed to remove vanished player " + uuid, e);
+        }
+    }
+
+    public java.util.Set<java.util.UUID> getVanishedPlayers() {
+        java.util.Set<java.util.UUID> vanished = new java.util.HashSet<>();
+        if (!connect())
+            return vanished;
+        String query = "SELECT uuid FROM vanished_players";
+        try (PreparedStatement stmt = connection.prepareStatement(query);
+                ResultSet rs = stmt.executeQuery()) {
+            while (rs.next()) {
+                vanished.add(java.util.UUID.fromString(rs.getString("uuid")));
+            }
+        } catch (SQLException e) {
+            plugin.getLogger().log(Level.WARNING, "[CoreDB] Failed to get vanished players", e);
+        }
+        return vanished;
     }
 }
