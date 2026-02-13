@@ -9,7 +9,7 @@ import id.naturalsmp.naturalcore.utils.ChatUtils;
 public class ActionBarAnimator {
 
     // Action Bar constrained to Hotbar width (approx 40-50 chars)
-    private static final int ACTIONBAR_WIDTH = 45;
+    private static final int ACTIONBAR_WIDTH = 50;
 
     /**
      * Scroll transition: Slide effect using a fixed window tape.

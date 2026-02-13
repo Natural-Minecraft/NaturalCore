@@ -30,7 +30,7 @@ public class TipsComponent extends AbstractHUDComponent {
     private String currentTip = null;
     private int stayTicks = 0;
     private static final int STAY_DURATION = 200; // 10 seconds (was 5s)
-    private static final int MAX_WIDTH = 45; // Max ActionBar width for static text
+    private static final int MAX_WIDTH = 50; // Max ActionBar width for static text
 
     private BukkitTask scheduleTask;
 
