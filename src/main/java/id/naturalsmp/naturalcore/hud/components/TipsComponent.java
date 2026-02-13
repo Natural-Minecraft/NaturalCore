@@ -33,7 +33,7 @@ public class TipsComponent extends AbstractHUDComponent {
     private BukkitTask scheduleTask;
 
     public TipsComponent(NaturalCore plugin) {
-        super(plugin, "tips", HUDPriority.HIGH); // High priority to override Season HUD
+        super(plugin, "tips", HUDPriority.MEDIUM); // Medium priority (below Lagg)
         reload();
         startSchedule();
     }
@@ -97,6 +97,11 @@ public class TipsComponent extends AbstractHUDComponent {
 
     @Override
     public boolean shouldDisplay(Player player) {
+        // Don't show tips if LaggManager is active (cleanup in progress)
+        if (plugin.getLaggManager() != null && plugin.getLaggManager()
+                .getState() != id.naturalsmp.naturalcore.utility.NaturalLaggManager.LaggState.IDLE) {
+            return false;
+        }
         return currentTip != null;
     }
 
@@ -111,6 +116,6 @@ public class TipsComponent extends AbstractHUDComponent {
 
     @Override
     public int getTransitionDuration() {
-        return 60; // Slow scrolling for tips
+        return 40; // Match LaggComponent scrolling speed
     }
 }

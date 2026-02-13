@@ -26,6 +26,13 @@ public class SpawnListener implements Listener {
 
         List<String> allowed = ConfigUtils.getStringList("spawn.allowed-join-worlds");
 
+        // Allow vanilla worlds implicitly
+        if (currentWorld.equals("world") || currentWorld.equals("world_nether")
+                || currentWorld.equals("world_the_end")) {
+            // Do not force teleport to spawn
+            return;
+        }
+
         if (!e.getPlayer().hasPlayedBefore() || !allowed.contains(currentWorld)) {
             // First Join Kit
             if (!e.getPlayer().hasPlayedBefore()) {

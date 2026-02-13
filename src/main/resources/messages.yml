@@ -142,6 +142,7 @@ teleport:
   teleporting-title: "%displayname%"
   teleporting-subtitle: "&7Teleporting..."
   back-success: "&#55FF55&l⚡ &7Berhasil kembali ke lokasi sebelumnya."
+  back-location-set: "&aLokasi &eback &adisetel."
   back-fail: "&#FF5555&l⚡ &cTidak ada lokasi teleportasi tersisa!"
   back-no-rank: "&#FF5555&l⚡ &cKamu butuh rank &#FF55FF&lMIDI &cuntuk teleport ke lokasi non-mati!"
   otp-success: "&#00AAFF&l✈ &7Teleportasi ke &#00AAFF&l%player%&7."

@@ -7,9 +7,9 @@ package id.naturalsmp.naturalcore.hud;
 public enum HUDPriority {
 
     CRITICAL(100), // Temperature warning, HP critical
-    HIGH(75), // Lagg notifications, active events
-    MEDIUM(50), // Normal combat info
-    LOW(25), // Tips, hints
+    HIGH(75), // Lagg notifications
+    MEDIUM(50), // Normal combat info, Tips
+    LOW(25), //
     DEFAULT(10); // Season info, always-on HUD
 
     private final int value;

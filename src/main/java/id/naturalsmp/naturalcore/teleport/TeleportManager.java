@@ -31,15 +31,27 @@ public class TeleportManager {
     }
 
     public void setLastLocation(org.bukkit.entity.Player p) {
-        lastLocations.put(p.getUniqueId(), p.getLocation());
+        setLastLocation(p, p.getLocation());
+    }
+
+    public void setLastLocation(org.bukkit.entity.Player p, org.bukkit.Location loc) {
+        lastLocations.put(p.getUniqueId(), loc);
+
+        // Send Action Bar notification ONLY if player has permission
+        if (p.hasPermission("naturalsmp.midi") || p.hasPermission("naturalsmp.back")) {
+            String msg = ConfigUtils.getString("messages.teleport.back-location-set");
+            if (msg != null && !msg.isEmpty()) {
+                p.spigot().sendMessage(net.md_5.bungee.api.ChatMessageType.ACTION_BAR,
+                        net.md_5.bungee.api.chat.TextComponent.fromLegacyText(ChatUtils.colorize(msg)));
+            }
+        }
     }
 
     public void setLastDeathLocation(org.bukkit.entity.Player p) {
         lastDeathLocations.put(p.getUniqueId(), p.getLocation());
-        // Death counts as a "Back" location for those with permission too, usually.
-        // But we keep them separate to distinguish logic.
-        // Optional: setLastLocation(p); // If we want death to override normal back for
-        // VIPs too immediately.
+        // Also set as normal back location so /back works for everyone (if permitted)
+        // or just to have it saved
+        setLastLocation(p, p.getLocation());
     }
 
     public org.bukkit.Location getLastLocation(org.bukkit.entity.Player p) {

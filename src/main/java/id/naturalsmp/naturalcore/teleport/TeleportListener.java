@@ -24,12 +24,12 @@ public class TeleportListener implements Listener {
         }
 
         // Save location for /back
-        plugin.getTeleportManager().setLastLocation(e.getPlayer());
+        plugin.getTeleportManager().setLastLocation(e.getPlayer(), e.getFrom());
     }
 
     @EventHandler
     public void onQuit(PlayerQuitEvent e) {
         // Save location on logout so /back works after relog
-        plugin.getTeleportManager().setLastLocation(e.getPlayer());
+        plugin.getTeleportManager().setLastLocation(e.getPlayer(), e.getPlayer().getLocation());
     }
 }
