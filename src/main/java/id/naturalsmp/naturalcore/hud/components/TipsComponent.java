@@ -2,6 +2,7 @@ package id.naturalsmp.naturalcore.hud.components;
 
 import id.naturalsmp.naturalcore.NaturalCore;
 import id.naturalsmp.naturalcore.hud.HUDPriority;
+import id.naturalsmp.naturalcore.utility.NaturalLaggManager;
 import id.naturalsmp.naturalcore.utils.ChatUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.Sound;
@@ -97,19 +98,11 @@ public class TipsComponent extends AbstractHUDComponent {
 
     @Override
     public boolean shouldDisplay(Player player) {
-import id.naturalsmp.naturalcore.utility.NaturalLaggManager;
-
-// ... (existing imports)
-
-    @Override
-    public boolean shouldDisplay(Player player) {
         // Don't show tips if LaggManager is active (cleanup in progress)
         if (plugin.getLaggManager() != null && plugin.getLaggManager()
                 .getState() != NaturalLaggManager.LaggState.IDLE) {
             return false;
         }
-        return currentTip != null;
-    }
         return currentTip != null;
     }
 
