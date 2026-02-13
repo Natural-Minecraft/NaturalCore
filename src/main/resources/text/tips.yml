@@ -1,16 +1,37 @@
 # ==========================================
 # NATURAL CORE - TIPS CONFIGURATION
 # ==========================================
+# Semua setting bisa diubah tanpa restart plugin.
+# Gunakan /nacore reload untuk menerapkan perubahan.
 
 settings:
   enabled: true
-  interval: 300 # Detik (5 Menit)
-  duration: 4 # Detik (Waktu diam membaca)
-  sound: "BLOCK_NOTE_BLOCK_HAT" # Suara tik tik
+  interval: 300         # Detik antar tips (default: 300 = 5 menit)
+  duration: 10          # Detik tips ditampilkan (default: 10)
+
+  # Sound effect saat tips muncul
+  sound:
+    enabled: true
+    name: "BLOCK_NOTE_BLOCK_HAT"
+    volume: 0.4
+    pitch: 2.0
+
+  # Marquee (scrolling) untuk tips yang kepanjangan
+  marquee:
+    max-width: 50        # Lebar maksimal sebelum scrolling aktif
+    scroll-speed: 4      # Ticks per karakter scroll (makin kecil = makin cepat)
+    pause-duration: 4.0  # Detik jeda membaca sebelum/sesudah scroll
+
+    # Typing sound effect saat scrolling
+    typing-sound:
+      enabled: true
+      name: "BLOCK_NOTE_BLOCK_HAT"
+      volume: 0.15
+      pitch: 1.8
 
 tips:
-  - "&e&lTIPS: &7Gunakan &f/rtp &7untuk mencari lahan survival yang aman!"
-  - "&e&lTIPS: &7Ajak temanmu bermain untuk membuat &fClan &7bersama!"
-  - "&e&lTIPS: &7Jangan lupa vote server setiap hari dengan &f/vote&7."
-  - "&e&lTIPS: &7Beli rank &bMVP &7untuk akses fitur &f/fly &7di survival."
-  - "&e&lTIPS: &7Gunakan &f/profile &7untuk melihat statistikmu."
+  - "&7Ketik &f/rtp &7untuk cari lahan survival!"
+  - "&7Buat &fClan &7bersama temanmu!"
+  - "&7Vote harian dengan &f/vote&7!"
+  - "&7Rank &bMVP &7= akses &f/fly &7survival!"
+  - "&7Cek statistikmu di &f/profile&7!"
