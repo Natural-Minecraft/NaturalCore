@@ -97,11 +97,19 @@ public class TipsComponent extends AbstractHUDComponent {
 
     @Override
     public boolean shouldDisplay(Player player) {
+import id.naturalsmp.naturalcore.utility.NaturalLaggManager;
+
+// ... (existing imports)
+
+    @Override
+    public boolean shouldDisplay(Player player) {
         // Don't show tips if LaggManager is active (cleanup in progress)
         if (plugin.getLaggManager() != null && plugin.getLaggManager()
-                .getState() != id.naturalsmp.naturalcore.utility.NaturalLaggManager.LaggState.IDLE) {
+                .getState() != NaturalLaggManager.LaggState.IDLE) {
             return false;
         }
+        return currentTip != null;
+    }
         return currentTip != null;
     }
 
