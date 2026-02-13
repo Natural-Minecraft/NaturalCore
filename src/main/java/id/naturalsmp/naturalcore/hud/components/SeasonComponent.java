@@ -136,4 +136,9 @@ public class SeasonComponent extends AbstractHUDComponent {
 
         return "&b✦ &f" + mana + "&7/&f" + maxMana;
     }
+
+    @Override
+    public int getTransitionDuration() {
+        return 40; // Allow smooth transition FROM other components (like Tips/Lagg) back to Season
+    }
 }
