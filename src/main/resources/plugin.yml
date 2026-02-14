@@ -46,6 +46,10 @@ commands:
   tphere:
     description: Tarik player
     permission: naturalsmp.tphere
+  tieradmin:
+    description: Admin tier management
+    permission: naturalsmp.admin
+    aliases: [tadmin]
 
   endersee:
     description: Intip enderchest player lain
