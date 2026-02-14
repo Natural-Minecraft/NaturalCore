@@ -34,9 +34,14 @@ public class ChatListener implements Listener {
         }
 
         private static final java.util.Map<java.util.UUID, Boolean> searchMode = new java.util.HashMap<>();
+        private static final java.util.Map<java.util.UUID, Boolean> tierEditMode = new java.util.HashMap<>();
 
         public static void setSearchMode(java.util.UUID uuid) {
                 searchMode.put(uuid, true);
+        }
+
+        public static void setTierEditMode(java.util.UUID uuid) {
+                tierEditMode.put(uuid, true);
         }
 
         @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
@@ -60,6 +65,58 @@ public class ChatListener implements Listener {
                                 } else {
                                         new id.naturalsmp.naturalcore.utility.TutorialGUI(plugin).openGUI(player,
                                                         query);
+                                }
+                        });
+                        return;
+                }
+
+                // TIER EDIT MODE INTERCEPTION
+                if (tierEditMode.containsKey(player.getUniqueId())) {
+                        event.setCancelled(true);
+                        tierEditMode.remove(player.getUniqueId());
+
+                        String input = net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer
+                                        .plainText().serialize(event.message());
+
+                        Bukkit.getScheduler().runTask(plugin, () -> {
+                                if (input.equalsIgnoreCase("cancel")) {
+                                        player.sendMessage(ChatUtils.toComponent("&#FF5555&l✘ &cEdit dibatalkan."));
+                                        return;
+                                }
+
+                                try {
+                                        double value = Double.parseDouble(input);
+                                        id.naturalsmp.naturalcore.tier.TierEditorGUI.EditContext context = id.naturalsmp.naturalcore.tier.TierEditorGUI
+                                                        .getContext(player.getUniqueId());
+
+                                        if (context != null) {
+                                                id.naturalsmp.naturalcore.tier.TierManager tm = plugin.getTierManager();
+                                                id.naturalsmp.naturalcore.tier.TierManager.Tier tier = tm
+                                                                .getTier(context.level);
+
+                                                if (tier != null) {
+                                                        double curMoney = tier.reqMoney;
+                                                        int curKills = tier.reqKills;
+
+                                                        if (context.type == id.naturalsmp.naturalcore.tier.TierEditorGUI.EditType.MONEY) {
+                                                                curMoney = value;
+                                                        } else {
+                                                                curKills = (int) value;
+                                                        }
+
+                                                        tm.updateTierRequirement(context.level, curMoney, curKills);
+                                                        player.sendMessage(ChatUtils.toComponent(
+                                                                        "&#55FF55&l✔ &aRequirement diperbarui untuk level &e"
+                                                                                        + context.level));
+
+                                                        // Re-open editor
+                                                        new id.naturalsmp.naturalcore.tier.TierEditorGUI(plugin,
+                                                                        context.level).openGUI(player);
+                                                }
+                                        }
+                                } catch (NumberFormatException e) {
+                                        player.sendMessage(ChatUtils.toComponent(
+                                                        "&#FF5555&l✘ &cInput tidak valid! Harap masukkan angka."));
                                 }
                         });
                         return;

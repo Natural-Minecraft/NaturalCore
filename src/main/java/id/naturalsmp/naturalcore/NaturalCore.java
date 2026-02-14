@@ -502,7 +502,10 @@ public final class NaturalCore extends JavaPlugin {
         this.tierGUI = new id.naturalsmp.naturalcore.tier.TierGUI(this); // Listeners inside
         getServer().getPluginManager().registerEvents(tierGUI, this);
         getServer().getPluginManager().registerEvents(new id.naturalsmp.naturalcore.tier.TierTopGUI(this), this);
+        getServer().getPluginManager().registerEvents(new id.naturalsmp.naturalcore.tier.TierAdminGUI(this), this);
+        getServer().getPluginManager().registerEvents(new id.naturalsmp.naturalcore.tier.TierEditorGUI(this, 0), this);
         registerCmd("tier", new id.naturalsmp.naturalcore.tier.TierCommand(this));
+        registerCmd("tieradmin", new id.naturalsmp.naturalcore.tier.TierAdminCommand(this));
         registerCmd("chatview", new id.naturalsmp.naturalcore.chat.ChatSnapshotCommand());
 
         getServer().getPluginManager().registerEvents(new id.naturalsmp.naturalcore.teleport.PlayerDeathListener(this),

@@ -185,6 +185,26 @@ public class TierManager {
         savePlayerData();
     }
 
+    public void updateTierRequirement(int level, double money, int kills) {
+        Tier t = tierLevels.get(level);
+        if (t != null) {
+            t.reqMoney = money;
+            t.reqKills = kills;
+
+            tiersConfig.set("tiers." + level + ".requirements.money", money);
+            tiersConfig.set("tiers." + level + ".requirements.mob_kills", kills);
+            saveTiersConfig();
+        }
+    }
+
+    public void saveTiersConfig() {
+        try {
+            tiersConfig.save(tiersFile);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
     // --- LEADERBOARD ---
     public Map<String, Integer> getTopPlayers(int limit) {
         // Sort playerConfig keys by value
