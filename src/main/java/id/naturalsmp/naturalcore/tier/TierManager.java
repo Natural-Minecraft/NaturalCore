@@ -69,6 +69,7 @@ public class TierManager {
                 }
             }
         }
+        plugin.getLogger().info("Tier System: Loaded " + tierLevels.size() + " tiers from tiers.yml");
 
         // Load Players
         playerTiers.clear();
