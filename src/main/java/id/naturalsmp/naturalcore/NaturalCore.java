@@ -482,7 +482,10 @@ public final class NaturalCore extends JavaPlugin {
         // 22. Tags System (v1.8)
         id.naturalsmp.naturalcore.chat.tags.TagsGUI tagsGUI = new id.naturalsmp.naturalcore.chat.tags.TagsGUI(this);
         getServer().getPluginManager().registerEvents(tagsGUI, this);
-        registerCmd("tags", new id.naturalsmp.naturalcore.chat.tags.TagsCommand(this));
+        id.naturalsmp.naturalcore.chat.tags.TagsCommand tagsCmd = new id.naturalsmp.naturalcore.chat.tags.TagsCommand(
+                this);
+        registerCmd("tags", tagsCmd);
+        getCommand("tags").setTabCompleter(new id.naturalsmp.naturalcore.chat.tags.TagsTabCompleter(this));
 
         // 23. AFK System (v1.8)
         this.afkManager = new id.naturalsmp.naturalcore.afk.AFKManager(this);

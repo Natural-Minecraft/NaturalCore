@@ -31,6 +31,7 @@ public class LaggComponent extends AbstractHUDComponent {
             return;
 
         int countdown = lagg.getAutoRemovalCountdown();
+        lagg.tickAnimation(); // Advance animation state machine
         if (lagg.getState() == NaturalLaggManager.LaggState.COUNTDOWN) {
             if (countdown != lastBroadcastSec) {
                 lastBroadcastSec = countdown;
