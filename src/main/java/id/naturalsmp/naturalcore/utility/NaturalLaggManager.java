@@ -99,39 +99,47 @@ public class NaturalLaggManager implements Listener {
         this.excludedWorlds = new HashSet<>(plugin.getConfig().getStringList("lagg.excluded-worlds"));
     }
 
-    private void startTasks() {
-        // 1. Animation Tick (2 ticks)
-        new BukkitRunnable() {
-            @Override
-            public void run() {
-                tickAnimation();
-            }
-        }.runTaskTimer(plugin, 2L, 2L);
-
-        // 2. Mob Merging & TPS Optimizer
-        new BukkitRunnable() {
-            @Override
-            public void run() {
-                if (mergingEnabled)
+    public void startTasks() {
+        // Mob Merge Task (every 10 seconds)
+        if (mergingEnabled) {
+            new BukkitRunnable() {
+                @Override
+                public void run() {
                     performMobMerging();
-                checkPerformanceOptimizer();
-            }
-        }.runTaskTimer(plugin, optimizerCheckInterval * 20L, optimizerCheckInterval * 20L);
-
-        // 3. Scheduled Auto-Removal
-        if (autoRemovalEnabled) {
-            startAutoRemovalCycle();
+                }
+            }.runTaskTimer(plugin, 200L, 200L);
         }
 
-        // 4. Chunk Entity Limiter
+        // Hologram position update (every 5 ticks = 0.25s)
+        new BukkitRunnable() {
+            @Override
+            public void run() {
+                HologramUtil.tickHolograms();
+            }
+        }.runTaskTimer(plugin, 20L, 5L);
+
+        // Chunk Limiter
         if (chunkLimiterEnabled) {
             new BukkitRunnable() {
                 @Override
                 public void run() {
                     enforceChunkLimits();
                 }
-            }.runTaskTimer(plugin, chunkLimiterInterval * 20L, chunkLimiterInterval * 20L);
+            }.runTaskTimer(plugin, 100L, chunkLimiterInterval * 20L);
         }
+
+        // Auto Removal Cycle
+        if (autoRemovalEnabled) {
+            startAutoRemovalCycle();
+        }
+
+        // Performance Optimizer
+        new BukkitRunnable() {
+            @Override
+            public void run() {
+                checkPerformanceOptimizer();
+            }
+        }.runTaskTimer(plugin, 200L, optimizerCheckInterval * 20L);
     }
 
     private void startAutoRemovalCycle() {
@@ -348,6 +356,9 @@ public class NaturalLaggManager implements Listener {
             return;
 
         int stackSize = getStackSize(entity);
+        // Always remove hologram from dying entity
+        HologramUtil.removeHologram(entity);
+
         if (stackSize > 1) {
             int newSize = stackSize - 1;
             String baseNameRaw = getStackBaseName(entity);
@@ -373,7 +384,7 @@ public class NaturalLaggManager implements Listener {
             }
             newEntity.setHealth(newEntity.getAttribute(org.bukkit.attribute.Attribute.GENERIC_MAX_HEALTH).getValue());
 
-            // Set Name
+            // Set Name and hologram
             updateStackName(newEntity, baseNameRaw, newSize);
         }
     }
@@ -426,6 +437,7 @@ public class NaturalLaggManager implements Listener {
                         for (LivingEntity other : toMerge) {
                             other.getWorld().spawnParticle(org.bukkit.Particle.CLOUD, other.getLocation().add(0, 1, 0),
                                     5, 0.2, 0.2, 0.2, 0.05);
+                            HologramUtil.removeHologram(other);
                             other.remove();
                         }
                         updateStackName(base, baseName, totalStack);
@@ -464,6 +476,8 @@ public class NaturalLaggManager implements Listener {
 
     private void updateStackName(LivingEntity le, String baseNameRaw, int size) {
         if (size <= 1) {
+            // Single mob — remove hologram, restore original name
+            HologramUtil.removeHologram(le);
             String typeName = le.getType().name();
             // If baseNameRaw looks like the default type name, clear custom name
             if (ChatUtils.decolorize(baseNameRaw).equalsIgnoreCase(typeName)) {
@@ -474,12 +488,19 @@ public class NaturalLaggManager implements Listener {
                 le.setCustomNameVisible(true);
             }
         } else {
-            // Apply suffix
+            // Stacked mob — use hologram instead of custom name
+            le.setCustomNameVisible(false);
+
+            // Build pretty display name
+            String cleanName = ChatUtils.decolorize(baseNameRaw);
+            String holoText = "<gradient:#FFD700:#FFA500>" + cleanName + "</gradient> <gray>x" + size;
+            HologramUtil.updateHologram(le, holoText);
+
+            // Still store count in custom name for internal tracking (hidden)
             if (!baseNameRaw.contains("§") && !baseNameRaw.contains("&")) {
                 baseNameRaw = "&e" + baseNameRaw;
             }
-            le.setCustomName(ChatUtils.colorize(baseNameRaw + " &7x" + size));
-            le.setCustomNameVisible(true);
+            le.setCustomName(ChatUtils.colorize(baseNameRaw + " §7x" + size));
         }
     }
 

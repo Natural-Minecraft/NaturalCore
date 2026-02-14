@@ -449,6 +449,7 @@ public final class NaturalCore extends JavaPlugin {
         registerCmd("start", new StartCommand(this));
 
         // 20. v1.7 Utilities
+        id.naturalsmp.naturalcore.utility.HologramUtil.init(this);
         this.laggManager = new id.naturalsmp.naturalcore.utility.NaturalLaggManager(this);
         this.staffManager = new id.naturalsmp.naturalcore.staff.StaffManager(this);
         this.staffGUI = new id.naturalsmp.naturalcore.staff.StaffGUI(this);

@@ -132,6 +132,33 @@ public class NaturalCoreCommand implements CommandExecutor, TabCompleter {
                     if (sender instanceof Player p)
                         new NaturalCoreGUI(plugin).openGUI(p);
                 }
+                case "holo" -> {
+                    // /nacore admin holo purge [range]
+                    if (adminArgs.length < 1 || !adminArgs[0].equalsIgnoreCase("purge")) {
+                        ConfigUtils.sendUsage(sender, "/nacore admin holo purge [range]");
+                        return true;
+                    }
+
+                    double range = 0; // 0 = all loaded
+                    if (adminArgs.length >= 2) {
+                        try {
+                            range = Double.parseDouble(adminArgs[1]);
+                        } catch (NumberFormatException e) {
+                            ConfigUtils.sendError(sender, "Invalid range number.");
+                            return true;
+                        }
+                    }
+
+                    int count;
+                    if (range > 0 && sender instanceof Player p) {
+                        count = id.naturalsmp.naturalcore.utility.HologramUtil.purgeHolograms(p.getLocation(), range);
+                        ConfigUtils.sendAdmin(sender,
+                                "&aPurged &f" + count + " &aholograms within &f" + range + " &ablocks.");
+                    } else {
+                        count = id.naturalsmp.naturalcore.utility.HologramUtil.purgeAllHolograms();
+                        ConfigUtils.sendAdmin(sender, "&aPurged &f" + count + " &aholograms in all loaded chunks.");
+                    }
+                }
                 default ->
                     ConfigUtils.sendError(sender, ConfigUtils.getMessage("messages.global.sub-command-not-found"));
             }
@@ -227,8 +254,13 @@ public class NaturalCoreCommand implements CommandExecutor, TabCompleter {
         }
 
         if (args.length == 2 && args[0].equalsIgnoreCase("admin")) {
-            return Arrays.asList("reload", "resetseason", "ranksync", "gui", "status", "backup").stream()
+            return Arrays.asList("reload", "resetseason", "ranksync", "gui", "status", "backup", "holo").stream()
                     .filter(s -> s.startsWith(args[1].toLowerCase())).collect(java.util.stream.Collectors.toList());
+        }
+
+        if (args.length == 3 && args[0].equalsIgnoreCase("admin") && args[1].equalsIgnoreCase("holo")) {
+            return Arrays.asList("purge").stream()
+                    .filter(s -> s.startsWith(args[2].toLowerCase())).collect(java.util.stream.Collectors.toList());
         }
 
         return java.util.Collections.emptyList();
