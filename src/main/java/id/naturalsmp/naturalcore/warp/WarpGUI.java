@@ -7,6 +7,7 @@ import id.naturalsmp.naturalcore.utils.GUIUtils;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
+import org.bukkit.NamespacedKey;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -18,16 +19,19 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.persistence.PersistentDataType;
 
 import java.util.*;
 
 public class WarpGUI implements Listener {
 
     private final NaturalCore plugin;
+    private final NamespacedKey warpIdKey;
     private final HashMap<UUID, Boolean> editorMode = new HashMap<>();
 
     public WarpGUI(NaturalCore plugin) {
         this.plugin = plugin;
+        this.warpIdKey = new NamespacedKey(plugin, "warp_id");
     }
 
     public void openGUI(Player player, boolean isEditor) {
@@ -88,6 +92,8 @@ public class WarpGUI implements Listener {
             }
         }
         meta.lore(lore);
+        // Store warp ID in PDC for reliable retrieval on click
+        meta.getPersistentDataContainer().set(warpIdKey, PersistentDataType.STRING, w.getId());
         item.setItemMeta(meta);
         return item;
     }
@@ -215,41 +221,15 @@ public class WarpGUI implements Listener {
             return;
 
         ItemMeta meta = clicked.getItemMeta();
-        if (!meta.hasLore() || meta.lore() == null || meta.lore().isEmpty())
+        if (meta == null)
             return;
 
-        // Note: Retrieving lore from Component can be tricky if we want plain text.
-        // But here we just need the ID which is usually in the first line or known.
-        // Wait, current logic: String warpId =
-        // ChatUtils.stripColor(meta.getLore().get(0));
-        // We need to support Component-based lore retrieval.
-        // Or we can store the ID in PDC (PersistentDataContainer) for robust handling,
-        // but for now let's try to extract text from Component.
-
-        // This is risky if we change to Component.
-        // Let's defer component migration for lore READING, or assume ID extraction
-        // needs fix.
-        // Actually, let's keep the helper method returning String lore in
-        // 'meta.getLore()'
-        // IF we didn't change it. But we DID change createWarpItem to use
-        // meta.lore(List<Component>).
-        // So meta.getLore() (deprecated) might return null or work if Spigot converts
-        // it back.
-        // To be safe, we should assume we need to extract from Component.
-
-        // However, extracting plain text from Component lore:
-        // We can use meta.lore() which returns List<Component>.
-        List<Component> lore = meta.lore();
-        if (lore == null || lore.isEmpty())
+        // Retrieve warp ID from PDC (reliable, no lore parsing needed)
+        String warpId = meta.getPersistentDataContainer().get(warpIdKey, PersistentDataType.STRING);
+        if (warpId == null)
             return;
-
-        // We need to serialize back to string to strip color.
-        String firstLine = net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer.legacyAmpersand()
-                .serialize(lore.get(0));
-        String warpId = ChatUtils.stripColor(firstLine);
 
         Warp w = plugin.getWarpManager().getWarp(warpId);
-
         if (w == null)
             return;
 
