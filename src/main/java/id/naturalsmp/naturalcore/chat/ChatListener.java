@@ -110,18 +110,15 @@ public class ChatListener implements Listener {
                                 .match(mentionPattern)
                                 .replacement((result, builder) -> {
                                         String tagName = result.group(1);
-                                        String fullTag = result.group(0);
 
                                         // 1. Check @everyone
                                         if (tagName.equalsIgnoreCase("everyone")) {
                                                 if (sender.hasPermission("naturalsmp.mention.everyone")) {
                                                         notifyEveryone(sender);
-                                                        return Component.text("@everyone")
-                                                                        .color(NamedTextColor.GOLD)
-                                                                        .decorate(net.kyori.adventure.text.format.TextDecoration.BOLD)
-                                                                        .hoverEvent(HoverEvent.showText(Component.text(
-                                                                                        "Mention Everyone",
-                                                                                        NamedTextColor.YELLOW)));
+                                                        return ChatUtils.toComponent(
+                                                                        "<gradient:#ff0000:#8b0000><bold>@everyone</bold></gradient>")
+                                                                        .hoverEvent(HoverEvent.showText(ChatUtils
+                                                                                        .toComponent("&cBroadcast to all players")));
                                                 }
                                                 return builder;
                                         }
@@ -130,12 +127,10 @@ public class ChatListener implements Listener {
                                         if (tagName.equalsIgnoreCase("here")) {
                                                 if (sender.hasPermission("naturalsmp.mention.here")) {
                                                         notifyHere(sender);
-                                                        return Component.text("@here")
-                                                                        .color(NamedTextColor.YELLOW)
-                                                                        .decorate(net.kyori.adventure.text.format.TextDecoration.BOLD)
-                                                                        .hoverEvent(HoverEvent.showText(Component.text(
-                                                                                        "Mention Here (Radius)",
-                                                                                        NamedTextColor.YELLOW)));
+                                                        return ChatUtils.toComponent(
+                                                                        "<gradient:#ffff55:#ffaa00><bold>@here</bold></gradient>")
+                                                                        .hoverEvent(HoverEvent.showText(ChatUtils
+                                                                                        .toComponent("&eBroadcast to nearby players")));
                                                 }
                                                 return builder;
                                         }
@@ -151,8 +146,7 @@ public class ChatListener implements Listener {
                                                                 target = p;
                                                                 break;
                                                         }
-                                                        // Support tagging by DisplayName (stripped) ???
-                                                        // InteractiveChat supports it, let's try basic implementation
+                                                        // Support tagging by DisplayName (stripped)
                                                         String simpleDisplay = ChatUtils.stripColor(p.getDisplayName());
                                                         if (simpleDisplay.equalsIgnoreCase(tagName)) {
                                                                 target = p;
@@ -165,17 +159,26 @@ public class ChatListener implements Listener {
                                                 // Send notification to TARGET only
                                                 notifyPlayer(sender, target);
 
-                                                // Return styled component
-                                                return Component.text("@" + target.getName())
-                                                                .color(NamedTextColor.GOLD)
+                                                // Return styled component with Premium Gradient
+                                                return ChatUtils.toComponent("<gradient:#ffd700:#ffa500>@"
+                                                                + target.getName() + "</gradient>")
                                                                 .hoverEvent(HoverEvent.showText(
-                                                                                Component.text("Ping: "
-                                                                                                + target.getPing()
-                                                                                                + "ms\n",
-                                                                                                NamedTextColor.GRAY)
-                                                                                                .append(Component.text(
-                                                                                                                "Klik untuk PM",
-                                                                                                                NamedTextColor.YELLOW))))
+                                                                                ChatUtils.toComponent(
+                                                                                                "&8&m------------------------&r\n"
+                                                                                                                +
+                                                                                                                "&6&lUser Info\n"
+                                                                                                                +
+                                                                                                                "&7Name: &f"
+                                                                                                                + target.getName()
+                                                                                                                + "\n" +
+                                                                                                                "&7Ping: &a"
+                                                                                                                + target.getPing()
+                                                                                                                + "ms\n"
+                                                                                                                +
+                                                                                                                "\n" +
+                                                                                                                "&e&lKLIK UNTUK PM\n"
+                                                                                                                +
+                                                                                                                "&8&m------------------------")))
                                                                 .clickEvent(ClickEvent.suggestCommand(
                                                                                 "/msg " + target.getName() + " "));
                                         }
@@ -194,19 +197,18 @@ public class ChatListener implements Listener {
                         return;
 
                 target.playSound(target.getLocation(), Sound.ENTITY_EXPERIENCE_ORB_PICKUP, 1f, 1f);
-                target.sendActionBar(ChatUtils.colorize("&6&lTag! &e" + sender.getName() + " &7menyapa Anda!"));
-                // Title might be too intrusive for every tag? InteractiveChat usually does
-                // sound + actionbar.
-                // Keeping title as requested but maybe shorter/subtle?
-                // target.sendTitle(ChatUtils.colorize("&6&lTAGGED!"),
-                // ChatUtils.colorize("&7Oleh &f" + sender.getName()), 5, 20, 5);
+                target.sendActionBar(
+                                ChatUtils.toComponent("<gradient:#ffd700:#ffa500><bold>TAG!</bold></gradient> <yellow>"
+                                                + sender.getName() + " <gray>tagged you!"));
         }
 
         private void notifyEveryone(Player sender) {
                 for (Player p : Bukkit.getOnlinePlayers()) {
                         if (!p.equals(sender)) {
                                 p.playSound(p.getLocation(), Sound.BLOCK_NOTE_BLOCK_BELL, 1f, 1.2f);
-                                p.sendActionBar(ChatUtils.colorize("&c&l@everyone &7dari &f" + sender.getName()));
+                                p.sendActionBar(ChatUtils.toComponent(
+                                                "<gradient:#ff0000:#8b0000><bold>@everyone</bold></gradient> <gray>from <white>"
+                                                                + sender.getName()));
                         }
                 }
         }
@@ -219,7 +221,9 @@ public class ChatListener implements Listener {
                         if (!p.equals(sender)
                                         && p.getLocation().distanceSquared(sender.getLocation()) <= radius * radius) {
                                 p.playSound(p.getLocation(), Sound.BLOCK_NOTE_BLOCK_BELL, 1f, 1.5f);
-                                p.sendActionBar(ChatUtils.colorize("&e&l@here &7dari &f" + sender.getName()));
+                                p.sendActionBar(ChatUtils.toComponent(
+                                                "<gradient:#ffff55:#ffaa00><bold>@here</bold></gradient> <gray>from <white>"
+                                                                + sender.getName()));
                         }
                 }
         }
