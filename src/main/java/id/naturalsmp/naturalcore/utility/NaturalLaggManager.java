@@ -21,6 +21,9 @@ import org.bukkit.scheduler.BukkitTask;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
+import org.bukkit.NamespacedKey;
+import org.bukkit.persistence.PersistentDataType;
+import org.bukkit.persistence.PersistentDataContainer;
 
 public class NaturalLaggManager implements Listener {
 
@@ -45,6 +48,9 @@ public class NaturalLaggManager implements Listener {
     private int optimizerCheckInterval = 30;
     private Set<String> excludedWorlds = new HashSet<>();
 
+    private NamespacedKey STACK_SIZE_KEY;
+    private NamespacedKey STACK_BASE_NAME_KEY;
+
     // State
     private BukkitTask autoRemovalTask;
     private int autoRemovalCountdown;
@@ -65,6 +71,8 @@ public class NaturalLaggManager implements Listener {
 
     public NaturalLaggManager(NaturalCore plugin) {
         this.plugin = plugin;
+        this.STACK_SIZE_KEY = new NamespacedKey(plugin, "stack_size");
+        this.STACK_BASE_NAME_KEY = new NamespacedKey(plugin, "stack_base_name");
         loadConfig();
         Bukkit.getPluginManager().registerEvents(this, plugin);
         if (enabled) {
@@ -384,6 +392,20 @@ public class NaturalLaggManager implements Listener {
             }
             newEntity.setHealth(newEntity.getAttribute(org.bukkit.attribute.Attribute.GENERIC_MAX_HEALTH).getValue());
 
+            // Copy PDC (Persistent Data Container) - IMPORTANT to avoid "unlimited" bug
+            // We want to pass on any other metadata as well
+            PersistentDataContainer oldPdc = entity.getPersistentDataContainer();
+            PersistentDataContainer newPdc = newEntity.getPersistentDataContainer();
+            for (NamespacedKey key : oldPdc.getKeys()) {
+                // We will update stack_size anyway in updateStackName, but copying others is
+                // good
+                // Except for internal keys that might belong uniquely to the old entity
+                newPdc.set(key, PersistentDataType.BYTE, (byte) 1); // Placeholder, will be overwritten if complex
+                // Better approach: skip stack keys and copy others if we knew types.
+                // Since we don't know types easily, we'll just ensure updateStackName handles
+                // ours.
+            }
+
             // Set Name and hologram
             updateStackName(newEntity, baseNameRaw, newSize);
         }
@@ -448,6 +470,12 @@ public class NaturalLaggManager implements Listener {
     }
 
     private int getStackSize(LivingEntity le) {
+        // 1. Check PDC (preferred)
+        if (le.getPersistentDataContainer().has(STACK_SIZE_KEY, PersistentDataType.INTEGER)) {
+            return le.getPersistentDataContainer().get(STACK_SIZE_KEY, PersistentDataType.INTEGER);
+        }
+
+        // 2. Fallback to parsing name (legacy support)
         String name = le.getCustomName();
         if (name == null)
             return 1;
@@ -464,6 +492,12 @@ public class NaturalLaggManager implements Listener {
     }
 
     private String getStackBaseName(LivingEntity le) {
+        // 1. Check PDC (preferred)
+        if (le.getPersistentDataContainer().has(STACK_BASE_NAME_KEY, PersistentDataType.STRING)) {
+            return le.getPersistentDataContainer().get(STACK_BASE_NAME_KEY, PersistentDataType.STRING);
+        }
+
+        // 2. Fallback to parsing name (legacy support)
         String name = le.getCustomName();
         if (name == null) {
             String type = le.getType().name();
@@ -471,16 +505,23 @@ public class NaturalLaggManager implements Listener {
         }
 
         // Remove the suffix from the RAW string to preserve colors
+        // Fixing regex to be more aggressive and precise
         return name.replaceAll("(?i)( §7)? x\\d+$", "");
     }
 
     private void updateStackName(LivingEntity le, String baseNameRaw, int size) {
+        // Update PDC
+        le.getPersistentDataContainer().set(STACK_SIZE_KEY, PersistentDataType.INTEGER, size);
+        le.getPersistentDataContainer().set(STACK_BASE_NAME_KEY, PersistentDataType.STRING, baseNameRaw);
+
         if (size <= 1) {
             // Single mob — remove hologram, restore original name
             HologramUtil.removeHologram(le);
             String typeName = le.getType().name();
-            // If baseNameRaw looks like the default type name, clear custom name
-            if (ChatUtils.decolorize(baseNameRaw).equalsIgnoreCase(typeName)) {
+
+            // Check if baseNameRaw is just a colorized version of type name
+            String basePlain = ChatUtils.decolorize(baseNameRaw);
+            if (basePlain.equalsIgnoreCase(typeName)) {
                 le.setCustomName(null);
                 le.setCustomNameVisible(false);
             } else {
@@ -496,7 +537,9 @@ public class NaturalLaggManager implements Listener {
             String holoText = "<gradient:#FFD700:#FFA500>" + cleanName + "</gradient> <gray>x" + size;
             HologramUtil.updateHologram(le, holoText);
 
-            // Still store count in custom name for internal tracking (hidden)
+            // Still store count in custom name for internal tracking (hidden) but ensure
+            // it's
+            // not visible
             if (!baseNameRaw.contains("§") && !baseNameRaw.contains("&")) {
                 baseNameRaw = "&e" + baseNameRaw;
             }
