@@ -197,3 +197,20 @@ rank_price_database:
   table: "products"
   # Uses existing 'products' table from store.naturalsmp.id
   # Filters by type='rank', id format: "rank-vip", "rank-mvp", etc.
+
+# ==========================================
+#          FIRST JOIN KIT
+# ==========================================
+first-join-kit:
+  items:
+    - "WOODEN_SWORD:1"
+    - "WOODEN_PICKAXE:1"
+    - "WOODEN_AXE:1"
+    - "WOODEN_SHOVEL:1"
+    - "COOKED_BEEF:16"
+    - "GOLDEN_SHOVEL:1"
+  armor:
+    helmet: "LEATHER_HELMET"
+    chestplate: "LEATHER_CHESTPLATE"
+    leggings: "LEATHER_LEGGINGS"
+    boots: "LEATHER_BOOTS"

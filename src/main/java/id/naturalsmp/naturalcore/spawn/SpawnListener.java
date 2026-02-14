@@ -24,79 +24,74 @@ public class SpawnListener implements Listener {
         Player p = e.getPlayer();
         String currentWorld = p.getWorld().getName();
 
+        // 1. FIRST JOIN HANDLING (Priority)
+        if (!e.getPlayer().hasPlayedBefore()) {
+            // First Join Kit
+            List<String> kitItems = plugin.getConfig().getStringList("first-join-kit.items");
+            if (kitItems.isEmpty()) {
+                // Fallback Default
+                p.getInventory().addItem(new org.bukkit.inventory.ItemStack(org.bukkit.Material.WOODEN_SWORD));
+                p.getInventory().addItem(new org.bukkit.inventory.ItemStack(org.bukkit.Material.WOODEN_PICKAXE));
+                p.getInventory().addItem(new org.bukkit.inventory.ItemStack(org.bukkit.Material.WOODEN_AXE));
+                p.getInventory().addItem(new org.bukkit.inventory.ItemStack(org.bukkit.Material.WOODEN_SHOVEL));
+                p.getInventory().addItem(new org.bukkit.inventory.ItemStack(org.bukkit.Material.COOKED_BEEF, 16));
+                p.getInventory().addItem(new org.bukkit.inventory.ItemStack(org.bukkit.Material.GOLDEN_SHOVEL)); // Claim
+            } else {
+                for (String itemStr : kitItems) {
+                    try {
+                        String[] parts = itemStr.split(":");
+                        org.bukkit.Material mat = org.bukkit.Material.valueOf(parts[0]);
+                        int amount = parts.length > 1 ? Integer.parseInt(parts[1]) : 1;
+                        p.getInventory().addItem(new org.bukkit.inventory.ItemStack(mat, amount));
+                    } catch (Exception ignored) {
+                    }
+                }
+            }
+
+            // Armor
+            String helmet = plugin.getConfig().getString("first-join-kit.armor.helmet", "LEATHER_HELMET");
+            String chest = plugin.getConfig().getString("first-join-kit.armor.chestplate", "LEATHER_CHESTPLATE");
+            String legs = plugin.getConfig().getString("first-join-kit.armor.leggings", "LEATHER_LEGGINGS");
+            String boots = plugin.getConfig().getString("first-join-kit.armor.boots", "LEATHER_BOOTS");
+
+            try {
+                if (!helmet.equals("AIR"))
+                    p.getInventory()
+                            .setHelmet(new org.bukkit.inventory.ItemStack(org.bukkit.Material.valueOf(helmet)));
+                if (!chest.equals("AIR"))
+                    p.getInventory()
+                            .setChestplate(new org.bukkit.inventory.ItemStack(org.bukkit.Material.valueOf(chest)));
+                if (!legs.equals("AIR"))
+                    p.getInventory()
+                            .setLeggings(new org.bukkit.inventory.ItemStack(org.bukkit.Material.valueOf(legs)));
+                if (!boots.equals("AIR"))
+                    p.getInventory()
+                            .setBoots(new org.bukkit.inventory.ItemStack(org.bukkit.Material.valueOf(boots)));
+            } catch (Exception ignored) {
+            }
+
+            p.sendMessage(ChatUtils.colorize("&aWelcome to NaturalSMP! You received a starter kit."));
+
+            // Teleport to spawn for first join
+            plugin.getSpawnManager().teleport(p);
+
+            p.setAllowFlight(false);
+            p.setFlying(false);
+            return; // Done with first join
+        }
+
+        // 2. EXISTING PLAYER JOIN HANDLING
         List<String> allowed = ConfigUtils.getStringList("spawn.allowed-join-worlds");
 
-        // Allow vanilla worlds implicitly
+        // Allow vanilla worlds implicitly for existing players
         if (currentWorld.equals("world") || currentWorld.equals("world_nether")
                 || currentWorld.equals("world_the_end")) {
-            // Do not force teleport to spawn
             return;
         }
 
-        if (!e.getPlayer().hasPlayedBefore() || !allowed.contains(currentWorld)) {
-            // First Join Kit
-            if (!e.getPlayer().hasPlayedBefore()) {
-                // Modified: Load kit from config 'first-join-kit'
-                // Format config:
-                // first-join-kit:
-                // items:
-                // - MATERIAL:AMOUNT
-                // armor:
-                // helmet: MATERIAL
-                // chestplate: MATERIAL
-                // leggings: MATERIAL
-                // boots: MATERIAL
-
-                List<String> kitItems = plugin.getConfig().getStringList("first-join-kit.items");
-                if (kitItems.isEmpty()) {
-                    // Fallback Default
-                    p.getInventory().addItem(new org.bukkit.inventory.ItemStack(org.bukkit.Material.WOODEN_SWORD));
-                    p.getInventory().addItem(new org.bukkit.inventory.ItemStack(org.bukkit.Material.WOODEN_PICKAXE));
-                    p.getInventory().addItem(new org.bukkit.inventory.ItemStack(org.bukkit.Material.WOODEN_AXE));
-                    p.getInventory().addItem(new org.bukkit.inventory.ItemStack(org.bukkit.Material.WOODEN_SHOVEL));
-                    p.getInventory().addItem(new org.bukkit.inventory.ItemStack(org.bukkit.Material.COOKED_BEEF, 16));
-                    p.getInventory().addItem(new org.bukkit.inventory.ItemStack(org.bukkit.Material.GOLDEN_SHOVEL)); // Claim
-                } else {
-                    for (String itemStr : kitItems) {
-                        try {
-                            String[] parts = itemStr.split(":");
-                            org.bukkit.Material mat = org.bukkit.Material.valueOf(parts[0]);
-                            int amount = parts.length > 1 ? Integer.parseInt(parts[1]) : 1;
-                            p.getInventory().addItem(new org.bukkit.inventory.ItemStack(mat, amount));
-                        } catch (Exception ignored) {
-                        }
-                    }
-                }
-
-                // Armor
-                String helmet = plugin.getConfig().getString("first-join-kit.armor.helmet", "LEATHER_HELMET");
-                String chest = plugin.getConfig().getString("first-join-kit.armor.chestplate", "LEATHER_CHESTPLATE");
-                String legs = plugin.getConfig().getString("first-join-kit.armor.leggings", "LEATHER_LEGGINGS");
-                String boots = plugin.getConfig().getString("first-join-kit.armor.boots", "LEATHER_BOOTS");
-
-                try {
-                    if (!helmet.equals("AIR"))
-                        p.getInventory()
-                                .setHelmet(new org.bukkit.inventory.ItemStack(org.bukkit.Material.valueOf(helmet)));
-                    if (!chest.equals("AIR"))
-                        p.getInventory()
-                                .setChestplate(new org.bukkit.inventory.ItemStack(org.bukkit.Material.valueOf(chest)));
-                    if (!legs.equals("AIR"))
-                        p.getInventory()
-                                .setLeggings(new org.bukkit.inventory.ItemStack(org.bukkit.Material.valueOf(legs)));
-                    if (!boots.equals("AIR"))
-                        p.getInventory()
-                                .setBoots(new org.bukkit.inventory.ItemStack(org.bukkit.Material.valueOf(boots)));
-                } catch (Exception ignored) {
-                }
-
-                p.sendMessage(ChatUtils.colorize("&aWelcome to NaturalSMP! You received a starter kit."));
-            }
-
-            // Teleport ke spawn utama
+        // If in an non-allowed world, force to spawn
+        if (!allowed.contains(currentWorld)) {
             plugin.getSpawnManager().teleport(p);
-
-            // Matikan fly agar aman (standar safety)
             p.setAllowFlight(false);
             p.setFlying(false);
         }
