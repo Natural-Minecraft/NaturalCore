@@ -99,38 +99,129 @@ public class ChatListener implements Listener {
         }
 
         private Component processMentions(Player sender, Component message) {
-                for (Player target : Bukkit.getOnlinePlayers()) {
-                        String mentionTag = "@" + target.getName();
+                // Pre-compile pattern for better performance (though method-local here, could
+                // be static class field)
+                // Match @ followed by word characters (A-Za-z0-9_)
+                // We use a broader regex to catch potential names, then validate
+                Pattern mentionPattern = Pattern.compile("(?i)@([a-zA-Z0-9_]+)");
 
-                        TextReplacementConfig config = TextReplacementConfig.builder()
-                                        .match(Pattern.compile("(?i)" + Pattern.quote(mentionTag)))
-                                        .replacement((result, builder) -> {
-                                                // Premium Notifications
-                                                target.playSound(target.getLocation(),
-                                                                Sound.ENTITY_EXPERIENCE_ORB_PICKUP, 1f, 1f);
-                                                target.sendActionBar(ChatUtils.colorize(
-                                                                "&6&lTag! &e" + sender.getName() + " &7menyapa Anda!"));
+                // Helper for text replacement
+                TextReplacementConfig config = TextReplacementConfig.builder()
+                                .match(mentionPattern)
+                                .replacement((result, builder) -> {
+                                        String tagName = result.group(1);
+                                        String fullTag = result.group(0);
 
-                                                target.sendTitle(
-                                                                ChatUtils.colorize("&6&lTAGGED!"),
-                                                                ChatUtils.colorize("&7Oleh &f" + sender.getName()),
-                                                                10, 40, 10);
+                                        // 1. Check @everyone
+                                        if (tagName.equalsIgnoreCase("everyone")) {
+                                                if (sender.hasPermission("naturalsmp.mention.everyone")) {
+                                                        notifyEveryone(sender);
+                                                        return Component.text("@everyone")
+                                                                        .color(NamedTextColor.GOLD)
+                                                                        .decorate(net.kyori.adventure.text.format.TextDecoration.BOLD)
+                                                                        .hoverEvent(HoverEvent.showText(Component.text(
+                                                                                        "Mention Everyone",
+                                                                                        NamedTextColor.YELLOW)));
+                                                }
+                                                return builder;
+                                        }
 
-                                                return Component.text(mentionTag)
+                                        // 2. Check @here
+                                        if (tagName.equalsIgnoreCase("here")) {
+                                                if (sender.hasPermission("naturalsmp.mention.here")) {
+                                                        notifyHere(sender);
+                                                        return Component.text("@here")
+                                                                        .color(NamedTextColor.YELLOW)
+                                                                        .decorate(net.kyori.adventure.text.format.TextDecoration.BOLD)
+                                                                        .hoverEvent(HoverEvent.showText(Component.text(
+                                                                                        "Mention Here (Radius)",
+                                                                                        NamedTextColor.YELLOW)));
+                                                }
+                                                return builder;
+                                        }
+
+                                        // 3. Check specific player
+                                        Player target = Bukkit.getPlayerExact(tagName);
+                                        // Fallback: Try match by display name (strip color) or partial match?
+                                        // For now, strict match or closest match to avoid spam
+                                        if (target == null) {
+                                                // Try searching online players by name (case-insensitive)
+                                                for (Player p : Bukkit.getOnlinePlayers()) {
+                                                        if (p.getName().equalsIgnoreCase(tagName)) {
+                                                                target = p;
+                                                                break;
+                                                        }
+                                                        // Support tagging by DisplayName (stripped) ???
+                                                        // InteractiveChat supports it, let's try basic implementation
+                                                        String simpleDisplay = ChatUtils.stripColor(p.getDisplayName());
+                                                        if (simpleDisplay.equalsIgnoreCase(tagName)) {
+                                                                target = p;
+                                                                break;
+                                                        }
+                                                }
+                                        }
+
+                                        if (target != null) {
+                                                // Send notification to TARGET only
+                                                notifyPlayer(sender, target);
+
+                                                // Return styled component
+                                                return Component.text("@" + target.getName())
                                                                 .color(NamedTextColor.GOLD)
                                                                 .hoverEvent(HoverEvent.showText(
                                                                                 Component.text("Ping: "
                                                                                                 + target.getPing()
-                                                                                                + "ms\n§eKlik untuk kirim pesan pribadi!",
-                                                                                                NamedTextColor.GRAY)))
+                                                                                                + "ms\n",
+                                                                                                NamedTextColor.GRAY)
+                                                                                                .append(Component.text(
+                                                                                                                "Klik untuk PM",
+                                                                                                                NamedTextColor.YELLOW))))
                                                                 .clickEvent(ClickEvent.suggestCommand(
                                                                                 "/msg " + target.getName() + " "));
-                                        })
-                                        .build();
+                                        }
 
-                        message = message.replaceText(config);
+                                        // No match? Return original text
+                                        return builder;
+                                })
+                                .build();
+
+                return message.replaceText(config);
+        }
+
+        private void notifyPlayer(Player sender, Player target) {
+                // Avoid self-notification
+                if (sender.equals(target))
+                        return;
+
+                target.playSound(target.getLocation(), Sound.ENTITY_EXPERIENCE_ORB_PICKUP, 1f, 1f);
+                target.sendActionBar(ChatUtils.colorize("&6&lTag! &e" + sender.getName() + " &7menyapa Anda!"));
+                // Title might be too intrusive for every tag? InteractiveChat usually does
+                // sound + actionbar.
+                // Keeping title as requested but maybe shorter/subtle?
+                // target.sendTitle(ChatUtils.colorize("&6&lTAGGED!"),
+                // ChatUtils.colorize("&7Oleh &f" + sender.getName()), 5, 20, 5);
+        }
+
+        private void notifyEveryone(Player sender) {
+                for (Player p : Bukkit.getOnlinePlayers()) {
+                        if (!p.equals(sender)) {
+                                p.playSound(p.getLocation(), Sound.BLOCK_NOTE_BLOCK_BELL, 1f, 1.2f);
+                                p.sendActionBar(ChatUtils.colorize("&c&l@everyone &7dari &f" + sender.getName()));
+                        }
                 }
-                return message;
+        }
+
+        private void notifyHere(Player sender) {
+                // Radius e.g. 50 blocks or World? InteractiveChat usually does World or Radius.
+                // Let's do Radius 50 for "Here"
+                double radius = 100.0;
+                for (Player p : sender.getWorld().getPlayers()) {
+                        if (!p.equals(sender)
+                                        && p.getLocation().distanceSquared(sender.getLocation()) <= radius * radius) {
+                                p.playSound(p.getLocation(), Sound.BLOCK_NOTE_BLOCK_BELL, 1f, 1.5f);
+                                p.sendActionBar(ChatUtils.colorize("&e&l@here &7dari &f" + sender.getName()));
+                        }
+                }
         }
 
         private Component processPlaceholders(Player player, Component message) {
