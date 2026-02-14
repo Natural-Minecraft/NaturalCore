@@ -197,23 +197,34 @@ public class ChatUtils {
                     }
                 }
             }
-        } catch (Exception ignored) {
-            // Jika Vault error, biarkan prefix/suffix kosong agar plugin tidak crash
+            }
+        }catch(
+
+    Exception e)
+    {
+        // Jika Vault error, biarkan prefix/suffix kosong agar plugin tidak crash
+        if (ConfigUtils.isDebug()) {
+            NaturalCore.getInstance().getLogger()
+                    .warning("Error fetching Vault data for " + p.getName() + ": " + e.getMessage());
+            e.printStackTrace();
         }
+    }
 
-        // 2. Buat DisplayName (Gabungan Prefix + Nama + Suffix)
-        // Kita colorize per bagian agar aman jika prefix mengandung warna
-        String displayName = (prefix != null ? prefix : "") + p.getName() + (suffix != null ? suffix : "");
+    // 2. Buat DisplayName (Gabungan Prefix + Nama + Suffix)
+    // Kita colorize per bagian agar aman jika prefix mengandung warna
+    String displayName = (prefix != null ? prefix : "") + p.getName() + (suffix != null ? suffix : "");
 
-        // 3. Replace Placeholders
-        // %displayname% -> [Owner] Steve [Ganteng]
-        // %player% -> Steve (Nama Asli)
-        String result = message
-                .replace("%displayname%", displayName)
-                .replace("%player%", p.getName());
+    // 3. Replace Placeholders
+    // %displayname% -> [Owner] Steve [Ganteng]
+    // %player% -> Steve (Nama Asli)
+    String result = message
+            .replace("%displayname%", displayName)
+            .replace("%player%", p.getName());
 
-        // 4. Colorize hasil akhirnya
-        return colorize(result);
+    // 4. Colorize hasil akhirnya
+    return
+
+    colorize(result);
     }
 
     /**
