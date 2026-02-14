@@ -67,11 +67,33 @@ public class ChatListener implements Listener {
                 if (!ConfigUtils.getBoolean("chat.enabled"))
                         return;
 
-                // Get the raw message as text. We use legacySection() because it's
-                // the most standard way to get text with current formatting.
+                // Get the raw message as text.
                 String messageText = legacySection.serialize(event.message());
 
-                // 1. Colorize & Emoji Support (Legacy conversion for now)
+                // Apply ChatColor settings
+                ChatColorManager colorManager = plugin.getChatColorManager();
+                if (colorManager != null && player.hasPermission("naturalsmp.chat.color")) {
+                        String color = colorManager.getPlayerColor(player);
+                        String font = colorManager.getPlayerFont(player);
+                        boolean bold = colorManager.isBold(player);
+                        boolean italic = colorManager.isItalic(player);
+
+                        // Apply font
+                        messageText = colorManager.applyFont(messageText, font);
+
+                        // Prepend formatting
+                        StringBuilder formatted = new StringBuilder();
+                        formatted.append(color);
+                        if (bold)
+                                formatted.append("&l");
+                        if (italic)
+                                formatted.append("&o");
+                        formatted.append(messageText);
+
+                        messageText = formatted.toString();
+                }
+
+                // 1. Colorize & Emoji Support
                 if (player.hasPermission("naturalsmp.chat.color")) {
                         messageText = ChatUtils.colorize(messageText);
                 }
