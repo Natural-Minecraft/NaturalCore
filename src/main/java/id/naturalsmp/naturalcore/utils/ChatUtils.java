@@ -199,11 +199,6 @@ public class ChatUtils {
             }
         } catch (Exception e) {
             // Jika Vault error, biarkan prefix/suffix kosong agar plugin tidak crash
-            if (ConfigUtils.isDebug()) {
-                NaturalCore.getInstance().getLogger()
-                        .warning("Error fetching Vault data for " + p.getName() + ": " + e.getMessage());
-                e.printStackTrace();
-            }
         }
 
         // 2. Buat DisplayName (Gabungan Prefix + Nama + Suffix)
