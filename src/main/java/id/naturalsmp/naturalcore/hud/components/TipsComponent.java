@@ -155,44 +155,54 @@ public class TipsComponent extends AbstractHUDComponent {
             return null;
 
         String prefix = "<gradient:#FFD700:#FFA500>💡 TIPS</gradient> &8» &f";
-        String fullKey = prefix + currentTip;
+        // Calculate prefix visual length once
+        int prefixLen = ChatUtils.getVisualLength(prefix);
 
-        // Check visual length
-        int len = ChatUtils.getVisualLength(fullKey);
+        // Determine available width for the tip content
+        int availableWidth = Math.max(10, maxWidth - prefixLen); // Ensure at least 10 chars for tip
 
-        if (len <= maxWidth) {
-            return fullKey;
-        }
+        // Check content length
+        int contentLen = ChatUtils.getVisualLength(currentTip);
 
-        // Marquee Logic for long tips
-        int scrollRange = len - maxWidth;
-        int scrollTicks = scrollRange * scrollSpeed;
-        int cycleTicks = pauseTicks + scrollTicks + pauseTicks; // Pause -> Scroll -> Pause
-        int currentCycle = tick % cycleTicks;
-
-        int offset = 0;
-        boolean isScrolling = false;
-        if (currentCycle < pauseTicks) {
-            offset = 0; // Pause start (reading time)
-        } else if (currentCycle < pauseTicks + scrollTicks) {
-            offset = (currentCycle - pauseTicks) / scrollSpeed; // Scroll
-            isScrolling = true;
+        String displayContent;
+        if (contentLen <= availableWidth) {
+            displayContent = currentTip;
+            lastScrollOffset = -1; // Reset scroll state if it fits
         } else {
-            offset = scrollRange; // Pause end (reading time)
-        }
+            // Marquee Logic for long tips (APPLIED ONLY TO CONTENT)
+            int scrollRange = contentLen - availableWidth;
+            int scrollTicks = scrollRange * scrollSpeed;
+            int cycleTicks = pauseTicks + scrollTicks + pauseTicks; // Pause -> Scroll -> Pause
+            int currentCycle = tick % cycleTicks;
 
-        // Typing sound effect during scroll (plays when offset changes)
-        if (typingSoundEnabled && isScrolling && offset != lastScrollOffset) {
-            lastScrollOffset = offset;
-            try {
-                player.playSound(player.getLocation(), typingSound, typingSoundVolume, typingSoundPitch);
-            } catch (Exception ignored) {
+            int offset = 0;
+            boolean isScrolling = false;
+            if (currentCycle < pauseTicks) {
+                offset = 0; // Pause start
+            } else if (currentCycle < pauseTicks + scrollTicks) {
+                offset = (currentCycle - pauseTicks) / scrollSpeed; // Scroll
+                isScrolling = true;
+            } else {
+                offset = scrollRange; // Pause end
             }
-        } else if (!isScrolling) {
-            lastScrollOffset = -1;
+
+            // Typing sound effect during scroll
+            if (typingSoundEnabled && isScrolling && offset != lastScrollOffset) {
+                lastScrollOffset = offset;
+                try {
+                    player.playSound(player.getLocation(), typingSound, typingSoundVolume, typingSoundPitch);
+                } catch (Exception ignored) {
+                }
+            } else if (!isScrolling) {
+                lastScrollOffset = -1;
+            }
+
+            // Slice ONLY the content
+            displayContent = ChatUtils.getVisualSlice(currentTip, offset, availableWidth);
         }
 
-        return ChatUtils.getVisualSlice(fullKey, offset, maxWidth);
+        // Combine Static Prefix + Dynamic/Static Content
+        return prefix + displayContent;
     }
 
     @Override
