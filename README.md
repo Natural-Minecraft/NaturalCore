@@ -1,6 +1,12 @@
-# NaturalCore v2.0.8 (Maintenance Update)
+# NaturalCore v2.0.9 (Hologram & Tips Update)
 
 Plugin inti (core) premium untuk server **NaturalSMP**, mengelola seluruh aspek penting server dengan stabilitas ultra-tinggi dan estetika premium.
+
+## ✨ Fitur Baru v2.0.9 (Hologram & Tips Update)
+*   **Hologram System**: Sistem hologram baru berbasis `TextDisplay` untuk performa lebih ringan dan visual lebih tajam (menggantikan ArmorStand lama).
+*   **Tips System**: Peningkatan visual pada pesan tips di Action Bar.
+*   **Back Comand**: Logika command `/back` diperbaiki untuk akurasi lokasi kematian/teleport yang lebih baik.
+*   **Interactive Tagging**: (Support) Dukungan sistem tagging pemain interaktif.
 
 ## ✨ Fitur Baru v2.0.8 (Maintenance Update)
 *   **Build Fixes**: Perbaikan error kompilasi pada `SignMenu` dan `NaturalLagg`.
