@@ -212,7 +212,7 @@ public class NaturalLaggManager implements Listener {
         this.animationFrame = 0;
     }
 
-    private void tickAnimation() {
+    public void tickAnimation() {
         if (state == LaggState.IDLE)
             return;
 
