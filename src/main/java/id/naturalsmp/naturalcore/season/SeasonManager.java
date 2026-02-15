@@ -7,6 +7,7 @@ import me.clip.placeholderapi.PlaceholderAPI;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.Sound;
 import org.bukkit.block.Block;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
@@ -19,9 +20,10 @@ import java.util.UUID;
 public class SeasonManager {
 
     private final NaturalCore plugin;
-    private final SeasonRegionManager regionManager;
+    private final SeasonRegionManager regionManager; // Keep for compatibility but it will wrap global
     private boolean enabled;
 
+    private Season currentSeason = Season.SPRING;
     private final Map<UUID, Double> playerTemps = new HashMap<>();
     private int temperatureTickCounter = 0;
 
@@ -31,7 +33,7 @@ public class SeasonManager {
 
     public SeasonManager(NaturalCore plugin) {
         this.plugin = plugin;
-        this.regionManager = new SeasonRegionManager(plugin);
+        this.regionManager = new SeasonRegionManager(plugin, this); // Modified constructor
         loadData();
         startTasks();
     }

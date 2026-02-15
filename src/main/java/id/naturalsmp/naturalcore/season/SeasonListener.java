@@ -17,15 +17,7 @@ public class SeasonListener implements Listener {
         this.manager = manager;
     }
 
-    @EventHandler
-    public void onPlayerMove(org.bukkit.event.player.PlayerMoveEvent event) {
-        // Optimization: Only check if block changed
-        if (event.getFrom().getBlockX() == event.getTo().getBlockX()
-                && event.getFrom().getBlockZ() == event.getTo().getBlockZ()) {
-            return;
-        }
-        manager.getRegionManager().updatePlayerRegion(event.getPlayer());
-    }
+    // Optimized: No PlayerMoveEvent needed for Global Season
 
     @EventHandler
     public void onChunkLoad(ChunkLoadEvent event) {
