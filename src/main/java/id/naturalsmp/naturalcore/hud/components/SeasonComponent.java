@@ -27,7 +27,7 @@ public class SeasonComponent extends AbstractHUDComponent {
 
     @Override
     public String getContent(Player player, int tick) {
-        Season currentSeason = plugin.getSeasonManager().getCurrentSeason();
+        Season currentSeason = plugin.getSeasonManager().getRegionManager().getSeason(player.getLocation());
         Double temp = plugin.getSeasonManager().getPlayerTemperature(player);
 
         // Get season-specific gradient colors

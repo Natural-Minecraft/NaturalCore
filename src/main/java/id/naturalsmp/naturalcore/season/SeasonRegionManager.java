@@ -81,6 +81,7 @@ public class SeasonRegionManager {
         String title = ChatUtils.colorize(season.getIcon() + " &l" + season.name());
         String subtitle = ChatUtils.colorize("&7Entering new seasonal region...");
         p.sendTitle(title, subtitle, 10, 70, 20);
+        p.sendActionBar(ChatUtils.toComponent(title + " " + subtitle));
         p.playSound(p.getLocation(), org.bukkit.Sound.ENTITY_PLAYER_LEVELUP, 1f, 0.5f);
     }
 }
