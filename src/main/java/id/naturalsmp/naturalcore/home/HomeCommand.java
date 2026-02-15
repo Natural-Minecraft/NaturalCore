@@ -36,6 +36,12 @@ public class HomeCommand implements CommandExecutor {
             // Nama Home (Default "home" jika tidak diketik)
             String name = (args.length > 0) ? args[0] : "home";
 
+            // Validation: Disallow empty names or special characters that break config
+            if (name.trim().isEmpty() || name.contains(".")) {
+                ConfigUtils.sendMessage(p, "prefix.home", "messages.home.invalid-name");
+                return true;
+            }
+
             // Cek Limit
             int current = homeManager.getHomes(p).size();
             int max = homeManager.getMaxHomes(p);

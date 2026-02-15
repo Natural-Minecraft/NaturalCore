@@ -312,16 +312,15 @@ public class ChatListener implements Listener {
                 ItemStack item = player.getInventory().getItemInMainHand();
                 if (item != null && item.getType() != Material.AIR) {
                         UUID id = ChatSnapshotManager.createItemSnapshot(player.getName(), item);
+                        Component itemDisplay = item.displayName();
+                        if (item.getAmount() > 1) {
+                                itemDisplay = itemDisplay.append(
+                                                Component.text(" x" + item.getAmount()).color(NamedTextColor.GRAY));
+                        }
+
                         message = message.replaceText(TextReplacementConfig.builder()
-                                        .match(Pattern.compile("\\[(item|i)\\]"))
-                                        .replacement(blueBracket(Component
-                                                        .text(ChatUtils.stripColor(legacySection
-                                                                        .serialize(item.displayName()))
-                                                                        .replace("[", "")
-                                                                        .replace("]", "")
-                                                                        + " x"
-                                                                        + item.getAmount())
-                                                        .color(NamedTextColor.YELLOW)
+                                        .match(Pattern.compile("(?i)\\[(item|i)\\]"))
+                                        .replacement(aestheticBracket(itemDisplay
                                                         .hoverEvent(createSafeHover(item))
                                                         .clickEvent(ClickEvent
                                                                         .runCommand("/chatview " + id + " item"))))
@@ -332,9 +331,9 @@ public class ChatListener implements Listener {
                 if (messageContains(message, "[inv]")) {
                         UUID id = ChatSnapshotManager.createInventorySnapshot(player);
                         message = message.replaceText(TextReplacementConfig.builder()
-                                        .match(Pattern.compile("\\[inv\\]"))
-                                        .replacement(blueBracket(Component.text("Inventory")
-                                                        .color(NamedTextColor.YELLOW)
+                                        .match(Pattern.compile("(?i)\\[inv\\]"))
+                                        .replacement(aestheticBracket(Component.text("Inventory")
+                                                        .color(NamedTextColor.GREEN)
                                                         .hoverEvent(HoverEvent.showText(Component.text(
                                                                         "Click to view inventory",
                                                                         NamedTextColor.GRAY)))
@@ -347,13 +346,12 @@ public class ChatListener implements Listener {
                         UUID id = ChatSnapshotManager.createEnderSnapshot(player.getName(),
                                         player.getEnderChest().getContents());
                         message = message.replaceText(TextReplacementConfig.builder()
-                                        .match(Pattern.compile("\\[ender\\]"))
-                                        .replacement(blueBracket(Component.text("Enderchest")
-                                                        .color(NamedTextColor.YELLOW)
-                                                        .hoverEvent(HoverEvent
-                                                                        .showText(Component.text(
-                                                                                        "Click to view enderchest",
-                                                                                        NamedTextColor.GRAY)))
+                                        .match(Pattern.compile("(?i)\\[ender\\]"))
+                                        .replacement(aestheticBracket(Component.text("Enderchest")
+                                                        .color(NamedTextColor.LIGHT_PURPLE)
+                                                        .hoverEvent(HoverEvent.showText(Component.text(
+                                                                        "Click to view enderchest",
+                                                                        NamedTextColor.GRAY)))
                                                         .clickEvent(ClickEvent
                                                                         .runCommand("/chatview " + id + " ender"))))
                                         .build());
@@ -361,25 +359,21 @@ public class ChatListener implements Listener {
 
                 // [pos]
                 message = message.replaceText(TextReplacementConfig.builder()
-                                .match(Pattern.compile("\\[pos\\]"))
-                                .replacement(
-                                                blueBracket(
-                                                                Component
-                                                                                .text(player.getLocation().getBlockX()
-                                                                                                + ", "
-                                                                                                + player.getLocation()
-                                                                                                                .getBlockY()
-                                                                                                + ", "
-                                                                                                + player.getLocation()
-                                                                                                                .getBlockZ())
-                                                                                .color(NamedTextColor.YELLOW)))
+                                .match(Pattern.compile("(?i)\\[pos\\]"))
+                                .replacement(aestheticBracket(Component.text(
+                                                player.getLocation().getBlockX() + ", " +
+                                                                player.getLocation().getBlockY() + ", " +
+                                                                player.getLocation().getBlockZ())
+                                                .color(NamedTextColor.GREEN)))
                                 .build());
 
                 // [ping]
+                int ping = player.getPing();
+                NamedTextColor pingColor = (ping < 100) ? NamedTextColor.GREEN
+                                : (ping < 200) ? NamedTextColor.YELLOW : NamedTextColor.RED;
                 message = message.replaceText(TextReplacementConfig.builder()
-                                .match(Pattern.compile("\\[ping\\]"))
-                                .replacement(blueBracket(
-                                                Component.text(player.getPing() + "ms").color(NamedTextColor.YELLOW)))
+                                .match(Pattern.compile("(?i)\\[ping\\]"))
+                                .replacement(aestheticBracket(Component.text(ping + "ms").color(pingColor)))
                                 .build());
 
                 // [money]
@@ -388,17 +382,17 @@ public class ChatListener implements Listener {
                         bal = plugin.getVaultManager().getEconomy().getBalance(player);
                 }
                 message = message.replaceText(TextReplacementConfig.builder()
-                                .match(Pattern.compile("\\[money\\]"))
-                                .replacement(blueBracket(Component.text("$" + ChatUtils.format(bal))
-                                                .color(NamedTextColor.YELLOW)))
+                                .match(Pattern.compile("(?i)\\[money\\]"))
+                                .replacement(aestheticBracket(Component.text("$" + ChatUtils.format(bal))
+                                                .color(NamedTextColor.GOLD)))
                                 .build());
 
                 // [time]
                 long time = player.getWorld().getTime();
                 String timeStr = String.format("%02d:%02d", (time / 1000 + 6) % 24, (time % 1000) * 60 / 1000);
                 message = message.replaceText(TextReplacementConfig.builder()
-                                .match(Pattern.compile("\\[time\\]"))
-                                .replacement(blueBracket(Component.text(timeStr).color(NamedTextColor.YELLOW)))
+                                .match(Pattern.compile("(?i)\\[time\\]"))
+                                .replacement(aestheticBracket(Component.text(timeStr).color(NamedTextColor.AQUA)))
                                 .build());
 
                 return message;
@@ -410,7 +404,7 @@ public class ChatListener implements Listener {
                                 .match(Pattern.compile("\\[/([^\\]]+)\\]"))
                                 .replacement((result, builder) -> {
                                         String cmd = result.group(1);
-                                        return blueBracket(Component.text("/" + cmd).color(NamedTextColor.YELLOW)
+                                        return aestheticBracket(Component.text("/" + cmd).color(NamedTextColor.YELLOW)
                                                         .clickEvent(ClickEvent.suggestCommand("/" + cmd))
                                                         .hoverEvent(HoverEvent
                                                                         .showText(Component.text(
@@ -424,7 +418,7 @@ public class ChatListener implements Listener {
                                 .match(Pattern.compile("\\[hover:([^\\]]+)\\]"))
                                 .replacement((result, builder) -> {
                                         String text = result.group(1);
-                                        return blueBracket(Component.text(text).color(NamedTextColor.YELLOW)
+                                        return aestheticBracket(Component.text(text).color(NamedTextColor.YELLOW)
                                                         .hoverEvent(
                                                                         HoverEvent.showText(Component.text(
                                                                                         "Informasi Tambahan",
@@ -435,10 +429,10 @@ public class ChatListener implements Listener {
                 return message;
         }
 
-        private Component blueBracket(Component inner) {
-                return Component.text("[").color(NamedTextColor.AQUA)
+        private Component aestheticBracket(Component inner) {
+                return Component.text("[").color(NamedTextColor.DARK_GRAY)
                                 .append(inner)
-                                .append(Component.text("]").color(NamedTextColor.AQUA));
+                                .append(Component.text("]").color(NamedTextColor.DARK_GRAY));
         }
 
         private HoverEvent<?> createSafeHover(ItemStack original) {

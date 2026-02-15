@@ -93,6 +93,8 @@ public class HomeManager implements Listener {
         // Update cache is implicitly done since config is a reference
         // Push to disk async
         savePlayerConfigAsync(uuid, config);
+
+        plugin.getLogger().info("Player " + p.getName() + " set home '" + name + "' at " + loc.toString());
     }
 
     public void deleteHome(Player p, String name) {
@@ -100,6 +102,8 @@ public class HomeManager implements Listener {
         FileConfiguration config = getPlayerConfig(uuid);
         config.set("homes." + name, null);
         savePlayerConfigAsync(uuid, config);
+
+        plugin.getLogger().info("Player " + p.getName() + " deleted home '" + name + "'");
     }
 
     public Location getHome(Player p, String name) {

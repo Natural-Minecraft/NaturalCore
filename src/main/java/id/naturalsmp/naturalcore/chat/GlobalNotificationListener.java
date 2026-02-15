@@ -63,10 +63,6 @@ public class GlobalNotificationListener implements Listener {
             return;
 
         String title = LegacyComponentSerializer.legacyAmpersand().serialize(e.getAdvancement().getDisplay().title());
-        // Hide default advancement message if possible (usually via gamerule, but we
-        // can't easily cancel the system broadcast here without a custom advancement
-        // system or packet manipulation)
-        // However, we can send our aesthetic one.
 
         Player p = e.getPlayer();
         List<String> variants = ConfigUtils.getMessageList("social.notifications.achievement");
@@ -82,5 +78,46 @@ public class GlobalNotificationListener implements Listener {
         for (Player online : Bukkit.getOnlinePlayers()) {
             online.playSound(online.getLocation(), Sound.UI_TOAST_CHALLENGE_COMPLETE, 0.5f, 1.5f);
         }
+    }
+
+    @EventHandler
+    public void onJoin(org.bukkit.event.player.PlayerJoinEvent e) {
+        // Disable default join message
+        e.setJoinMessage(null);
+
+        Player p = e.getPlayer();
+        if (plugin.getVanishManager().isVanished(p))
+            return;
+
+        List<String> messages;
+        if (!p.hasPlayedBefore()) {
+            messages = ConfigUtils.getMessageList("social.notifications.first-join");
+            if (messages.isEmpty())
+                messages = java.util.Collections.singletonList("&dWelcome &f%player% &dto the server!");
+        } else {
+            messages = ConfigUtils.getMessageList("social.notifications.join");
+            if (messages.isEmpty())
+                messages = java.util.Collections.singletonList("&a+ &f%player%");
+        }
+
+        String msg = messages.get(random.nextInt(messages.size())).replace("%player%", p.getName());
+        GUIUtils.broadcast(msg);
+    }
+
+    @EventHandler
+    public void onQuit(org.bukkit.event.player.PlayerQuitEvent e) {
+        // Disable default quit message
+        e.setQuitMessage(null);
+
+        Player p = e.getPlayer();
+        if (plugin.getVanishManager().isVanished(p))
+            return;
+
+        List<String> messages = ConfigUtils.getMessageList("social.notifications.quit");
+        if (messages.isEmpty())
+            messages = java.util.Collections.singletonList("&c- &f%player%");
+
+        String msg = messages.get(random.nextInt(messages.size())).replace("%player%", p.getName());
+        GUIUtils.broadcast(msg);
     }
 }

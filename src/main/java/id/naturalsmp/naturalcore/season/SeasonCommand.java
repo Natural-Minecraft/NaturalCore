@@ -26,23 +26,17 @@ public class SeasonCommand implements CommandExecutor {
         }
 
         if (args.length == 0) {
-            sender.sendMessage(ChatUtils.colorize("&6&lSeason Info:"));
-            sender.sendMessage(ChatUtils.colorize("&fCurrent Season: " + manager.getCurrentSeason().getIcon() + " &e"
-                    + manager.getCurrentSeason().name()));
-            sender.sendMessage(ChatUtils.colorize("&fUse &e/season set <season> &fto change."));
+            Season season = manager.getRegionManager().getSeason(((Player) sender).getLocation());
+            sender.sendMessage(ChatUtils.colorize("&6&lSeason Info (Regional):"));
+            sender.sendMessage(ChatUtils.colorize("&fCurrent Region Season: " + season.getIcon() + " &e"
+                    + season.name()));
+            sender.sendMessage(
+                    ChatUtils.colorize("&7Seasons are now determined by region coordinates and world time."));
             return true;
         }
 
-        if (args[0].equalsIgnoreCase("set") && args.length > 1) {
-            try {
-                Season newSeason = Season.valueOf(args[1].toUpperCase());
-                // Forcing season change (requires more logic in manager to be fully flushed)
-                // We will implement a forceSet method in manager
-                sender.sendMessage(ChatUtils.colorize("&aChanging season to " + newSeason.name() + "..."));
-                manager.forceSetSeason(newSeason);
-            } catch (IllegalArgumentException e) {
-                sender.sendMessage(ChatUtils.colorize("&cInvalid season name!"));
-            }
+        if (args[0].equalsIgnoreCase("set")) {
+            sender.sendMessage(ChatUtils.colorize("&cManual season control is disabled in Regional Mode."));
             return true;
         }
 
