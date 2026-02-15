@@ -102,6 +102,13 @@ public class StartGUI implements Listener {
         }
     }
 
+    @EventHandler
+    public void onDrag(org.bukkit.event.inventory.InventoryDragEvent e) {
+        if (e.getInventory().getHolder() instanceof StartHolder) {
+            e.setCancelled(true);
+        }
+    }
+
     public static class StartHolder implements InventoryHolder {
         @Override
         public Inventory getInventory() {

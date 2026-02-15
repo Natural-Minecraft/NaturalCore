@@ -139,6 +139,13 @@ public class TutorialGUI implements Listener {
         }
     }
 
+    @EventHandler
+    public void onDrag(org.bukkit.event.inventory.InventoryDragEvent e) {
+        if (e.getInventory().getHolder() instanceof TutorialHolder) {
+            e.setCancelled(true);
+        }
+    }
+
     private static class CommandItem {
         String command;
         Material mat;

@@ -169,6 +169,11 @@ public class ItemBuilderCommand implements CommandExecutor {
 
         ItemStack item = new ItemStack(mat, amount);
         target.getInventory().addItem(item);
+
+        // Logging
+        plugin.getLogger().info(
+                "GIVE CMD: " + sender.getName() + " gave " + amount + "x " + mat.name() + " to " + target.getName());
+
         sender.sendMessage(ChatUtils.colorize(ConfigUtils.getString("messages.item-edit.give-success")
                 .replace("%amount%", String.valueOf(amount))
                 .replace("%item%", mat.name())

@@ -130,6 +130,13 @@ public class MenuGUI implements Listener {
         }
     }
 
+    @EventHandler
+    public void onDrag(org.bukkit.event.inventory.InventoryDragEvent e) {
+        if (e.getInventory().getHolder() instanceof MenuHolder) {
+            e.setCancelled(true);
+        }
+    }
+
     public static class MenuHolder implements InventoryHolder {
         @Override
         public Inventory getInventory() {
