@@ -5,25 +5,33 @@ import id.naturalsmp.naturalcore.utils.ChatUtils;
 import id.naturalsmp.naturalcore.utils.ConfigUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
-import org.bukkit.Material;
+import org.bukkit.NamespacedKey;
 import org.bukkit.Sound;
 import org.bukkit.World;
-import org.bukkit.entity.*;
+import org.bukkit.attribute.Attribute;
+import org.bukkit.entity.Entity;
+import org.bukkit.entity.Item;
+import org.bukkit.entity.LivingEntity;
+import org.bukkit.entity.Mob;
+import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
+import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityDeathEvent;
-import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.loot.LootContext;
+import org.bukkit.loot.LootTable;
+import org.bukkit.persistence.PersistentDataContainer;
+import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
-import org.bukkit.NamespacedKey;
-import org.bukkit.persistence.PersistentDataType;
-import org.bukkit.persistence.PersistentDataContainer;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class NaturalLaggManager implements Listener {
 
@@ -36,9 +44,8 @@ public class NaturalLaggManager implements Listener {
     private List<Integer> warningTimes = Arrays.asList(60, 30, 10, 5, 3, 2, 1);
     private boolean mergingEnabled = true;
     private int mergingThreshold = 5;
-    private double mergingRadiusSq = 4.0;
+    private double mergingRadiusSq = 16.0; // 4 block radius (4*4)
     private Set<String> mergingBlacklist = new HashSet<>();
-    private int defaultCleanupDuration = 10;
     private Set<String> itemWhitelist = new HashSet<>();
     private boolean removeDeathDrops = false;
     private boolean chunkLimiterEnabled = true;
@@ -48,8 +55,8 @@ public class NaturalLaggManager implements Listener {
     private int optimizerCheckInterval = 30;
     private Set<String> excludedWorlds = new HashSet<>();
 
-    private NamespacedKey STACK_SIZE_KEY;
-    private NamespacedKey STACK_BASE_NAME_KEY;
+    private final NamespacedKey STACK_SIZE_KEY;
+    private final NamespacedKey STACK_BASE_NAME_KEY;
 
     // State
     private BukkitTask autoRemovalTask;
@@ -64,10 +71,8 @@ public class NaturalLaggManager implements Listener {
     private LaggState state = LaggState.IDLE;
     private int animationFrame = 0;
     private final int MAX_FRAMES = 20;
-    private int countdownSeconds = 0;
-    private int currentTick = 0;
-    private int successStayTicks = 0;
     private int cleanedCount = 0;
+    private int successStayTicks = 0;
 
     public NaturalLaggManager(NaturalCore plugin) {
         this.plugin = plugin;
@@ -90,11 +95,10 @@ public class NaturalLaggManager implements Listener {
 
         this.mergingEnabled = plugin.getConfig().getBoolean("lagg.merging.enabled", true);
         this.mergingThreshold = plugin.getConfig().getInt("lagg.merging.threshold", 5);
-        double radius = plugin.getConfig().getDouble("lagg.merging.radius", 2.0);
+        double radius = plugin.getConfig().getDouble("lagg.merging.radius", 4.0);
         this.mergingRadiusSq = radius * radius;
         this.mergingBlacklist = new HashSet<>(plugin.getConfig().getStringList("lagg.merging.blacklist"));
 
-        this.defaultCleanupDuration = plugin.getConfig().getInt("lagg.cleanup.default-duration", 10);
         this.itemWhitelist = new HashSet<>(plugin.getConfig().getStringList("lagg.cleanup.item-whitelist"));
         this.removeDeathDrops = plugin.getConfig().getBoolean("lagg.cleanup.remove-death-drops", false);
 
@@ -118,13 +122,8 @@ public class NaturalLaggManager implements Listener {
             }.runTaskTimer(plugin, 200L, 200L);
         }
 
-        // Hologram position update (every 5 ticks = 0.25s)
-        new BukkitRunnable() {
-            @Override
-            public void run() {
-                HologramUtil.tickHolograms();
-            }
-        }.runTaskTimer(plugin, 20L, 5L);
+        // NOTE: HologramUtil.tickHolograms() removed for performance.
+        // Holograms are now Passengers.
 
         // Chunk Limiter
         if (chunkLimiterEnabled) {
@@ -150,6 +149,8 @@ public class NaturalLaggManager implements Listener {
         }.runTaskTimer(plugin, 200L, optimizerCheckInterval * 20L);
     }
 
+    // --- AUTO REMOVAL LOGIC ---
+    // (Kept mostly same, just slight cleanup)
     private void startAutoRemovalCycle() {
         autoRemovalCountdown = autoRemovalInterval;
         autoRemovalTask = new BukkitRunnable() {
@@ -157,13 +158,10 @@ public class NaturalLaggManager implements Listener {
             public void run() {
                 autoRemovalCountdown--;
 
-                // 15s Sync: Chat msg AND Start Animation
                 if (autoRemovalCountdown == 15) {
                     broadcastWarning(15);
                     startAnimation();
-                }
-                // Other warnings (only if not 15, to avoid double broadcast if 15 is in list)
-                else if (warningTimes.contains(autoRemovalCountdown) && autoRemovalCountdown != 15) {
+                } else if (warningTimes.contains(autoRemovalCountdown) && autoRemovalCountdown != 15) {
                     broadcastWarning(autoRemovalCountdown);
                 }
 
@@ -197,16 +195,13 @@ public class NaturalLaggManager implements Listener {
 
     public void startCleanup(int seconds) {
         this.autoRemovalCountdown = seconds;
-        // If countdown is less than or equal to 15 (animation start threshold), start
-        // animation immediately
-        // Otherwise, the main loop will catch it when it reaches 15.
         if (seconds <= 15) {
             startAnimation();
         }
         broadcastWarning(seconds);
     }
 
-    // Trigger visual slide-in
+    // --- ANIMATION ---
     public void startAnimation() {
         if (state != LaggState.IDLE)
             return;
@@ -214,7 +209,6 @@ public class NaturalLaggManager implements Listener {
         this.animationFrame = 0;
     }
 
-    // Trigger visual success
     public void triggerSuccessAnimation() {
         this.state = LaggState.SUCCESS_SLIDING_IN;
         this.animationFrame = 0;
@@ -223,7 +217,6 @@ public class NaturalLaggManager implements Listener {
     public void tickAnimation() {
         if (state == LaggState.IDLE)
             return;
-
         animationFrame++;
 
         switch (state) {
@@ -236,10 +229,8 @@ public class NaturalLaggManager implements Listener {
                     playTickSound(1.5f);
             }
             case COUNTDOWN -> {
-                // Visual ticks for arrows, logic driven by autoRemovalCountdown
-                // Check if we should stop (master countdown reset or finished)
                 if (autoRemovalCountdown > 15 || autoRemovalCountdown <= 0) {
-                    // Handled by triggerSuccessAnimation call in main loop
+                    // Handled by main loop
                 } else if (autoRemovalCountdown <= 5 && animationFrame % 10 == 0) {
                     playTickSound(2.0f);
                 }
@@ -253,7 +244,7 @@ public class NaturalLaggManager implements Listener {
             }
             case SUCCESS_STATIC -> {
                 successStayTicks += 2;
-                if (successStayTicks >= 100) { // 5 seconds
+                if (successStayTicks >= 100) {
                     state = LaggState.SLIDING_OUT;
                     animationFrame = 0;
                 }
@@ -280,50 +271,25 @@ public class NaturalLaggManager implements Listener {
             return null;
 
         String laggText = getLaggContent();
-
-        // Slide In: Text enters from Right to Left
         if (state == LaggState.SLIDING_IN || state == LaggState.SUCCESS_SLIDING_IN) {
             float progress = (float) animationFrame / MAX_FRAMES;
-            // Easing function for smooth slide
             float ease = 1 - (float) Math.pow(1 - progress, 3);
-
-            // We want it to look like it's sliding in from the right.
-            // Simplified "Typewriter" or "Reveal" effect for Action Bar constraints
             int revealLen = (int) (ChatUtils.getVisualLength(laggText) * ease);
             return ChatUtils.getVisualSlice(laggText, 0, revealLen);
-        }
-
-        // Slide Out: Text exits to Left (or fades)
-        else if (state == LaggState.SLIDING_OUT) {
+        } else if (state == LaggState.SLIDING_OUT) {
             float progress = (float) animationFrame / MAX_FRAMES;
             float ease = (float) Math.pow(progress, 3);
-
             int cutLen = (int) (ChatUtils.getVisualLength(laggText) * ease);
             return ChatUtils.getVisualSlice(laggText, cutLen, ChatUtils.getVisualLength(laggText) - cutLen);
         }
-
         return laggText;
     }
 
     private String getLaggContent() {
-        if (state == LaggState.SLIDING_IN || state == LaggState.COUNTDOWN || state == LaggState.SLIDING_OUT) {
-            // Show countdown content
-            if (state == LaggState.SLIDING_OUT && successStayTicks > 0) {
-                // Actually if we are in sliding out, we are likely showing the success message
-                // sliding out
-                // But wait, the state transition logic goes Success -> Static -> Slide Out
-                // So Slide Out should show Success message fading out.
-                // However, the block above shares logic. Let's separate "Countdown content" vs
-                // "Success content".
-            }
-        }
-
         if (state == LaggState.SUCCESS_SLIDING_IN || state == LaggState.SUCCESS_STATIC
                 || state == LaggState.SLIDING_OUT) {
-            return "&#55FF55&l✔ CLEANUP COMPLETE &7(Removed " + cleanedCount + " items)";
+            return "&#55FF55&l✔ CLEANUP COMPLETE &7(" + cleanedCount + " items)";
         }
-
-        // Default: Countdown Content
         return "&fClearing Items in &c" + autoRemovalCountdown + "s";
     }
 
@@ -334,11 +300,9 @@ public class NaturalLaggManager implements Listener {
                 return;
             for (Entity entity : world.getEntities()) {
                 if (entity instanceof Item item) {
-                    // Skip whitelisted items
                     ItemStack stack = item.getItemStack();
                     if (itemWhitelist.contains(stack.getType().name()))
                         continue;
-                    // Skip death drops if configured
                     if (!removeDeathDrops && recentDeathDrops.contains(entity.getUniqueId()))
                         continue;
                     entity.remove();
@@ -353,174 +317,177 @@ public class NaturalLaggManager implements Listener {
         }
     }
 
-    @EventHandler
-    public void onMobDie(EntityDeathEvent e) {
+    // --- STACK MOB LOGIC (REFACTORED) ---
+
+    @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
+    public void onEntityDamage(EntityDamageEvent e) {
         if (!mergingEnabled)
             return;
-        LivingEntity entity = e.getEntity();
-        if (entity instanceof Player)
+        if (!(e.getEntity() instanceof LivingEntity entity))
             return;
-        if (entity.hasMetadata("NPC"))
+        if (entity instanceof Player || entity.hasMetadata("NPC"))
             return;
 
+        // Check fatal damage
+        if (e.getFinalDamage() < entity.getHealth())
+            return;
+
+        // Check stack size
         int stackSize = getStackSize(entity);
-        // Always remove hologram from dying entity
-        HologramUtil.removeHologram(entity);
+        if (stackSize <= 1) {
+            // Let it die naturally.
+            // Explicitly remove hologram just in case passenger logic misses (rare but
+            // safe)
+            HologramUtil.removeHologram(entity);
+            return;
+        }
 
-        if (stackSize > 1) {
-            int newSize = stackSize - 1;
-            String baseNameRaw = getStackBaseName(entity);
+        // Prevent Death, Decrement Stack
+        e.setCancelled(true);
+        entity.setHealth(entity.getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue());
 
-            // Spawn replacement
-            LivingEntity newEntity = (LivingEntity) entity.getWorld().spawnEntity(entity.getLocation(),
-                    entity.getType());
+        int newSize = stackSize - 1;
+        String baseName = getStackBaseName(entity);
+        updateStackName(entity, baseName, newSize);
 
-            // Copy Equipment
-            if (entity.getEquipment() != null && newEntity.getEquipment() != null) {
-                newEntity.getEquipment().setArmorContents(entity.getEquipment().getArmorContents());
-                newEntity.getEquipment().setItemInMainHand(entity.getEquipment().getItemInMainHand());
-                newEntity.getEquipment().setItemInOffHand(entity.getEquipment().getItemInOffHand());
+        // Feedback
+        entity.getWorld().playSound(entity.getLocation(), Sound.ENTITY_GENERIC_DAMAGE, 1f, 1f);
+        // Simulate Knockback/Hurt effect? Bukkit handles damage animation even if
+        // cancelled often?
+        // No, if cancelled, no animation.
+        entity.playEffect(org.bukkit.EntityEffect.HURT);
+
+        // Loot Simulation (Basic)
+        // We drop items for the "one" that died.
+        if (entity instanceof Mob mob) {
+            LootTable table = mob.getLootTable();
+            if (table != null) {
+                try {
+                    // Requires context. Minimal context:
+                    LootContext.Builder builder = new LootContext.Builder(entity.getLocation())
+                            .lootedEntity(entity);
+                    // We don't have killer easily in EntityDamageEvent unless we cast to
+                    // EntityDamageByEntityEvent
+                    // But simplified drops are fine for stackers.
+                    Collection<ItemStack> drops = table.populateLoot(null, builder.build());
+                    for (ItemStack drop : drops) {
+                        entity.getWorld().dropItemNaturally(entity.getLocation(), drop);
+                    }
+                } catch (Exception ex) {
+                    // Fallback or ignore
+                }
             }
-
-            // Copy Attributes if possible (Health, Damage)
-            org.bukkit.attribute.AttributeInstance oldMax = entity
-                    .getAttribute(org.bukkit.attribute.Attribute.GENERIC_MAX_HEALTH);
-            org.bukkit.attribute.AttributeInstance newMax = newEntity
-                    .getAttribute(org.bukkit.attribute.Attribute.GENERIC_MAX_HEALTH);
-            if (oldMax != null && newMax != null) {
-                newMax.setBaseValue(oldMax.getBaseValue());
-            }
-            newEntity.setHealth(newEntity.getAttribute(org.bukkit.attribute.Attribute.GENERIC_MAX_HEALTH).getValue());
-
-            // Copy PDC (Persistent Data Container) - IMPORTANT to avoid "unlimited" bug
-            // We want to pass on any other metadata as well
-            PersistentDataContainer oldPdc = entity.getPersistentDataContainer();
-            PersistentDataContainer newPdc = newEntity.getPersistentDataContainer();
-            for (NamespacedKey key : oldPdc.getKeys()) {
-                // We will update stack_size anyway in updateStackName, but copying others is
-                // good
-                // Except for internal keys that might belong uniquely to the old entity
-                newPdc.set(key, PersistentDataType.BYTE, (byte) 1); // Placeholder, will be overwritten if complex
-                // Better approach: skip stack keys and copy others if we knew types.
-                // Since we don't know types easily, we'll just ensure updateStackName handles
-                // ours.
-            }
-
-            // Set Name and hologram
-            updateStackName(newEntity, baseNameRaw, newSize);
         }
     }
 
+    // New Merging Logic: Chunk-Based for Performance
     private void performMobMerging() {
         for (World world : Bukkit.getWorlds()) {
             if (excludedWorlds.contains(world.getName()))
                 continue;
 
-            List<LivingEntity> mergeable = new ArrayList<>();
-            for (Entity e : world.getEntities()) {
-                if (e instanceof LivingEntity le && !(e instanceof Player) && !e.hasMetadata("NPC") && !le.isDead()) {
-                    if (mergingBlacklist.contains(le.getType().name()))
-                        continue;
-                    mergeable.add(le);
-                }
-            }
-
-            // Group by Signature (Type + Name)
-            Map<String, List<LivingEntity>> groups = new HashMap<>();
-            for (LivingEntity le : mergeable) {
-                String signature = le.getType().name() + "::" + getStackBaseName(le);
-                groups.computeIfAbsent(signature, k -> new ArrayList<>()).add(le);
-            }
-
-            for (List<LivingEntity> group : groups.values()) {
-                if (group.size() < 2)
-                    continue;
-
-                for (int i = 0; i < group.size(); i++) {
-                    LivingEntity base = group.get(i);
-                    if (!base.isValid() || base.isDead())
-                        continue;
-
-                    int totalStack = getStackSize(base);
-                    List<LivingEntity> toMerge = new ArrayList<>();
-
-                    for (int j = i + 1; j < group.size(); j++) {
-                        LivingEntity other = group.get(j);
-                        if (other.isValid() && !other.isDead() &&
-                                base.getLocation().distanceSquared(other.getLocation()) <= mergingRadiusSq) {
-
-                            toMerge.add(other);
-                            totalStack += getStackSize(other);
-                        }
-                    }
-
-                    if (!toMerge.isEmpty()) {
-                        String baseName = getStackBaseName(base);
-                        for (LivingEntity other : toMerge) {
-                            other.getWorld().spawnParticle(org.bukkit.Particle.CLOUD, other.getLocation().add(0, 1, 0),
-                                    5, 0.2, 0.2, 0.2, 0.05);
-                            HologramUtil.removeHologram(other);
-                            other.remove();
-                        }
-                        updateStackName(base, baseName, totalStack);
-                    }
-                }
+            for (Chunk chunk : world.getLoadedChunks()) {
+                mergeEntitiesInChunk(chunk);
             }
         }
     }
 
-    private int getStackSize(LivingEntity le) {
-        // 1. Check PDC (preferred)
-        if (le.getPersistentDataContainer().has(STACK_SIZE_KEY, PersistentDataType.INTEGER)) {
-            return le.getPersistentDataContainer().get(STACK_SIZE_KEY, PersistentDataType.INTEGER);
+    private void mergeEntitiesInChunk(Chunk chunk) {
+        Entity[] entities = chunk.getEntities();
+        if (entities.length < 2)
+            return;
+
+        Map<String, List<LivingEntity>> groups = new HashMap<>();
+
+        for (Entity e : entities) {
+            if (e instanceof LivingEntity le && !(e instanceof Player) && !e.hasMetadata("NPC") && !le.isDead()) {
+                if (mergingBlacklist.contains(le.getType().name()))
+                    continue;
+
+                String signature = le.getType().name() + "::" + getStackBaseName(le);
+                groups.computeIfAbsent(signature, k -> new ArrayList<>()).add(le);
+            }
         }
 
-        // 2. Fallback to parsing name (legacy support)
-        String name = le.getCustomName();
-        if (name == null)
-            return 1;
+        for (List<LivingEntity> group : groups.values()) {
+            if (group.size() < 2)
+                continue;
 
-        String stripped = ChatUtils.decolorize(name);
-        try {
-            java.util.regex.Matcher m = java.util.regex.Pattern.compile(" x(\\d+)$").matcher(stripped);
-            if (m.find()) {
-                return Integer.parseInt(m.group(1));
+            LivingEntity base = group.get(0);
+            if (!base.isValid())
+                continue;
+
+            int totalStack = getStackSize(base);
+            boolean changed = false;
+
+            for (int i = 1; i < group.size(); i++) {
+                LivingEntity other = group.get(i);
+                if (!other.isValid())
+                    continue;
+
+                // Distance check (squared)
+                if (base.getLocation().distanceSquared(other.getLocation()) > mergingRadiusSq)
+                    continue;
+
+                totalStack += getStackSize(other);
+
+                // FX
+                other.getWorld().spawnParticle(org.bukkit.Particle.CLOUD, other.getLocation().add(0, 0.5, 0), 3, 0.1,
+                        0.1, 0.1, 0.05);
+                HologramUtil.removeHologram(other);
+                other.remove();
+                changed = true;
             }
-        } catch (Exception ignored) {
+
+            if (changed) {
+                updateStackName(base, getStackBaseName(base), totalStack);
+            }
+        }
+    }
+
+    // --- UTILS ---
+
+    private int getStackSize(LivingEntity le) {
+        PersistentDataContainer pdc = le.getPersistentDataContainer();
+        if (pdc.has(STACK_SIZE_KEY, PersistentDataType.INTEGER)) {
+            return pdc.get(STACK_SIZE_KEY, PersistentDataType.INTEGER);
+        }
+        // Legacy fallback
+        String name = le.getCustomName();
+        if (name != null) {
+            String stripped = ChatUtils.decolorize(name);
+            Pattern p = Pattern.compile(" x(\\d+)$");
+            Matcher m = p.matcher(stripped);
+            if (m.find())
+                return Integer.parseInt(m.group(1));
         }
         return 1;
     }
 
     private String getStackBaseName(LivingEntity le) {
-        // 1. Check PDC (preferred)
-        if (le.getPersistentDataContainer().has(STACK_BASE_NAME_KEY, PersistentDataType.STRING)) {
-            return le.getPersistentDataContainer().get(STACK_BASE_NAME_KEY, PersistentDataType.STRING);
+        PersistentDataContainer pdc = le.getPersistentDataContainer();
+        if (pdc.has(STACK_BASE_NAME_KEY, PersistentDataType.STRING)) {
+            return pdc.get(STACK_BASE_NAME_KEY, PersistentDataType.STRING);
         }
-
-        // 2. Fallback to parsing name (legacy support)
+        // Legacy fallback
         String name = le.getCustomName();
         if (name == null) {
             String type = le.getType().name();
             return type.substring(0, 1).toUpperCase() + type.substring(1).toLowerCase();
         }
-
-        // Remove the suffix from the RAW string to preserve colors
-        // Fixing regex to be more aggressive and precise
         return name.replaceAll("(?i)( §7)? x\\d+$", "");
     }
 
     private void updateStackName(LivingEntity le, String baseNameRaw, int size) {
-        // Update PDC
         le.getPersistentDataContainer().set(STACK_SIZE_KEY, PersistentDataType.INTEGER, size);
         le.getPersistentDataContainer().set(STACK_BASE_NAME_KEY, PersistentDataType.STRING, baseNameRaw);
 
         if (size <= 1) {
-            // Single mob — remove hologram, restore original name
             HologramUtil.removeHologram(le);
             String typeName = le.getType().name();
-
-            // Check if baseNameRaw is just a colorized version of type name
             String basePlain = ChatUtils.decolorize(baseNameRaw);
+
+            // If the name is just the mob type, hide custom name
             if (basePlain.equalsIgnoreCase(typeName)) {
                 le.setCustomName(null);
                 le.setCustomNameVisible(false);
@@ -529,21 +496,25 @@ public class NaturalLaggManager implements Listener {
                 le.setCustomNameVisible(true);
             }
         } else {
-            // Stacked mob — use hologram instead of custom name
-            le.setCustomNameVisible(false);
+            le.setCustomNameVisible(false); // Hide vanilla name, use hologram
+            le.setCustomName(null); // Keep vanilla name clear to avoid clutter? Or keep it for backup?
+            // Actually, if we setCustomName(null), getCustomName() returns null.
+            // We store baseName in PDC, so it's safe.
 
-            // Build pretty display name
+            // Aesthetic Hologram
             String cleanName = ChatUtils.decolorize(baseNameRaw);
-            String holoText = "<gradient:#FFD700:#FFA500>" + cleanName + "</gradient> <gray>x" + size;
-            HologramUtil.updateHologram(le, holoText);
 
-            // Still store count in custom name for internal tracking (hidden) but ensure
-            // it's
-            // not visible
-            if (!baseNameRaw.contains("§") && !baseNameRaw.contains("&")) {
-                baseNameRaw = "&e" + baseNameRaw;
-            }
-            le.setCustomName(ChatUtils.colorize(baseNameRaw + " §7x" + size));
+            // Format: Gradient Name | xSize
+            // Example: <gradient:#00ff00:#00aa00>Cow</gradient> <gray>x50
+            String holoText = "<gradient:#55ffff:#00aa00><bold>" + cleanName + "</bold></gradient> <gray>x" + size;
+
+            HologramUtil.updateHologram(le, holoText + " ");
+            // Added space for padding
+
+            // Also set custom name slightly for fallback? No, let's rely on Hologram.
+            // If we set custom name, it might show under the passenger.
+            le.setCustomName(ChatUtils.colorize(baseNameRaw + " &7x" + size));
+            le.setCustomNameVisible(false);
         }
     }
 
