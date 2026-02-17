@@ -352,7 +352,7 @@ public class NaturalLaggManager implements Listener {
         updateStackName(entity, baseName, newSize);
 
         // Feedback
-        entity.getWorld().playSound(entity.getLocation(), Sound.ENTITY_GENERIC_DAMAGE, 1f, 1f);
+        entity.getWorld().playSound(entity.getLocation(), Sound.ENTITY_GENERIC_HURT, 1f, 1f);
         // Simulate Knockback/Hurt effect? Bukkit handles damage animation even if
         // cancelled often?
         // No, if cancelled, no animation.

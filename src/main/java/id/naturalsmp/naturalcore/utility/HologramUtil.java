@@ -91,6 +91,33 @@ public class HologramUtil {
     }
 
     /**
+     * Purge orphaned holograms around a location.
+     *
+     * @param center The center location
+     * @param radius Radius in blocks (0 = all loaded)
+     * @return Number of holograms purged
+     */
+    public static int purgeHolograms(org.bukkit.Location center, double radius) {
+        int purged = 0;
+        double radiusSq = radius * radius;
+
+        for (Entity entity : center.getWorld().getEntities()) {
+            if (!(entity instanceof TextDisplay td))
+                continue;
+            if (!td.getPersistentDataContainer().has(PDC_HOLO_TAG, PersistentDataType.BYTE))
+                continue;
+
+            // Check range
+            if (radius > 0 && td.getLocation().distanceSquared(center) > radiusSq)
+                continue;
+
+            td.remove();
+            purged++;
+        }
+        return purged;
+    }
+
+    /**
      * Legacy Cleanup: Remove all old holograms from the world that might be
      * lingering
      * from the previous system (teleport-based).
