@@ -16,6 +16,7 @@ import java.util.List;
 /**
  * Utility for managing floating TextDisplay holograms attached to entities.
  * Optimized to use Passengers instead of Teleport Ticks.
+ * Premium minimalist design.
  */
 public class HologramUtil {
 
@@ -37,6 +38,9 @@ public class HologramUtil {
 
         TextDisplay display = getPassengerHologram(target);
 
+        // Calculate Y offset based on entity height for better positioning
+        float yOffset = getHologramOffset(target);
+
         if (display == null) {
             // Create new holo as passenger
             display = target.getWorld().spawn(target.getLocation(), TextDisplay.class, d -> {
@@ -48,18 +52,45 @@ public class HologramUtil {
                 d.setShadowed(false);
                 d.setBackgroundColor(Color.fromARGB(0, 0, 0, 0)); // Transparent background
 
-                // Scale and Translation
-                // Position it slightly above the mob's head.
-                // Since it's a passenger, (0,0,0) is the seat.
-                // We add a translation up.
+                // Position above mob head
                 Transformation transformation = d.getTransformation();
-                transformation.getTranslation().set(0.0f, 0.7f, 0.0f);
+                transformation.getTranslation().set(0.0f, yOffset, 0.0f);
                 d.setTransformation(transformation);
             });
             target.addPassenger(display);
+        } else {
+            // Update existing position if needed
+            Transformation transformation = display.getTransformation();
+            if (Math.abs(transformation.getTranslation().y() - yOffset) > 0.1f) {
+                transformation.getTranslation().set(0.0f, yOffset, 0.0f);
+                display.setTransformation(transformation);
+            }
         }
 
         display.text(ChatUtils.toComponent(text));
+    }
+
+    /**
+     * Get Y offset for hologram based on entity type/height.
+     * Ensures the hologram sits nicely above the mob's head.
+     */
+    private static float getHologramOffset(LivingEntity entity) {
+        double height = entity.getHeight();
+
+        // Small mobs (chicken, rabbit, silverfish)
+        if (height < 0.6)
+            return 0.3f;
+        // Medium-small (pig, sheep, wolf)
+        if (height < 1.0)
+            return 0.5f;
+        // Medium (cow, zombie, skeleton)
+        if (height < 2.0)
+            return 0.7f;
+        // Tall (enderman, iron golem)
+        if (height < 3.0)
+            return 0.9f;
+        // Very tall (ghast, wither)
+        return 1.2f;
     }
 
     /**
@@ -118,9 +149,8 @@ public class HologramUtil {
     }
 
     /**
-     * Legacy Cleanup: Remove all old holograms from the world that might be
-     * lingering
-     * from the previous system (teleport-based).
+     * Purge ALL holograms from all worlds.
+     * Used on server startup to clean orphans from crashes.
      */
     public static int purgeAllHolograms() {
         int purged = 0;

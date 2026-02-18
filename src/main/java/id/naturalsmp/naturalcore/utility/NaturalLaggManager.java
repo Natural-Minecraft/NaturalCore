@@ -10,6 +10,7 @@ import org.bukkit.Sound;
 import org.bukkit.World;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.entity.Entity;
+import org.bukkit.entity.ExperienceOrb;
 import org.bukkit.entity.Item;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Mob;
@@ -17,6 +18,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
+import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
@@ -46,6 +48,8 @@ public class NaturalLaggManager implements Listener {
     private boolean mergingEnabled = true;
     private int mergingThreshold = 5;
     private double mergingRadiusSq = 16.0; // 4 block radius (4*4)
+    private int maxStackSize = 256;
+    private int mergeIntervalTicks = 100; // 5 seconds
     private Set<String> mergingBlacklist = new HashSet<>();
     private Set<String> itemWhitelist = new HashSet<>();
     private boolean removeDeathDrops = false;
@@ -63,6 +67,9 @@ public class NaturalLaggManager implements Listener {
     private BukkitTask autoRemovalTask;
     private int autoRemovalCountdown;
     private final Set<UUID> recentDeathDrops = ConcurrentHashMap.newKeySet();
+
+    // Track entities currently being processed to prevent recursion
+    private final Set<UUID> processingDeath = ConcurrentHashMap.newKeySet();
 
     // Animation States
     public enum LaggState {
@@ -83,6 +90,13 @@ public class NaturalLaggManager implements Listener {
         Bukkit.getPluginManager().registerEvents(this, plugin);
         if (enabled) {
             startTasks();
+            // Purge orphan holograms on startup
+            Bukkit.getScheduler().runTaskLater(plugin, () -> {
+                int purged = HologramUtil.purgeAllHolograms();
+                if (purged > 0) {
+                    plugin.getLogger().info("[NaturalLagg] Cleaned " + purged + " orphan holograms.");
+                }
+            }, 100L);
         }
     }
 
@@ -98,6 +112,8 @@ public class NaturalLaggManager implements Listener {
         this.mergingThreshold = plugin.getConfig().getInt("lagg.merging.threshold", 5);
         double radius = plugin.getConfig().getDouble("lagg.merging.radius", 4.0);
         this.mergingRadiusSq = radius * radius;
+        this.maxStackSize = plugin.getConfig().getInt("lagg.merging.max-stack-size", 256);
+        this.mergeIntervalTicks = plugin.getConfig().getInt("lagg.merging.merge-interval", 5) * 20;
         this.mergingBlacklist = new HashSet<>(plugin.getConfig().getStringList("lagg.merging.blacklist"));
 
         this.itemWhitelist = new HashSet<>(plugin.getConfig().getStringList("lagg.cleanup.item-whitelist"));
@@ -113,18 +129,15 @@ public class NaturalLaggManager implements Listener {
     }
 
     public void startTasks() {
-        // Mob Merge Task (every 10 seconds)
+        // Mob Merge Task
         if (mergingEnabled) {
             new BukkitRunnable() {
                 @Override
                 public void run() {
                     performMobMerging();
                 }
-            }.runTaskTimer(plugin, 200L, 200L);
+            }.runTaskTimer(plugin, 200L, mergeIntervalTicks);
         }
-
-        // NOTE: HologramUtil.tickHolograms() removed for performance.
-        // Holograms are now Passengers.
 
         // Chunk Limiter
         if (chunkLimiterEnabled) {
@@ -150,8 +163,8 @@ public class NaturalLaggManager implements Listener {
         }.runTaskTimer(plugin, 200L, optimizerCheckInterval * 20L);
     }
 
-    // --- AUTO REMOVAL LOGIC ---
-    // (Kept mostly same, just slight cleanup)
+    // ==================== AUTO REMOVAL LOGIC ====================
+
     private void startAutoRemovalCycle() {
         autoRemovalCountdown = autoRemovalInterval;
         autoRemovalTask = new BukkitRunnable() {
@@ -179,11 +192,11 @@ public class NaturalLaggManager implements Listener {
         String msg;
         if (seconds >= 60) {
             msg = ConfigUtils.getString("messages.system.lagg.warning-minute",
-                    "&#FFAA00&l⚠ &7Pembersihan item dalam &e%time% &7menit.");
+                    "&#FFAA00&l⚠ §7Pembersihan item dalam &e%time% §7menit.");
             msg = msg.replace("%time%", String.valueOf(seconds / 60));
         } else {
             msg = ConfigUtils.getString("messages.system.lagg.warning-second",
-                    "&#FFAA00&l⚠ &7Pembersihan item dalam &e%time% &7detik.");
+                    "&#FFAA00&l⚠ §7Pembersihan item dalam &e%time% §7detik.");
             msg = msg.replace("%time%", String.valueOf(seconds));
         }
         Bukkit.broadcast(ChatUtils.toComponent(ChatUtils.colorize(msg)));
@@ -202,7 +215,8 @@ public class NaturalLaggManager implements Listener {
         broadcastWarning(seconds);
     }
 
-    // --- ANIMATION ---
+    // ==================== ANIMATION ====================
+
     public void startAnimation() {
         if (state != LaggState.IDLE)
             return;
@@ -230,9 +244,7 @@ public class NaturalLaggManager implements Listener {
                     playTickSound(1.5f);
             }
             case COUNTDOWN -> {
-                if (autoRemovalCountdown > 15 || autoRemovalCountdown <= 0) {
-                    // Handled by main loop
-                } else if (autoRemovalCountdown <= 5 && animationFrame % 10 == 0) {
+                if (autoRemovalCountdown <= 5 && animationFrame % 10 == 0) {
                     playTickSound(2.0f);
                 }
             }
@@ -289,7 +301,7 @@ public class NaturalLaggManager implements Listener {
     private String getLaggContent() {
         if (state == LaggState.SUCCESS_SLIDING_IN || state == LaggState.SUCCESS_STATIC
                 || state == LaggState.SLIDING_OUT) {
-            return "&#55FF55&l✔ CLEANUP COMPLETE &7(" + cleanedCount + " items)";
+            return "&#55FF55&l✔ CLEANUP COMPLETE §7(" + cleanedCount + " items)";
         }
         return "&fClearing Items in &c" + autoRemovalCountdown + "s";
     }
@@ -318,7 +330,7 @@ public class NaturalLaggManager implements Listener {
         }
     }
 
-    // --- STACK MOB LOGIC (REFACTORED) ---
+    // ==================== STACK MOB: DAMAGE HANDLER ====================
 
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     public void onEntityDamage(EntityDamageEvent e) {
@@ -329,59 +341,148 @@ public class NaturalLaggManager implements Listener {
         if (entity instanceof Player || entity.hasMetadata("NPC"))
             return;
 
-        // Check fatal damage
+        int stackSize = getStackSize(entity);
+        if (stackSize <= 1) {
+            // Mob biasa, biarkan mati natural. Cleanup hologram jika ada.
+            if (e.getFinalDamage() >= entity.getHealth()) {
+                HologramUtil.removeHologram(entity);
+            }
+            return;
+        }
+
+        // Non-fatal damage — biarkan terkena damage biasa
         if (e.getFinalDamage() < entity.getHealth())
             return;
 
-        // Check stack size
-        int stackSize = getStackSize(entity);
-        if (stackSize <= 1) {
-            // Let it die naturally.
-            // Explicitly remove hologram just in case passenger logic misses (rare but
-            // safe)
-            HologramUtil.removeHologram(entity);
-            return;
-        }
-
-        // Prevent Death, Decrement Stack
+        // === Fatal damage pada stacked mob ===
         e.setCancelled(true);
-        entity.setHealth(entity.getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue());
+
+        // Reset HP
+        if (entity.getAttribute(Attribute.GENERIC_MAX_HEALTH) != null) {
+            entity.setHealth(entity.getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue());
+        }
 
         int newSize = stackSize - 1;
         String baseName = getStackBaseName(entity);
-        updateStackName(entity, baseName, newSize);
+        updateStackDisplay(entity, baseName, newSize);
 
-        // Feedback
-        entity.getWorld().playSound(entity.getLocation(), Sound.ENTITY_GENERIC_HURT, 1f, 1f);
-        // Simulate Knockback/Hurt effect? Bukkit handles damage animation even if
-        // cancelled often?
-        // No, if cancelled, no animation.
+        // Hurt animation
         entity.playEffect(org.bukkit.EntityEffect.HURT);
+        entity.getWorld().playSound(entity.getLocation(), Sound.ENTITY_GENERIC_HURT, 1f, 1f);
 
-        // Loot Simulation (Basic)
-        // We drop items for the "one" that died.
+        // === Loot & XP ===
+        Player killer = getKiller(e);
+
         if (entity instanceof Mob mob) {
-            LootTable table = mob.getLootTable();
-            if (table != null) {
-                try {
-                    // Requires context. Minimal context:
-                    LootContext.Builder builder = new LootContext.Builder(entity.getLocation())
-                            .lootedEntity(entity);
-                    // We don't have killer easily in EntityDamageEvent unless we cast to
-                    // EntityDamageByEntityEvent
-                    // But simplified drops are fine for stackers.
-                    Collection<ItemStack> drops = table.populateLoot(null, builder.build());
-                    for (ItemStack drop : drops) {
-                        entity.getWorld().dropItemNaturally(entity.getLocation(), drop);
-                    }
-                } catch (Exception ex) {
-                    // Fallback or ignore
-                }
-            }
+            dropLoot(mob, killer);
+            dropXp(mob, killer);
         }
     }
 
-    // New Merging Logic: Chunk-Based for Performance
+    // ==================== STACK MOB: DEATH HANDLER ====================
+
+    @EventHandler(priority = EventPriority.HIGHEST)
+    public void onEntityDeath(EntityDeathEvent e) {
+        if (!mergingEnabled)
+            return;
+        if (e instanceof PlayerDeathEvent)
+            return;
+
+        LivingEntity entity = e.getEntity();
+        if (entity.hasMetadata("NPC"))
+            return;
+
+        // Prevent recursion
+        if (processingDeath.contains(entity.getUniqueId()))
+            return;
+        processingDeath.add(entity.getUniqueId());
+
+        try {
+            int stackSize = getStackSize(entity);
+            if (stackSize <= 1) {
+                // Mob biasa — cleanup hologram
+                HologramUtil.removeHologram(entity);
+                return;
+            }
+
+            // Stacked mob mati (dari void, /kill, suffocation, etc.)
+            // Jangan multiply drops — cukup drop 1x (entity sudah mati, Bukkit handle
+            // drops)
+            // Tapi update PDC supaya hologram di-clean
+            HologramUtil.removeHologram(entity);
+
+            // Clear PDC
+            entity.getPersistentDataContainer().remove(STACK_SIZE_KEY);
+            entity.getPersistentDataContainer().remove(STACK_BASE_NAME_KEY);
+
+        } finally {
+            processingDeath.remove(entity.getUniqueId());
+        }
+    }
+
+    // ==================== LOOT & XP HELPERS ====================
+
+    /**
+     * Drop loot untuk 1 mob dari stack menggunakan proper LootContext.
+     */
+    private void dropLoot(Mob mob, Player killer) {
+        LootTable table = mob.getLootTable();
+        if (table == null)
+            return;
+
+        try {
+            LootContext.Builder builder = new LootContext.Builder(mob.getLocation())
+                    .lootedEntity(mob);
+
+            if (killer != null) {
+                builder.killer(killer);
+                // Looting enchant level
+                ItemStack hand = killer.getInventory().getItemInMainHand();
+                int lootingLevel = hand.getEnchantmentLevel(org.bukkit.enchantments.Enchantment.LOOTING);
+                builder.luck(lootingLevel);
+            }
+
+            Collection<ItemStack> drops = table.populateLoot(new java.util.Random(), builder.build());
+            for (ItemStack drop : drops) {
+                mob.getWorld().dropItemNaturally(mob.getLocation(), drop);
+            }
+        } catch (Exception ex) {
+            // Fallback: silent fail, mob drops 1x naturally handled by damage
+        }
+    }
+
+    /**
+     * Drop XP orb untuk 1 mob dari stack.
+     */
+    private void dropXp(Mob mob, Player killer) {
+        if (killer == null)
+            return;
+
+        // Base XP berdasarkan mob type (simplified — Bukkit default)
+        int baseXp = mob.getType().name().contains("ENDER") ? 5 : 3;
+        mob.getWorld().spawn(mob.getLocation(), ExperienceOrb.class, orb -> {
+            orb.setExperience(baseXp);
+        });
+    }
+
+    /**
+     * Extract killer dari damage event chain.
+     */
+    private Player getKiller(EntityDamageEvent e) {
+        if (e instanceof EntityDamageByEntityEvent edbe) {
+            if (edbe.getDamager() instanceof Player p)
+                return p;
+            // Projectile → shooter
+            if (edbe.getDamager() instanceof org.bukkit.entity.Projectile proj) {
+                if (proj.getShooter() instanceof Player p)
+                    return p;
+            }
+        }
+        return null;
+    }
+
+    // ==================== MOB MERGING LOGIC ====================
+
     private void performMobMerging() {
         for (World world : Bukkit.getWorlds()) {
             if (excludedWorlds.contains(world.getName()))
@@ -430,9 +531,15 @@ public class NaturalLaggManager implements Listener {
                 if (base.getLocation().distanceSquared(other.getLocation()) > mergingRadiusSq)
                     continue;
 
-                totalStack += getStackSize(other);
+                int otherStack = getStackSize(other);
 
-                // FX
+                // Max stack size check
+                if (totalStack + otherStack > maxStackSize)
+                    continue;
+
+                totalStack += otherStack;
+
+                // Merge FX
                 other.getWorld().spawnParticle(org.bukkit.Particle.CLOUD, other.getLocation().add(0, 0.5, 0), 3, 0.1,
                         0.1, 0.1, 0.05);
                 HologramUtil.removeHologram(other);
@@ -441,24 +548,25 @@ public class NaturalLaggManager implements Listener {
             }
 
             if (changed) {
-                updateStackName(base, getStackBaseName(base), totalStack);
+                updateStackDisplay(base, getStackBaseName(base), totalStack);
+                // Despawn protection for stacked mobs
+                base.setRemoveWhenFarAway(false);
             }
         }
     }
 
-    // --- UTILS ---
+    // ==================== STACK UTILS ====================
 
     private int getStackSize(LivingEntity le) {
         PersistentDataContainer pdc = le.getPersistentDataContainer();
         if (pdc.has(STACK_SIZE_KEY, PersistentDataType.INTEGER)) {
             return pdc.get(STACK_SIZE_KEY, PersistentDataType.INTEGER);
         }
-        // Legacy fallback
+        // Legacy fallback: parse from custom name
         String name = le.getCustomName();
         if (name != null) {
             String stripped = ChatUtils.decolorize(name);
-            Pattern p = Pattern.compile(" x(\\d+)$");
-            Matcher m = p.matcher(stripped);
+            Matcher m = Pattern.compile("x(\\d+)$").matcher(stripped);
             if (m.find())
                 return Integer.parseInt(m.group(1));
         }
@@ -473,51 +581,69 @@ public class NaturalLaggManager implements Listener {
         // Legacy fallback
         String name = le.getCustomName();
         if (name == null) {
-            String type = le.getType().name();
-            return type.substring(0, 1).toUpperCase() + type.substring(1).toLowerCase();
+            // Capitalize type name: ZOMBIE → Zombie
+            String type = le.getType().name().replace("_", " ");
+            StringBuilder sb = new StringBuilder();
+            for (String word : type.split(" ")) {
+                if (sb.length() > 0)
+                    sb.append(" ");
+                sb.append(word.substring(0, 1).toUpperCase()).append(word.substring(1).toLowerCase());
+            }
+            return sb.toString();
         }
-        return name.replaceAll("(?i)( §7)? x\\d+$", "");
+        // Strip stack suffix from legacy name
+        String stripped = ChatUtils.decolorize(name);
+        return stripped.replaceAll("\\s*x\\d+$", "").trim();
     }
 
-    private void updateStackName(LivingEntity le, String baseNameRaw, int size) {
+    /**
+     * Update stack data dan hologram display.
+     * Format: <gradient:#6CCAFE:#55FF55><bold>Cow</bold></gradient> <dark_gray>•
+     * <white>x<bold>50</bold>
+     */
+    private void updateStackDisplay(LivingEntity le, String baseName, int size) {
         le.getPersistentDataContainer().set(STACK_SIZE_KEY, PersistentDataType.INTEGER, size);
-        le.getPersistentDataContainer().set(STACK_BASE_NAME_KEY, PersistentDataType.STRING, baseNameRaw);
+        le.getPersistentDataContainer().set(STACK_BASE_NAME_KEY, PersistentDataType.STRING, baseName);
 
         if (size <= 1) {
+            // Unstacked — remove hologram, restore name
             HologramUtil.removeHologram(le);
-            String typeName = le.getType().name();
-            String basePlain = ChatUtils.decolorize(baseNameRaw);
+            String plainName = ChatUtils.decolorize(baseName);
+            String typeName = le.getType().name().replace("_", " ");
 
-            // If the name is just the mob type, hide custom name
-            if (basePlain.equalsIgnoreCase(typeName)) {
+            // Jika nama = type name default, hide custom name
+            if (plainName.equalsIgnoreCase(typeName) ||
+                    plainName.equalsIgnoreCase(typeName.replace(" ", ""))) {
                 le.setCustomName(null);
                 le.setCustomNameVisible(false);
             } else {
-                le.setCustomName(baseNameRaw);
+                le.setCustomName(baseName);
                 le.setCustomNameVisible(true);
             }
+
+            // Re-enable natural despawn
+            le.setRemoveWhenFarAway(true);
+            le.getPersistentDataContainer().remove(STACK_SIZE_KEY);
+            le.getPersistentDataContainer().remove(STACK_BASE_NAME_KEY);
         } else {
-            le.setCustomNameVisible(false); // Hide vanilla name, use hologram
-            le.setCustomName(null); // Keep vanilla name clear to avoid clutter? Or keep it for backup?
-            // Actually, if we setCustomName(null), getCustomName() returns null.
-            // We store baseName in PDC, so it's safe.
-
-            // Aesthetic Hologram
-            String cleanName = ChatUtils.decolorize(baseNameRaw);
-
-            // Format: Gradient Name | xSize
-            // Example: <gradient:#00ff00:#00aa00>Cow</gradient> <gray>x50
-            String holoText = "<gradient:#55ffff:#00aa00><bold>" + cleanName + "</bold></gradient> <gray>x" + size;
-
-            HologramUtil.updateHologram(le, holoText + " ");
-            // Added space for padding
-
-            // Also set custom name slightly for fallback? No, let's rely on Hologram.
-            // If we set custom name, it might show under the passenger.
-            le.setCustomName(ChatUtils.colorize(baseNameRaw + " &7x" + size));
+            // Stacked — premium minimalist hologram
             le.setCustomNameVisible(false);
+            le.setCustomName(null);
+
+            String cleanName = ChatUtils.decolorize(baseName);
+
+            // Premium hologram: gradient name • bold count
+            String holoText = "<gradient:#6CCAFE:#55FF55><bold>" + cleanName
+                    + "</bold></gradient> <dark_gray>• <white>x<bold>" + size + "</bold>";
+
+            HologramUtil.updateHologram(le, holoText);
+
+            // Despawn protection
+            le.setRemoveWhenFarAway(false);
         }
     }
+
+    // ==================== CHUNK LIMITER ====================
 
     private void enforceChunkLimits() {
         for (World world : Bukkit.getWorlds()) {
@@ -531,8 +657,18 @@ public class NaturalLaggManager implements Listener {
                     for (Entity e : entities) {
                         if (removed >= toRemove)
                             break;
+
+                        // Skip stacked mobs — removing them would lose many entities
+                        if (e instanceof LivingEntity le) {
+                            if (le instanceof Player || le.hasMetadata("NPC"))
+                                continue;
+                            if (getStackSize(le) > 1)
+                                continue; // SKIP stacked — too valuable to delete
+                        }
+
                         if (e instanceof Item
                                 || (e instanceof LivingEntity && !(e instanceof Player) && !e.hasMetadata("NPC"))) {
+                            HologramUtil.removeHologram((LivingEntity) e);
                             e.remove();
                             removed++;
                         }
@@ -541,6 +677,8 @@ public class NaturalLaggManager implements Listener {
             }
         }
     }
+
+    // ==================== PERFORMANCE OPTIMIZER ====================
 
     private void checkPerformanceOptimizer() {
         double tps = Bukkit.getTPS()[0];
@@ -565,6 +703,8 @@ public class NaturalLaggManager implements Listener {
         return false;
     }
 
+    // ==================== PLAYER DEATH DROPS PROTECTION ====================
+
     @EventHandler(priority = EventPriority.MONITOR)
     public void onPlayerDeath(PlayerDeathEvent e) {
         if (!removeDeathDrops) {
@@ -577,6 +717,8 @@ public class NaturalLaggManager implements Listener {
             }, 5L);
         }
     }
+
+    // ==================== GETTERS ====================
 
     public LaggState getState() {
         return state;
