@@ -455,8 +455,8 @@ public final class NaturalCore extends JavaPlugin {
         this.staffGUI = new id.naturalsmp.naturalcore.staff.StaffGUI(this);
         this.healthManager = new id.naturalsmp.naturalcore.utility.ServerHealthManager(this);
         this.statusGUI = new id.naturalsmp.naturalcore.utility.ServerStatusGUI(this);
-        this.tradeManager = new id.naturalsmp.naturalcore.trade.TradeManager(this);
         this.tradeGUI = new id.naturalsmp.naturalcore.trade.TradeGUI(this);
+        this.tradeManager = new id.naturalsmp.naturalcore.trade.TradeManager(this);
         this.combatManager = new id.naturalsmp.naturalcore.combat.CombatManager(this);
         this.playtimeManager = new id.naturalsmp.naturalcore.playtime.PlaytimeManager(this);
         this.broadcastManager = new id.naturalsmp.naturalcore.announcement.BroadcastManager(this);
