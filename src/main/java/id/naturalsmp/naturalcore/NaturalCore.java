@@ -614,6 +614,21 @@ public final class NaturalCore extends JavaPlugin {
         if (chatGameManager != null) {
             chatGameManager.stop();
         }
+        if (combatManager != null) {
+            combatManager.stop();
+        }
+        if (hudManager != null) {
+            hudManager.stop();
+        }
+        if (healthManager != null) {
+            healthManager.stop();
+        }
+        if (playtimeManager != null) {
+            playtimeManager.stop();
+        }
+        if (laggManager != null) {
+            laggManager.stop();
+        }
     }
 
     // --- GETTERS ---

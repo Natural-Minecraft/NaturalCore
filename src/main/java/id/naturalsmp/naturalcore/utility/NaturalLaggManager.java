@@ -65,6 +65,9 @@ public class NaturalLaggManager implements Listener {
 
     // State
     private BukkitTask autoRemovalTask;
+    private BukkitTask mergeTask;
+    private BukkitTask chunkTask;
+    private BukkitTask performanceTask;
     private int autoRemovalCountdown;
     private final Set<UUID> recentDeathDrops = ConcurrentHashMap.newKeySet();
 
@@ -100,6 +103,27 @@ public class NaturalLaggManager implements Listener {
         }
     }
 
+    public void stop() {
+        if (autoRemovalTask != null) {
+            autoRemovalTask.cancel();
+            autoRemovalTask = null;
+        }
+        if (mergeTask != null) {
+            mergeTask.cancel();
+            mergeTask = null;
+        }
+        if (chunkTask != null) {
+            chunkTask.cancel();
+            chunkTask = null;
+        }
+        if (performanceTask != null) {
+            performanceTask.cancel();
+            performanceTask = null;
+        }
+        recentDeathDrops.clear();
+        processingDeath.clear();
+    }
+
     public void loadConfig() {
         this.enabled = plugin.getConfig().getBoolean("lagg.enabled", true);
         this.autoRemovalEnabled = plugin.getConfig().getBoolean("lagg.auto-removal.enabled", true);
@@ -131,7 +155,7 @@ public class NaturalLaggManager implements Listener {
     public void startTasks() {
         // Mob Merge Task
         if (mergingEnabled) {
-            new BukkitRunnable() {
+            this.mergeTask = new BukkitRunnable() {
                 @Override
                 public void run() {
                     performMobMerging();
@@ -141,7 +165,7 @@ public class NaturalLaggManager implements Listener {
 
         // Chunk Limiter
         if (chunkLimiterEnabled) {
-            new BukkitRunnable() {
+            this.chunkTask = new BukkitRunnable() {
                 @Override
                 public void run() {
                     enforceChunkLimits();
@@ -155,7 +179,7 @@ public class NaturalLaggManager implements Listener {
         }
 
         // Performance Optimizer
-        new BukkitRunnable() {
+        this.performanceTask = new BukkitRunnable() {
             @Override
             public void run() {
                 checkPerformanceOptimizer();
@@ -677,10 +701,12 @@ public class NaturalLaggManager implements Listener {
                                 continue; // SKIP stacked — too valuable to delete
                         }
 
-                        if (e instanceof Item
-                                || (e instanceof LivingEntity && !(e instanceof Player) && !e.hasMetadata("NPC"))) {
-                            HologramUtil.removeHologram((LivingEntity) e);
+                        if (e instanceof Item) {
                             e.remove();
+                            removed++;
+                        } else if (e instanceof LivingEntity le && !(e instanceof Player) && !e.hasMetadata("NPC")) {
+                            HologramUtil.removeHologram(le);
+                            le.remove();
                             removed++;
                         }
                     }

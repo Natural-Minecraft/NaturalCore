@@ -5,45 +5,57 @@ import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.scheduler.BukkitRunnable;
 
+import java.util.Collections;
 import java.util.LinkedList;
+import java.util.List;
 
 public class ServerHealthManager {
 
     private final NaturalCore plugin;
-    private final LinkedList<Double> tpsHistory = new LinkedList<>();
-    private final LinkedList<Double> ramHistory = new LinkedList<>();
+    private final List<Double> tpsHistory = Collections.synchronizedList(new LinkedList<>());
+    private final List<Double> ramHistory = Collections.synchronizedList(new LinkedList<>());
     private static final int MAX_HISTORY = 30;
+    private BukkitTask tickTask;
 
     public ServerHealthManager(NaturalCore plugin) {
         this.plugin = plugin;
         startTicking();
     }
 
+    public void stop() {
+        if (tickTask != null) {
+            tickTask.cancel();
+            tickTask = null;
+        }
+    }
+
     private void startTicking() {
-        new BukkitRunnable() {
+        this.tickTask = new BukkitRunnable() {
             @Override
             public void run() {
-                // Capture TPS
+                // Capture TPS (Safe to call Bukkit.getTPS() sync or async in most versions,
+                // but history lists must be synchronized)
                 double[] tps = Bukkit.getTPS();
-                tpsHistory.addFirst(tps[0]);
+                tpsHistory.add(0, tps[0]);
                 if (tpsHistory.size() > MAX_HISTORY)
-                    tpsHistory.removeLast();
+                    tpsHistory.remove(tpsHistory.size() - 1);
 
                 // Capture RAM (MB)
                 long usedMemory = (Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory()) / 1024
                         / 1024;
-                ramHistory.addFirst((double) usedMemory);
+                ramHistory.add(0, (double) usedMemory);
                 if (ramHistory.size() > MAX_HISTORY)
-                    ramHistory.removeLast();
+                    ramHistory.remove(ramHistory.size() - 1);
             }
-        }.runTaskTimerAsynchronously(plugin, 0, 20L * 5); // Every 5 seconds
+        }.runTaskTimer(plugin, 0, 20L * 5); // Run synchronously to be safe with List access and world counting if
+                                            // needed
     }
 
-    public LinkedList<Double> getTpsHistory() {
+    public List<Double> getTpsHistory() {
         return tpsHistory;
     }
 
-    public LinkedList<Double> getRamHistory() {
+    public List<Double> getRamHistory() {
         return ramHistory;
     }
 

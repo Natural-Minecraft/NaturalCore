@@ -1,6 +1,13 @@
-# NaturalCore v2.0.9 (Hologram & Tips Update)
+# NaturalCore v2.1.0 (The Mini-Games Update)
 
 Plugin inti (core) premium untuk server **NaturalSMP**, mengelola seluruh aspek penting server dengan stabilitas ultra-tinggi dan estetika premium.
+
+## ✨ Fitur Baru v2.1.0 (The Mini-Games Update)
+*   **1000 Chat Games**: Sistem mini-game chat interaktif baru (Trivia, Matematika, Susun Kata, Ketik Cepat) dengan 1000 pertanyaan yang tidak berulang.
+*   **Customizable Games**: Sepenuhnya dapat dikonfigurasi melalui `chat-games.yml`.
+*   **Dynamic Rewards**: Random reward berupa Iron Ingot, Diamond, uang (Rp), atau kombinasi (Diamond + Uang) untuk setiap pemenang game.
+*   **Bug Fix**: Memperbaiki `ClassCastException` pada sistem `NaturalLagg` saat membersihkan entity item.
+*   **Bug Fix**: Menghapus duplikasi pesan Join & Quit pada `GlobalNotificationListener`.
 
 ## ✨ Fitur Baru v2.0.9 (Hologram & Tips Update)
 *   **Hologram System**: Sistem hologram baru berbasis `TextDisplay` untuk performa lebih ringan dan visual lebih tajam (menggantikan ArmorStand lama).

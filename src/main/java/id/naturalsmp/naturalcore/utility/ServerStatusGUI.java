@@ -87,10 +87,17 @@ public class ServerStatusGUI implements Listener {
         return "&#FF5555" + String.format("%.2f", tps) + " &c&l(LAGGING)";
     }
 
-    private String generateGraph(LinkedList<Double> history, double max) {
+    private String generateGraph(List<Double> history, double max) {
         StringBuilder sb = new StringBuilder("&f");
-        for (int i = history.size() - 1; i >= 0; i--) {
-            double val = history.get(i);
+        // Create a copy to avoid ConcurrentModificationException if needed,
+        // though history is now synchronized, iteration still needs care or snapshots.
+        List<Double> snapshot;
+        synchronized (history) {
+            snapshot = new ArrayList<>(history);
+        }
+
+        for (int i = snapshot.size() - 1; i >= 0; i--) {
+            double val = snapshot.get(i);
             int index = (int) ((val / max) * (bars.length - 1));
             index = Math.max(0, Math.min(index, bars.length - 1));
             sb.append(bars[index]);

@@ -2,19 +2,19 @@ tiers:
   # --- WARRIOR ---
   1:
     id: "warrior_3"
-    display: "&#FFAA00Warrior III"
+    display: "&#FF9B00ᴡ&#EF9300ᴀ&#DF8B00ʀ&#CF8300ʀ&#BF7C00ɪ&#AE7400ᴏ&#9E6C00ʀ &#7E5C001"
     requirements:
       money: 1000
       mob_kills: 1000
   2:
     id: "warrior_2"
-    display: "&#FFAA00Warrior II"
+    display: "&#FF9B00ᴡ&#F89800ᴀ&#F19400ʀ&#EA9100ʀ&#E28D00ɪ&#DB8A00ᴏ&#D48600ʀ &#C67F002"
     requirements:
       money: 2500
       mob_kills: 2500
   3:
     id: "warrior_1"
-    display: "&#FFAA00Warrior I"
+    display: "&#B77800ᴡ&#B07500ᴀ&#A97100ʀ&#A26E00ʀ&#9B6A00ɪ&#946700ᴏ&#8C6300ʀ &#7E5C003"
     requirements:
       money: 5000
       mob_kills: 5000
@@ -22,19 +22,19 @@ tiers:
   # --- ELITE ---
   4:
     id: "elite_3"
-    display: "&#55FFFFElite III"
+    display: "&#6D6D6Dᴇ&#828282ʟ&#969696ɪ&#ABABABᴛ&#BFBFBFᴇ &f3"
     requirements:
       money: 10000
       mob_kills: 10000
   5:
     id: "elite_2"
-    display: "&#55FFFFElite II"
+    display: "&#6D6D6Dᴇ&#828282ʟ&#969696ɪ&#ABABABᴛ&#BFBFBFᴇ &f2"
     requirements:
       money: 15000
       mob_kills: 15000
   6:
     id: "elite_1"
-    display: "&#55FFFFElite I"
+    display: "&#6D6D6Dᴇ&#828282ʟ&#969696ɪ&#ABABABᴛ&#BFBFBFᴇ &f1"
     requirements:
       money: 25000
       mob_kills: 25000
@@ -42,25 +42,25 @@ tiers:
   # --- MASTER ---
   7:
     id: "master_4"
-    display: "&#AA00AAMaster IV"
+    display: "&#FFB747ᴍ&#EEA939ᴀ&#DD9A2Bs&#CD8C1Cᴛ&#BC7D0Eᴇ&#AB6F00ʀ &f4"
     requirements:
       money: 40000
       mob_kills: 40000
   8:
     id: "master_3"
-    display: "&#AA00AAMaster III"
+    display: "&#FFB747ᴍ&#EEA939ᴀ&#DD9A2Bs&#CD8C1Cᴛ&#BC7D0Eᴇ&#AB6F00ʀ &f3"
     requirements:
       money: 60000
       mob_kills: 55000
   9:
     id: "master_2"
-    display: "&#AA00AAMaster II"
+    display: "&#FFB747ᴍ&#EEA939ᴀ&#DD9A2Bs&#CD8C1Cᴛ&#BC7D0Eᴇ&#AB6F00ʀ &f2"
     requirements:
       money: 80000
       mob_kills: 75000
   10:
     id: "master_1"
-    display: "&#AA00AAMaster I"
+    display: "&#FFB747ᴍ&#EEA939ᴀ&#DD9A2Bs&#CD8C1Cᴛ&#BC7D0Eᴇ&#AB6F00ʀ &f1"
     requirements:
       money: 100000
       mob_kills: 100000
@@ -68,31 +68,31 @@ tiers:
   # --- GRANDMASTER ---
   11:
     id: "gm_5"
-    display: "&#FFFF55Grandmaster V"
+    display: "&#C1BCBCɢ&#C7C3C3ʀ&#CDC9C9ᴀ&#D4D0D0ɴ&#DAD7D7ᴅ&#E0DEDEᴍ&#E6E4E4ᴀ&#ECEBEBs&#F3F2F2ᴛ&#F9F8F8ᴇ&#FFFFFFʀ &f5"
     requirements:
       money: 150000
       mob_kills: 130000
   12:
     id: "gm_4"
-    display: "&#FFFF55Grandmaster IV"
+    display: "&#C1BCBCɢ&#C7C3C3ʀ&#CDC9C9ᴀ&#D4D0D0ɴ&#DAD7D7ᴅ&#E0DEDEᴍ&#E6E4E4ᴀ&#ECEBEBs&#F3F2F2ᴛ&#F9F8F8ᴇ&#FFFFFFʀ &f4"
     requirements:
       money: 200000
       mob_kills: 160000
   13:
     id: "gm_3"
-    display: "&#FFFF55Grandmaster III"
+    display: "&#C1BCBCɢ&#C7C3C3ʀ&#CDC9C9ᴀ&#D4D0D0ɴ&#DAD7D7ᴅ&#E0DEDEᴍ&#E6E4E4ᴀ&#ECEBEBs&#F3F2F2ᴛ&#F9F8F8ᴇ&#FFFFFFʀ &f3"
     requirements:
       money: 250000
       mob_kills: 200000
   14:
     id: "gm_2"
-    display: "&#FFFF55Grandmaster II"
+    display: "&#C1BCBCɢ&#C7C3C3ʀ&#CDC9C9ᴀ&#D4D0D0ɴ&#DAD7D7ᴅ&#E0DEDEᴍ&#E6E4E4ᴀ&#ECEBEBs&#F3F2F2ᴛ&#F9F8F8ᴇ&#FFFFFFʀ &f2"
     requirements:
       money: 300000
       mob_kills: 250000
   15:
     id: "gm_1"
-    display: "&#FFFF55Grandmaster I"
+    display: "&#C1BCBCɢ&#C7C3C3ʀ&#CDC9C9ᴀ&#D4D0D0ɴ&#DAD7D7ᴅ&#E0DEDEᴍ&#E6E4E4ᴀ&#ECEBEBs&#F3F2F2ᴛ&#F9F8F8ᴇ&#FFFFFFʀ &f1"
     requirements:
       money: 400000
       mob_kills: 300000
@@ -100,31 +100,31 @@ tiers:
   # --- EPIC ---
   16:
     id: "epic_5"
-    display: "&#FF55FFEpic V"
+    display: "&#008C04ᴇ&#00B22Eᴘ&#00D959ɪ&#00FF83ᴄ &f5"
     requirements:
       money: 550000
       mob_kills: 360000
   17:
     id: "epic_4"
-    display: "&#FF55FFEpic IV"
+    display: "&#008C04ᴇ&#00B22Eᴘ&#00D959ɪ&#00FF83ᴄ &f4"
     requirements:
       money: 700000
       mob_kills: 420000
   18:
     id: "epic_3"
-    display: "&#FF55FFEpic III"
+    display: "&#008C04ᴇ&#00B22Eᴘ&#00D959ɪ&#00FF83ᴄ &f3"
     requirements:
       money: 850000
       mob_kills: 500000
   19:
     id: "epic_2"
-    display: "&#FF55FFEpic II"
+    display: "&#008C04ᴇ&#00B22Eᴘ&#00D959ɪ&#00FF83ᴄ &f2"
     requirements:
       money: 1000000
       mob_kills: 580000
   20:
     id: "epic_1"
-    display: "&#FF55FFEpic I"
+    display: "&#008C04ᴇ&#00B22Eᴘ&#00D959ɪ&#00FF83ᴄ &f1"
     requirements:
       money: 1250000
       mob_kills: 660000
@@ -132,31 +132,31 @@ tiers:
   # --- LEGEND ---
   21:
     id: "legend_5"
-    display: "&#FFAA00Legend V"
+    display: "&#FFB000ʟ&#FFBE00ᴇ&#FFCD00ɢ&#FFDB00ᴇ&#FFEA00ɴ&#FFF800ᴅ &f5"
     requirements:
       money: 1500000
       mob_kills: 750000
   22:
     id: "legend_4"
-    display: "&#FFAA00Legend IV"
+    display: "&#FFB000ʟ&#FFBE00ᴇ&#FFCD00ɢ&#FFDB00ᴇ&#FFEA00ɴ&#FFF800ᴅ &f4"
     requirements:
       money: 1750000
       mob_kills: 850000
   23:
     id: "legend_3"
-    display: "&#FFAA00Legend III"
+    display: "&#FFB000ʟ&#FFBE00ᴇ&#FFCD00ɢ&#FFDB00ᴇ&#FFEA00ɴ&#FFF800ᴅ &f3"
     requirements:
       money: 2000000
       mob_kills: 950000
   24:
     id: "legend_2"
-    display: "&#FFAA00Legend II"
+    display: "&#FFB000ʟ&#FFBE00ᴇ&#FFCD00ɢ&#FFDB00ᴇ&#FFEA00ɴ&#FFF800ᴅ &f2"
     requirements:
       money: 2500000
       mob_kills: 1050000
   25:
     id: "legend_1"
-    display: "&#FFAA00Legend I"
+    display: "&#FFB000ʟ&#FFBE00ᴇ&#FFCD00ɢ&#FFDB00ᴇ&#FFEA00ɴ&#FFF800ᴅ &f1"
     requirements:
       money: 3000000
       mob_kills: 1200000
@@ -164,19 +164,19 @@ tiers:
   # --- MYTHIC ---
   26:
     id: "mythic"
-    display: "&#AA0000Mythic"
+    display: "&#F80E0E&lM&#E00909&lY&#C80505&lT&#B00000&lH&#B00000&lI&#B00000&lC"
     requirements:
       money: 5000000
       mob_kills: 1350000
   27:
     id: "mythic_glory"
-    display: "&#AA0000&lMythic Glory"
+    display: "&#F80E0E&lM&#EF270C&lY&#E7410A&lT&#DE5A07&lH&#D57305&lI&#C94D03&lC &#B00000&lG&#970F0E&lL&#7E1E1B&lO&#642C29&lR&#4B3B36&lY"
     requirements:
       money: 10000000
       mob_kills: 1500000
   28:
     id: "mythic_immortal"
-    display: "&#AA0000&lMythic Immortal"
+    display: "&#F80E0E&lM&#D31510&lY&#AD1C11&lT&#882313&lH&#622A14&lI&#76200F&lC&#89150A&lA&#9D0B05&lL &#C2260E&lI&#D34D1B&lM&#E57329&lM&#F69936&lO&#F87329&lR&#FB4D1B&lT&#FD260E&lA&#FF0000&lL"
     requirements:
       money: 25000000
       mob_kills: 2000000

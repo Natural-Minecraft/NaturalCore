@@ -21,6 +21,7 @@ public class PlaytimeManager {
     private final File dataFile;
     private FileConfiguration data;
     private final Set<Milestone> milestones = new HashSet<>();
+    private BukkitTask checkTask;
 
     public PlaytimeManager(NaturalCore plugin) {
         this.plugin = plugin;
@@ -28,6 +29,14 @@ public class PlaytimeManager {
         loadData();
         setupMilestones();
         startCheckTask();
+    }
+
+    public void stop() {
+        if (checkTask != null) {
+            checkTask.cancel();
+            checkTask = null;
+        }
+        saveData(); // Final save
     }
 
     private void setupMilestones() {
@@ -55,7 +64,7 @@ public class PlaytimeManager {
     }
 
     private void startCheckTask() {
-        new BukkitRunnable() {
+        this.checkTask = new BukkitRunnable() {
             @Override
             public void run() {
                 for (Player player : Bukkit.getOnlinePlayers()) {

@@ -29,12 +29,21 @@ public class HUDManager implements Listener {
 
     // Global tick counter
     private int globalTick = 0;
+    private BukkitTask updaterTask;
 
     public HUDManager(NaturalCore plugin) {
         this.plugin = plugin;
         registerComponents();
         Bukkit.getPluginManager().registerEvents(this, plugin);
         startTask();
+    }
+
+    public void stop() {
+        if (updaterTask != null) {
+            updaterTask.cancel();
+            updaterTask = null;
+        }
+        playerStates.clear();
     }
 
     private void registerComponents() {
