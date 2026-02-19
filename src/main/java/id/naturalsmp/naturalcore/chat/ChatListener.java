@@ -48,6 +48,17 @@ public class ChatListener implements Listener {
         public void onChat(AsyncChatEvent event) {
                 Player player = event.getPlayer();
 
+                // CHAT GAME ANSWER CHECK
+                ChatGameManager gameManager = plugin.getChatGameManager();
+                if (gameManager != null && gameManager.hasActiveGame()) {
+                        String plainMsg = net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer
+                                        .plainText().serialize(event.message());
+                        if (gameManager.tryAnswer(player, plainMsg)) {
+                                event.setCancelled(true);
+                                return;
+                        }
+                }
+
                 // SEARCH MODE INTERCEPTION
                 if (searchMode.containsKey(player.getUniqueId())) {
                         event.setCancelled(true);

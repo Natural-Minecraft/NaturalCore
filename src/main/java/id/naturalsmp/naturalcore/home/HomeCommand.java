@@ -38,7 +38,7 @@ public class HomeCommand implements CommandExecutor {
 
             // Validation: Disallow empty names or special characters that break config
             if (name.trim().isEmpty() || name.contains(".")) {
-                ConfigUtils.sendMessage(p, "prefix.home", "messages.home.invalid-name");
+                ConfigUtils.sendMessage(p, "prefix.general", "messages.teleport.home.invalid-name");
                 return true;
             }
 
@@ -48,7 +48,7 @@ public class HomeCommand implements CommandExecutor {
 
             // Jika belum punya home ini (home baru), tapi sudah limit -> Block
             if (!homeManager.hasHome(p, name) && current >= max) {
-                ConfigUtils.sendMessage(p, "prefix.home", "messages.home.home-limit",
+                ConfigUtils.sendMessage(p, "prefix.general", "messages.teleport.home.limit",
                         "%current%", String.valueOf(current),
                         "%max%", String.valueOf(max));
                 return true;
@@ -58,7 +58,7 @@ public class HomeCommand implements CommandExecutor {
             homeManager.setHome(p, name, p.getLocation());
 
             // FIX: Support %home% DAN %name% agar config fleksibel
-            ConfigUtils.sendMessage(p, "prefix.home", "messages.home.home-set", "%home%", name, "%name%", name);
+            ConfigUtils.sendMessage(p, "prefix.general", "messages.teleport.home.set", "%home%", name, "%name%", name);
             return true;
         }
 
@@ -69,13 +69,13 @@ public class HomeCommand implements CommandExecutor {
 
             String name = (args.length > 0) ? args[0] : "home";
             if (!homeManager.hasHome(p, name)) {
-                ConfigUtils.sendMessage(p, "prefix.home", "messages.home.home-not-found");
+                ConfigUtils.sendMessage(p, "prefix.general", "messages.teleport.home.not-found");
                 return true;
             }
 
             homeManager.deleteHome(p, name);
 
-            ConfigUtils.sendMessage(p, "prefix.home", "messages.home.home-deleted", "%name%", name);
+            ConfigUtils.sendMessage(p, "prefix.general", "messages.teleport.home.deleted", "%name%", name);
             return true;
         }
 
@@ -86,9 +86,9 @@ public class HomeCommand implements CommandExecutor {
 
             Set<String> list = homeManager.getHomes(p);
             if (list.isEmpty()) {
-                ConfigUtils.sendMessage(p, "prefix.home", "messages.home.list-empty");
+                ConfigUtils.sendMessage(p, "prefix.general", "messages.teleport.home.empty");
             } else {
-                ConfigUtils.sendMessage(p, "prefix.home", "messages.home.home-list", "%homes%",
+                ConfigUtils.sendMessage(p, "prefix.general", "messages.teleport.home.list", "%homes%",
                         String.join(", ", list));
             }
             return true;
@@ -105,7 +105,7 @@ public class HomeCommand implements CommandExecutor {
                 if (homeManager.hasHome(p, name)) {
                     homeManager.teleportHome(p, name);
                 } else {
-                    ConfigUtils.sendMessage(p, "prefix.home", "messages.home.home-not-found", "%name%", name);
+                    ConfigUtils.sendMessage(p, "prefix.general", "messages.teleport.home.not-found", "%name%", name);
                 }
                 return true;
             }

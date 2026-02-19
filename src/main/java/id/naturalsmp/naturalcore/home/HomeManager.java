@@ -141,12 +141,13 @@ public class HomeManager implements Listener {
     public void teleportHome(Player p, String name) {
         Location loc = getHome(p, name);
         if (loc == null) {
-            ConfigUtils.sendMessage(p, "prefix.home", "messages.home.home-not-found", "%name%", name);
+            ConfigUtils.sendMessage(p, "prefix.general", "messages.teleport.home.not-found", "%name%", name);
             return;
         }
         p.teleport(loc);
         p.playSound(p.getLocation(), Sound.ENTITY_ENDERMAN_TELEPORT, 1f, 1f);
-        ConfigUtils.sendMessage(p, "prefix.home", "messages.home.home-teleport", "%location%", name);
+        ConfigUtils.sendMessage(p, "prefix.general", "messages.teleport.home.teleport", "%location%", name, "%name%",
+                name);
     }
 
     // --- LIMITS ---

@@ -43,6 +43,10 @@ public class BackCommand implements CommandExecutor {
                     p.playSound(p.getLocation(), Sound.BLOCK_NOTE_BLOCK_BASS, 1f, 0.5f);
                     return true;
                 }
+                // No death location either — show specific message
+                p.sendMessage(ChatUtils.colorize(prefix + ConfigUtils.getString("messages.teleport.back-no-death")));
+                p.playSound(p.getLocation(), Sound.BLOCK_NOTE_BLOCK_BASS, 1f, 0.5f);
+                return true;
             }
         }
 

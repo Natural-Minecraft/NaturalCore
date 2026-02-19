@@ -145,6 +145,7 @@ teleport:
   back-location-set: "&aLokasi &eback &adisetel."
   back-fail: "&#FF5555&l⚡ &cTidak ada lokasi teleportasi tersisa!"
   back-no-rank: "&#FF5555&l⚡ &cKamu butuh rank &#FF55FF&lMIDI &cuntuk teleport ke lokasi non-mati!"
+  back-no-death: "&#FF5555&l⚡ &7Kamu belum pernah mati! Gunakan &e/back &7setelah kamu mati."
   otp-success: "&#00AAFF&l✈ &7Teleportasi ke &#00AAFF&l%player%&7."
   otp-usage: "&#FF5555&l⚠ &cGunakan: &#f/otp <player>"
   spawn:
@@ -160,6 +161,7 @@ teleport:
     list: "&7Daftar Home kamu: &f%homes%"
     empty: "&cKamu belum punya home! Gunakan /sethome <nama>"
     exist: "&cHome dengan nama tersebut sudah ada!"
+    invalid-name: "&c&l✘ &7Nama home tidak valid! Hindari karakter spesial."
   warp:
     set: "&aWarp '&f%name%&a' berhasil dibuat!"
     deleted: "&cWarp '&f%name%&c' telah dihapus."

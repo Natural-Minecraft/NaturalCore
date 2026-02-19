@@ -119,6 +119,7 @@ public final class NaturalCore extends JavaPlugin {
     private BackupManager backupManager;
     private RankPriceDatabase rankPriceDatabase;
     private id.naturalsmp.naturalcore.database.NaturalCoreDatabase coreDatabase;
+    private ChatGameManager chatGameManager;
 
     @Override
     public void onEnable() {
@@ -422,6 +423,11 @@ public final class NaturalCore extends JavaPlugin {
         getServer().getPluginManager().registerEvents(new ChatPreviewGUI(), this);
         getServer().getPluginManager().registerEvents(new GlobalNotificationListener(this), this);
         getServer().getPluginManager().registerEvents(new GuiSoundListener(), this);
+
+        // Chat Games System
+        this.chatGameManager = new ChatGameManager(this);
+        this.chatGameManager.start();
+        getLogger().info("Chat Games System: ENABLED");
         this.hudManager = new HUDManager(this);
         this.messageManager = new MessageManager();
         PrivateMessageCommand pmCmd = new PrivateMessageCommand(this);
@@ -605,6 +611,9 @@ public final class NaturalCore extends JavaPlugin {
         if (afkManager != null) {
             afkManager.cleanup();
         }
+        if (chatGameManager != null) {
+            chatGameManager.stop();
+        }
     }
 
     // --- GETTERS ---
@@ -736,6 +745,10 @@ public final class NaturalCore extends JavaPlugin {
 
     public id.naturalsmp.naturalcore.utility.BackupManager getBackupManager() {
         return backupManager;
+    }
+
+    public ChatGameManager getChatGameManager() {
+        return chatGameManager;
     }
 
     public RankPriceDatabase getRankPriceDatabase() {

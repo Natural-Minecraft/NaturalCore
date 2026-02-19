@@ -114,6 +114,11 @@ public class MenuGUI implements Listener {
             return;
         Player p = (Player) e.getWhoClicked();
 
+        // Block clicks on player's own inventory (bottom)
+        if (e.getClickedInventory() != e.getView().getTopInventory()) {
+            return;
+        }
+
         ItemStack clicked = e.getCurrentItem();
         if (clicked == null || clicked.getType() == Material.AIR)
             return;
@@ -125,6 +130,8 @@ public class MenuGUI implements Listener {
             case 21 -> new TutorialGUI(plugin).openGUI(p, null); // Open Basic Commands
             case 23 -> p.performCommand("chatcolor");
             case 29 -> p.performCommand("warps");
+            case 31 -> p.performCommand("home");
+            case 33 -> p.performCommand("shop");
             case 48 -> p.performCommand("warp tutorial");
             case 50 -> p.sendMessage(ChatUtils.toComponent("&bDiscord: &fhttps://dc.naturalsmp.net/"));
         }

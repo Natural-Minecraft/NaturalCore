@@ -332,7 +332,7 @@ public class NaturalLaggManager implements Listener {
 
     // ==================== STACK MOB: DAMAGE HANDLER ====================
 
-    @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
+    @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
     public void onEntityDamage(EntityDamageEvent e) {
         if (!mergingEnabled)
             return;
@@ -345,7 +345,7 @@ public class NaturalLaggManager implements Listener {
         if (stackSize <= 1) {
             // Mob biasa, biarkan mati natural. Cleanup hologram jika ada.
             if (e.getFinalDamage() >= entity.getHealth()) {
-                HologramUtil.removeHologram(entity);
+                Bukkit.getScheduler().runTask(plugin, () -> HologramUtil.removeHologram(entity));
             }
             return;
         }
@@ -355,28 +355,39 @@ public class NaturalLaggManager implements Listener {
             return;
 
         // === Fatal damage pada stacked mob ===
+        // Cancel event ONLY — do NOT modify entity state during event dispatch.
+        // This prevents conflicts with AuraMobs and other plugins.
         e.setCancelled(true);
 
-        // Reset HP
-        if (entity.getAttribute(Attribute.GENERIC_MAX_HEALTH) != null) {
-            entity.setHealth(entity.getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue());
-        }
-
-        int newSize = stackSize - 1;
-        String baseName = getStackBaseName(entity);
-        updateStackDisplay(entity, baseName, newSize);
-
-        // Hurt animation
-        entity.playEffect(org.bukkit.EntityEffect.HURT);
-        entity.getWorld().playSound(entity.getLocation(), Sound.ENTITY_GENERIC_HURT, 1f, 1f);
-
-        // === Loot & XP ===
+        // Extract killer NOW (event data won't be available next tick)
         Player killer = getKiller(e);
+        String baseName = getStackBaseName(entity);
+        int newSize = stackSize - 1;
 
-        if (entity instanceof Mob mob) {
-            dropLoot(mob, killer);
-            dropXp(mob, killer);
-        }
+        // === Delay all state modifications to next tick ===
+        // Other plugins (AuraMobs, etc.) finish processing the event first.
+        Bukkit.getScheduler().runTask(plugin, () -> {
+            if (!entity.isValid())
+                return;
+
+            // Reset HP
+            if (entity.getAttribute(Attribute.GENERIC_MAX_HEALTH) != null) {
+                entity.setHealth(entity.getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue());
+            }
+
+            // Update stack
+            updateStackDisplay(entity, baseName, newSize);
+
+            // Hurt animation & sound
+            entity.playEffect(org.bukkit.EntityEffect.HURT);
+            entity.getWorld().playSound(entity.getLocation(), Sound.ENTITY_GENERIC_HURT, 1f, 1f);
+
+            // Loot & XP
+            if (entity instanceof Mob mob) {
+                dropLoot(mob, killer);
+                dropXp(mob, killer);
+            }
+        });
     }
 
     // ==================== STACK MOB: DEATH HANDLER ====================
