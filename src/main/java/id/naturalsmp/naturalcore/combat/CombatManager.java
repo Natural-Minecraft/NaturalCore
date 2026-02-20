@@ -8,6 +8,7 @@ import org.bukkit.boss.BarStyle;
 import org.bukkit.boss.BossBar;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
+import org.bukkit.scheduler.BukkitTask;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -19,10 +20,23 @@ public class CombatManager {
     private final Map<UUID, Long> combatTimers = new HashMap<>();
     private final Map<UUID, BossBar> bossBars = new HashMap<>();
     private final int COMBAT_SECONDS = 15;
+    private BukkitTask cleanupTask;
 
     public CombatManager(NaturalCore plugin) {
         this.plugin = plugin;
         startCleanupTask();
+    }
+
+    public void stop() {
+        if (cleanupTask != null) {
+            cleanupTask.cancel();
+            cleanupTask = null;
+        }
+        for (BossBar bar : bossBars.values()) {
+            bar.removeAll();
+        }
+        bossBars.clear();
+        combatTimers.clear();
     }
 
     public void tagPlayer(Player player) {
@@ -55,7 +69,7 @@ public class CombatManager {
     }
 
     private void startCleanupTask() {
-        new BukkitRunnable() {
+        this.cleanupTask = new BukkitRunnable() {
             @Override
             public void run() {
                 long now = System.currentTimeMillis();
