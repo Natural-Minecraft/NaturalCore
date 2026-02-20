@@ -80,6 +80,13 @@ public class SeasonManager {
 
     public double calculateTemperature(Player p) {
         Location loc = p.getLocation();
+
+        // Disable temperature system in dungeon worlds to prevent HUD overrides and
+        // damage
+        if (loc.getWorld().getName().toLowerCase().startsWith("dungeon")) {
+            return 20.0;
+        }
+
         Season currentSeason = regionManager.getSeason(loc);
 
         FileConfiguration config = ConfigUtils.getSeasonConfig();

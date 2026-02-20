@@ -18,6 +18,11 @@ public class PlayerDeathListener implements Listener {
     public void onDeath(PlayerDeathEvent e) {
         Player p = e.getEntity();
 
+        // Do not save location in dungeon worlds
+        if (p.getWorld().getName().toLowerCase().startsWith("dungeon")) {
+            return;
+        }
+
         // Save Location for /back
         plugin.getTeleportManager().setLastLocation(p, p.getLocation());
         plugin.getTeleportManager().setLastDeathLocation(p);

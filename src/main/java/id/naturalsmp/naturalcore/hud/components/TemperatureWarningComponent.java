@@ -24,6 +24,10 @@ public class TemperatureWarningComponent extends AbstractHUDComponent {
 
     @Override
     public boolean shouldDisplay(Player player) {
+        if (player.getWorld().getName().toLowerCase().startsWith("dungeon")) {
+            return false;
+        }
+
         Double temp = plugin.getSeasonManager().getPlayerTemperature(player);
         if (temp == null)
             return false;
