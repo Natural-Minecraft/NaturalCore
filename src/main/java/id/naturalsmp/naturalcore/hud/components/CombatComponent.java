@@ -54,15 +54,16 @@ public class CombatComponent extends AbstractHUDComponent {
         String prefix;
         String contentColor = "&f";
         if (percent < 20) {
-            // Heartbeat pulse for critical
-            boolean blink = (tick % 10 < 5);
-            prefix = blink ? "&c❤" : "&4❤";
+            // Heartbeat pulse for critical (every 10 ticks = 0.5s beat)
+            boolean blink = (tick % 20 < 10);
+            prefix = blink ? "&c&l❤" : "&4❤";
             contentColor = blink ? "&c" : "&f";
         } else {
             prefix = "&7⚔";
         }
 
-        return prefix + " " + contentColor + entityName + " &7| " + healthBar + " &7| " + getPercentColor(percent)
+        // Actionbar: ⚔ Target ┃ HealthBar ┃ 100%
+        return prefix + " " + contentColor + entityName + " &8┃ " + healthBar + " &8┃ " + getPercentColor(percent)
                 + percent + "%";
     }
 
@@ -84,22 +85,22 @@ public class CombatComponent extends AbstractHUDComponent {
     }
 
     private String buildPremiumHealthBar(double hp, double max, int percent, int tick) {
-        StringBuilder sb = new StringBuilder("&8[");
+        StringBuilder sb = new StringBuilder("&8"); // Optional bracket if desired, but minimalistic is better without
         int total = 10;
         int filled = (int) Math.round((hp / max) * total);
 
         // Gradient based on HP percentage
         String fillColor = getHealthColor(percent);
 
+        // Using a solid line composed of characters for a cleaner look
         for (int i = 0; i < total; i++) {
             if (i < filled) {
-                sb.append(fillColor).append("█");
+                sb.append(fillColor).append("■"); // Bold solid square
             } else {
-                sb.append("&8░");
+                sb.append("&8□"); // Empty square Outline
             }
         }
 
-        sb.append("&8]");
         return sb.toString();
     }
 

@@ -64,26 +64,27 @@ public class BiomeInfoComponent extends AbstractHUDComponent {
         String icon = getBiomeIcon(biome);
         String gradient = getBiomeGradient(biome);
 
-        return icon + " " + gradient + biomeName + "</gradient>";
+        // Center-focused design with abstract separators
+        return gradient + "✦ " + icon + " " + biomeName.toUpperCase() + " ✦</gradient>";
     }
 
     private String getBiomeIcon(Biome biome) {
         String name = biome.name();
         if (name.contains("NETHER"))
-            return "&c🔥";
+            return "🔥";
         if (name.contains("END"))
-            return "&d🔮";
+            return "🔮";
         if (name.contains("OCEAN") || name.contains("RIVER"))
-            return "&b🌊";
+            return "🌊";
         if (name.contains("FOREST"))
-            return "&a🌳";
+            return "🌳";
         if (name.contains("DESERT"))
-            return "&e🌵";
+            return "🐪";
         if (name.contains("ICE") || name.contains("SNOW"))
-            return "&f❄";
+            return "❄";
         if (name.contains("DEEP_DARK"))
-            return "&3💀";
-        return "&f📍";
+            return "💀";
+        return "📍";
     }
 
     private String getBiomeGradient(Biome biome) {

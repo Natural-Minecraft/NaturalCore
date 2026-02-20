@@ -84,7 +84,7 @@ public class HUDManager implements Listener {
             for (Player player : Bukkit.getOnlinePlayers()) {
                 updateHUD(player);
             }
-        }, 2L, 2L);
+        }, 1L, 1L); // 1 Tick = 20Hz Butter Smooth Animation
     }
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
@@ -143,22 +143,20 @@ public class HUDManager implements Listener {
     }
 
     private String handleTransition(PlayerHUDState state, String newContent, HUDComponent newComponent) {
-        // Check if target changed
         String componentId = (newComponent != null) ? newComponent.getId() : "none";
 
+        // If target changed, prepare transition
         if (!componentId.equals(state.lastComponentId)) {
-            // Target changed, start transition
             state.previousContent = state.displayedContent;
             state.transitionFrame = 0;
             state.lastComponentId = componentId;
             state.transitioning = true;
         }
 
-        // If transitioning
-        int duration = (newComponent != null) ? newComponent.getTransitionDuration() : 2;
+        int duration = (newComponent != null) ? newComponent.getTransitionDuration() : 20;
 
-        // If duration is short (e.g. 2 ticks), just pop up instantly
-        if (duration <= 2) {
+        // If duration is too short or if we're instantly switching from an empty state
+        if (duration <= 2 || (state.previousContent == null || state.previousContent.isEmpty())) {
             state.transitioning = false;
             state.displayedContent = newContent;
             return newContent;
@@ -168,11 +166,18 @@ public class HUDManager implements Listener {
             state.transitionFrame++;
             float progress = (float) state.transitionFrame / duration;
 
-            // Scroll from previous (or empty) to new
-            state.displayedContent = ActionBarAnimator.scrollTransition(
-                    state.previousContent != null ? state.previousContent : "",
-                    newContent,
-                    progress);
+            // Use the new Reveal/Fade out transitions instead of scrolling
+            // Fade out the old content for the first half, reveal the new for the second
+            // half
+            if (progress < 0.5f) {
+                // Fade out previous
+                float fadeOutProgress = progress * 2.0f;
+                state.displayedContent = ActionBarAnimator.fadeOutEffect(state.previousContent, fadeOutProgress);
+            } else {
+                // Reveal the new
+                float revealProgress = (progress - 0.5f) * 2.0f;
+                state.displayedContent = ActionBarAnimator.revealEffect(newContent, revealProgress);
+            }
 
             if (state.transitionFrame >= duration) {
                 state.transitioning = false;

@@ -131,7 +131,7 @@ public class TipsComponent extends AbstractHUDComponent {
     @Override
     public void tick(int tick) {
         if (currentTip != null) {
-            stayTicks += 2; // Called every 2 ticks
+            stayTicks++; // Called every 1 tick (20Hz)
             if (stayTicks >= stayDuration) {
                 currentTip = null;
                 lastScrollOffset = -1;

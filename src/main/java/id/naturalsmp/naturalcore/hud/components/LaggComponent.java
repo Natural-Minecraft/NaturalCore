@@ -85,7 +85,7 @@ public class LaggComponent extends AbstractHUDComponent {
             urgencyColor = "&f&l"; // Pulse white
         }
 
-        return icon + " &7ClearLagg &8» " + urgencyColor + countdown + "s " + progressBar;
+        return icon + " &7ClearLagg &8┃ " + urgencyColor + countdown + "s " + progressBar;
     }
 
     private String buildCountdownBar(int countdown, int tick) {
@@ -94,7 +94,7 @@ public class LaggComponent extends AbstractHUDComponent {
         int filledBlocks = Math.min(countdown, maxTime);
         int emptyBlocks = maxTime - filledBlocks;
 
-        StringBuilder bar = new StringBuilder("&8[");
+        StringBuilder bar = new StringBuilder("&8");
 
         // Color based on time remaining
         String fillColor;
@@ -108,13 +108,12 @@ public class LaggComponent extends AbstractHUDComponent {
             fillColor = "&#FF5555"; // Red
 
         for (int i = 0; i < filledBlocks; i++) {
-            bar.append(fillColor).append("┃");
+            bar.append(fillColor).append("■");
         }
         for (int i = 0; i < emptyBlocks; i++) {
-            bar.append("&8·");
+            bar.append("&8□");
         }
 
-        bar.append("&8]");
         return bar.toString();
     }
 

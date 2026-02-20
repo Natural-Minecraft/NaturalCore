@@ -115,13 +115,13 @@ public class DungeonHUDComponent extends AbstractHUDComponent {
 
             String heartColor = lives > 1 ? "&a" : "&c";
 
-            // Format: ⚔ Stage 1/3 (Wave 2/5) | 🎯 Kill All (4 left) | ❤ 3 | ⏱ 02:30 | ⭐ S
-            return "&7⚔ Stage &f" + currentStage + "/" + totalStages + " &8(&7Wave &f" + currentWave + "/" + totalWaves
-                    + "&8) &8| " +
-                    "&e🎯 " + objective + " &8| " +
-                    "&7Lives: " + heartColor + lives + " ❤ &8| " +
-                    "&7Waktu: &f" + time + " &8| " +
-                    "&7Rank: &#FFBB00" + rank;
+            // Premium Format: ⚔ Stage 1/3 ┃ 🎯 Objective ┃ ❤ 3 ┃ ⏱ 02:30 ┃ ⭐ S
+            return "&7⚔ &fStage " + currentStage + "/" + totalStages + " &8(&7W" + currentWave + "/" + totalWaves
+                    + "&8) &8┃ " +
+                    "&e🎯 " + objective + " &8┃ " +
+                    heartColor + "❤ " + lives + " &8┃ " +
+                    "&7⏱ &f" + time + " &8┃ " +
+                    "&#FFBB00⭐ " + rank;
 
         } catch (Exception e) {
             return "&c[Dungeon HUD Error]";

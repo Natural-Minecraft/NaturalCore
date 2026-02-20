@@ -21,51 +21,25 @@ public class ActionBarAnimator {
      * @param progress    Animation progress (0.0 to 1.0)
      * @return The interpolated text for this frame
      */
+    /**
+     * Replaces the old scrolling effect. No longer used, but kept for API
+     * compatibility.
+     * Defers to reveal effect.
+     */
+    @Deprecated
     public static String scrollTransition(String lastText, String currentText, float progress) {
-        if (progress >= 1.0f)
-            return currentText;
-        if (progress <= 0.0f)
-            return lastText;
-
-        // 1. Prepare Content
-        String oldT = lastText != null ? lastText : "";
-        String newT = currentText != null ? currentText : "";
-        String gap = "   &#4facfe»   "; // Visual separator with Hex color
-
-        // 2. Build the Tape (Keep it in raw/mixed format, getVisualSlice will handle
-        // it)
-        String padding = " ".repeat(ACTIONBAR_WIDTH);
-        String tape = padding + oldT + gap + newT + padding;
-
-        // 3. Calculate Visual Measurements
-        int oldLen = ChatUtils.getVisualLength(oldT);
-        int newLen = ChatUtils.getVisualLength(newT);
-        int gapLen = ChatUtils.getVisualLength(gap);
-        int paddingLen = ACTIONBAR_WIDTH;
-
-        // 4. Determine Start and End Offsets in Visual Space
-        // We want to slice a window of exactly ACTIONBAR_WIDTH.
-
-        // Start: Center OldText in the window
-        int startOffset = paddingLen - (ACTIONBAR_WIDTH - oldLen) / 2;
-
-        // End: Center NewText in the window
-        int endOffset = (paddingLen + oldLen + gapLen) - (ACTIONBAR_WIDTH - newLen) / 2;
-
-        // 5. Interpolate using smoothStep
-        float eased = smoothStep(progress);
-        int currentOffset = (int) (startOffset + (endOffset - startOffset) * eased);
-
-        // 6. Slice the Tape using our new robust method
-        return ChatUtils.getVisualSlice(tape, currentOffset, ACTIONBAR_WIDTH);
+        return revealEffect(currentText, progress);
     }
 
     /**
-     * Reveal effect: Text appears character by character from left.
-     * 
+     * Center-aligned Revealing effect. Smoothly expands text outward from the
+     * center
+     * avoiding Minecraft's default jitter by using full String but styled with
+     * dynamic colors.
+     *
      * @param text     The full text to reveal
      * @param progress Animation progress (0.0 to 1.0)
-     * @return The revealed portion of the text
+     * @return Center-revealed string
      */
     public static String revealEffect(String text, float progress) {
         if (text == null || text.isEmpty())
@@ -76,16 +50,23 @@ public class ActionBarAnimator {
             return "";
 
         float eased = easeOutCubic(progress);
-        int revealLen = (int) (ChatUtils.getVisualLength(text) * eased);
-        return ChatUtils.getVisualSlice(text, 0, revealLen);
+        int fullLength = ChatUtils.getVisualLength(text);
+        int revealRadius = (int) ((fullLength / 2.0f) * eased);
+
+        // Calculate visible center boundaries
+        int center = fullLength / 2;
+        int startIndex = center - revealRadius;
+        int endIndex = center + revealRadius;
+
+        // Ensure bounds
+        startIndex = Math.max(0, startIndex);
+        endIndex = Math.min(fullLength, endIndex);
+
+        return ChatUtils.getVisualSlice(text, startIndex, endIndex - startIndex);
     }
 
     /**
-     * Fade out effect: Text disappears from left.
-     * 
-     * @param text     The text to fade out
-     * @param progress Animation progress (0.0 to 1.0)
-     * @return The remaining visible text
+     * Opposite of reveal. Text collapses into the center.
      */
     public static String fadeOutEffect(String text, float progress) {
         if (text == null || text.isEmpty())
@@ -96,8 +77,19 @@ public class ActionBarAnimator {
             return text;
 
         float eased = easeInCubic(progress);
-        int cutLen = (int) (ChatUtils.getVisualLength(text) * eased);
-        return ChatUtils.getVisualSlice(text, cutLen, ChatUtils.getVisualLength(text) - cutLen);
+        int fullLength = ChatUtils.getVisualLength(text);
+
+        // Progress defines how much is cut from the edges
+        int cutRadius = (int) ((fullLength / 2.0f) * eased);
+
+        int center = fullLength / 2;
+        int startIndex = cutRadius;
+        int endIndex = fullLength - cutRadius;
+
+        if (startIndex >= endIndex)
+            return "";
+
+        return ChatUtils.getVisualSlice(text, startIndex, endIndex - startIndex);
     }
 
     /**
