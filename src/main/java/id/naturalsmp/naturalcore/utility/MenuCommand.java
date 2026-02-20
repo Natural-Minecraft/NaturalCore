@@ -13,8 +13,9 @@ public class MenuCommand implements CommandExecutor {
 
     public MenuCommand(NaturalCore plugin) {
         this.gui = new MenuGUI(plugin);
-        // Register events for the GUI
+        // Register events for the Custom GUIs
         plugin.getServer().getPluginManager().registerEvents(gui, plugin);
+        plugin.getServer().getPluginManager().registerEvents(new TutorialGUI(plugin), plugin);
     }
 
     @Override
