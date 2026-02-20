@@ -2,7 +2,7 @@ package id.naturalsmp.naturalcore.hud.components;
 
 import id.naturalsmp.naturalcore.NaturalCore;
 import id.naturalsmp.naturalcore.hud.HUDPriority;
-import id.naturalsmp.naturalcore.utils.ChatUtils;
+
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
@@ -31,7 +31,7 @@ public class DungeonHUDComponent extends AbstractHUDComponent {
     private Method getTotalWavesInStageMethod;
     private Method getTotalStagesMethod;
     private Method getObjectiveTextMethod;
-    private Method getRemainingMobsMethod;
+
     private Method getCurrentStageMethod;
     private Method getCurrentWaveMethod;
 
@@ -64,7 +64,6 @@ public class DungeonHUDComponent extends AbstractHUDComponent {
             this.getTotalWavesInStageMethod = instanceClass.getMethod("getTotalWavesInStage");
             this.getTotalStagesMethod = instanceClass.getMethod("getTotalStages");
             this.getObjectiveTextMethod = instanceClass.getMethod("getObjectiveText");
-            this.getRemainingMobsMethod = instanceClass.getMethod("getRemainingMobs");
             this.getCurrentStageMethod = instanceClass.getMethod("getCurrentStage");
             this.getCurrentWaveMethod = instanceClass.getMethod("getCurrentWave");
 
