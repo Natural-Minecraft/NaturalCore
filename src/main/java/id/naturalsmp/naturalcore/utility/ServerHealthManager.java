@@ -4,6 +4,7 @@ import id.naturalsmp.naturalcore.NaturalCore;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.scheduler.BukkitRunnable;
+import org.bukkit.scheduler.BukkitTask;
 
 import java.util.Collections;
 import java.util.LinkedList;
