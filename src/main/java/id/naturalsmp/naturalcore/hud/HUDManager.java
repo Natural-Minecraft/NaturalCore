@@ -50,6 +50,7 @@ public class HUDManager implements Listener {
         // Register components in priority order (will be sorted anyway)
         components.add(new TemperatureWarningComponent(plugin));
         components.add(new LaggComponent(plugin));
+        components.add(new DungeonHUDComponent(plugin));
         components.add(new CombatComponent(plugin));
         components.add(new BiomeInfoComponent(plugin));
         components.add(new TipsComponent(plugin));
