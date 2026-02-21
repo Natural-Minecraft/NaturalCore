@@ -221,6 +221,8 @@ public class ProfileGUI implements Listener {
     public void onClick(InventoryClickEvent e) {
         if (e.getInventory().getHolder() instanceof ProfileHolder) {
             e.setCancelled(true);
+            if (e.getClickedInventory() != e.getView().getTopInventory())
+                return;
             Player p = (Player) e.getWhoClicked();
 
             if (e.getCurrentItem() == null)

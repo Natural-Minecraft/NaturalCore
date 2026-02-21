@@ -72,7 +72,7 @@ public class HUDManager implements Listener {
     }
 
     private void startTask() {
-        Bukkit.getScheduler().runTaskTimer(plugin, () -> {
+        updaterTask = Bukkit.getScheduler().runTaskTimer(plugin, () -> {
             globalTick++;
 
             // Tick all components

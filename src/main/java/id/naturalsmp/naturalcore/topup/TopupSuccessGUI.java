@@ -149,6 +149,8 @@ public class TopupSuccessGUI implements Listener {
     public void onClick(InventoryClickEvent e) {
         if (e.getInventory().getHolder() instanceof TopupHolder) {
             e.setCancelled(true);
+            if (e.getClickedInventory() != e.getView().getTopInventory())
+                return;
         }
     }
 

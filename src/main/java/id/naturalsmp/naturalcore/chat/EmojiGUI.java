@@ -108,6 +108,8 @@ public class EmojiGUI implements Listener {
         String title = ChatUtils.stripColor(e.getView().getTitle());
         if (title.contains("NATURAL") && title.contains("EMOJI")) {
             e.setCancelled(true);
+            if (e.getClickedInventory() != e.getView().getTopInventory())
+                return;
 
             if (e.getCurrentItem() == null || e.getCurrentItem().getType() == Material.AIR)
                 return;

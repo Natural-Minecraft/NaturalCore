@@ -110,6 +110,8 @@ public class TierGUI implements Listener {
             return;
 
         e.setCancelled(true);
+        if (e.getClickedInventory() != e.getView().getTopInventory())
+            return;
         if (e.getCurrentItem() == null)
             return;
 

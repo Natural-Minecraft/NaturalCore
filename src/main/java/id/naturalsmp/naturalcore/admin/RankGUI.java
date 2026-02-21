@@ -198,6 +198,8 @@ public class RankGUI implements Listener {
             return;
 
         e.setCancelled(true);
+        if (e.getClickedInventory() != e.getView().getTopInventory())
+            return;
 
         if (e.getCurrentItem() == null || e.getCurrentItem().getType() == Material.AIR)
             return;
@@ -265,6 +267,8 @@ public class RankGUI implements Listener {
         if (!(e.getInventory().getHolder() instanceof ConfirmationHolder holder))
             return;
         e.setCancelled(true);
+        if (e.getClickedInventory() != e.getView().getTopInventory())
+            return;
 
         if (e.getCurrentItem() == null)
             return;

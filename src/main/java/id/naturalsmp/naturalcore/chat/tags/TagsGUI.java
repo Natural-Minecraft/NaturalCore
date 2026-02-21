@@ -95,6 +95,8 @@ public class TagsGUI implements Listener {
     public void onClick(InventoryClickEvent e) {
         if (e.getView().title().equals(ChatUtils.toComponent("&8Chat Tags Collection"))) {
             e.setCancelled(true);
+            if (e.getClickedInventory() != e.getView().getTopInventory())
+                return;
 
             if (e.getCurrentItem() == null)
                 return;

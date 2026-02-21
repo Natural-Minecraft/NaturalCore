@@ -76,6 +76,8 @@ public class StaffGUI implements Listener {
         if (!(e.getInventory().getHolder() instanceof StaffHolder))
             return;
         e.setCancelled(true);
+        if (e.getClickedInventory() != e.getView().getTopInventory())
+            return;
 
         ItemStack item = e.getCurrentItem();
         if (item == null || item.getType() == Material.AIR)

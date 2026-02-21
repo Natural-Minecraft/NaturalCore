@@ -109,6 +109,8 @@ public class TierTopGUI implements Listener {
     public void onClick(InventoryClickEvent e) {
         if (e.getInventory().getHolder() instanceof TierTopHolder) {
             e.setCancelled(true);
+            if (e.getClickedInventory() != e.getView().getTopInventory())
+                return;
         }
     }
 }

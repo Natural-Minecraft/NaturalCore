@@ -197,6 +197,8 @@ public class ChatColorGUI implements Listener {
             return;
 
         e.setCancelled(true);
+        if (e.getClickedInventory() != e.getView().getTopInventory())
+            return;
         if (!(e.getWhoClicked() instanceof Player))
             return;
 

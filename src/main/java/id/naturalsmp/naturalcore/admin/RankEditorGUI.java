@@ -145,6 +145,8 @@ public class RankEditorGUI implements Listener {
         if (!(e.getInventory().getHolder() instanceof EditorHolder holder))
             return;
         e.setCancelled(true);
+        if (e.getClickedInventory() != e.getView().getTopInventory())
+            return;
 
         Player p = (Player) e.getWhoClicked();
         ItemStack current = e.getCurrentItem();

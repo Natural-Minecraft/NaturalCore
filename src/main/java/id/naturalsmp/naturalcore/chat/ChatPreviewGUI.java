@@ -43,6 +43,8 @@ public class ChatPreviewGUI implements Listener, InventoryHolder {
     public void onInventoryClick(InventoryClickEvent event) {
         if (event.getInventory().getHolder() instanceof ChatPreviewGUI) {
             event.setCancelled(true);
+            if (event.getClickedInventory() != event.getView().getTopInventory())
+                return;
         }
     }
 

@@ -93,6 +93,8 @@ public class BaltopGUI implements Listener {
     public void onClick(InventoryClickEvent e) {
         if (e.getInventory().getHolder() instanceof BaltopHolder) {
             e.setCancelled(true);
+            if (e.getClickedInventory() != e.getView().getTopInventory())
+                return;
         }
     }
 

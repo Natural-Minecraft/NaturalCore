@@ -67,6 +67,8 @@ public class TierAdminGUI implements Listener {
         if (!(e.getInventory().getHolder() instanceof TierAdminHolder))
             return;
         e.setCancelled(true);
+        if (e.getClickedInventory() != e.getView().getTopInventory())
+            return;
 
         if (e.getCurrentItem() == null || e.getCurrentItem().getType() != Material.PAPER)
             return;

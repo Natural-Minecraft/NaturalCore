@@ -71,6 +71,8 @@ public class TierEditorGUI implements Listener {
         if (!(e.getInventory().getHolder() instanceof TierEditorHolder))
             return;
         e.setCancelled(true);
+        if (e.getClickedInventory() != e.getView().getTopInventory())
+            return;
 
         Player p = (Player) e.getWhoClicked();
         ItemStack item = e.getCurrentItem();

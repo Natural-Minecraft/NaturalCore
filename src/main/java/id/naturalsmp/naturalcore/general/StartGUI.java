@@ -84,6 +84,8 @@ public class StartGUI implements Listener {
         if (!(e.getInventory().getHolder() instanceof StartHolder))
             return;
         e.setCancelled(true);
+        if (e.getClickedInventory() != e.getView().getTopInventory())
+            return;
 
         if (!(e.getWhoClicked() instanceof Player))
             return;
