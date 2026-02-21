@@ -86,7 +86,6 @@ public class TeleportManager {
         requestType.put(target.getUniqueId(), isTpaHere);
 
         // Pesan ke Pengirim
-        String prefix = ConfigUtils.getString("prefix.teleport");
         sender.sendMessage(
                 prefix + ConfigUtils.getString("messages.teleport.tpa-sent").replace("%target%", target.getName()));
 
