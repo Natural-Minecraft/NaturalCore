@@ -12,6 +12,7 @@ import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.bukkit.event.inventory.ClickType;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryDragEvent;
 import org.bukkit.inventory.Inventory;
@@ -134,6 +135,8 @@ public class HomeGUI implements Listener {
                             .replace("%z%", String.valueOf(loc.getBlockZ()))));
                 }
             }
+            lore.add(Component.empty());
+            lore.add(ChatUtils.toComponent("&c&lShift+Click &7untuk menghapus"));
             meta.lore(lore);
             // Store home name in PDC to avoid color code parsing issues
             meta.getPersistentDataContainer().set(HOME_NAME_KEY, org.bukkit.persistence.PersistentDataType.STRING,
@@ -205,8 +208,120 @@ public class HomeGUI implements Listener {
                 homeName = ChatUtils.stripColor(displayName);
             }
 
+            // Shift+Click = Delete (open confirmation)
+            if (e.getClick() == ClickType.SHIFT_LEFT || e.getClick() == ClickType.SHIFT_RIGHT) {
+                openConfirmGUI(p, homeName);
+                return;
+            }
+
+            // Normal Click = Teleport
             p.closeInventory();
             p.performCommand("home " + homeName);
+        }
+    }
+
+    // --- CONFIRMATION GUI ---
+
+    private void openConfirmGUI(Player p, String homeName) {
+        Inventory inv = GUIUtils.createGUI(new ConfirmHolder(), 27,
+                "&c&lHapus Home: &f" + homeName);
+
+        // Fill background
+        ItemStack bg = new ItemStack(Material.BLACK_STAINED_GLASS_PANE);
+        ItemMeta bgMeta = bg.getItemMeta();
+        if (bgMeta != null) {
+            bgMeta.displayName(Component.text(" "));
+            bg.setItemMeta(bgMeta);
+        }
+        for (int i = 0; i < 27; i++)
+            inv.setItem(i, bg);
+
+        // Confirm button (Slot 11) - Red Wool
+        ItemStack confirm = new ItemStack(Material.RED_WOOL);
+        ItemMeta cMeta = confirm.getItemMeta();
+        if (cMeta != null) {
+            cMeta.displayName(ChatUtils.toComponent("&c&l✘ YA, HAPUS"));
+            List<Component> lore = new ArrayList<>();
+            lore.add(ChatUtils.toComponent("&7Home &f" + homeName + " &7akan"));
+            lore.add(ChatUtils.toComponent("&7dihapus secara &cpermanen&7."));
+            cMeta.lore(lore);
+            cMeta.getPersistentDataContainer().set(HOME_NAME_KEY,
+                    org.bukkit.persistence.PersistentDataType.STRING, homeName);
+            confirm.setItemMeta(cMeta);
+        }
+        inv.setItem(11, confirm);
+
+        // Cancel button (Slot 15) - Green Wool
+        ItemStack cancel = new ItemStack(Material.LIME_WOOL);
+        ItemMeta kMeta = cancel.getItemMeta();
+        if (kMeta != null) {
+            kMeta.displayName(ChatUtils.toComponent("&a&l✔ BATAL"));
+            List<Component> lore = new ArrayList<>();
+            lore.add(ChatUtils.toComponent("&7Kembali ke daftar home."));
+            kMeta.lore(lore);
+            cancel.setItemMeta(kMeta);
+        }
+        inv.setItem(15, cancel);
+
+        // Info item (Slot 13) - Barrier
+        ItemStack info = new ItemStack(Material.BARRIER);
+        ItemMeta iMeta = info.getItemMeta();
+        if (iMeta != null) {
+            iMeta.displayName(ChatUtils.toComponent("&e&l⚠ KONFIRMASI"));
+            List<Component> lore = new ArrayList<>();
+            lore.add(ChatUtils.toComponent("&7Apakah kamu yakin ingin"));
+            lore.add(ChatUtils.toComponent("&7menghapus home &f" + homeName + "&7?"));
+            iMeta.lore(lore);
+            info.setItemMeta(iMeta);
+        }
+        inv.setItem(13, info);
+
+        p.openInventory(inv);
+        p.playSound(p.getLocation(), Sound.BLOCK_NOTE_BLOCK_BASS, 1f, 0.5f);
+    }
+
+    @EventHandler
+    public void onConfirmClick(InventoryClickEvent e) {
+        if (!(e.getInventory().getHolder() instanceof ConfirmHolder))
+            return;
+        e.setCancelled(true);
+
+        if (!(e.getWhoClicked() instanceof Player p))
+            return;
+        if (e.getCurrentItem() == null || e.getCurrentItem().getType() == Material.AIR)
+            return;
+
+        int slot = e.getRawSlot();
+
+        // Cancel (Slot 15) - Go back to home list
+        if (slot == 15) {
+            open(p, 0);
+            return;
+        }
+
+        // Confirm (Slot 11) - Delete the home
+        if (slot == 11) {
+            String homeName = e.getCurrentItem().getItemMeta().getPersistentDataContainer()
+                    .get(HOME_NAME_KEY, org.bukkit.persistence.PersistentDataType.STRING);
+            if (homeName != null) {
+                plugin.getHomeManager().deleteHome(p, homeName);
+                p.closeInventory();
+                p.playSound(p.getLocation(), Sound.ENTITY_ITEM_BREAK, 1f, 1f);
+                String prefix = ConfigUtils.getString("messages.prefix.general");
+                p.sendMessage(ChatUtils.colorize(prefix + ConfigUtils.getString("messages.teleport.home.deleted")
+                        .replace("%name%", homeName)));
+
+                // Reopen the home list (if they still have homes)
+                Bukkit.getScheduler().runTaskLater(plugin, () -> openGUI(p), 5L);
+            }
+            return;
+        }
+    }
+
+    @EventHandler
+    public void onConfirmDrag(InventoryDragEvent e) {
+        if (e.getInventory().getHolder() instanceof ConfirmHolder) {
+            e.setCancelled(true);
         }
     }
 
@@ -218,6 +333,13 @@ public class HomeGUI implements Listener {
     }
 
     public static class HomeHolder implements InventoryHolder {
+        @Override
+        public Inventory getInventory() {
+            return null;
+        }
+    }
+
+    public static class ConfirmHolder implements InventoryHolder {
         @Override
         public Inventory getInventory() {
             return null;
