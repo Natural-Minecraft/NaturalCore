@@ -69,6 +69,18 @@ public class TeleportManager {
     // --- LOGIC REQUEST ---
 
     public void sendTpaRequest(Player sender, Player target, boolean isTpaHere) {
+        String prefix = ConfigUtils.getString("prefix.teleport");
+
+        // Block TPA in dungeon worlds
+        if (sender.getWorld().getName().toLowerCase().startsWith("dungeon")) {
+            sender.sendMessage(prefix + ChatUtils.colorize("&cKamu tidak bisa menggunakan TPA di dunia dungeon!"));
+            return;
+        }
+        if (target.getWorld().getName().toLowerCase().startsWith("dungeon")) {
+            sender.sendMessage(prefix + ChatUtils.colorize("&cPemain tersebut sedang berada di dungeon!"));
+            return;
+        }
+
         // Simpan request
         tpaRequests.put(target.getUniqueId(), sender.getUniqueId());
         requestType.put(target.getUniqueId(), isTpaHere);
@@ -114,6 +126,18 @@ public class TeleportManager {
 
         if (sender == null || !sender.isOnline()) {
             receiver.sendMessage(prefix + ChatUtils.colorize("&cPemain tersebut sudah offline."));
+            return;
+        }
+
+        // Block teleport if either player is now in a dungeon world
+        if (sender.getWorld().getName().toLowerCase().startsWith("dungeon")
+                || receiver.getWorld().getName().toLowerCase().startsWith("dungeon")) {
+            receiver.sendMessage(
+                    prefix + ChatUtils.colorize("&cTeleport dibatalkan! Salah satu pemain berada di dungeon."));
+            if (sender.isOnline()) {
+                sender.sendMessage(
+                        prefix + ChatUtils.colorize("&cTeleport dibatalkan! Salah satu pemain berada di dungeon."));
+            }
             return;
         }
 
