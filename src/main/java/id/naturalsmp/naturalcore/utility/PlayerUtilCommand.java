@@ -66,11 +66,11 @@ public class PlayerUtilCommand implements CommandExecutor {
             target.setSaturation(20);
             target.setFireTicks(0);
 
-            ConfigUtils.sendGeneral(target, "messages.essentials.heal-success");
+            ConfigUtils.sendGeneral(target, "messages.utils.essentials.heal-success");
             target.playSound(target.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, 1f, 1f);
 
             if (!target.equals(sender)) {
-                ConfigUtils.sendGeneral(sender, "messages.essentials.heal-other", "%player%", target.getName());
+                ConfigUtils.sendGeneral(sender, "messages.utils.essentials.heal-other", "%player%", target.getName());
             }
             return true;
         }
@@ -83,11 +83,11 @@ public class PlayerUtilCommand implements CommandExecutor {
             target.setFoodLevel(20);
             target.setSaturation(20);
 
-            ConfigUtils.sendGeneral(target, "messages.essentials.feed-success");
+            ConfigUtils.sendGeneral(target, "messages.utils.essentials.feed-success");
             target.playSound(target.getLocation(), Sound.ENTITY_GENERIC_EAT, 1f, 1f);
 
             if (!target.equals(sender)) {
-                ConfigUtils.sendGeneral(sender, "messages.essentials.feed-other", "%player%", target.getName());
+                ConfigUtils.sendGeneral(sender, "messages.utils.essentials.feed-other", "%player%", target.getName());
             }
             return true;
         }
@@ -100,7 +100,8 @@ public class PlayerUtilCommand implements CommandExecutor {
             boolean newStatus = !target.getAllowFlight();
             target.setAllowFlight(newStatus);
 
-            String msgPath = newStatus ? "messages.utils.essentials.fly-enabled" : "messages.utils.essentials.fly-disabled";
+            String msgPath = newStatus ? "messages.utils.essentials.fly-enabled"
+                    : "messages.utils.essentials.fly-disabled";
             ConfigUtils.sendGeneral(target, msgPath);
 
             if (!target.equals(sender)) {

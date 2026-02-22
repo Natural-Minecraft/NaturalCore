@@ -58,7 +58,7 @@ public class EnvironmentCommand implements CommandExecutor, TabCompleter {
 
         if (timeArg.equalsIgnoreCase("reset")) {
             target.resetPlayerTime();
-            sender.sendMessage(ConfigUtils.getString("messages.utils.ptime.reset")
+            sender.sendMessage(ConfigUtils.getString("messages.utils.visuals.ptime-reset")
                     .replace("%target%", target.getName()));
             return true;
         }
@@ -82,7 +82,7 @@ public class EnvironmentCommand implements CommandExecutor, TabCompleter {
         }
 
         target.setPlayerTime(time, false);
-        sender.sendMessage(ConfigUtils.getString("messages.utils.ptime.success")
+        sender.sendMessage(ConfigUtils.getString("messages.utils.visuals.ptime-success")
                 .replace("%target%", target.getName())
                 .replace("%time%", timeArg));
         return true;
@@ -116,7 +116,7 @@ public class EnvironmentCommand implements CommandExecutor, TabCompleter {
 
         if (weatherArg.equalsIgnoreCase("reset")) {
             target.resetPlayerWeather();
-            sender.sendMessage(ConfigUtils.getString("messages.utils.pweather.reset")
+            sender.sendMessage(ConfigUtils.getString("messages.utils.visuals.pweather-reset")
                     .replace("%target%", target.getName()));
             return true;
         }
@@ -137,7 +137,7 @@ public class EnvironmentCommand implements CommandExecutor, TabCompleter {
             }
         }
 
-        sender.sendMessage(ConfigUtils.getString("messages.utils.pweather.success")
+        sender.sendMessage(ConfigUtils.getString("messages.utils.visuals.pweather-success")
                 .replace("%target%", target.getName())
                 .replace("%weather%", weatherArg));
         return true;

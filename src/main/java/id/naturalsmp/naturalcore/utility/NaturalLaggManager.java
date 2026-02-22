@@ -455,6 +455,69 @@ public class NaturalLaggManager implements Listener {
         }
     }
 
+    // ==================== STACK MOB: EXPLOSION HANDLER ====================
+
+    @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
+    public void onEntityExplode(org.bukkit.event.entity.EntityExplodeEvent e) {
+        if (!mergingEnabled)
+            return;
+        if (!(e.getEntity() instanceof LivingEntity entity))
+            return;
+
+        int stackSize = getStackSize(entity);
+        if (stackSize <= 1) {
+            HologramUtil.removeHologram(entity); // Clean if single
+            return;
+        }
+
+        // It's a stacked Creeper/Ghast exploding.
+        // We let the explosion happen but we SPAWN a new stack minus 1
+        String baseName = getStackBaseName(entity);
+        int newSize = stackSize - 1;
+
+        // Clean up the hologram from the detonating entity
+        HologramUtil.removeHologram(entity);
+
+        // Spawn replacement entity
+        Bukkit.getScheduler().runTask(plugin, () -> {
+            LivingEntity newEntity = (LivingEntity) entity.getWorld().spawnEntity(entity.getLocation(),
+                    entity.getType());
+
+            // Set stats and stack data
+            if (entity.getAttribute(Attribute.GENERIC_MAX_HEALTH) != null) {
+                double maxHp = entity.getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue();
+                if (newEntity.getAttribute(Attribute.GENERIC_MAX_HEALTH) != null) {
+                    newEntity.getAttribute(Attribute.GENERIC_MAX_HEALTH).setBaseValue(maxHp);
+                    newEntity.setHealth(maxHp);
+                }
+            }
+            updateStackDisplay(newEntity, baseName, newSize);
+
+            // Temporary stun / target clear to prevent instant chain explosion
+            if (newEntity instanceof Mob mob) {
+                mob.setTarget(null);
+                mob.setAware(false);
+                Bukkit.getScheduler().runTaskLater(plugin, () -> {
+                    if (mob.isValid())
+                        mob.setAware(true);
+                }, 40L); // 2 second stun
+            }
+        });
+    }
+
+    // ==================== STACK MOB: GENERIC REMOVE HANDLER ====================
+
+    @EventHandler(priority = EventPriority.MONITOR)
+    public void onEntityRemove(org.bukkit.event.entity.EntityRemoveEvent e) {
+        if (!mergingEnabled)
+            return;
+        if (e.getEntity() instanceof LivingEntity entity) {
+            // Ensure holograms are wiped if removed abruptly (e.g. /kill, chunk unload,
+            // plugin force remove)
+            HologramUtil.removeHologram(entity);
+        }
+    }
+
     // ==================== LOOT & XP HELPERS ====================
 
     /**
