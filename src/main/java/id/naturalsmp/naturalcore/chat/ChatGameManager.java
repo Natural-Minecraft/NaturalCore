@@ -179,6 +179,10 @@ public class ChatGameManager {
                 Bukkit.broadcast(
                         ChatUtils.toComponent("  &#FF5555&l✘ &cWaktu habis! Jawaban: &f" + currentGame.answer));
                 Bukkit.broadcast(ChatUtils.toComponent(""));
+                // --- LOGGING ---
+                id.naturalsmp.naturalcore.utility.NaturalLogger.getInstance()
+                        .logChatGame("no one get right answer of \"" + currentGame.question + "\"");
+                // ---------------
                 currentGame = null;
             }
         }, GAME_TIMEOUT * 20L);
@@ -238,6 +242,11 @@ public class ChatGameManager {
                 }
             }
         }
+
+        // --- LOGGING ---
+        id.naturalsmp.naturalcore.utility.NaturalLogger.getInstance().logChatGame(
+                player.getName() + " get right answer of \"" + game.question + "\", answer: \"" + game.answer + "\"");
+        // ---------------
 
         // Broadcast winner
         String line = "&8&m                                          ";

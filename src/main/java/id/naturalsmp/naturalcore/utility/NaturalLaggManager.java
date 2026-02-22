@@ -332,6 +332,9 @@ public class NaturalLaggManager implements Listener {
 
     private void performClean() {
         AtomicInteger count = new AtomicInteger(0);
+        // --- LOGGING ---
+        StringBuilder details = new StringBuilder();
+        // ---------------
         Bukkit.getWorlds().forEach(world -> {
             if (excludedWorlds.contains(world.getName()))
                 return;
@@ -342,6 +345,17 @@ public class NaturalLaggManager implements Listener {
                         continue;
                     if (!removeDeathDrops && recentDeathDrops.contains(entity.getUniqueId()))
                         continue;
+
+                    // --- LOGGING ---
+                    if (details.length() > 0)
+                        details.append(", ");
+                    details.append(stack.getType().name().toLowerCase())
+                            .append(" (").append(stack.getAmount()).append("x at ")
+                            .append(item.getLocation().getBlockX()).append(", ")
+                            .append(item.getLocation().getBlockY()).append(", ")
+                            .append(item.getLocation().getBlockZ()).append(")");
+                    // ---------------
+
                     entity.remove();
                     count.incrementAndGet();
                 }
@@ -352,6 +366,15 @@ public class NaturalLaggManager implements Listener {
         for (Player p : Bukkit.getOnlinePlayers()) {
             p.playSound(p.getLocation(), Sound.ENTITY_EXPERIENCE_ORB_PICKUP, 1f, 1f);
         }
+
+        // --- LOGGING ---
+        if (this.cleanedCount > 0) {
+            id.naturalsmp.naturalcore.utility.NaturalLogger logger = id.naturalsmp.naturalcore.utility.NaturalLogger
+                    .getInstance();
+            logger.logClearLaggItemDetail(details.toString());
+            logger.logClearLagg(this.cleanedCount);
+        }
+        // ---------------
     }
 
     // ==================== STACK MOB: DAMAGE HANDLER ====================

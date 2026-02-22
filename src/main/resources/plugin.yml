@@ -63,7 +63,7 @@ commands:
   # --- MESSAGING ---
   msg:
     description: Kirim pesan pribadi
-    aliases: [tell, w, whisper]
+    aliases: [tell, w, whisper, pm]
   reply:
     description: Balas pesan terakhir
     aliases: [r]

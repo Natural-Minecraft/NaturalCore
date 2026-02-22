@@ -434,6 +434,11 @@ public final class NaturalCore extends JavaPlugin {
         registerCmd("msg", pmCmd);
         registerCmd("reply", pmCmd);
 
+        // NaturalLogger System (v1.9.9)
+        id.naturalsmp.naturalcore.utility.NaturalLogger.init(this);
+        getServer().getPluginManager().registerEvents(new id.naturalsmp.naturalcore.listeners.LogListener(), this);
+        getLogger().info("NaturalLogger System: ENABLED");
+
         // 18. World Utils (NEW)
         WorldUtilCommand worldCmd = new WorldUtilCommand();
         registerCmd("day", worldCmd);
@@ -628,6 +633,9 @@ public final class NaturalCore extends JavaPlugin {
         }
         if (laggManager != null) {
             laggManager.stop();
+        }
+        if (id.naturalsmp.naturalcore.utility.NaturalLogger.getInstance() != null) {
+            id.naturalsmp.naturalcore.utility.NaturalLogger.getInstance().stop();
         }
     }
 
