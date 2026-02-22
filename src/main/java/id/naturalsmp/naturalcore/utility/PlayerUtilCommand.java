@@ -100,11 +100,11 @@ public class PlayerUtilCommand implements CommandExecutor {
             boolean newStatus = !target.getAllowFlight();
             target.setAllowFlight(newStatus);
 
-            String msgPath = newStatus ? "messages.essentials.fly-enabled" : "messages.essentials.fly-disabled";
+            String msgPath = newStatus ? "messages.utils.essentials.fly-enabled" : "messages.utils.essentials.fly-disabled";
             ConfigUtils.sendGeneral(target, msgPath);
 
             if (!target.equals(sender)) {
-                ConfigUtils.sendGeneral(sender, "messages.essentials.fly-other", "%player%", target.getName(),
+                ConfigUtils.sendGeneral(sender, "messages.utils.essentials.fly-other", "%player%", target.getName(),
                         "%status%", newStatus ? "enabled" : "disabled");
             }
             return true;
