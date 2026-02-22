@@ -1,6 +1,7 @@
 package id.naturalsmp.naturalcore.utility;
 
 import id.naturalsmp.naturalcore.NaturalCore;
+import id.naturalsmp.naturalcore.utils.ChatUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.configuration.file.YamlConfiguration;
 
@@ -121,18 +122,16 @@ public class NaturalLogger {
         queueLog("chat-games.log", "[" + timestamp() + "] " + resultMsg);
     }
 
-    public void logChat(String player, String rawFormat, String message) {
-        // rawFormat example: [Not Secure] Azka ᴡᴀʀʀɪᴏʀ 3 » 10
-        String cleanLine = cleanChatLine(rawFormat, message);
+    public void logChat(String renderedMessage) {
+        String cleanLine = cleanChatLine(renderedMessage);
         queueLog("chats.log", "[" + timestamp() + "] " + cleanLine);
     }
 
     // --- Core Logic ---
 
-    private String cleanChatLine(String format, String message) {
+    private String cleanChatLine(String renderedMessage) {
         // Strip colors
-        String plain = org.bukkit.ChatColor
-                .stripColor(ChatUtils.decolorize(format.replace("%1$s", "").replace("%2$s", message)));
+        String plain = org.bukkit.ChatColor.stripColor(ChatUtils.decolorize(renderedMessage));
 
         // Remove [Not Secure]
         plain = plain.replace("[Not Secure]", "").trim();
