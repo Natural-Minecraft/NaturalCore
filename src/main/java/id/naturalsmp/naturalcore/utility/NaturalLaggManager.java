@@ -537,7 +537,8 @@ public class NaturalLaggManager implements Listener {
         Map<String, List<LivingEntity>> groups = new HashMap<>();
 
         for (Entity e : entities) {
-            if (e instanceof LivingEntity le && !(e instanceof Player) && !e.hasMetadata("NPC") && !le.isDead()) {
+            if (e instanceof LivingEntity le && !(e instanceof Player) && !(e instanceof org.bukkit.entity.ArmorStand)
+                    && !e.hasMetadata("NPC") && !le.isDead()) {
                 if (mergingBlacklist.contains(le.getType().name()))
                     continue;
 
@@ -704,7 +705,8 @@ public class NaturalLaggManager implements Listener {
                         if (e instanceof Item) {
                             e.remove();
                             removed++;
-                        } else if (e instanceof LivingEntity le && !(e instanceof Player) && !e.hasMetadata("NPC")) {
+                        } else if (e instanceof LivingEntity le && !(e instanceof Player)
+                                && !(e instanceof org.bukkit.entity.ArmorStand) && !e.hasMetadata("NPC")) {
                             HologramUtil.removeHologram(le);
                             le.remove();
                             removed++;
