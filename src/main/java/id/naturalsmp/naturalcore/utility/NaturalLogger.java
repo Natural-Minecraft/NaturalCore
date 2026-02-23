@@ -30,8 +30,8 @@ public class NaturalLogger {
     private final ConcurrentLinkedQueue<LogEntry> writeQueue = new ConcurrentLinkedQueue<>();
     private boolean isWriting = false;
 
-    private final SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
-    private final SimpleDateFormat folderFormat = new SimpleDateFormat("ddMMMMMyyyy", Locale.ENGLISH);
+    private final SimpleDateFormat dateFormat;
+    private final SimpleDateFormat folderFormat;
 
     private NaturalLogger(NaturalCore plugin) {
         this.plugin = plugin;
@@ -42,6 +42,12 @@ public class NaturalLogger {
         this.todayDir = new File(logsDir, "today");
         if (!todayDir.exists())
             todayDir.mkdirs();
+
+        this.dateFormat = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
+        this.dateFormat.setTimeZone(TimeZone.getTimeZone("Asia/Jakarta"));
+
+        this.folderFormat = new SimpleDateFormat("ddMMMMMyyyy", Locale.ENGLISH);
+        this.folderFormat.setTimeZone(TimeZone.getTimeZone("Asia/Jakarta"));
 
         loadMappings();
         startWriterTask();
@@ -122,21 +128,41 @@ public class NaturalLogger {
         queueLog("chat-games.log", "[" + timestamp() + "] " + resultMsg);
     }
 
-    public void logChat(String renderedMessage) {
-        String cleanLine = cleanChatLine(renderedMessage);
-        queueLog("chats.log", "[" + timestamp() + "] " + cleanLine);
+    public void logConnection(String username, UUID uuid, String action, String reason) {
+        String base = "[" + timestamp() + "] " + username + " (" + uuid.toString() + ") " + action;
+        if (reason != null && !reason.isEmpty()) {
+            base += " [" + reason + "]";
+        }
+        queueLog("connections.log", base);
+    }
+
+    public void logChat(String playerName, String prefix, String tier, String formatInfo, String message) {
+        String cleanPrefix = cleanText(prefix);
+        String cleanTier = cleanText(tier);
+        String cleanMsg = cleanText(message);
+
+        String prefixPart = cleanPrefix.isEmpty() ? "" : "[" + cleanPrefix + "] ";
+        String tierPart = cleanTier.isEmpty() ? "" : " [" + cleanTier + "]";
+
+        // Output -> [23/02/2026 00:16:57] [Owner] AnakTentara [MYTHICAL IMMORTAL]
+        // [color chat: { white }, format: { font: { default } }]: humm
+        String finalLine = prefixPart + playerName + tierPart + formatInfo + ": " + cleanMsg;
+
+        queueLog("chats.log", "[" + timestamp() + "] " + finalLine);
     }
 
     // --- Core Logic ---
 
-    private String cleanChatLine(String renderedMessage) {
+    private String cleanText(String input) {
+        if (input == null || input.isEmpty())
+            return "";
+
         // Strip colors
-        String plain = org.bukkit.ChatColor.stripColor(ChatUtils.decolorize(renderedMessage));
+        String plain = org.bukkit.ChatColor.stripColor(ChatUtils.decolorize(input));
 
         // Remove [Not Secure]
         plain = plain.replace("[Not Secure]", "").trim();
 
-        // Normally, the format is "<PREFIX><Player> Â» <Message>"
         // Real-time translation to English alphabet based on unicode fonts.
         plain = plain
                 .replace("ᴀ", "a").replace("ʙ", "b").replace("ᴄ", "c").replace("ᴅ", "d")

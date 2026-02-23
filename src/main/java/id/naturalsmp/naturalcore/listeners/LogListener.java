@@ -7,6 +7,8 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import io.papermc.paper.event.player.AsyncChatEvent;
 import org.bukkit.event.player.PlayerCommandPreprocessEvent;
+import org.bukkit.event.player.PlayerJoinEvent;
+import org.bukkit.event.player.PlayerQuitEvent;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 
@@ -59,7 +61,21 @@ public class LogListener implements Listener {
             formatInfo = " [color chat: { " + colorName + " }, format: { " + String.join(", ", formats) + " }]";
         }
 
-        NaturalLogger.getInstance().logChat(finalOutput + formatInfo);
+        String prefix = "";
+        if (id.naturalsmp.naturalcore.NaturalCore.getInstance().getVaultManager() != null &&
+                id.naturalsmp.naturalcore.NaturalCore.getInstance().getVaultManager().getChat() != null) {
+            prefix = id.naturalsmp.naturalcore.NaturalCore.getInstance().getVaultManager().getChat()
+                    .getPlayerPrefix(player);
+        }
+
+        String tier = "";
+        id.naturalsmp.naturalcore.tier.TierManager tm = id.naturalsmp.naturalcore.NaturalCore.getInstance()
+                .getTierManager();
+        if (tm != null) {
+            tier = tm.getPlayerTierId(player);
+        }
+
+        NaturalLogger.getInstance().logChat(player.getName(), prefix, tier, formatInfo, finalOutput);
     }
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
@@ -93,5 +109,21 @@ public class LogListener implements Listener {
             // 3. Normal Command Check
             NaturalLogger.getInstance().logCommand(player.getName(), message);
         }
+    }
+
+    @EventHandler(priority = EventPriority.MONITOR)
+    public void onPlayerJoin(PlayerJoinEvent event) {
+        Player player = event.getPlayer();
+        NaturalLogger.getInstance().logConnection(player.getName(), player.getUniqueId(), "JOINED", null);
+    }
+
+    @EventHandler(priority = EventPriority.MONITOR)
+    public void onPlayerQuit(PlayerQuitEvent event) {
+        Player player = event.getPlayer();
+        String legacyMsg = "";
+        if (event.quitMessage() != null) {
+            legacyMsg = PlainTextComponentSerializer.plainText().serialize(event.quitMessage());
+        }
+        NaturalLogger.getInstance().logConnection(player.getName(), player.getUniqueId(), "QUIT", legacyMsg);
     }
 }
