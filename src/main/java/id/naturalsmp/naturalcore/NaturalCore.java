@@ -274,6 +274,7 @@ public final class NaturalCore extends JavaPlugin {
         // Social System (v1.9.9)
         SocialListener socialListener = new SocialListener(this);
         getServer().getPluginManager().registerEvents(socialListener, this);
+        getServer().getPluginManager().registerEvents(new id.naturalsmp.naturalcore.listeners.PingListener(), this);
 
         registerCmd("rankeditor", (sender, cmd, label, args) -> {
             if (sender instanceof Player)
