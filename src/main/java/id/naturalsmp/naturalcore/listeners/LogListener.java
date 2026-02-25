@@ -18,9 +18,9 @@ public class LogListener implements Listener {
     public void onPlayerChat(AsyncChatEvent event) {
         Player player = event.getPlayer();
 
-        // Render final message using the renderer set by ChatListener
-        Component rendered = event.renderer().render(player, player.displayName(), event.message(), player);
-        String finalOutput = PlainTextComponentSerializer.plainText().serialize(rendered);
+        // We don't want the full renderer because it appends the Display
+        // prefix/name/tier again
+        String finalOutput = PlainTextComponentSerializer.plainText().serialize(event.message());
 
         String formatInfo = "";
         id.naturalsmp.naturalcore.chat.ChatColorManager colorManager = id.naturalsmp.naturalcore.NaturalCore

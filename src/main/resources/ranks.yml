@@ -198,3 +198,30 @@ ranks:
       - naturalsmp.home.limit.nature
       - redprotect.limits.blocks.500000
       - redprotect.limits.claim.80
+
+
+rank-lainnya:
+  winter:
+    display: "&bWinter"
+    prefix: " "
+  youtube:
+    display: "&cYou&fTube"
+    prefix: " "
+  tiktok:
+    display: "&bTikTok"
+    prefix: " "
+  helper:
+    display: "&bHelper"
+    prefix: " "
+  moderator:
+    display: "&2Moderator"
+    prefix: " "
+  admin:
+    display: "&c&lAdmin"
+    prefix: " "
+  developer:
+    display: "&2Developer"
+    prefix: " "
+  owner:
+    display: "&6Owner"
+    prefix: " "

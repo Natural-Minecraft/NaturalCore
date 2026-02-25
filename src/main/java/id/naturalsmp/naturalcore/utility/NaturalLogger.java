@@ -75,8 +75,22 @@ public class NaturalLogger {
             if (ranksCfg.contains("ranks")) {
                 for (String key : ranksCfg.getConfigurationSection("ranks").getKeys(false)) {
                     String prefix = ranksCfg.getString("ranks." + key + ".prefix");
-                    if (prefix != null && !prefix.trim().isEmpty()) {
-                        rankMap.put(ChatUtils.decolorize(prefix).trim(), key);
+                    String display = ranksCfg.getString("ranks." + key + ".display");
+                    if (prefix != null && display != null) {
+                        String cleanPrefix = org.bukkit.ChatColor.stripColor(ChatUtils.decolorize(prefix));
+                        String cleanDisplay = org.bukkit.ChatColor.stripColor(ChatUtils.decolorize(display));
+                        rankMap.put(cleanPrefix, cleanDisplay);
+                    }
+                }
+            }
+            if (ranksCfg.contains("rank-lainnya")) {
+                for (String key : ranksCfg.getConfigurationSection("rank-lainnya").getKeys(false)) {
+                    String prefix = ranksCfg.getString("rank-lainnya." + key + ".prefix");
+                    String display = ranksCfg.getString("rank-lainnya." + key + ".display");
+                    if (prefix != null && display != null) {
+                        String cleanPrefix = org.bukkit.ChatColor.stripColor(ChatUtils.decolorize(prefix));
+                        String cleanDisplay = org.bukkit.ChatColor.stripColor(ChatUtils.decolorize(display));
+                        rankMap.put(cleanPrefix, cleanDisplay);
                     }
                 }
             }
@@ -137,9 +151,16 @@ public class NaturalLogger {
     }
 
     public void logChat(String playerName, String prefix, String tier, String formatInfo, String message) {
-        String cleanPrefix = cleanText(prefix);
-        String cleanTier = cleanText(tier);
-        String cleanMsg = cleanText(message);
+        String cleanPrefix = org.bukkit.ChatColor.stripColor(ChatUtils.decolorize(prefix == null ? "" : prefix));
+        if (rankMap.containsKey(cleanPrefix)) {
+            cleanPrefix = rankMap.get(cleanPrefix);
+        } else if (rankMap.containsKey(cleanPrefix.trim())) {
+            cleanPrefix = rankMap.get(cleanPrefix.trim());
+        }
+        cleanPrefix = cleanText(cleanPrefix).trim();
+
+        String cleanTier = cleanText(tier).trim();
+        String cleanMsg = cleanText(message).trim();
 
         String prefixPart = cleanPrefix.isEmpty() ? "" : "[" + cleanPrefix + "] ";
         String tierPart = cleanTier.isEmpty() ? "" : " [" + cleanTier + "]";
