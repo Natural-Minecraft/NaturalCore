@@ -32,11 +32,16 @@ public class HUDManager implements Listener {
     private int globalTick = 0;
     private BukkitTask updaterTask;
 
+    // ProtocolLib action bar interception
+    private HUDPacketListener packetListener;
+    private NotificationComponent notificationComponent;
+
     public HUDManager(NaturalCore plugin) {
         this.plugin = plugin;
         registerComponents();
         Bukkit.getPluginManager().registerEvents(this, plugin);
         startTask();
+        initPacketListener();
     }
 
     public void stop() {
@@ -44,10 +49,18 @@ public class HUDManager implements Listener {
             updaterTask.cancel();
             updaterTask = null;
         }
+        if (packetListener != null) {
+            packetListener.unregister();
+            packetListener = null;
+        }
         playerStates.clear();
     }
 
     private void registerComponents() {
+        // Notification component (intercepts action bars from other plugins)
+        notificationComponent = new NotificationComponent(plugin);
+        components.add(notificationComponent);
+
         // Register components in priority order (will be sorted anyway)
         components.add(new TemperatureWarningComponent(plugin));
         components.add(new LaggComponent(plugin));
@@ -60,6 +73,15 @@ public class HUDManager implements Listener {
 
         // Sort by priority (highest first)
         components.sort((a, b) -> Integer.compare(b.getPriority().getValue(), a.getPriority().getValue()));
+    }
+
+    private void initPacketListener() {
+        try {
+            packetListener = new HUDPacketListener(plugin, this);
+            packetListener.register();
+        } catch (NoClassDefFoundError e) {
+            plugin.getLogger().info("[HUD] ProtocolLib not available, action bar interception disabled.");
+        }
     }
 
     public void reload() {
@@ -136,9 +158,15 @@ public class HUDManager implements Listener {
         // Handle transitions
         String finalMessage = handleTransition(state, content, activeComponent);
 
-        // Send to player
+        // Send to player (mark bypass so our packet listener ignores it)
         if (finalMessage != null && !finalMessage.isEmpty()) {
+            if (packetListener != null) {
+                packetListener.markBypassing(player.getUniqueId());
+            }
             player.sendActionBar(ChatUtils.toComponent(ChatUtils.colorize(finalMessage)));
+            if (packetListener != null) {
+                packetListener.unmarkBypassing(player.getUniqueId());
+            }
         }
     }
 
@@ -210,6 +238,29 @@ public class HUDManager implements Listener {
                 return t;
         }
         return null;
+    }
+
+    /**
+     * Show a notification from an external source (e.g. intercepted MMOItems action
+     * bar).
+     * This is called by HUDPacketListener when it intercepts another plugin's
+     * action bar.
+     *
+     * @param player  The player
+     * @param message The raw text message
+     * @param ticks   Duration in ticks
+     */
+    public void showNotification(Player player, String message, int ticks) {
+        if (notificationComponent != null) {
+            notificationComponent.showNotification(player, message, ticks);
+        }
+    }
+
+    /**
+     * Get the notification component.
+     */
+    public NotificationComponent getNotificationComponent() {
+        return notificationComponent;
     }
 
     /**

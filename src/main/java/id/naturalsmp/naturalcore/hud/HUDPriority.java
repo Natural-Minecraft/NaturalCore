@@ -6,6 +6,7 @@ package id.naturalsmp.naturalcore.hud;
  */
 public enum HUDPriority {
 
+    HIGHEST(200), // ProtocolLib Action Bars / Notifications
     CRITICAL(100), // Temperature warning, HP critical
     HIGH(75), // Lagg notifications
     MEDIUM(50), // Normal combat info, Tips
