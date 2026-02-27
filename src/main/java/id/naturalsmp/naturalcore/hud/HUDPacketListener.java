@@ -20,6 +20,9 @@ import java.util.concurrent.ConcurrentHashMap;
  * Intercepts Action Bar packets sent by other plugins (like MMOItems,
  * MythicLib)
  * and routes them through NaturalCore's HUD system with premium aesthetics.
+ *
+ * In Minecraft 1.19.4+, action bars are sent via SYSTEM_CHAT with overlay=true,
+ * NOT via SET_ACTION_BAR_TEXT.
  */
 public class HUDPacketListener {
 
@@ -51,10 +54,15 @@ public class HUDPacketListener {
 
         protocolManager = ProtocolLibrary.getProtocolManager();
 
+        // =====================================================================
+        // Listener 1: SYSTEM_CHAT — Modern 1.19.4+ action bar packet
+        // MMOItems/MythicLib sends action bar via this in 1.21
+        // The packet has a boolean "overlay" field — true = action bar
+        // =====================================================================
         protocolManager.addPacketListener(new PacketAdapter(
                 plugin,
                 ListenerPriority.HIGHEST,
-                PacketType.Play.Server.SET_ACTION_BAR_TEXT) {
+                PacketType.Play.Server.SYSTEM_CHAT) {
             @Override
             public void onPacketSending(PacketEvent event) {
                 if (event.isCancelled())
@@ -64,18 +72,26 @@ public class HUDPacketListener {
                 if (player == null)
                     return;
 
+                // Check if this is an action bar (overlay = true)
+                try {
+                    Boolean isOverlay = event.getPacket().getBooleans().read(0);
+                    if (isOverlay == null || !isOverlay) {
+                        return; // Regular chat message, not action bar
+                    }
+                } catch (Exception e) {
+                    return; // Can't read overlay flag, skip
+                }
+
                 // NaturalCore's own packets — let them through
                 if (bypassPlayers.contains(player.getUniqueId())) {
                     return;
                 }
 
-                // Intercept: this packet is from another plugin (MMOItems, MythicLib, etc.)
+                // This is an action bar from another plugin — intercept!
                 event.setCancelled(true);
 
-                // Extract text and route to our notification system
-                String text = extractText(event);
+                String text = extractTextFromSystemChat(event);
                 if (text != null && !text.isBlank()) {
-                    // Schedule on main thread to ensure thread safety
                     plugin.getServer().getScheduler().runTask(plugin, () -> {
                         hudManager.showNotification(player, text, 40);
                     });
@@ -83,29 +99,51 @@ public class HUDPacketListener {
             }
         });
 
-        plugin.getLogger().info("[HUD] ProtocolLib action bar interception registered successfully.");
+        // =====================================================================
+        // Listener 2: SET_ACTION_BAR_TEXT — Legacy fallback
+        // Some plugins might still use this on older protocol versions
+        // =====================================================================
+        try {
+            protocolManager.addPacketListener(new PacketAdapter(
+                    plugin,
+                    ListenerPriority.HIGHEST,
+                    PacketType.Play.Server.SET_ACTION_BAR_TEXT) {
+                @Override
+                public void onPacketSending(PacketEvent event) {
+                    if (event.isCancelled())
+                        return;
+
+                    Player player = event.getPlayer();
+                    if (player == null)
+                        return;
+
+                    if (bypassPlayers.contains(player.getUniqueId())) {
+                        return;
+                    }
+
+                    event.setCancelled(true);
+
+                    String text = extractTextFromActionBar(event);
+                    if (text != null && !text.isBlank()) {
+                        plugin.getServer().getScheduler().runTask(plugin, () -> {
+                            hudManager.showNotification(player, text, 40);
+                        });
+                    }
+                }
+            });
+        } catch (Exception e) {
+            plugin.getLogger().info("[HUD] SET_ACTION_BAR_TEXT not available, using SYSTEM_CHAT only.");
+        }
+
+        plugin.getLogger()
+                .info("[HUD] ProtocolLib action bar interception registered (SYSTEM_CHAT + SET_ACTION_BAR_TEXT).");
     }
 
     /**
-     * Extracts plain text from the action bar packet.
-     * Tries multiple methods for compatibility with different server versions.
+     * Extract text from SYSTEM_CHAT packet (modern 1.19.4+)
      */
-    private String extractText(PacketEvent event) {
-        // Method 1: Try WrappedChatComponent (JSON chat)
-        try {
-            WrappedChatComponent chatComponent = event.getPacket().getChatComponents().read(0);
-            if (chatComponent != null) {
-                String json = chatComponent.getJson();
-                if (json != null && !json.isEmpty()) {
-                    net.kyori.adventure.text.Component adventureComponent = net.kyori.adventure.text.serializer.gson.GsonComponentSerializer
-                            .gson().deserialize(json);
-                    return PlainTextComponentSerializer.plainText().serialize(adventureComponent);
-                }
-            }
-        } catch (Exception ignored) {
-        }
-
-        // Method 2: Try Adventure Component directly (Paper servers)
+    private String extractTextFromSystemChat(PacketEvent event) {
+        // Method 1: Try Adventure Component directly (Paper)
         try {
             var adventureModifier = event.getPacket().getModifier()
                     .withType(net.kyori.adventure.text.Component.class);
@@ -119,11 +157,45 @@ public class HUDPacketListener {
         } catch (Exception ignored) {
         }
 
-        // Method 3: Raw string fallback
+        // Method 2: Try WrappedChatComponent (JSON)
         try {
-            var stringModifier = event.getPacket().getStrings();
-            if (stringModifier.size() > 0) {
-                return stringModifier.read(0);
+            WrappedChatComponent chatComponent = event.getPacket().getChatComponents().read(0);
+            if (chatComponent != null) {
+                String json = chatComponent.getJson();
+                if (json != null && !json.isEmpty()) {
+                    net.kyori.adventure.text.Component adventureComp = net.kyori.adventure.text.serializer.gson.GsonComponentSerializer
+                            .gson().deserialize(json);
+                    return PlainTextComponentSerializer.plainText().serialize(adventureComp);
+                }
+            }
+        } catch (Exception ignored) {
+        }
+
+        // Method 3: Raw string
+        try {
+            var strings = event.getPacket().getStrings();
+            if (strings.size() > 0) {
+                return strings.read(0);
+            }
+        } catch (Exception ignored) {
+        }
+
+        return null;
+    }
+
+    /**
+     * Extract text from SET_ACTION_BAR_TEXT packet (legacy)
+     */
+    private String extractTextFromActionBar(PacketEvent event) {
+        try {
+            WrappedChatComponent chatComponent = event.getPacket().getChatComponents().read(0);
+            if (chatComponent != null) {
+                String json = chatComponent.getJson();
+                if (json != null && !json.isEmpty()) {
+                    net.kyori.adventure.text.Component adventureComp = net.kyori.adventure.text.serializer.gson.GsonComponentSerializer
+                            .gson().deserialize(json);
+                    return PlainTextComponentSerializer.plainText().serialize(adventureComp);
+                }
             }
         } catch (Exception ignored) {
         }
