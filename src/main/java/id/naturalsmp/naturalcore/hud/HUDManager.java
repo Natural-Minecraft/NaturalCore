@@ -11,6 +11,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
+import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.scheduler.BukkitTask;
 
 import java.util.*;
@@ -272,5 +273,18 @@ public class HUDManager implements Listener {
         String previousContent = "";
         int transitionFrame = 0;
         boolean transitioning = false;
+    }
+
+    // ===========================================
+    // EVENTS
+    // ===========================================
+
+    @EventHandler(priority = EventPriority.MONITOR)
+    public void onPlayerInteract(org.bukkit.event.player.PlayerInteractEvent event) {
+        // Track player clicks (left/right click) for notification component
+        // to re-display cooldowns if they attempt to cast a spell again
+        if (notificationComponent != null) {
+            notificationComponent.registerInteraction(event.getPlayer());
+        }
     }
 }

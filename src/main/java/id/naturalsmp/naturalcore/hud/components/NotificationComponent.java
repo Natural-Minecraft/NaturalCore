@@ -23,6 +23,13 @@ public class NotificationComponent extends AbstractHUDComponent {
 
     private final Map<UUID, Notification> activeNotifications = new HashMap<>();
 
+    // Tracks when a cooldown for a specific skill was first sent to a player
+    // playerUUID -> (skillName -> firstSeenTimeMs)
+    private final Map<UUID, Map<String, Long>> cooldownDisplayStartTimes = new HashMap<>();
+
+    // Tracks the last time a player interacted (clicked), to show cooldown again
+    private final Map<UUID, Long> lastInteractTimes = new ConcurrentHashMap<>();
+
     public NotificationComponent(NaturalCore plugin) {
         super(plugin, "notification", HUDPriority.HIGHEST);
     }
@@ -199,17 +206,52 @@ public class NotificationComponent extends AbstractHUDComponent {
         // Extract extra data based on type
         switch (type) {
             case COOLDOWN -> {
-                // Try to extract seconds remaining and skill name from the message
+                // Extract skill name
                 notification.extraData = extractCooldownInfo(rawMessage);
-                // Extend duration to match the cooldown
+                // Extract total cooldown duration
                 double seconds = extractSeconds(rawMessage);
                 if (seconds > 0) {
                     notification.totalDurationMs = seconds * 1000;
-                    notification.expiryTime = System.currentTimeMillis() + (long) notification.totalDurationMs;
                 }
             }
             case CANT_USE -> notification.extraData = rawMessage;
             default -> {
+            }
+        }
+
+        // --- Custom Cooldown Display Limiter Logic ---
+        if (type == NotificationType.COOLDOWN) {
+            String skillName = notification.extraData != null ? notification.extraData : "Unknown";
+            Map<String, Long> playerCooldowns = cooldownDisplayStartTimes.computeIfAbsent(player.getUniqueId(),
+                    k -> new HashMap<>());
+
+            long now = System.currentTimeMillis();
+            long firstSeen = playerCooldowns.getOrDefault(skillName, 0L);
+
+            // If we haven't seen this skill's cooldown recently (e.g. within the last 5
+            // seconds)
+            // It means this is a fresh cast or a fresh "attempt to cast"
+            // Wait, since MMOItems sends the packet every tick, the packet gap is never >
+            // 5s unless the cooldown finished.
+            // BUT, if the player interacts (clicks), we update `lastInteractTime`.
+            if (now - firstSeen > 10000L) {
+                playerCooldowns.put(skillName, now);
+                firstSeen = now;
+            }
+
+            long timeSinceFirstSeen = now - firstSeen;
+            long lastInteract = lastInteractTimes.getOrDefault(player.getUniqueId(), 0L);
+
+            // Logic:
+            // 1. Show for the first 3 seconds of the initial cast
+            // 2. OR, if they clicked/interacted recently (within the last 4 seconds), show
+            // it for 4 seconds
+            boolean showBecauseInitial = timeSinceFirstSeen <= 3000L;
+            boolean showBecauseInteract = (now - lastInteract) <= 4000L;
+
+            if (!showBecauseInitial && !showBecauseInteract) {
+                // Time's up, don't show the cooldown anymore (it will return to default HUD)
+                return;
             }
         }
 
@@ -228,6 +270,19 @@ public class NotificationComponent extends AbstractHUDComponent {
         notification.totalDurationMs = durationMs;
 
         activeNotifications.put(player.getUniqueId(), notification);
+    }
+
+    // =================================================================
+    // INTERACTION TRACKING
+    // =================================================================
+
+    /**
+     * Called by HUDManager when the player clicks/interacts.
+     * This registers an intent to see the cooldown again for 4 seconds if it's
+     * active.
+     */
+    public void registerInteraction(Player player) {
+        lastInteractTimes.put(player.getUniqueId(), System.currentTimeMillis());
     }
 
     // =================================================================
