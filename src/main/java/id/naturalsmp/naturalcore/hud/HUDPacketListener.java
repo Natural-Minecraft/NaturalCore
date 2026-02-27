@@ -17,8 +17,9 @@ import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
- * Intercepts Action Bar packets sent by other plugins (like MMOItems)
- * and routes them through NaturalCore's HUD system instead.
+ * Intercepts Action Bar packets sent by other plugins (like MMOItems,
+ * MythicLib)
+ * and routes them through NaturalCore's HUD system with premium aesthetics.
  */
 public class HUDPacketListener {
 
@@ -26,8 +27,7 @@ public class HUDPacketListener {
     private final HUDManager hudManager;
     private ProtocolManager protocolManager;
 
-    // UUIDs of players currently receiving a NaturalCore HUD update.
-    // Packets sent while a UUID is in this set are "ours" and should pass through.
+    // UUIDs currently sending NaturalCore's own action bars — bypass interception
     private final Set<UUID> bypassPlayers = Collections.newSetFromMap(new ConcurrentHashMap<>());
 
     public HUDPacketListener(NaturalCore plugin, HUDManager hudManager) {
@@ -35,18 +35,10 @@ public class HUDPacketListener {
         this.hudManager = hudManager;
     }
 
-    /**
-     * Mark a player as currently receiving a NaturalCore action bar.
-     * Call this RIGHT BEFORE sending player.sendActionBar() from NaturalCore.
-     */
     public void markBypassing(UUID playerId) {
         bypassPlayers.add(playerId);
     }
 
-    /**
-     * Unmark a player after NaturalCore's action bar has been sent.
-     * Call this RIGHT AFTER sending player.sendActionBar() from NaturalCore.
-     */
     public void unmarkBypassing(UUID playerId) {
         bypassPlayers.remove(playerId);
     }
@@ -72,58 +64,70 @@ public class HUDPacketListener {
                 if (player == null)
                     return;
 
-                // If this packet was sent by NaturalCore itself, let it through
+                // NaturalCore's own packets — let them through
                 if (bypassPlayers.contains(player.getUniqueId())) {
                     return;
                 }
 
-                // This packet was sent by another plugin (e.g. MMOItems, MythicLib)
-                // Cancel the original packet and route it through our HUD system
+                // Intercept: this packet is from another plugin (MMOItems, MythicLib, etc.)
                 event.setCancelled(true);
 
-                // Extract the text content from the packet
+                // Extract text and route to our notification system
                 String text = extractText(event);
                 if (text != null && !text.isBlank()) {
-                    // Show it as a notification for ~40 ticks (2 seconds)
-                    hudManager.showNotification(player, text, 40);
+                    // Schedule on main thread to ensure thread safety
+                    plugin.getServer().getScheduler().runTask(plugin, () -> {
+                        hudManager.showNotification(player, text, 40);
+                    });
                 }
             }
         });
 
-        plugin.getLogger().info("[HUD] ProtocolLib action bar interception registered.");
+        plugin.getLogger().info("[HUD] ProtocolLib action bar interception registered successfully.");
     }
 
     /**
      * Extracts plain text from the action bar packet.
-     * SET_ACTION_BAR_TEXT holds a WrappedChatComponent (JSON chat).
+     * Tries multiple methods for compatibility with different server versions.
      */
     private String extractText(PacketEvent event) {
+        // Method 1: Try WrappedChatComponent (JSON chat)
         try {
             WrappedChatComponent chatComponent = event.getPacket().getChatComponents().read(0);
             if (chatComponent != null) {
                 String json = chatComponent.getJson();
-                if (json != null) {
-                    // Parse the JSON chat component to plain text via Adventure
+                if (json != null && !json.isEmpty()) {
                     net.kyori.adventure.text.Component adventureComponent = net.kyori.adventure.text.serializer.gson.GsonComponentSerializer
                             .gson().deserialize(json);
                     return PlainTextComponentSerializer.plainText().serialize(adventureComponent);
                 }
             }
-        } catch (Exception e) {
-            // Fallback: try reading adventure components directly
-            try {
-                var adventureModifier = event.getPacket().getModifier()
-                        .withType(net.kyori.adventure.text.Component.class);
-                if (adventureModifier.size() > 0) {
-                    net.kyori.adventure.text.Component comp = (net.kyori.adventure.text.Component) adventureModifier
-                            .read(0);
-                    if (comp != null) {
-                        return PlainTextComponentSerializer.plainText().serialize(comp);
-                    }
-                }
-            } catch (Exception ignored) {
-            }
+        } catch (Exception ignored) {
         }
+
+        // Method 2: Try Adventure Component directly (Paper servers)
+        try {
+            var adventureModifier = event.getPacket().getModifier()
+                    .withType(net.kyori.adventure.text.Component.class);
+            if (adventureModifier.size() > 0) {
+                net.kyori.adventure.text.Component comp = (net.kyori.adventure.text.Component) adventureModifier
+                        .read(0);
+                if (comp != null) {
+                    return PlainTextComponentSerializer.plainText().serialize(comp);
+                }
+            }
+        } catch (Exception ignored) {
+        }
+
+        // Method 3: Raw string fallback
+        try {
+            var stringModifier = event.getPacket().getStrings();
+            if (stringModifier.size() > 0) {
+                return stringModifier.read(0);
+            }
+        } catch (Exception ignored) {
+        }
+
         return null;
     }
 
