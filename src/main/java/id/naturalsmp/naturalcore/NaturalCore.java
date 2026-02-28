@@ -2,7 +2,6 @@ package id.naturalsmp.naturalcore;
 
 import id.naturalsmp.naturalcore.admin.*;
 import id.naturalsmp.naturalcore.chat.ChatListener;
-import id.naturalsmp.naturalcore.chat.ChatTabCompleter;
 import id.naturalsmp.naturalcore.chat.ChatPreviewGUI;
 import id.naturalsmp.naturalcore.economy.VaultManager;
 import id.naturalsmp.naturalcore.home.HomeGUI;
