@@ -1,16 +1,12 @@
 # ==========================================
 #      NATURAL CORE - CONFIGURATION
 # ==========================================
-config-version: 2.0.5
+config-version: 2.2.1
 
 # Catatan: Konfigurasi sekarang terpisah:
 # - config.yml     : Pengaturan utama (ini)
 # - messages.yml   : Semua pesan plugin
 # - chatemojis.yml : Konfigurasi emoji chat
-
-# --- BUTTON MODULES ---
-modules:
-
 
 # --- PREFIX SETTINGS ---
 # Gunakan format Hex &#RRGGBB untuk warna modern

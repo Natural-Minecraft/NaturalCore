@@ -529,6 +529,12 @@ public final class NaturalCore extends JavaPlugin {
         getServer().getPluginManager().registerEvents(topupGUI, this);
         registerCmd("topupnotification", new TopupCommand(this, topupGUI));
 
+        // 26. Sell Confirmation System (v2.2.2)
+        SellConfirmCommand sellConfirmHandler = new SellConfirmCommand();
+        registerCmd("sellall", sellConfirmHandler);
+        registerCmd("sellhand", sellConfirmHandler);
+        registerCmd("sellhandall", sellConfirmHandler);
+
         // Selesai
         getLogger().info(
                 ChatUtils.colorize("&6&lNaturalCore v" + getDescription().getVersion() + " &asudah aktif sepenuhnya!"));

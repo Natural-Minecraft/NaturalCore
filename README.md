@@ -1,8 +1,13 @@
-# NaturalCore v2.2.0 (The Experience Update)
+# NaturalCore v2.2.2 (The Protection Update)
 
 Plugin inti (core) premium untuk server **NaturalSMP**, mengelola seluruh aspek penting server dengan stabilitas ultra-tinggi dan estetika premium.
 
-## ✨ Fitur Baru v2.2.0 (The Experience Update)
+## ✨ Fitur Baru v2.2.2 (The Protection Update)
+*   **SellAll Confirmation System**: Mencegah member salah menjual seluruh inventory. Sekarang `/sellall`, `/sellhand`, dan `/sellhandall` memerlukan konfirmasi (ketik 2x) dalam 10 detik.
+*   **Accidental Sell Fix**: Menonaktifkan shortcut tombol "F" pada GUI Toko untuk mencegah penjualan tidak sengaja saat navigasi menu.
+
+## ✨ Fitur Baru v2.2.1 (Stability Update)
+*   **Dynamic Mob Stacker**: Sekarang fitur Mob Stacking bisa dinyalakan/matikan secara real-time via `/nacore reload` tanpa perlu restart server.
 *   **Priority Join**: Limit display server menjadi 69, namun slot asli bisa menampung 100 pemain. Pemain dengan rank Nature atau prioritas bisa join, mengusir 1 pemain (non-prioritas) yang online paling lama secara acak dengan pesan kick khusus.
 *   **Aesthetic Priority Message**: Pesan khusus 3 baris saat player prioritas join yang bisa dikustomisasi via `messages.yml`, disertai efek suara naga dan petir.
 *   **Hologram Radius Fix**: Hologram entitas kini memiliki batas jarak pandang 5 blocks agar tidak menembus dinding dari jauh.
