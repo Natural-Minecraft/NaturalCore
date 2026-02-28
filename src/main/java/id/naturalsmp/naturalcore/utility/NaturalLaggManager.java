@@ -152,6 +152,14 @@ public class NaturalLaggManager implements Listener {
         this.excludedWorlds = new HashSet<>(plugin.getConfig().getStringList("lagg.excluded-worlds"));
     }
 
+    public void reload() {
+        stop();
+        loadConfig();
+        if (enabled) {
+            startTasks();
+        }
+    }
+
     public void startTasks() {
         // Mob Merge Task
         if (mergingEnabled) {
