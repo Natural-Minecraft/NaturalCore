@@ -113,6 +113,13 @@ commands:
   pay:
     description: Kirim uang
 
+  sellall:
+    description: Jual semua item di inventory (dengan konfirmasi)
+  sellhand:
+    description: Jual item di tangan (dengan konfirmasi)
+  sellhandall:
+    description: Jual semua item tipe yang sama (dengan konfirmasi)
+
   # --- ESSENTIALS ---
   gamemode:
     description: Gamemode

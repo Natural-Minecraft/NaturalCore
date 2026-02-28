@@ -1,7 +1,7 @@
 # ==========================================
 #      NATURAL CORE - CONFIGURATION
 # ==========================================
-config-version: 2.2.2
+config-version: 2.2.3
 
 # Catatan: Konfigurasi sekarang terpisah:
 # - config.yml     : Pengaturan utama (ini)
@@ -156,7 +156,9 @@ spawn:
     - "world"
     - "world_nether"
     - "world_the_end"
-    - "Resources"
+    - "resource"
+
+# ==========================================
 #              RTP SETTINGS
 # ==========================================
 rtp:

@@ -1,6 +1,10 @@
-# NaturalCore v2.2.2 (The Protection Update)
+# NaturalCore v2.2.3 (The Mention Update)
 
 Plugin inti (core) premium untuk server **NaturalSMP**, mengelola seluruh aspek penting server dengan stabilitas ultra-tinggi dan estetika premium.
+
+## ✨ Fitur Baru v2.2.3 (The Mention Update)
+*   **Modern Chat Mentions**: Tab completion untuk `@player` sekarang berfungsi penuh menggunakan client-side suggestions. Otomatis memunculkan dropdown daftar pemain saat kamu mengetik `@`.
+*   **Cleanup**: Menghapus sistem tab completion lama yang sudah tidak kompatibel dengan client modern.
 
 ## ✨ Fitur Baru v2.2.2 (The Protection Update)
 *   **SellAll Confirmation System**: Mencegah member salah menjual seluruh inventory. Sekarang `/sellall`, `/sellhand`, dan `/sellhandall` memerlukan konfirmasi (ketik 2x) dalam 10 detik.

@@ -419,8 +419,11 @@ public final class NaturalCore extends JavaPlugin {
         getServer().getPluginManager().registerEvents(new ChatColorGUI(this), this);
 
         getServer().getPluginManager().registerEvents(new ChatListener(this), this);
-        // MentionListener is now integrated into ChatListener (Adventure API)
-        getServer().getPluginManager().registerEvents(new ChatTabCompleter(), this);
+        // Modern Mention Tab Completion (v2.2.3)
+        MentionTabManager mentionTab = new MentionTabManager(this);
+        getServer().getPluginManager().registerEvents(mentionTab, this);
+        mentionTab.initialSync();
+
         getServer().getPluginManager().registerEvents(new ChatPreviewGUI(), this);
         getServer().getPluginManager().registerEvents(new GlobalNotificationListener(this), this);
         getServer().getPluginManager().registerEvents(new GuiSoundListener(), this);
