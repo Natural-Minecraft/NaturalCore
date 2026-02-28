@@ -90,6 +90,12 @@ social:
     - "  &fSelamat datang &b%displayname% &fdi &aNaturalSMP&f!"
     - "  &7Semoga betah bermain bersama kami! &e(#%count%)"
     - ""
+  priority-join:
+    - ""
+    - "&8&m       &r &e\u2728 &6&lPRIORITY LOGIN &e\u2728 &8&m       "
+    - "  &fSelamat datang kembali, &b%displayname%&f!"
+    - "  &7Terima kasih atas dukunganmu yang luar biasa \u2764"
+    - ""
   motd:
     - "&8&m--------------------------------"
     - " &6&lWelcome to NaturalSMP!"

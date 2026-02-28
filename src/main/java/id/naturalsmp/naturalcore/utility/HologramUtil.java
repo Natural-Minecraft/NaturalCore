@@ -50,6 +50,7 @@ public class HologramUtil {
                 d.setBillboard(Display.Billboard.CENTER);
                 d.setSeeThrough(true);
                 d.setShadowed(false);
+                d.setViewRange(5.0f); // Limit view to 5 blocks radius
                 d.setBackgroundColor(Color.fromARGB(0, 0, 0, 0)); // Transparent background
 
                 // Position above mob head

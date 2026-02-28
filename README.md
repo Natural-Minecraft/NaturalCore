@@ -1,6 +1,12 @@
-# NaturalCore v2.1.0 (The Mini-Games Update)
+# NaturalCore v2.2.0 (The Experience Update)
 
 Plugin inti (core) premium untuk server **NaturalSMP**, mengelola seluruh aspek penting server dengan stabilitas ultra-tinggi dan estetika premium.
+
+## ✨ Fitur Baru v2.2.0 (The Experience Update)
+*   **Priority Join**: Limit display server menjadi 69, namun slot asli bisa menampung 100 pemain. Pemain dengan rank Nature atau prioritas bisa join, mengusir 1 pemain (non-prioritas) yang online paling lama secara acak dengan pesan kick khusus.
+*   **Aesthetic Priority Message**: Pesan khusus 3 baris saat player prioritas join yang bisa dikustomisasi via `messages.yml`, disertai efek suara naga dan petir.
+*   **Hologram Radius Fix**: Hologram entitas kini memiliki batas jarak pandang 5 blocks agar tidak menembus dinding dari jauh.
+*   **Tips Actionbar Sync Fix**: Sinkronisasi sempurna antara teks marquee action bar dengan suara efek mengetik mesin tik.
 
 ## ✨ Fitur Baru v2.1.0 (The Mini-Games Update)
 *   **1000 Chat Games**: Sistem mini-game chat interaktif baru (Trivia, Matematika, Susun Kata, Ketik Cepat) dengan 1000 pertanyaan yang tidak berulang.

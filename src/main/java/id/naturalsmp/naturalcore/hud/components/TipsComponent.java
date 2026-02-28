@@ -186,8 +186,8 @@ public class TipsComponent extends AbstractHUDComponent {
                 offset = scrollRange; // Pause end
             }
 
-            // Typing sound effect during scroll
-            if (typingSoundEnabled && isScrolling && offset != lastScrollOffset) {
+            // Typing sound effect during scroll (only play if it moved past offset 0)
+            if (typingSoundEnabled && isScrolling && offset != lastScrollOffset && offset > 0) {
                 lastScrollOffset = offset;
                 try {
                     player.playSound(player.getLocation(), typingSound, typingSoundVolume, typingSoundPitch);
