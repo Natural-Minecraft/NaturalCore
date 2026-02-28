@@ -118,8 +118,11 @@ public class SocialListener implements Listener {
 
         // 4. Priority Woahh Join Effect (if permission naturalsmp.priority)
         if (p.hasPermission("naturalsmp.priority")) {
-            GUIUtils.broadcast(ChatUtils
-                    .colorize("&e&l>&6&l> &b&l" + p.getName() + " &a&lhas swooped into the server! &6&l<&e&l<"));
+            GUIUtils.broadcast(ChatUtils.colorize(""));
+            GUIUtils.broadcast(ChatUtils.colorize("&8&m       &r &e\u2728 &6&lPRIORITY LOGIN &e\u2728 &8&m       "));
+            GUIUtils.broadcast(ChatUtils.colorize("  &fSelamat datang kembali, &b" + p.getName() + "&f!"));
+            GUIUtils.broadcast(ChatUtils.colorize("  &7Terima kasih atas dukunganmu yang luar biasa \u2764"));
+            GUIUtils.broadcast(ChatUtils.colorize(""));
             for (Player online : Bukkit.getOnlinePlayers()) {
                 online.playSound(online.getLocation(), Sound.ENTITY_ENDER_DRAGON_GROWL, 0.5f, 1.5f);
                 online.playSound(online.getLocation(), Sound.ENTITY_LIGHTNING_BOLT_THUNDER, 0.5f, 1f);
