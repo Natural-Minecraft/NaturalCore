@@ -1,7 +1,7 @@
 # ==========================================
 #      NATURAL CORE - CONFIGURATION
 # ==========================================
-config-version: 2.2.1
+config-version: 2.2.2
 
 # Catatan: Konfigurasi sekarang terpisah:
 # - config.yml     : Pengaturan utama (ini)
