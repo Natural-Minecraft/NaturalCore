@@ -36,7 +36,7 @@ public class SeasonComponent extends AbstractHUDComponent {
         String tempDisplay = formatTemperature(temp);
 
         // Get mana from PlaceholderAPI
-        String manaDisplay = getManaDisplay(player);
+        String manaDisplay = getManaDisplay(player, tick);
 
         // Premium format: Season | Temp | Mana
         return seasonGradient + seasonName + " &7| " + tempDisplay + " &7| " + manaDisplay;
@@ -98,7 +98,7 @@ public class SeasonComponent extends AbstractHUDComponent {
         return color + icon + " " + String.format("%.1f", temp) + "°C";
     }
 
-    private String getManaDisplay(Player player) {
+    private String getManaDisplay(Player player, int tick) {
         String mana = "N/A";
         String maxMana = "N/A";
 
@@ -112,6 +112,23 @@ public class SeasonComponent extends AbstractHUDComponent {
                 mana = "0";
             if (maxMana == null || maxMana.isEmpty() || maxMana.equals("%auraskills_mana_max_int%"))
                 maxMana = "0";
+
+            // Check for active mana warning delegated from NotificationComponent
+            boolean hasWarning = false;
+            if (plugin.getHudManager().getNotificationComponent() != null) {
+                hasWarning = plugin.getHudManager().getNotificationComponent()
+                        .hasActiveWarning(player, NotificationComponent.NotificationType.MANA_WARNING);
+            }
+
+            if (hasWarning) {
+                // Fast blink cycle: 6 ticks per phase (3 ticks ON, 3 ticks OFF)
+                boolean blinkOn = (tick % 6) < 3;
+                if (blinkOn) {
+                    return "&c✦ &c" + mana + "&7/&c" + maxMana;
+                } else {
+                    return "&4✦ &4" + mana + "&7/&4" + maxMana;
+                }
+            }
 
             // Calculate mana percentage for dynamic colors
             String manaColor = "&b"; // Default color

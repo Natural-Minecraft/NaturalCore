@@ -46,6 +46,11 @@ public class NotificationComponent extends AbstractHUDComponent {
             return false;
         }
 
+        // Delegate MANA_WARNING to SeasonComponent instead of overriding the whole HUD
+        if (notification.type == NotificationType.MANA_WARNING) {
+            return false;
+        }
+
         return true;
     }
 
@@ -57,12 +62,29 @@ public class NotificationComponent extends AbstractHUDComponent {
 
         return switch (notification.type) {
             case COOLDOWN -> renderCooldown(notification, globalTick);
+            // MANA_WARNING is now handled by SeasonComponent, but we keep this case for
+            // fallback/safety
             case MANA_WARNING -> renderManaWarning(notification, globalTick);
             case STAMINA_WARNING -> renderStaminaWarning(notification, globalTick);
             case TWO_HANDED -> renderTwoHanded(notification, globalTick);
             case CANT_USE -> renderCantUse(notification, globalTick);
             default -> renderGeneric(notification, globalTick);
         };
+    }
+
+    /**
+     * Helper method to check if a player has an active warning of a specific type.
+     * Used by other components (like SeasonComponent) to display the warning
+     * inline.
+     */
+    public boolean hasActiveWarning(Player player, NotificationType type) {
+        Notification notification = activeNotifications.get(player.getUniqueId());
+        if (notification != null && notification.type == type) {
+            if (System.currentTimeMillis() <= notification.expiryTime) {
+                return true;
+            }
+        }
+        return false;
     }
 
     // =========================================
