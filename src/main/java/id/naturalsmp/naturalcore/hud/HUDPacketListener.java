@@ -8,7 +8,7 @@ import com.comphenix.protocol.events.PacketAdapter;
 import com.comphenix.protocol.events.PacketEvent;
 import com.comphenix.protocol.wrappers.WrappedChatComponent;
 import id.naturalsmp.naturalcore.NaturalCore;
-import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
+import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import org.bukkit.entity.Player;
 
 import java.util.Collections;
@@ -151,7 +151,8 @@ public class HUDPacketListener {
                 net.kyori.adventure.text.Component comp = (net.kyori.adventure.text.Component) adventureModifier
                         .read(0);
                 if (comp != null) {
-                    return PlainTextComponentSerializer.plainText().serialize(comp);
+                    return LegacyComponentSerializer.legacySection().serialize(comp)
+                            .replace("§", "&");
                 }
             }
         } catch (Exception ignored) {
@@ -165,7 +166,8 @@ public class HUDPacketListener {
                 if (json != null && !json.isEmpty()) {
                     net.kyori.adventure.text.Component adventureComp = net.kyori.adventure.text.serializer.gson.GsonComponentSerializer
                             .gson().deserialize(json);
-                    return PlainTextComponentSerializer.plainText().serialize(adventureComp);
+                    return LegacyComponentSerializer.legacySection().serialize(adventureComp)
+                            .replace("§", "&");
                 }
             }
         } catch (Exception ignored) {
@@ -194,7 +196,8 @@ public class HUDPacketListener {
                 if (json != null && !json.isEmpty()) {
                     net.kyori.adventure.text.Component adventureComp = net.kyori.adventure.text.serializer.gson.GsonComponentSerializer
                             .gson().deserialize(json);
-                    return PlainTextComponentSerializer.plainText().serialize(adventureComp);
+                    return LegacyComponentSerializer.legacySection().serialize(adventureComp)
+                            .replace("§", "&");
                 }
             }
         } catch (Exception ignored) {

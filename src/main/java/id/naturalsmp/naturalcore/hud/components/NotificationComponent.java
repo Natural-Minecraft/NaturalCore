@@ -97,7 +97,7 @@ public class NotificationComponent extends AbstractHUDComponent {
 
         String skillName = n.extraData != null ? n.extraData : "Skill";
 
-        return icon + " &8┃ &7" + skillName + " " + bar + " &8┃ "
+        return icon + " &7" + skillName + " " + bar + " "
                 + timeColor + String.format("%.1fs", secondsLeft);
     }
 
@@ -144,8 +144,8 @@ public class NotificationComponent extends AbstractHUDComponent {
         String manaText = blinkOn ? "&#FF5555&lMana" : "&#AA0000&lMana";
         String msgColor = blinkOn ? "&c" : "&4";
 
-        return manaIcon + " &8┃ " + msgColor + "Insufficient " + manaText
-                + msgColor + "! " + "&8┃ " + manaIcon;
+        return manaIcon + " " + msgColor + "Insufficient " + manaText
+                + msgColor + "! " + manaIcon;
     }
 
     // =========================================
@@ -158,8 +158,8 @@ public class NotificationComponent extends AbstractHUDComponent {
         String text = blinkOn ? "&#FFAA00&lStamina" : "&#AA5500&lStamina";
         String msgColor = blinkOn ? "&6" : "&c";
 
-        return icon + " &8┃ " + msgColor + "Not Enough " + text
-                + msgColor + "! " + "&8┃ " + icon;
+        return icon + " " + msgColor + "Not Enough " + text
+                + msgColor + "! " + icon;
     }
 
     // =========================================
@@ -169,7 +169,7 @@ public class NotificationComponent extends AbstractHUDComponent {
         boolean pulse = (tick % 8) < 4;
         String icon = pulse ? "&#FFAA00⚠" : "&#FFFFFF⚠";
 
-        return icon + " &8┃ &6Two-Handed &7weapon — &cdrop offhand! &8┃ " + icon;
+        return icon + " &6Two-Handed &7weapon — &cdrop offhand! " + icon;
     }
 
     // =========================================
@@ -180,14 +180,14 @@ public class NotificationComponent extends AbstractHUDComponent {
         String icon = pulse ? "&c✖" : "&4✖";
         String text = n.extraData != null ? n.extraData : "Cannot use this item";
 
-        return icon + " &8┃ &c" + text + " &8┃ " + icon;
+        return icon + " &c" + text + " " + icon;
     }
 
     // =========================================
     // GENERIC — Simple styled message
     // =========================================
     private String renderGeneric(Notification n, int tick) {
-        return "&8┃ &7" + n.rawMessage + " &8┃";
+        return n.rawMessage;
     }
 
     // =================================================================
