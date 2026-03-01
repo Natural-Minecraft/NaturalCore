@@ -747,6 +747,10 @@ public final class NaturalCore extends JavaPlugin {
         return seasonResetManager;
     }
 
+    public HUDManager getHudManager() {
+        return hudManager;
+    }
+
     // --- CHAT COLOR ---
 
     public id.naturalsmp.naturalcore.chat.ChatColorManager getChatColorManager() {
