@@ -91,7 +91,7 @@ public final class NaturalCore extends JavaPlugin {
     private VanishManager vanishManager;
     private TeleportManager teleportManager;
     private MessageManager messageManager;
-    private EmojiManager emojiManager;
+
     private SeasonManager seasonManager;
     private BannerManager bannerManager;
     private ProfileManager profileManager;
@@ -148,7 +148,7 @@ public final class NaturalCore extends JavaPlugin {
 
         // Migrate or Save text resources
         saveTextResource("announcements.yml");
-        saveTextResource("chatemojis.yml");
+
         saveTextResource("tips.yml");
 
         // 2B. Init Backup System (v2.0)
@@ -403,11 +403,7 @@ public final class NaturalCore extends JavaPlugin {
             getLogger().info("PlaceholderAPI ditemukan. Expansion terdaftar.");
         }
 
-        // 17. Emoji System (NEW)
-        this.emojiManager = new EmojiManager(this);
-        registerCmd("emoji", new EmojiCommand(this));
-        getLogger().info("Emoji System: ENABLED");
-        getServer().getPluginManager().registerEvents(new EmojiGUI(this), this);
+        // 17. Emoji System (Moved to NaturalFun)
 
         // 17C. AFK System
         registerCmd("afk", new id.naturalsmp.naturalcore.afk.AFKCommand(this));
@@ -587,8 +583,7 @@ public final class NaturalCore extends JavaPlugin {
         id.naturalsmp.naturalcore.utils.ConfigUtils.reload();
 
         // Comprehensive Module Reload
-        if (emojiManager != null)
-            emojiManager.loadEmojis();
+
         if (tagsManager != null)
             tagsManager.loadConfigs();
         if (tierManager != null)
@@ -681,10 +676,6 @@ public final class NaturalCore extends JavaPlugin {
 
     public MessageManager getMessageManager() {
         return messageManager;
-    }
-
-    public id.naturalsmp.naturalcore.chat.EmojiManager getEmojiManager() {
-        return emojiManager;
     }
 
     public SeasonManager getSeasonManager() {

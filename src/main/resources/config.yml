@@ -35,7 +35,7 @@ lagg:
 
   # Mob Stacking / Merging
   merging:
-    enabled: true
+    enabled: false
     threshold: 5
     radius: 2.0
     # Mob yang TIDAK digabungkan
@@ -89,7 +89,7 @@ chat:
   # Format Chat Global
   # %displayname% = Prefix + Nama + Suffix (dari LuckPerms)
   # %player%      = Nama Asli
-  format: "%displayname% &8» &f{message}"
+  format: "%displayname% &e» &f{message}"
 
   # Format Private Message (MSG)
   msg-format-sender: "&8[&bme &8→ &b{receiver}&8] &f{message}"
@@ -116,7 +116,7 @@ afk:
   display-text: "&b💤 &7Sedang Bermimpi... &b💤"
   title:
     enabled: true
-    title: "<gradient:#808080:#D3D3D3>YOU ARE NOW AFK</gradient>"
+    title: "<gradient:#3E73FF:#94fff1:#3E73FF><b>YOU ARE NOW AFK</b></gradient>"
     subtitle: "&7Move to resume..."
 
 # ==========================================

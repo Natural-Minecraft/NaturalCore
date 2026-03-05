@@ -161,14 +161,12 @@ public class ChatListener implements Listener {
                         messageText = formatted.toString();
                 }
 
-                // 1. Colorize & Emoji Support
+                // 1. Colorize Support
                 if (player.hasPermission("naturalsmp.chat.color")) {
                         messageText = ChatUtils.colorize(messageText);
                 }
 
-                if (EmojiManager.getInstance() != null) {
-                        messageText = EmojiManager.getInstance().parseEmojis(player, messageText);
-                }
+                // Emoji parsing moved to NaturalFun
 
                 // Convert back to Component
                 Component message = legacySection.deserialize(messageText);
