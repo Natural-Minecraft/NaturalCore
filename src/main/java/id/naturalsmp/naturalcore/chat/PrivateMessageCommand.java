@@ -76,10 +76,8 @@ public class PrivateMessageCommand implements CommandExecutor {
         // Update Reply Target
         plugin.getMessageManager().setReplyTarget(sender, receiver);
 
-        // Parse Emojis dalam pesan
-        if (EmojiManager.getInstance() != null) {
-            message = EmojiManager.getInstance().parseEmojis(sender, message);
-        }
+        // Parse Emojis dalam pesan (Dipindah ke NaturalFun, jika perlu format emoji
+        // MSG, tambah filter di NaturalFun)
 
         // Format Pesan
         String formatSender = ConfigUtils.getString("chat.msg-format-sender")
