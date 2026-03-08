@@ -121,10 +121,10 @@
             <scope>provided</scope>
         </dependency>
         <dependency>
-            <groupId>dev.lone</groupId>
-            <artifactId>api-itemsadder</artifactId>
+            <groupId>com.github.LoneDev6</groupId>
+            <artifactId>API-ItemsAdder</artifactId>
             <version>4.0.10</version>
-            <scope>system</scope>
+            <scope>provided</scope>
         </dependency>
     </dependencies>
 
