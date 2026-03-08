@@ -57,7 +57,7 @@ public class NaturalCoreExpansion extends PlaceholderExpansion {
             if (rank == null || rank.prefix == null) {
                 return "";
             }
-            String cleanedPrefix = rank.prefix.replace(":", "").trim();
+            String cleanedPrefix = rank.prefix.replace(":", "").replace(" ", "");
             return "%img_" + cleanedPrefix + "%";
         }
 
