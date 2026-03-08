@@ -1,6 +1,8 @@
 package id.naturalsmp.naturalcore;
 
+import dev.lone.itemsadder.api.FontImages.FontImageWrapper;
 import me.clip.placeholderapi.expansion.PlaceholderExpansion;
+import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
@@ -51,14 +53,33 @@ public class NaturalCoreExpansion extends PlaceholderExpansion {
         }
 
         // %naturalcore_playerrank%
+        // Menggunakan ItemsAdder FontImageWrapper untuk langsung resolve
+        // karakter unicode font image, agar bisa dipakai di scoreboard.
         if (params.equalsIgnoreCase("playerrank")) {
             id.naturalsmp.naturalcore.permissions.PermissionManager.RankConfig rank = plugin.getPermissionManager()
                     .getHighestRank(p);
-            if (rank == null || rank.prefix == null) {
-                return "%img__rank-member_%";
+
+            // Ambil nama image dari prefix rank (format: :_rank-member_: )
+            String imageName = "_rank-member_"; // default
+            if (rank != null && rank.prefix != null) {
+                imageName = rank.prefix.replace(":", "").trim();
             }
-            String cleanedPrefix = rank.prefix.replace(":", "").replace(" ", "");
-            return "%img_" + cleanedPrefix + "%";
+
+            // Coba resolve via ItemsAdder API
+            if (Bukkit.getPluginManager().isPluginEnabled("ItemsAdder")) {
+                try {
+                    // Format: "namespace:imagename" -> "naturalprefix:_rank-member_"
+                    FontImageWrapper fontImage = new FontImageWrapper("naturalprefix:" + imageName);
+                    if (fontImage.exists()) {
+                        return fontImage.getString();
+                    }
+                } catch (Exception e) {
+                    plugin.getLogger().warning("Failed to resolve font image: " + imageName);
+                }
+            }
+
+            // Fallback: return raw prefix jika ItemsAdder tidak tersedia
+            return rank != null && rank.prefix != null ? rank.prefix : ":_rank-member_:";
         }
 
         return null;
