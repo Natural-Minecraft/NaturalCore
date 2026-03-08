@@ -197,8 +197,24 @@ rank_price_database:
   # Filters by type='rank', id format: "rank-vip", "rank-mvp", etc.
 
 # ==========================================
-#          FIRST JOIN KIT
+#          PROLOGUE SETTINGS
 # ==========================================
+# First-time players are redirected to this world for the story prologue.
+# Kit is given at the end of prologue via NaturalInteraction rewards.
+prologue:
+  quest-sky-world: "quest_sky"
+  spawn:
+    x: 0.5
+    y: 100
+    z: 0.5
+    yaw: 0
+    pitch: 0
+
+# ==========================================
+#          FIRST JOIN KIT (Legacy)
+# ==========================================
+# NOTE: Kit is now delivered via prologue.json rewards (NaturalInteraction).
+# This section is kept as fallback if quest_sky world is not loaded.
 first-join-kit:
   items:
     - "WOODEN_SWORD:1"
