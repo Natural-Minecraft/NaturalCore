@@ -50,6 +50,17 @@ public class NaturalCoreExpansion extends PlaceholderExpansion {
             return String.valueOf(plugin.getHomeManager().getMaxHomes(p));
         }
 
+        // %naturalcore_playerrank%
+        if (params.equalsIgnoreCase("playerrank")) {
+            id.naturalsmp.naturalcore.permissions.PermissionManager.RankConfig rank = plugin.getPermissionManager()
+                    .getHighestRank(p);
+            if (rank == null || rank.prefix == null) {
+                return "";
+            }
+            String cleanedPrefix = rank.prefix.replace(":", "").trim();
+            return "%img_" + cleanedPrefix + "%";
+        }
+
         return null;
     }
 }
