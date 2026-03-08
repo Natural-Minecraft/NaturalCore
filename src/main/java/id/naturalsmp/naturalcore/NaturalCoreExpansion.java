@@ -55,7 +55,7 @@ public class NaturalCoreExpansion extends PlaceholderExpansion {
             id.naturalsmp.naturalcore.permissions.PermissionManager.RankConfig rank = plugin.getPermissionManager()
                     .getHighestRank(p);
             if (rank == null || rank.prefix == null) {
-                return "";
+                return "%img__rank-member_%";
             }
             String cleanedPrefix = rank.prefix.replace(":", "").replace(" ", "");
             return "%img_" + cleanedPrefix + "%";
