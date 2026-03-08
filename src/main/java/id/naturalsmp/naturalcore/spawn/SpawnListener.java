@@ -24,59 +24,47 @@ public class SpawnListener implements Listener {
         Player p = e.getPlayer();
         String currentWorld = p.getWorld().getName();
 
-        // 1. FIRST JOIN HANDLING (Priority)
+        // 1. FIRST JOIN HANDLING (Priority) — Prologue Redirect
         if (!e.getPlayer().hasPlayedBefore()) {
-            // First Join Kit
-            List<String> kitItems = plugin.getConfig().getStringList("first-join-kit.items");
-            if (kitItems.isEmpty()) {
-                // Fallback Default
-                p.getInventory().addItem(new org.bukkit.inventory.ItemStack(org.bukkit.Material.WOODEN_SWORD));
-                p.getInventory().addItem(new org.bukkit.inventory.ItemStack(org.bukkit.Material.WOODEN_PICKAXE));
-                p.getInventory().addItem(new org.bukkit.inventory.ItemStack(org.bukkit.Material.WOODEN_AXE));
-                p.getInventory().addItem(new org.bukkit.inventory.ItemStack(org.bukkit.Material.WOODEN_SHOVEL));
-                p.getInventory().addItem(new org.bukkit.inventory.ItemStack(org.bukkit.Material.COOKED_BEEF, 16));
-                p.getInventory().addItem(new org.bukkit.inventory.ItemStack(org.bukkit.Material.GOLDEN_SHOVEL)); // Claim
+            // Prologue: teleport to quest_sky world, no kit yet (kit given after prologue)
+            String questWorldName = plugin.getConfig().getString("prologue.quest-sky-world", "quest_sky");
+            org.bukkit.World questWorld = org.bukkit.Bukkit.getWorld(questWorldName);
+
+            if (questWorld != null) {
+                // Read spawn location from config or use world spawn
+                double x = plugin.getConfig().getDouble("prologue.spawn.x", 0.5);
+                double y = plugin.getConfig().getDouble("prologue.spawn.y", 100);
+                double z = plugin.getConfig().getDouble("prologue.spawn.z", 0.5);
+                float yaw = (float) plugin.getConfig().getDouble("prologue.spawn.yaw", 0);
+                float pitch = (float) plugin.getConfig().getDouble("prologue.spawn.pitch", 0);
+
+                org.bukkit.Location questSpawn = new org.bukkit.Location(questWorld, x, y, z, yaw, pitch);
+                p.teleport(questSpawn);
+
+                // Set adventure mode to prevent breaking blocks
+                p.setGameMode(org.bukkit.GameMode.ADVENTURE);
+
+                // Make player invisible for cinematic feel
+                p.addPotionEffect(
+                        new org.bukkit.potion.PotionEffect(org.bukkit.potion.PotionEffectType.INVISIBILITY,
+                                Integer.MAX_VALUE, 0, false, false, false));
+
+                // Screen fade-in effect using ScreenEffects addon
+                org.bukkit.Bukkit.getScheduler().runTaskLater(plugin, () -> {
+                    org.bukkit.Bukkit.dispatchCommand(org.bukkit.Bukkit.getConsoleSender(),
+                            "screeneffect fullscreen BLACK 20 40 20 freeze " + p.getName());
+                }, 5L); // Small delay to ensure player is loaded
+
+                p.setAllowFlight(false);
+                p.setFlying(false);
             } else {
-                for (String itemStr : kitItems) {
-                    try {
-                        String[] parts = itemStr.split(":");
-                        org.bukkit.Material mat = org.bukkit.Material.valueOf(parts[0]);
-                        int amount = parts.length > 1 ? Integer.parseInt(parts[1]) : 1;
-                        p.getInventory().addItem(new org.bukkit.inventory.ItemStack(mat, amount));
-                    } catch (Exception ignored) {
-                    }
-                }
+                // Fallback: quest_sky world not loaded — use old behavior
+                plugin.getLogger().warning("Prologue world '" + questWorldName + "' not found! Using default spawn.");
+                plugin.getSpawnManager().teleport(p);
+                p.setAllowFlight(false);
+                p.setFlying(false);
             }
 
-            // Armor
-            String helmet = plugin.getConfig().getString("first-join-kit.armor.helmet", "LEATHER_HELMET");
-            String chest = plugin.getConfig().getString("first-join-kit.armor.chestplate", "LEATHER_CHESTPLATE");
-            String legs = plugin.getConfig().getString("first-join-kit.armor.leggings", "LEATHER_LEGGINGS");
-            String boots = plugin.getConfig().getString("first-join-kit.armor.boots", "LEATHER_BOOTS");
-
-            try {
-                if (!helmet.equals("AIR"))
-                    p.getInventory()
-                            .setHelmet(new org.bukkit.inventory.ItemStack(org.bukkit.Material.valueOf(helmet)));
-                if (!chest.equals("AIR"))
-                    p.getInventory()
-                            .setChestplate(new org.bukkit.inventory.ItemStack(org.bukkit.Material.valueOf(chest)));
-                if (!legs.equals("AIR"))
-                    p.getInventory()
-                            .setLeggings(new org.bukkit.inventory.ItemStack(org.bukkit.Material.valueOf(legs)));
-                if (!boots.equals("AIR"))
-                    p.getInventory()
-                            .setBoots(new org.bukkit.inventory.ItemStack(org.bukkit.Material.valueOf(boots)));
-            } catch (Exception ignored) {
-            }
-
-            p.sendMessage(ChatUtils.colorize("&aWelcome to NaturalSMP! You received a starter kit."));
-
-            // Teleport to spawn for first join
-            plugin.getSpawnManager().teleport(p);
-
-            p.setAllowFlight(false);
-            p.setFlying(false);
             return; // Done with first join
         }
 

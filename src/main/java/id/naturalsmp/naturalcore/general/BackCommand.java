@@ -56,10 +56,12 @@ public class BackCommand implements CommandExecutor {
             return true;
         }
 
-        // Prevent returning *to* or *from* a dungeon world
-        if (p.getWorld().getName().toLowerCase().startsWith("dungeon") ||
-                (backLoc.getWorld() != null && backLoc.getWorld().getName().toLowerCase().startsWith("dungeon"))) {
-            p.sendMessage(ChatUtils.colorize(prefix + "&cPerintah /back diblokir untuk wilayah Dungeon!"));
+        // Prevent returning *to* or *from* a dungeon world or quest_sky
+        String currentWorldName = p.getWorld().getName().toLowerCase();
+        String backWorldName = backLoc.getWorld() != null ? backLoc.getWorld().getName().toLowerCase() : "";
+        if (currentWorldName.startsWith("dungeon") || currentWorldName.equals("quest_sky") ||
+                backWorldName.startsWith("dungeon") || backWorldName.equals("quest_sky")) {
+            p.sendMessage(ChatUtils.colorize(prefix + "&cPerintah /back diblokir untuk wilayah ini!"));
             p.playSound(p.getLocation(), Sound.BLOCK_NOTE_BLOCK_BASS, 1f, 0.5f);
             return true;
         }
