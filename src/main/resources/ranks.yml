@@ -13,7 +13,7 @@ ranks:
     weight: 0
     gui:
       item: COAL
-      name: "&7&lMEMBER"
+      name: "&7&lMEMBER &8|| &r%img__rank-member_%"
       benefits:
         - "&8» &fRank Default Player"
         - "&8» &fHome Limit: &e3 Home"
@@ -103,15 +103,16 @@ ranks:
     inherit: member
     gui:
       item: LAPIS_LAZULI
-      name: " &d&lMIDI"
+      name: "&d&lMIDI &8|| &r%img__rank-midi_%"
       benefits:
         - "&8» &fAkses &e/back &7(Teleport Ke Tempat Sebelumnya)"
         - "&8» &fAkses &e/chatcolor &7(Ubah Warna Chat)"
-        - "&8» &fAkses ColorChat &r &d&lMIDI"
+        - "&8» &fAkses ColorChat &r%img__rank-midi_% &d&lMIDI"
         - "&8» &fHome Limit: &e5 Home"
         - "&8» &fKematian tidak mengurangi EXP"
         - "&8» &fBlock Claim Limit: &425.000 Blok"
         - "&8» &fClaim Limit: &410 Claim"
+        - "&8» &fSell Multiplier: &e1.05x"
     permissions:
       - naturalsmp.enderchest
       - naturalsmp.back
@@ -128,16 +129,17 @@ ranks:
     inherit: midi
     gui:
       item: IRON_INGOT
-      name: " &a&lVIP"
+      name: "&a&lVIP &8|| &r%img__rank-vip_%"
       benefits:
         - "&8» &fSemua Fitur &d&lMIDI"
         - "&8» &fAkses &e/hat &7(Item di Kepala!)"
         - "&8» &fAkses &e/trash &7(Tempat Sampah)"
         - "&8» &fAkses &e/resource &7(Dunia Resource)"
-        - "&8» &fAkses ColorChat &r &a&lVIP"
+        - "&8» &fAkses ColorChat &r%img__rank-vip_% &a&lVIP"
         - "&8» &fHome Limit: &e10 Home"
         - "&8» &fBlock Claim Limit: &450.000 Blok"
         - "&8» &fClaim Limit: &420 Claim"
+        - "&8» &fSell Multiplier: &e1.1x"
     permissions:
       - naturalsmp.hat
       - naturalsmp.trash
@@ -155,15 +157,16 @@ ranks:
     inherit: vip
     gui:
       item: GOLD_INGOT
-      name: " &b&lMVP"
+      name: "&b&lMVP &8|| &r%img__rank-mvp_%"
       benefits:
         - "&8» &fSemua Fitur &a&lVIP"
         - "&8» &fAkses &e/nick &7(Nama Samaran)"
         - "&8» &fAkses &e/fly &7(Terbang di Survival)"
-        - "&8» &fAkses ColorChat &r &b&lMVP"
+        - "&8» &fAkses ColorChat &r%img__rank-mvp_% &b&lMVP"
         - "&8» &fHome Limit: &e20 Home"
         - "&8» &fBlock Claim Limit: &4150.000 Blok"
         - "&8» &fClaim Limit: &440 Claim"
+        - "&8» &fSell Multiplier: &e1.2x"
     permissions:
       - naturalsmp.fly
       - naturalsmp.craft
@@ -182,15 +185,16 @@ ranks:
     inherit: mvp
     gui:
       item: DIAMOND
-      name: " &e&lNATURE"
+      name: "&e&lNATURE &8|| &r%img__rank-nature_%"
       benefits:
         - "&8» &fSemua Fitur &b&lMVP"
         - "&8» &fChat Color Style (&kMagic&f, &lBold&f, dll)"
-        - "&8» &fAkses ColorChat &r &e&lNATURE"
+        - "&8» &fAkses ColorChat &r%img__rank-nature_% &e&lNATURE"
         - "&8» &fNature Join Announcement"
         - "&8» &fPriority Join (Server Full)"
         - "&8» &fBlock Claim Limit: &4500.000 Blok"
         - "&8» &fClaim Limit: &480 Claim"
+        - "&8» &fSell Multiplier: &e1.3x"
     permissions:
       - naturalsmp.priority
       - naturalsmp.temperature.immune
@@ -204,24 +208,32 @@ rank-lainnya:
   winter:
     display: "&bWinter"
     prefix: ":_prefix-winter_: "
+    weight: 5
   youtube:
     display: "&cYou&fTube"
     prefix: ":_youtuber_: "
+    weight: 15
   tiktok:
     display: "&bTikTok"
     prefix: ":_tiktoker_: "
+    weight: 15
   helper:
     display: "&bHelper"
     prefix: ":_staff-helper-server_: "
+    weight: 25
   moderator:
     display: "&2Moderator"
     prefix: ":_staff-moderator-server_: "
+    weight: 30
   admin:
     display: "&c&lAdmin"
     prefix: ":_staff-admin-server_: "
+    weight: 1000
   developer:
     display: "&2Developer"
     prefix: ":_staff-developer-server_: "
+    weight: 2000
   owner:
     display: "&6Owner"
     prefix: ":_owner-server_: "
+    weight: 3000

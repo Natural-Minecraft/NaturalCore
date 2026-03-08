@@ -54,7 +54,17 @@ public class PermissionManager {
         YamlConfiguration config = YamlConfiguration.loadConfiguration(configFile);
         ranks.clear();
 
-        ConfigurationSection section = config.getConfigurationSection("ranks");
+        // Load dari section "ranks" (donator ranks: member, midi, vip, mvp, nature)
+        loadSection(config, "ranks");
+
+        // Load dari section "rank-lainnya" (staff, content creator, dll)
+        loadSection(config, "rank-lainnya");
+
+        plugin.getLogger().info("Loaded " + ranks.size() + " ranks from ranks.yml");
+    }
+
+    private void loadSection(YamlConfiguration config, String sectionName) {
+        ConfigurationSection section = config.getConfigurationSection(sectionName);
         if (section == null)
             return;
 
@@ -65,7 +75,8 @@ public class PermissionManager {
 
             RankConfig rank = new RankConfig();
             rank.id = key;
-            rank.displayName = ChatUtils.colorize(rankSection.getString("display", "&7" + key));
+            rank.section = sectionName;
+            rank.displayName = ChatUtils.colorize(rankSection.getString("display", "\u00267" + key));
             rank.prefix = rankSection.getString("prefix", "");
             rank.weight = rankSection.getInt("weight", 0);
             rank.permissions = rankSection.getStringList("permissions");
@@ -84,7 +95,6 @@ public class PermissionManager {
             ranks.put(rank.id, rank);
             registerBukkitPermission(rank);
         }
-        plugin.getLogger().info("Loaded " + ranks.size() + " ranks from ranks.yml");
     }
 
     private void registerBukkitPermission(RankConfig rank) {
@@ -146,7 +156,7 @@ public class PermissionManager {
                 lp.getGroupManager().saveGroup(group);
             });
         }
-        plugin.getLogger().info("Ranks synced to LuckPerms groups successfully! 🔑");
+        plugin.getLogger().info("Ranks synced to LuckPerms groups successfully! \uD83D\uDD11");
     }
 
     public RankConfig getHighestRank(org.bukkit.entity.Player player) {
@@ -200,10 +210,14 @@ public class PermissionManager {
 
     private void saveToConfig() {
         YamlConfiguration config = new YamlConfiguration();
-        ConfigurationSection section = config.createSection("ranks");
         for (RankConfig rank : ranks.values()) {
-            ConfigurationSection rSec = section.createSection(rank.id);
-            rSec.set("display", rank.displayName.replace("§", "&"));
+            String sectionName = rank.section != null ? rank.section : "ranks";
+            ConfigurationSection parentSection = config.getConfigurationSection(sectionName);
+            if (parentSection == null) {
+                parentSection = config.createSection(sectionName);
+            }
+            ConfigurationSection rSec = parentSection.createSection(rank.id);
+            rSec.set("display", rank.displayName.replace("\u00a7", "&"));
             rSec.set("prefix", rank.prefix);
             rSec.set("weight", rank.weight);
             rSec.set("permissions", rank.permissions);
@@ -212,7 +226,7 @@ public class PermissionManager {
             if (rank.guiItem != null) {
                 ConfigurationSection g = rSec.createSection("gui");
                 g.set("item", rank.guiItem);
-                g.set("name", rank.guiName.replace("§", "&"));
+                g.set("name", rank.guiName.replace("\u00a7", "&"));
                 g.set("benefits", rank.guiBenefits);
             }
         }
@@ -225,6 +239,7 @@ public class PermissionManager {
 
     public static class RankConfig {
         public String id;
+        public String section; // "ranks" atau "rank-lainnya"
         public String displayName;
         public String prefix;
         public int weight;
