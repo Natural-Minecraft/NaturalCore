@@ -170,7 +170,7 @@ public class RankGUI implements Listener {
             lore.add(ChatUtils.toComponent("&e• Semua rank berlaku &f30 Hari"));
             lore.add(ChatUtils.toComponent("&e• Perpanjang otomatis via website"));
             lore.add(Component.empty());
-            lore.add(ChatUtils.toComponent("&b→ store.naturalsmp.id"));
+            lore.add(ChatUtils.toComponent("&b→ store.naturalsmp.net"));
 
             meta.lore(lore);
             item.setItemMeta(meta);

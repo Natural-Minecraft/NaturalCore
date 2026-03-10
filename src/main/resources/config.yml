@@ -193,7 +193,7 @@ rank_price_database:
   username: "nsmp_website"
   password: ""
   table: "products"
-  # Uses existing 'products' table from store.naturalsmp.id
+  # Uses existing 'products' table from store.naturalsmp.net
   # Filters by type='rank', id format: "rank-vip", "rank-mvp", etc.
 
 # ==========================================
