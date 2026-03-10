@@ -392,6 +392,24 @@ commands:
   start:
     description: Menu awal pemilihan dunia (Survival/Resource/Dungeon)
 
+  # --- SOCIAL LINKS ---
+  links:
+    description: Tampilkan link official NaturalSMP
+  vote:
+    description: Tampilkan link vote NaturalSMP
+  discord:
+    description: Tampilkan link discord NaturalSMP
+  instagram:
+    description: Tampilkan link instagram NaturalSMP
+  whatsapp:
+    description: Tampilkan link whatsapp NaturalSMP
+  appeal:
+    description: Tampilkan link appeal NaturalSMP
+  wiki:
+    description: Tampilkan link wiki NaturalSMP
+  tiktok:
+    description: Tampilkan link tiktok NaturalSMP
+
 permissions:
   naturalsmp.admin:
     default: op

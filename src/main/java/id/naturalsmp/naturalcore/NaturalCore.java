@@ -527,6 +527,17 @@ public final class NaturalCore extends JavaPlugin {
         getServer().getPluginManager().registerEvents(topupGUI, this);
         registerCmd("topupnotification", new TopupCommand(this, topupGUI));
 
+        // 25.5. Social Links
+        SocialCommand socialCmd = new SocialCommand();
+        registerCmd("links", socialCmd);
+        registerCmd("vote", socialCmd);
+        registerCmd("discord", socialCmd);
+        registerCmd("instagram", socialCmd);
+        registerCmd("whatsapp", socialCmd);
+        registerCmd("appeal", socialCmd);
+        registerCmd("wiki", socialCmd);
+        registerCmd("tiktok", socialCmd);
+
         // 26. Sell Confirmation System (v2.2.2)
         SellConfirmCommand sellConfirmHandler = new SellConfirmCommand();
         registerCmd("sellall", sellConfirmHandler);

@@ -233,6 +233,10 @@ rank-lainnya:
     display: "&2Developer"
     prefix: ":_staff-developer-server_: "
     weight: 2000
+  ai:
+    display: "&2AI"
+    prefix: " &f&r  "
+    weight: 2500
   owner:
     display: "&6Owner"
     prefix: ":_owner-server_: "
