@@ -60,6 +60,17 @@ public class ChatUtils {
         return ChatColor.translateAlternateColorCodes('&', result);
     }
 
+    /**
+     * Parse PlaceholderAPI tags safely if the plugin is available.
+     */
+    public static String setPlaceholders(Player player, String text) {
+        if (text == null || text.isEmpty()) return text;
+        if (org.bukkit.Bukkit.getPluginManager().getPlugin("PlaceholderAPI") != null) {
+            return me.clip.placeholderapi.PlaceholderAPI.setPlaceholders(player, text);
+        }
+        return text;
+    }
+
     public static String serialize(net.kyori.adventure.text.Component component) {
         if (component == null)
             return "";
@@ -211,6 +222,8 @@ public class ChatUtils {
         String result = message
                 .replace("%displayname%", displayName)
                 .replace("%player%", p.getName());
+
+        result = setPlaceholders(p, result);
 
         // 4. Colorize hasil akhirnya
         return colorize(result);

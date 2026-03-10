@@ -87,6 +87,7 @@ public class RankGUI implements Listener {
             boolean isOwned = p.hasPermission("group." + rankId);
 
             inv.setItem(RANK_SLOTS[i], createRankItem(
+                    p,
                     RANK_MATERIALS[i],
                     RANK_COLORS[i],
                     rankId.toUpperCase(),
@@ -108,13 +109,16 @@ public class RankGUI implements Listener {
         p.openInventory(inv);
     }
 
-    private ItemStack createRankItem(Material mat, String color, String rankName, double priceRP, double priceNC,
+    private ItemStack createRankItem(Player p, Material mat, String color, String rankName, double priceRP, double priceNC,
             double discountedRP, double discountedNC, int discount, List<String> benefits, boolean isOwned) {
         ItemStack item = new ItemStack(mat);
         ItemMeta meta = item.getItemMeta();
         if (meta != null) {
-            meta.displayName(ChatUtils
-                    .toComponent(color + "<b>✦ " + rankName + " ✦</b>" + color.replace("<", "</").replace(">", ">")));
+            String displayNameRaw = color + "<b>✦ " + rankName + " ✦</b>" + color.replace("<", "</").replace(">", ">");
+            if (Bukkit.getPluginManager().getPlugin("PlaceholderAPI") != null) {
+                displayNameRaw = me.clip.placeholderapi.PlaceholderAPI.setPlaceholders(p, displayNameRaw);
+            }
+            meta.displayName(ChatUtils.toComponent(displayNameRaw));
 
             List<Component> componentLore = new ArrayList<>();
             componentLore.add(Component.empty());
@@ -124,7 +128,11 @@ public class RankGUI implements Listener {
             // Benefits
             componentLore.add(ChatUtils.toComponent("&e&lBenefits:"));
             for (String benefit : benefits) {
-                componentLore.add(ChatUtils.toComponent("&8• &7" + benefit));
+                String parsedBenefit = "&8• &7" + benefit;
+                if (Bukkit.getPluginManager().getPlugin("PlaceholderAPI") != null) {
+                    parsedBenefit = me.clip.placeholderapi.PlaceholderAPI.setPlaceholders(p, parsedBenefit);
+                }
+                componentLore.add(ChatUtils.toComponent(parsedBenefit));
             }
 
             componentLore.add(Component.empty());

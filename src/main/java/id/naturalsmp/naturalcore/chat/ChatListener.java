@@ -491,6 +491,11 @@ public class ChatListener implements Listener {
                         prefix = plugin.getVaultManager().getChat().getPlayerPrefix(player);
                 }
 
+                // Apply Placeholders
+                tag = ChatUtils.setPlaceholders(player, tag);
+                prefix = ChatUtils.setPlaceholders(player, prefix);
+                tierSuffix = ChatUtils.setPlaceholders(player, tierSuffix);
+
                 // USE LEGACY SECTION for colorized strings
                 Component playerPart = legacySection.deserialize(ChatUtils.colorize(tag))
                                 .append(legacySection.deserialize(ChatUtils.colorize(prefix)))
