@@ -202,10 +202,10 @@ rank_price_database:
 # First-time players are redirected to this world for the story prologue.
 # Kit is given at the end of prologue via NaturalInteraction rewards.
 prologue:
-  quest-sky-world: "quest_sky"
+  quest-sky-world: "story_sky"
   spawn:
     x: 0.5
-    y: 100
+    y: 201
     z: 0.5
     yaw: 0
     pitch: 0
