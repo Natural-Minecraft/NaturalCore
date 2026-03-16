@@ -12,14 +12,21 @@ public class Connection {
     public PrintWriter out;
     public BufferedReader in;
     
+    private String ip;
+    private int port;
+
     public Connection(String ip, int port) {
-        try {
-            clientSocket = new Socket(ip, port);
-            out = new PrintWriter(clientSocket.getOutputStream(), true);
-            in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
-        } catch (IOException e) {
-            e.printStackTrace();
+        this.ip = ip;
+        this.port = port;
+    }
+
+    public void connect() throws IOException {
+        if (clientSocket != null && !clientSocket.isClosed()) {
+            clientSocket.close();
         }
+        clientSocket = new Socket(ip, port);
+        out = new PrintWriter(clientSocket.getOutputStream(), true);
+        in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
     }
 
     public boolean isConnected() {

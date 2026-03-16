@@ -26,28 +26,21 @@ public class ConnectionManager {
             
             @Override
             public void run() {
-                if (connection.isConnected()) {
-                    
-                    isConnected = true;
-                    
+                if (!connection.isConnected()) {
                     try {
-                        if (connection.out == null) {
-                            connection.out = new PrintWriter(connection.clientSocket.getOutputStream());
-                        }
-                        if (connection.in == null) {
-                            connection.in = new BufferedReader(new InputStreamReader(connection.clientSocket.getInputStream()));
-                        }
+                        connection.connect();
                     } catch (IOException e) {
-                        e.printStackTrace();
+                        unableToConnect();
+                        return; // Retry next time
                     }
-                    
-                    sendMessage("name " + name);
-                    sendMessage("password " + password);
-                    instance.getLogger().info("Connected to Velocity Sync server.");
-                    cancel();
-                } else {
-                    unableToConnect();
                 }
+                
+                isConnected = true;
+                
+                sendMessage("name " + name);
+                sendMessage("password " + password);
+                instance.getLogger().info("Connected to Velocity Sync server.");
+                cancel();
             }
         }.runTaskTimerAsynchronously(instance, 0, 40);
     }
