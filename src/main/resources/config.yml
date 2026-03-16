@@ -234,6 +234,7 @@ first-join-kit:
 # ==========================================
 sync:
   enabled: true
+  host: "127.0.0.1"
   port: 25666
-  name: "natural-smp"
+  name: "spigot-backend"
   password: "defaultPassword"

@@ -14,8 +14,8 @@ public class ConnectionManager {
     private final Connection connection;
     private volatile boolean isConnected = false;
 
-    public ConnectionManager(NaturalCore instance, int port, String name, String password) {
-        connection = new Connection("127.0.0.1", port);
+    public ConnectionManager(NaturalCore instance, String host, int port, String name, String password) {
+        connection = new Connection(host, port);
 
         // Continuously try to connect to the server
         new BukkitRunnable() {

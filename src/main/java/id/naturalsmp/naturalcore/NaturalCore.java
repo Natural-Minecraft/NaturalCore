@@ -549,13 +549,14 @@ public final class NaturalCore extends JavaPlugin {
 
         // 27. Sync Client
         if (getConfig().getBoolean("sync.enabled", false)) {
+            String syncHost = getConfig().getString("sync.host", "127.0.0.1");
             int syncPort = getConfig().getInt("sync.port", 25666);
             String syncName = getConfig().getString("sync.name", "naturalcore");
             String syncPassword = getConfig().getString("sync.password", "defaultPassword");
             
-            this.connectionManager = new ConnectionManager(this, syncPort, syncName, syncPassword);
+            this.connectionManager = new ConnectionManager(this, syncHost, syncPort, syncName, syncPassword);
             registerCmd("sync", new SyncCommand(this));
-            getLogger().info("Sync client initialized on port " + syncPort);
+            getLogger().info("Sync client initialized pointing to " + syncHost + ":" + syncPort);
         }
 
         // Selesai
