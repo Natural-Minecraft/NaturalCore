@@ -82,6 +82,16 @@ public class NaturalCoreExpansion extends PlaceholderExpansion {
             return rank != null && rank.prefix != null ? rank.prefix : ":_rank-member_:";
         }
 
+        // %naturalcore_playerrank_bedrock%
+        if (params.equalsIgnoreCase("playerrank_bedrock")) {
+            id.naturalsmp.naturalcore.permissions.PermissionManager.RankConfig rank = plugin.getPermissionManager()
+                    .getHighestRank(p);
+            
+            if (rank == null) return "Member";
+            
+            return rank.prefix_bedrock != null ? rank.prefix_bedrock : rank.displayName;
+        }
+
         return null;
     }
 }

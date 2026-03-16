@@ -78,6 +78,7 @@ public class PermissionManager {
             rank.section = sectionName;
             rank.displayName = ChatUtils.colorize(rankSection.getString("display", "\u00267" + key));
             rank.prefix = rankSection.getString("prefix", "");
+            rank.prefix_bedrock = rankSection.getString("prefix_bedrock", rank.displayName); // Fallback to display name
             rank.weight = rankSection.getInt("weight", 0);
             rank.permissions = rankSection.getStringList("permissions");
             rank.inheritance = rankSection.getString("inherit");
@@ -219,6 +220,7 @@ public class PermissionManager {
             ConfigurationSection rSec = parentSection.createSection(rank.id);
             rSec.set("display", rank.displayName.replace("\u00a7", "&"));
             rSec.set("prefix", rank.prefix);
+            rSec.set("prefix_bedrock", rank.prefix_bedrock);
             rSec.set("weight", rank.weight);
             rSec.set("permissions", rank.permissions);
             rSec.set("inherit", rank.inheritance);
@@ -242,6 +244,7 @@ public class PermissionManager {
         public String section; // "ranks" atau "rank-lainnya"
         public String displayName;
         public String prefix;
+        public String prefix_bedrock;
         public int weight;
         public List<String> permissions;
         public String inheritance;
