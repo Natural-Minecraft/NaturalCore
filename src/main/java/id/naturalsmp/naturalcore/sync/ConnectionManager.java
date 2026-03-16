@@ -17,32 +17,35 @@ public class ConnectionManager {
     public ConnectionManager(NaturalCore instance, String host, int port, String name, String password) {
         connection = new Connection(host, port);
 
-        // Continuously try to connect to the server
+        // Continuously run background tasks to maintain connection
         new BukkitRunnable() {
-            
-            private void unableToConnect() {
-                instance.getLogger().warning("Unable to connect to the Velocity Sync instance");
-            }
-            
             @Override
             public void run() {
-                if (!connection.isConnected()) {
+                if (!isConnected) {
                     try {
                         connection.connect();
+                        isConnected = true;
+                        
+                        // Authorize and identify
+                        connection.sendMessage("name " + name);
+                        connection.sendMessage("password " + password);
+                        instance.getLogger().info("Connected to Velocity Sync server on " + host + ":" + port);
                     } catch (IOException e) {
-                        unableToConnect();
-                        return; // Retry next time
+                        // Silent fail or occasional log to avoid spam
+                        // We do not want to spam "Unable to connect" every 2 seconds
+                        return;
+                    }
+                } else {
+                    // Send Keep Alive to check and maintain the connection
+                    try {
+                        connection.sendMessage("keep alive packet");
+                    } catch (IOException e) {
+                        instance.getLogger().warning("Connection to Velocity Sync server lost. Reconnecting...");
+                        isConnected = false; // Trigger reconnect next tick
                     }
                 }
-                
-                isConnected = true;
-                
-                sendMessage("name " + name);
-                sendMessage("password " + password);
-                instance.getLogger().info("Connected to Velocity Sync server.");
-                cancel();
             }
-        }.runTaskTimerAsynchronously(instance, 0, 40);
+        }.runTaskTimerAsynchronously(instance, 40, 40); // Run every 2 seconds
     }
 
     public void dispatchCommand(String command) {
@@ -55,10 +58,11 @@ public class ConnectionManager {
     }
     
     private void sendMessage(String message) {
-        try {       
-            if (isConnected) connection.sendMessage(message);
+        if (!isConnected) return;
+        try {
+            connection.sendMessage(message);
         } catch (IOException e) {
-            e.printStackTrace();
+            isConnected = false;
         }
     }
 

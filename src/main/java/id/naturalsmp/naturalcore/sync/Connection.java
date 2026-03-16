@@ -36,6 +36,11 @@ public class Connection {
     public void sendMessage(String msg) throws IOException {
         if (out != null) {
             out.println(msg);
+            if (out.checkError()) {
+                throw new IOException("Connection dropped or write failed");
+            }
+        } else {
+            throw new IOException("OutputStream is null");
         }
     }
 }
