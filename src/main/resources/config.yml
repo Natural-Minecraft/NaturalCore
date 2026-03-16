@@ -228,3 +228,12 @@ first-join-kit:
     chestplate: "LEATHER_CHESTPLATE"
     leggings: "LEATHER_LEGGINGS"
     boots: "LEATHER_BOOTS"
+
+# ==========================================
+#          SYNC SYSTEM (Velocity)
+# ==========================================
+sync:
+  enabled: true
+  port: 25666
+  name: "natural-smp"
+  password: "defaultPassword"

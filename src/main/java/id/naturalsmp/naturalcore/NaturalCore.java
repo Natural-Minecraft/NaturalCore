@@ -20,6 +20,8 @@ import id.naturalsmp.naturalcore.utility.EnvironmentCommand;
 import id.naturalsmp.naturalcore.general.*;
 import id.naturalsmp.naturalcore.teleport.TeleportManager;
 import id.naturalsmp.naturalcore.utility.*;
+import id.naturalsmp.naturalcore.sync.ConnectionManager;
+import id.naturalsmp.naturalcore.sync.SyncCommand;
 
 import id.naturalsmp.naturalcore.teleport.TeleportCommand;
 
@@ -119,6 +121,7 @@ public final class NaturalCore extends JavaPlugin {
     private RankPriceDatabase rankPriceDatabase;
     private id.naturalsmp.naturalcore.database.NaturalCoreDatabase coreDatabase;
     private ChatGameManager chatGameManager;
+    private ConnectionManager connectionManager;
 
     @Override
     public void onEnable() {
@@ -544,6 +547,17 @@ public final class NaturalCore extends JavaPlugin {
         registerCmd("sellhand", sellConfirmHandler);
         registerCmd("sellhandall", sellConfirmHandler);
 
+        // 27. Sync Client
+        if (getConfig().getBoolean("sync.enabled", false)) {
+            int syncPort = getConfig().getInt("sync.port", 25666);
+            String syncName = getConfig().getString("sync.name", "naturalcore");
+            String syncPassword = getConfig().getString("sync.password", "defaultPassword");
+            
+            this.connectionManager = new ConnectionManager(this, syncPort, syncName, syncPassword);
+            registerCmd("sync", new SyncCommand(this));
+            getLogger().info("Sync client initialized on port " + syncPort);
+        }
+
         // Selesai
         getLogger().info(
                 ChatUtils.colorize("&6&lNaturalCore v" + getDescription().getVersion() + " &asudah aktif sepenuhnya!"));
@@ -644,6 +658,9 @@ public final class NaturalCore extends JavaPlugin {
         }
         if (healthManager != null) {
             healthManager.stop();
+        }
+        if (connectionManager != null) {
+            connectionManager.shutdown();
         }
         if (playtimeManager != null) {
             playtimeManager.stop();
@@ -789,6 +806,10 @@ public final class NaturalCore extends JavaPlugin {
 
     public ChatGameManager getChatGameManager() {
         return chatGameManager;
+    }
+
+    public ConnectionManager getConnectionManager() {
+        return connectionManager;
     }
 
     public RankPriceDatabase getRankPriceDatabase() {
