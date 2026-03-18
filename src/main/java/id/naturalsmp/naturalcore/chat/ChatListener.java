@@ -408,6 +408,28 @@ public class ChatListener implements Listener {
         }
 
         private Component processCustomFormatters(Component message) {
+                // Web Links (naturalsmp.net)
+                message = message.replaceText(TextReplacementConfig.builder()
+                                .match(Pattern.compile("(?i)\\b(?:(?:www|store|vote|discord|instagram|dc|ig|tiktok|tt|links)\\.)?naturalsmp\\.net\\b"))
+                                .replacement((result, builder) -> {
+                                        String matched = result.group();
+                                        return Component.text(matched)
+                                                        .color(NamedTextColor.BLUE)
+                                                        .decorate(net.kyori.adventure.text.format.TextDecoration.UNDERLINED)
+                                                        .clickEvent(ClickEvent.openUrl("https://" + matched))
+                                                        .hoverEvent(HoverEvent.showText(Component.text("Klik untuk membuka link!", NamedTextColor.GRAY)));
+                                })
+                                .build());
+
+                // [match:text]
+                message = message.replaceText(TextReplacementConfig.builder()
+                                .match(Pattern.compile("(?i)\\[match:([^\\]]+)\\]"))
+                                .replacement((result, builder) -> {
+                                        String text = result.group(1);
+                                        return aestheticBracket(Component.text(text).color(NamedTextColor.WHITE));
+                                })
+                                .build());
+
                 // [/command]
                 message = message.replaceText(TextReplacementConfig.builder()
                                 .match(Pattern.compile("\\[/([^\\]]+)\\]"))
