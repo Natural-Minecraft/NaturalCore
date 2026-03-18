@@ -3,6 +3,7 @@ package id.naturalsmp.naturalcore.hud.components;
 import id.naturalsmp.naturalcore.NaturalCore;
 import id.naturalsmp.naturalcore.hud.HUDPriority;
 import id.naturalsmp.naturalcore.utils.ChatUtils;
+import id.naturalsmp.naturalcore.utils.ConfigUtils;
 import org.bukkit.entity.Player;
 
 /**

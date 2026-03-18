@@ -108,6 +108,13 @@ chat:
 # TIPS settings moved to text/tips.yml
 
 # ==========================================
+#         TEMPERATURE SETTINGS
+# ==========================================
+temperature:
+  freezing_threshold: -10.0
+  overheating_threshold: 75.0
+
+# ==========================================
 #              AFK SETTINGS
 # ==========================================
 afk:
