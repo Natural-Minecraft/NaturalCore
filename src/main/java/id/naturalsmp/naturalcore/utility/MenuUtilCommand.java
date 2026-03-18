@@ -56,8 +56,7 @@ public class MenuUtilCommand implements CommandExecutor {
                 return true;
             }
             // Membuka Anvil Virtual (Bukan GUI custom, tapi native inventory)
-            p.openInventory(
-                    GUIUtils.createGUI(null, org.bukkit.event.inventory.InventoryType.ANVIL, "Repair & Rename"));
+            p.openAnvil(null, true);
             p.sendMessage(ChatUtils.colorize(prefix + ConfigUtils.getString("messages.utils.anvil-opened")));
             p.playSound(p.getLocation(), org.bukkit.Sound.BLOCK_ANVIL_USE, 1f, 1f); // Use with care, loud
             return true;
