@@ -182,6 +182,14 @@ public class ConfigUtils {
         return getConfig().getBoolean(path, def);
     }
 
+    public static double getDouble(String path) {
+        return getConfig().getDouble(path);
+    }
+
+    public static double getDouble(String path, double def) {
+        return getConfig().getDouble(path, def);
+    }
+
     public static List<String> getStringList(String path) {
         // Jika path dimulai dengan "messages.", ambil dari messages.yml
         if (path.startsWith("messages.")) {

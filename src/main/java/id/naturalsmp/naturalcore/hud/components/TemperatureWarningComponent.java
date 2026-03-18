@@ -11,8 +11,13 @@ import org.bukkit.entity.Player;
  */
 public class TemperatureWarningComponent extends AbstractHUDComponent {
 
-    private static final double COLD_THRESHOLD = 0.0; // Below 0°C = freezing
-    private static final double HOT_THRESHOLD = 45.0; // Above 45°C = overheating
+    private double getColdThreshold() {
+        return ConfigUtils.getDouble("temperature.freezing_threshold", -10.0);
+    }
+
+    private double getHotThreshold() {
+        return ConfigUtils.getDouble("temperature.overheating_threshold", 75.0);
+    }
 
     // Slow blink: 1.5s ON, 0.5s OFF (40 ticks total cycle)
     private static final int BLINK_ON_DURATION = 30; // 1.5 seconds
@@ -33,7 +38,7 @@ public class TemperatureWarningComponent extends AbstractHUDComponent {
             return false;
         // STRICT check: ONLY display if actually critical.
         // This ensures lower priority HUDs (like Tips) can show up when temp is normal.
-        return temp <= COLD_THRESHOLD || temp >= HOT_THRESHOLD;
+        return temp <= getColdThreshold() || temp >= getHotThreshold();
     }
 
     @Override
@@ -54,7 +59,7 @@ public class TemperatureWarningComponent extends AbstractHUDComponent {
     }
 
     private String getFullWarning(double temp, int tick) {
-        if (temp < COLD_THRESHOLD) {
+        if (temp < getColdThreshold()) {
             // Freezing - ice blue gradient
             String icon = (tick % 20 < 10) ? "❄" : "🥶";
             return "<gradient:#00BFFF:#87CEEB>" + icon + " FREEZING! " + icon + "</gradient> &8» &b"
@@ -69,7 +74,7 @@ public class TemperatureWarningComponent extends AbstractHUDComponent {
 
     private String getDimmedWarning(double temp) {
         // Dimmed version for blink OFF phase - keeps context visible
-        if (temp < COLD_THRESHOLD) {
+        if (temp < getColdThreshold()) {
             return "&8❄ &7FREEZING... &8" + String.format("%.1f", temp) + "°C";
         } else {
             return "&8🔥 &7OVERHEATING... &8" + String.format("%.1f", temp) + "°C";
