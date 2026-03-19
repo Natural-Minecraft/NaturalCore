@@ -55,7 +55,7 @@ public class MenuUtilCommand implements CommandExecutor {
                 p.sendMessage(ConfigUtils.getString("messages.global.no-permission"));
                 return true;
             }
-            // Membuka Anvil Virtual (Bukan GUI custom, tapi native inventory)
+            // Membuka Anvil Virtual (Bukan GUI custom, tapi nat ive inventory)
             p.openAnvil(null, true);
             p.sendMessage(ChatUtils.colorize(prefix + ConfigUtils.getString("messages.utils.anvil-opened")));
             p.playSound(p.getLocation(), org.bukkit.Sound.BLOCK_ANVIL_USE, 1f, 1f); // Use with care, loud

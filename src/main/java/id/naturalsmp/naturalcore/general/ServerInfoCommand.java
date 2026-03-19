@@ -9,9 +9,9 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
+import id.naturalsmp.naturalcore.permissions.PermissionManager.RankConfig;
 
 public class ServerInfoCommand implements CommandExecutor {
 
@@ -66,49 +66,55 @@ public class ServerInfoCommand implements CommandExecutor {
 
     // --- /list ---
     private boolean showOnlinePlayers(CommandSender sender) {
-        int online = Bukkit.getOnlinePlayers().size();
+        int onlineCount = Bukkit.getOnlinePlayers().size();
         int max = Bukkit.getMaxPlayers();
 
         sender.sendMessage(ChatUtils.colorize("&8&m----------------------------------------"));
-        sender.sendMessage(ChatUtils.colorize(" &6&lONLINE PLAYERS &7(" + online + "/" + max + ")"));
+        sender.sendMessage(ChatUtils.colorize(" &6&lONLINE PLAYERS &7(" + onlineCount + "/" + max + ")"));
         sender.sendMessage(ChatUtils.colorize("&8&m----------------------------------------"));
 
-        // Sort by Weight from rank-config.yml
-        Map<String, id.naturalsmp.naturalcore.permissions.PermissionManager.RankConfig> ranks = plugin
-                .getPermissionManager().getRanks();
-
-        List<Player> sortedPlayers = Bukkit.getOnlinePlayers().stream()
-                .sorted((p1, p2) -> {
-                    int w1 = getPlayerWeight(p1, ranks);
-                    int w2 = getPlayerWeight(p2, ranks);
-                    return Integer.compare(w2, w1); // Higher weight first
-                })
-                .collect(Collectors.toList());
-
-        String playerList = sortedPlayers.stream()
-                .map(p -> ChatUtils.formatMessage(p, "%displayname%"))
-                .collect(Collectors.joining("&7, &f"));
-
-        if (online > 0) {
-            sender.sendMessage(ChatUtils.colorize("&f" + playerList));
-        } else {
+        if (onlineCount == 0) {
             sender.sendMessage(ChatUtils.colorize("&7Tidak ada player online."));
+            sender.sendMessage(ChatUtils.colorize("&8&m----------------------------------------"));
+            return true;
         }
+
+        Map<RankConfig, List<Player>> groupedPlayers = new HashMap<>();
+        List<Player> defaultPlayers = new ArrayList<>();
+
+        for (Player p : Bukkit.getOnlinePlayers()) {
+            RankConfig highest = plugin.getPermissionManager().getHighestRank(p);
+            if (highest != null) {
+                groupedPlayers.computeIfAbsent(highest, k -> new ArrayList<>()).add(p);
+            } else {
+                defaultPlayers.add(p);
+            }
+        }
+
+        // Sort ranks by weight descending
+        List<RankConfig> sortedRanks = new ArrayList<>(groupedPlayers.keySet());
+        sortedRanks.sort((r1, r2) -> Integer.compare(r2.weight, r1.weight));
+
+        for (RankConfig rank : sortedRanks) {
+            List<Player> players = groupedPlayers.get(rank);
+            String playerNames = players.stream()
+                    .map(p -> ChatUtils.formatMessage(p, "%displayname%"))
+                    .collect(Collectors.joining("&7, "));
+            sender.sendMessage(ChatUtils.colorize(" " + rank.displayName + "&8: &f" + playerNames));
+        }
+
+        if (!defaultPlayers.isEmpty()) {
+            String playerNames = defaultPlayers.stream()
+                    .map(p -> ChatUtils.formatMessage(p, "%displayname%"))
+                    .collect(Collectors.joining("&7, "));
+            sender.sendMessage(ChatUtils.colorize(" &7Member&8: &f" + playerNames));
+        }
+
         sender.sendMessage(ChatUtils.colorize("&8&m----------------------------------------"));
         return true;
     }
 
-    private int getPlayerWeight(Player p,
-            Map<String, id.naturalsmp.naturalcore.permissions.PermissionManager.RankConfig> ranks) {
-        int maxWeight = 0;
-        for (Map.Entry<String, id.naturalsmp.naturalcore.permissions.PermissionManager.RankConfig> entry : ranks
-                .entrySet()) {
-            if (p.hasPermission(entry.getKey())) {
-                maxWeight = Math.max(maxWeight, entry.getValue().weight);
-            }
-        }
-        return maxWeight;
-    }
+
 
     // --- /info ---
     private boolean showServerInfo(CommandSender sender) {
