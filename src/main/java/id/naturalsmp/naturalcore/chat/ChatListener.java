@@ -136,7 +136,19 @@ public class ChatListener implements Listener {
                         return;
 
                 // Get the raw message as text.
-                String messageText = legacySection.serialize(event.message());
+                String messageText;
+                
+                if (player.hasPermission("naturalsmp.chat.color")) {
+                        messageText = legacySection.serialize(event.message());
+                } else {
+                        // Convert any native components to plain text
+                        messageText = net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer.plainText().serialize(event.message());
+                        // Strip any manual MiniMessage tags or legacy color codes typed by the player
+                        messageText = ChatUtils.stripColor(messageText);
+                        
+                        // Also escape MiniMessage tags just in case other plugins process it later
+                        messageText = net.kyori.adventure.text.minimessage.MiniMessage.miniMessage().escapeTags(messageText);
+                }
 
                 // Apply ChatColor settings
                 ChatColorManager colorManager = plugin.getChatColorManager();
