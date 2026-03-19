@@ -95,6 +95,11 @@ ranks:
     - voicechat.speak
     - voicechat.listen
     - voicechat.groups
+    - slimefun.inventory.open.BASICS
+    - slimefun.inventory.open.RESOURCES
+    - slimefun.inventory.open.TOOLS
+    - slimefun.inventory.open.WEAPONS
+    - slimefun.inventory.open.ARMOR
 
   midi:
     display: "&dMidi"
@@ -121,6 +126,8 @@ ranks:
       - naturalsmp.home.limit.midi
       - redprotect.limits.blocks.25000
       - redprotect.limits.claim.10
+      - slimefun.inventory.open.TECHNICAL_COMPONENTS
+      - slimefun.inventory.open.RESOURCES
 
   vip:
     display: "&aVIP"
@@ -149,6 +156,8 @@ ranks:
       - naturalsmp.home.limit.vip
       - redprotect.limits.blocks.50000
       - redprotect.limits.claim.20
+      - slimefun.inventory.open.ENERGY_AND_ELECTRICITY
+      - slimefun.inventory.open.CARGO_MANAGEMENT
 
   mvp:
     display: "&bMVP"
@@ -177,6 +186,8 @@ ranks:
       - naturalsmp.home.limit.mvp
       - redprotect.limits.blocks.150000
       - redprotect.limits.claim.40
+      - slimefun.inventory.open.ELECTRIC_MACHINES
+      - slimefun.inventory.open.GENERATORS
 
   nature:
     display: "&e&lNATURE"
@@ -202,6 +213,10 @@ ranks:
       - naturalsmp.home.limit.nature
       - redprotect.limits.blocks.500000
       - redprotect.limits.claim.80
+      - slimefun.inventory.open.MAGICAL_ITEMS
+      - slimefun.inventory.open.MAGICAL_ARMOR
+      - slimefun.inventory.open.ANCIENT_ALTAR
+      - slimefun.inventory.open.EXOTIC_GARDEN
 
 
 rank-lainnya:
