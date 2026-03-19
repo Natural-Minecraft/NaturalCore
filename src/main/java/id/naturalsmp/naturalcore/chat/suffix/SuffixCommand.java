@@ -1,17 +1,18 @@
-package id.naturalsmp.naturalcore.chat.tags;
+package id.naturalsmp.naturalcore.chat.suffix;
 
 import id.naturalsmp.naturalcore.NaturalCore;
+import id.naturalsmp.naturalcore.utils.ChatUtils;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
-public class TagsCommand implements CommandExecutor {
+public class SuffixCommand implements CommandExecutor {
 
     private final NaturalCore plugin;
 
-    public TagsCommand(NaturalCore plugin) {
+    public SuffixCommand(NaturalCore plugin) {
         this.plugin = plugin;
     }
 
@@ -21,18 +22,22 @@ public class TagsCommand implements CommandExecutor {
         if (args.length > 0) {
             if (args[0].equalsIgnoreCase("reload")) {
                 if (!sender.hasPermission("naturalsmp.admin")) {
-                    sender.sendMessage(id.naturalsmp.naturalcore.utils.ChatUtils.colorize("&cNo permission."));
+                    sender.sendMessage(ChatUtils.toComponent("&cNo permission."));
                     return true;
                 }
-                plugin.getTagsManager().loadConfigs();
-                sender.sendMessage(
-                        id.naturalsmp.naturalcore.utils.ChatUtils.colorize("&aTags configuration reloaded!"));
+                plugin.getSuffixManager().loadConfigs();
+                sender.sendMessage(ChatUtils.toComponent("&aSuffix configuration reloaded!"));
                 return true;
             }
         }
 
-        // Open GUI if no args or invalid args
-        new TagsGUI(plugin).openGUI((Player) sender);
+        if (!(sender instanceof Player p)) {
+            sender.sendMessage("Hanya player yang bisa menggunakan perintah ini.");
+            return true;
+        }
+
+        // Open GUI
+        new SuffixGUI(plugin).openGUI(p);
         return true;
     }
 }

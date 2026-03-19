@@ -353,8 +353,9 @@ commands:
     permission: naturalsmp.admin.banner
 
   # --- PROFILE ---
-  tags:
-    description: Koleksi Tag Chat
+  suffix:
+    description: Koleksi Suffix Chat
+    aliases: [suffixes]
   tier:
     description: Sistem Ranking Natural Tier
   profile:

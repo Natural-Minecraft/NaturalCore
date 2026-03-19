@@ -52,7 +52,7 @@ import id.naturalsmp.naturalcore.topup.TopupCommand;
 
 import id.naturalsmp.naturalcore.afk.AFKManager;
 import id.naturalsmp.naturalcore.announcement.BroadcastManager;
-import id.naturalsmp.naturalcore.chat.tags.TagsManager;
+import id.naturalsmp.naturalcore.chat.suffix.SuffixManager;
 import id.naturalsmp.naturalcore.combat.CombatManager;
 import id.naturalsmp.naturalcore.hud.HUDManager;
 import id.naturalsmp.naturalcore.maintenance.MaintenanceCommand;
@@ -98,7 +98,7 @@ public final class NaturalCore extends JavaPlugin {
     private BannerManager bannerManager;
     private ProfileManager profileManager;
     private ProfileGUI profileGUI;
-    private TagsManager tagsManager;
+    private SuffixManager suffixManager;
     private AFKManager afkManager;
     private TierManager tierManager;
     private TierGUI tierGUI;
@@ -157,7 +157,7 @@ public final class NaturalCore extends JavaPlugin {
         // 2B. Init Backup System (v2.0)
         this.backupManager = new id.naturalsmp.naturalcore.utility.BackupManager(this);
         this.seasonResetManager = new id.naturalsmp.naturalcore.season.SeasonResetManager(this);
-        this.tagsManager = new id.naturalsmp.naturalcore.chat.tags.TagsManager(this);
+        this.suffixManager = new id.naturalsmp.naturalcore.chat.suffix.SuffixManager(this);
 
         // 3. Setup Vault (Economy & Chat)
         this.vaultManager = new VaultManager(this);
@@ -492,13 +492,10 @@ public final class NaturalCore extends JavaPlugin {
         getServer().getPluginManager().registerEvents(profileGUI, this);
         getLogger().info("Profile System: ENABLED (CoinsEngine: " + profileManager.hasCoinsEngine() + ")");
 
-        // 22. Tags System (v1.8)
-        id.naturalsmp.naturalcore.chat.tags.TagsGUI tagsGUI = new id.naturalsmp.naturalcore.chat.tags.TagsGUI(this);
-        getServer().getPluginManager().registerEvents(tagsGUI, this);
-        id.naturalsmp.naturalcore.chat.tags.TagsCommand tagsCmd = new id.naturalsmp.naturalcore.chat.tags.TagsCommand(
-                this);
-        registerCmd("tags", tagsCmd);
-        getCommand("tags").setTabCompleter(new id.naturalsmp.naturalcore.chat.tags.TagsTabCompleter(this));
+        // 22. Suffix System (v2.3)
+        id.naturalsmp.naturalcore.chat.suffix.SuffixGUI suffixGUI = new id.naturalsmp.naturalcore.chat.suffix.SuffixGUI(this);
+        getServer().getPluginManager().registerEvents(suffixGUI, this);
+        registerCmd("suffix", new id.naturalsmp.naturalcore.chat.suffix.SuffixCommand(this));
 
         // 23. AFK System (v1.8)
         this.afkManager = new id.naturalsmp.naturalcore.afk.AFKManager(this);
@@ -610,8 +607,8 @@ public final class NaturalCore extends JavaPlugin {
 
         // Comprehensive Module Reload
 
-        if (tagsManager != null)
-            tagsManager.loadConfigs();
+        if (suffixManager != null)
+            suffixManager.loadConfigs();
         if (tierManager != null)
             tierManager.loadConfigs();
         if (warpManager != null)
@@ -723,8 +720,8 @@ public final class NaturalCore extends JavaPlugin {
         return homeGUI;
     }
 
-    public id.naturalsmp.naturalcore.chat.tags.TagsManager getTagsManager() {
-        return tagsManager;
+    public id.naturalsmp.naturalcore.chat.suffix.SuffixManager getSuffixManager() {
+        return suffixManager;
     }
 
     public id.naturalsmp.naturalcore.afk.AFKManager getAFKManager() {

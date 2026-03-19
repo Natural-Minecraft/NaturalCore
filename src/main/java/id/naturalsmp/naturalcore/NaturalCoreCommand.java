@@ -215,6 +215,33 @@ public class NaturalCoreCommand implements CommandExecutor, TabCompleter {
                         sub, proxyArgs);
                 return true;
             }
+            case "givesuffix" -> {
+                if (!sender.hasPermission("naturalsmp.admin")) return noPerm(sender);
+                if (proxyArgs.length < 2) {
+                    sender.sendMessage(id.naturalsmp.naturalcore.utils.ChatUtils.toComponent(
+                            "&cUsage: /nacore givesuffix <player> <suffixId>"));
+                    return true;
+                }
+                Player target = org.bukkit.Bukkit.getPlayer(proxyArgs[0]);
+                if (target == null) {
+                    sender.sendMessage(id.naturalsmp.naturalcore.utils.ChatUtils.toComponent(
+                            "&cPlayer '" + proxyArgs[0] + "' tidak ditemukan."));
+                    return true;
+                }
+                String suffixId = proxyArgs[1].toLowerCase();
+                if (!plugin.getSuffixManager().getAvailableSuffixes().containsKey(suffixId)) {
+                    sender.sendMessage(id.naturalsmp.naturalcore.utils.ChatUtils.toComponent(
+                            "&cSuffix '" + suffixId + "' tidak ada di config."));
+                    return true;
+                }
+                plugin.getSuffixManager().grantSuffix(target, suffixId);
+                plugin.getSuffixManager().setPlayerSuffix(target, suffixId);
+                sender.sendMessage(id.naturalsmp.naturalcore.utils.ChatUtils.toComponent(
+                        "&aSuffix '" + suffixId + "' diberikan ke " + target.getName() + "!"));
+                target.sendMessage(id.naturalsmp.naturalcore.utils.ChatUtils.toComponent(
+                        "&aKamu mendapatkan suffix baru:" + plugin.getSuffixManager().getAvailableSuffixes().get(suffixId)));
+                return true;
+            }
             case "home", "homes", "sethome", "delhome" -> {
                 new id.naturalsmp.naturalcore.home.HomeCommand(plugin.getHomeManager(),
                         plugin.getHomeGUI()).onCommand(sender, command, sub, proxyArgs);
@@ -246,7 +273,7 @@ public class NaturalCoreCommand implements CommandExecutor, TabCompleter {
 
         if (args.length == 1) {
             List<String> list = new ArrayList<>(
-                    Arrays.asList("admin", "version", "help", "spawn", "home", "bal", "vanish", "heal", "feed", "fly"));
+                    Arrays.asList("admin", "version", "help", "spawn", "home", "bal", "vanish", "heal", "feed", "fly", "givesuffix"));
             if (sender.hasPermission("naturalsmp.admin"))
                 list.add("reload");
             return list.stream().filter(s -> s.startsWith(args[0].toLowerCase()))

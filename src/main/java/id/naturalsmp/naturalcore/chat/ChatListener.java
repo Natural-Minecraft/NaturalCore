@@ -487,9 +487,8 @@ public class ChatListener implements Listener {
         }
 
         private Component buildFinalFormat(Player player, Component processedMessage) {
-                String tag = "";
-                if (plugin.getTagsManager() != null)
-                        tag = plugin.getTagsManager().getPlayerTag(player);
+                String customSuffix = (plugin.getSuffixManager() != null) ? plugin.getSuffixManager().getPlayerSuffix(player)
+                                : "";
                 String tierSuffix = (plugin.getTierManager() != null) ? plugin.getTierManager().getPlayerSuffix(player)
                                 : "";
 
@@ -514,15 +513,15 @@ public class ChatListener implements Listener {
                 }
 
                 // Apply Placeholders
-                tag = ChatUtils.setPlaceholders(player, tag);
                 prefix = ChatUtils.setPlaceholders(player, prefix);
+                customSuffix = ChatUtils.setPlaceholders(player, customSuffix);
                 tierSuffix = ChatUtils.setPlaceholders(player, tierSuffix);
 
-                // USE LEGACY SECTION for colorized strings
-                Component playerPart = legacySection.deserialize(ChatUtils.colorize(tag))
-                                .append(legacySection.deserialize(ChatUtils.colorize(prefix)))
+                // Format: [prefix][name][customSuffix][tierSuffix]
+                Component playerPart = legacySection.deserialize(ChatUtils.colorize(prefix))
                                 .append(Component.text(player.getName()).hoverEvent(HoverEvent.showText(playerHover))
                                                 .color(NamedTextColor.WHITE))
+                                .append(legacySection.deserialize(ChatUtils.colorize(customSuffix)))
                                 .append(legacySection.deserialize(ChatUtils.colorize(tierSuffix)));
 
                 return playerPart.append(Component.text(" » ").color(NamedTextColor.DARK_GRAY))
