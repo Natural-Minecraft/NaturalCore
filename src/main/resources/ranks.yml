@@ -105,12 +105,10 @@ ranks:
       item: LAPIS_LAZULI
       name: "&d&lMIDI &8|| &r%img__rank-midi_%"
       benefits:
-        - "&8» &fAkses &e/back &7(Teleport Ke Tempat Sebelumnya)"
-        - "&8» &fAkses &e/chatcolor &7(Ubah Warna Chat)"
-        - "&8» &fAkses ColorChat &r%img__rank-midi_% &d&lMIDI"
+        - "&8» &fAkses &e/enderchest &7(Virtual Enderchest)"
+        - "&8» &fAkses &e/back &7(Teleport ke Tempat Sebelumnya)"
         - "&8» &fHome Limit: &e5 Home"
-        - "&8» &fKematian tidak mengurangi EXP"
-        - "&8» &fBlock Claim Limit: &425.000 Blok"
+        - "&8» &fBlock Claim Limit: &416.000 Blok"
         - "&8» &fClaim Limit: &410 Claim"
         - "&8» &fSell Multiplier: &e1.05x"
     permissions:
@@ -119,25 +117,22 @@ ranks:
       - naturalsmp.emoji.unlimited
       - naturalsmp.color.midi
       - naturalsmp.home.limit.midi
-      - redprotect.limits.blocks.25000
+      - redprotect.limits.blocks.16000
       - redprotect.limits.claim.10
 
   vip:
     display: "&aVIP"
     prefix: ":_rank-vip_: "
-    weight: 200
+    weight: 125
     inherit: midi
     gui:
       item: IRON_INGOT
       name: "&a&lVIP &8|| &r%img__rank-vip_%"
       benefits:
         - "&8» &fSemua Fitur &d&lMIDI"
-        - "&8» &fAkses &e/hat &7(Item di Kepala!)"
-        - "&8» &fAkses &e/trash &7(Tempat Sampah)"
-        - "&8» &fAkses &e/resource &7(Dunia Resource)"
-        - "&8» &fAkses ColorChat &r%img__rank-vip_% &a&lVIP"
+        - "&8» &fAkses &e/nick &7(Nama Samaran)"
         - "&8» &fHome Limit: &e10 Home"
-        - "&8» &fBlock Claim Limit: &450.000 Blok"
+        - "&8» &fBlock Claim Limit: &432.000 Blok"
         - "&8» &fClaim Limit: &420 Claim"
         - "&8» &fSell Multiplier: &e1.1x"
     permissions:
@@ -147,61 +142,225 @@ ranks:
       - naturalsmp.nick
       - naturalsmp.color.vip
       - naturalsmp.home.limit.vip
-      - redprotect.limits.blocks.50000
+      - redprotect.limits.blocks.32000
       - redprotect.limits.claim.20
+
+  vip_plus:
+    display: "&aVIP+"
+    prefix: "&a&lVIP+ "
+    weight: 150
+    inherit: vip
+    gui:
+      item: IRON_BLOCK
+      name: "&a&lVIP+ &8|| &r%img__rank-vip_%"
+      benefits:
+        - "&8» &fSemua Fitur &a&lVIP"
+        - "&8» &fAkses &e/craft &7(Portable Crafting)"
+        - "&8» &fHome Limit: &e13 Home"
+        - "&8» &fBlock Claim Limit: &448.000 Blok"
+        - "&8» &fClaim Limit: &430 Claim"
+        - "&8» &fSell Multiplier: &e1.15x"
+    permissions:
+      - naturalsmp.craft
+      - naturalsmp.home.limit.vipplus
+      - redprotect.limits.blocks.48000
+      - redprotect.limits.claim.30
 
   mvp:
     display: "&bMVP"
     prefix: ":_rank-mvp_: "
-    weight: 300
-    inherit: vip
+    weight: 200
+    inherit: vip_plus
     gui:
       item: GOLD_INGOT
       name: "&b&lMVP &8|| &r%img__rank-mvp_%"
       benefits:
-        - "&8» &fSemua Fitur &a&lVIP"
-        - "&8» &fAkses &e/nick &7(Nama Samaran)"
+        - "&8» &fSemua Fitur &a&lVIP+"
         - "&8» &fAkses &e/fly &7(Terbang di Survival)"
-        - "&8» &fAkses ColorChat &r%img__rank-mvp_% &b&lMVP"
-        - "&8» &fHome Limit: &e20 Home"
-        - "&8» &fBlock Claim Limit: &4150.000 Blok"
+        - "&8» &fAkses &e/anvil &7(Portable Anvil)"
+        - "&8» &fHome Limit: &e15 Home"
+        - "&8» &fBlock Claim Limit: &464.000 Blok"
         - "&8» &fClaim Limit: &440 Claim"
         - "&8» &fSell Multiplier: &e1.2x"
     permissions:
       - naturalsmp.fly
-      - naturalsmp.craft
       - naturalsmp.anvil
-      - naturalsmp.ptime
-      - naturalsmp.pweather
       - naturalsmp.color.mvp
       - naturalsmp.home.limit.mvp
-      - redprotect.limits.blocks.150000
+      - redprotect.limits.blocks.64000
       - redprotect.limits.claim.40
+
+  mvp_plus:
+    display: "&bMVP+"
+    prefix: "&b&lMVP+ "
+    weight: 220
+    inherit: mvp
+    gui:
+      item: GOLD_BLOCK
+      name: "&b&lMVP+ &8|| &r%img__rank-mvp_%"
+      benefits:
+        - "&8» &fSemua Fitur &b&lMVP"
+        - "&8» &fAkses &e/repair &7(Perbaiki Item)"
+        - "&8» &fHome Limit: &e18 Home"
+        - "&8» &fBlock Claim Limit: &480.000 Blok"
+        - "&8» &fClaim Limit: &450 Claim"
+        - "&8» &fSell Multiplier: &e1.25x"
+    permissions:
+      - naturalsmp.repair
+      - naturalsmp.home.limit.mvpplus
+      - redprotect.limits.blocks.80000
+      - redprotect.limits.claim.50
+
+  gold:
+    display: "&6GOLD"
+    prefix: "&6&lGOLD "
+    weight: 300
+    inherit: mvp_plus
+    gui:
+      item: RAW_GOLD
+      name: "&6&lGOLD"
+      benefits:
+        - "&8» &fSemua Fitur &b&lMVP+"
+        - "&8» &fAkses &e/disposal &7(Tempat Sampah)"
+        - "&8» &fHome Limit: &e20 Home"
+        - "&8» &fBlock Claim Limit: &496.000 Blok"
+        - "&8» &fClaim Limit: &460 Claim"
+        - "&8» &fSell Multiplier: &e1.3x"
+    permissions:
+      - naturalsmp.disposal
+      - naturalsmp.home.limit.gold
+      - redprotect.limits.blocks.96000
+      - redprotect.limits.claim.60
+
+  gold_plus:
+    display: "&6GOLD+"
+    prefix: "&6&lGOLD+ "
+    weight: 320
+    inherit: gold
+    gui:
+      item: RAW_GOLD_BLOCK
+      name: "&6&lGOLD+"
+      benefits:
+        - "&8» &fSemua Fitur &6&lGOLD"
+        - "&8» &fHome Limit: &e25 Home"
+        - "&8» &fBlock Claim Limit: &4112.000 Blok"
+        - "&8» &fClaim Limit: &470 Claim"
+        - "&8» &fSell Multiplier: &e1.35x"
+    permissions:
+      - naturalsmp.home.limit.goldplus
+      - redprotect.limits.blocks.112000
+      - redprotect.limits.claim.70
 
   nature:
     display: "&e&lNATURE"
     prefix: ":_rank-nature_: "
     weight: 400
-    inherit: mvp
+    inherit: gold_plus
     gui:
       item: DIAMOND
       name: "&e&lNATURE &8|| &r%img__rank-nature_%"
       benefits:
-        - "&8» &fSemua Fitur &b&lMVP"
-        - "&8» &fChat Color Style (&kMagic&f, &lBold&f, dll)"
-        - "&8» &fAkses ColorChat &r%img__rank-nature_% &e&lNATURE"
-        - "&8» &fNature Join Announcement"
-        - "&8» &fPriority Join (Server Full)"
-        - "&8» &fBlock Claim Limit: &4500.000 Blok"
+        - "&8» &fSemua Fitur &6&lGOLD+"
+        - "&8» &fAkses &e/ptime &7(Ubah Waktu Pribadi)"
+        - "&8» &fAkses &e/pweather &7(Ubah Cuaca Pribadi)"
+        - "&8» &fHome Limit: &e30 Home"
+        - "&8» &fBlock Claim Limit: &4128.000 Blok"
         - "&8» &fClaim Limit: &480 Claim"
-        - "&8» &fSell Multiplier: &e1.3x"
+        - "&8» &fSell Multiplier: &e1.4x"
     permissions:
-      - naturalsmp.priority
+      - naturalsmp.ptime
+      - naturalsmp.pweather
       - naturalsmp.temperature.immune
       - naturalsmp.color.nature
       - naturalsmp.home.limit.nature
-      - redprotect.limits.blocks.500000
+      - redprotect.limits.blocks.128000
       - redprotect.limits.claim.80
+
+  nature_plus:
+    display: "&e&lNATURE+"
+    prefix: "&e&lNATURE+ "
+    weight: 420
+    inherit: nature
+    gui:
+      item: DIAMOND_BLOCK
+      name: "&e&lNATURE+"
+      benefits:
+        - "&8» &fSemua Fitur &e&lNATURE"
+        - "&8» &fBypass Server Full &7(Tetap Bisa Masuk)"
+        - "&8» &fHome Limit: &e40 Home"
+        - "&8» &fBlock Claim Limit: &4160.000 Blok"
+        - "&8» &fClaim Limit: &4100 Claim"
+        - "&8» &fSell Multiplier: &e1.45x"
+    permissions:
+      - naturalsmp.priority
+      - naturalsmp.home.limit.natureplus
+      - redprotect.limits.blocks.160000
+      - redprotect.limits.claim.100
+
+  nature_plus_plus:
+    display: "&e&lNATURE++"
+    prefix: "&e&lNATURE++ "
+    weight: 450
+    inherit: nature_plus
+    gui:
+      item: NETHERITE_SCRAP
+      name: "&e&lNATURE++"
+      benefits:
+        - "&8» &fSemua Fitur &e&lNATURE+"
+        - "&8» &fCustom Suffix &7(Akhiran Nama Bebas)"
+        - "&8» &fHome Limit: &e50 Home"
+        - "&8» &fBlock Claim Limit: &4192.000 Blok"
+        - "&8» &fClaim Limit: &4120 Claim"
+        - "&8» &fSell Multiplier: &e1.5x"
+    permissions:
+      - naturalsmp.suffix
+      - naturalsmp.home.limit.natureplusplus
+      - redprotect.limits.blocks.192000
+      - redprotect.limits.claim.120
+
+  cakrawala:
+    display: "&c&lCAKRAWALA"
+    prefix: "&c&lCAKRAWALA "
+    weight: 600
+    inherit: nature_plus_plus
+    gui:
+      item: NETHERITE_INGOT
+      name: "&c&lCAKRAWALA"
+      benefits:
+        - "&8» &fSemua Fitur &e&lNATURE++"
+        - "&8» &fBypass Semua Cooldown Command"
+        - "&8» &fHome Limit: &e70 Home"
+        - "&8» &fBlock Claim Limit: &4256.000 Blok"
+        - "&8» &fClaim Limit: &4160 Claim"
+        - "&8» &fSell Multiplier: &e1.75x"
+    permissions:
+      - naturalsmp.cooldown.bypass
+      - naturalsmp.home.limit.cakrawala
+      - redprotect.limits.blocks.256000
+      - redprotect.limits.claim.160
+
+  investor:
+    display: "&4&lINVESTOR"
+    prefix: "&4&lINVESTOR "
+    weight: 800
+    inherit: cakrawala
+    gui:
+      item: NETHERITE_BLOCK
+      name: "&4&lINVESTOR"
+      benefits:
+        - "&8» &fSemua Fitur &c&lCAKRAWALA"
+        - "&8» &fAkses &e/itp &7(Teleport Paksa)"
+        - "&8» &fCustom Prefix &7(Awalan Nama Bebas)"
+        - "&8» &fHome Limit: &e99 Home"
+        - "&8» &fBlock Claim Limit: &4320.000 Blok"
+        - "&8» &fClaim Limit: &4200 Claim"
+        - "&8» &fSell Multiplier: &e2.0x"
+    permissions:
+      - naturalsmp.prefix
+      - naturalsmp.itp
+      - naturalsmp.home.limit.investor
+      - redprotect.limits.blocks.320000
+      - redprotect.limits.claim.200
 
 
 rank-lainnya:

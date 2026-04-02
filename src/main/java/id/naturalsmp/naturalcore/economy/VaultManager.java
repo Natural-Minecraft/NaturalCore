@@ -1,7 +1,7 @@
 package id.naturalsmp.naturalcore.economy;
 
 import id.naturalsmp.naturalcore.NaturalCore;
-import net.milkbowl.vault.chat.Chat; // IMPORT BARU
+import net.milkbowl.vault.chat.Chat;
 import net.milkbowl.vault.economy.Economy;
 import org.bukkit.plugin.RegisteredServiceProvider;
 
