@@ -13,6 +13,7 @@ import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.bukkit.event.inventory.ClickType;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryDragEvent;
 import org.bukkit.inventory.Inventory;
@@ -24,27 +25,25 @@ import su.nightexpress.coinsengine.api.CoinsEngineAPI;
 
 import java.text.DecimalFormat;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
 /**
  * Rank Shop GUI - Displays all 12 donator ranks with prices fetched from MySQL.
- * Page 1: midi, vip, vip_plus, mvp, mvp_plus, gold (slots 10,12,14,28,30,32)
- * Page 2: gold_plus, nature, nature_plus, nature_plus_plus, cakrawala, investor (slots 10,12,14,28,30,32)
+ * 4x3 Grid (Slots: 10,12,14,16, 19,21,23,25, 28,30,32,34)
  */
 public class RankGUI implements Listener {
 
     private final NaturalCore plugin;
     private final DecimalFormat priceFormat = new DecimalFormat("#,###");
 
-    // All 12 donator ranks in order (excluding member)
+    // All 12 donator ranks in order
     private static final String[] ALL_RANKS = {
             "midi", "vip", "vip_plus", "mvp", "mvp_plus", "gold",
             "gold_plus", "nature", "nature_plus", "nature_plus_plus", "cakrawala", "investor"
     };
 
-    // Default materials fallback per rank (if not defined in gui.item)
+    // Default materials fallback per rank
     private static final java.util.Map<String, Material> RANK_MATERIAL_MAP = new java.util.HashMap<>() {{
         put("midi",            Material.LAPIS_LAZULI);
         put("vip",             Material.IRON_INGOT);
@@ -76,10 +75,8 @@ public class RankGUI implements Listener {
         put("investor",        "<#AA2200>");
     }};
 
-    // Slots for rank items in 54-slot GUI: row1 = 10,12,14  row2 = 28,30,32
-    private static final int[] RANK_ITEM_SLOTS = { 10, 12, 14, 28, 30, 32 };
-    private static final int RANKS_PER_PAGE = 6;
-    private static final int TOTAL_PAGES = (int) Math.ceil(ALL_RANKS.length / (double) RANKS_PER_PAGE);
+    // 4x3 Grid spacing
+    private static final int[] RANK_ITEM_SLOTS = { 10, 12, 14, 16, 19, 21, 23, 25, 28, 30, 32, 34 };
 
     public RankGUI(NaturalCore plugin) {
         this.plugin = plugin;
@@ -88,14 +85,11 @@ public class RankGUI implements Listener {
     // ─── Open Main GUI ────────────────────────────────────────────────────────
 
     public void openGUI(Player p) {
-        openPage(p, 1);
-    }
-
-    private void openPage(Player p, int page) {
         p.playSound(p.getLocation(), Sound.BLOCK_AMETHYST_BLOCK_CHIME, 1.0f, 1.2f);
-
-        String title = ConfigUtils.getMessage("ranks.gui-title") + " §8[" + page + "/" + TOTAL_PAGES + "]";
-        Inventory inv = GUIUtils.createGUI(new RankHolder(page), 54, title);
+        
+        String title = ConfigUtils.getMessage("ranks.gui-title") != null ? 
+                       ConfigUtils.getMessage("ranks.gui-title") : "§8Rank Shop";
+        Inventory inv = GUIUtils.createGUI(new RankHolder(), 54, title);
 
         // Glass border fill
         ItemStack glass = GUIUtils.createFiller(Material.GRAY_STAINED_GLASS_PANE);
@@ -104,13 +98,8 @@ public class RankGUI implements Listener {
         RankPriceDatabase priceDb = plugin.getRankPriceDatabase();
         Map<String, PermissionManager.RankConfig> ranks = plugin.getPermissionManager().getRanks();
 
-        // Calculate rank indices for this page
-        int startIdx = (page - 1) * RANKS_PER_PAGE;
-        int endIdx = Math.min(startIdx + RANKS_PER_PAGE, ALL_RANKS.length);
-
-        for (int i = startIdx; i < endIdx; i++) {
+        for (int i = 0; i < ALL_RANKS.length; i++) {
             String rankId = ALL_RANKS[i];
-            int slotIdx = i - startIdx;
 
             double priceRP = priceDb.getPriceRP(rankId);
             double priceNC = priceDb.getPriceNC(rankId);
@@ -128,7 +117,7 @@ public class RankGUI implements Listener {
             String displayId = rankId.toUpperCase().replace("_PLUS_PLUS", "++").replace("_PLUS", "+");
             boolean isOwned = p.hasPermission("group." + rankId);
 
-            inv.setItem(RANK_ITEM_SLOTS[slotIdx], createRankItem(
+            inv.setItem(RANK_ITEM_SLOTS[i], createRankItem(
                     p, mat, color, displayId, rankId,
                     priceRP, priceNC, discountedRP, discountedNC, discount,
                     benefits, isOwned));
@@ -136,22 +125,6 @@ public class RankGUI implements Listener {
 
         // Navigation / Info
         inv.setItem(4, createInfoItem());
-
-        // Prev page button
-        if (page > 1) {
-            inv.setItem(45, createItem(Material.ARROW, "§e§l← Halaman " + (page - 1),
-                    List.of("§7Klik untuk ke halaman sebelumnya.")));
-        } else {
-            inv.setItem(45, GUIUtils.createFiller(Material.GRAY_STAINED_GLASS_PANE));
-        }
-
-        // Next page button
-        if (page < TOTAL_PAGES) {
-            inv.setItem(53, createItem(Material.ARROW, "§e§lHalaman " + (page + 1) + " →",
-                    List.of("§7Klik untuk ke halaman berikutnya.")));
-        } else {
-            inv.setItem(53, GUIUtils.createFiller(Material.GRAY_STAINED_GLASS_PANE));
-        }
 
         // Close button
         inv.setItem(49, createItem(Material.BARRIER, "§c§lTUTUP", List.of("§7Klik untuk keluar menu.")));
@@ -187,12 +160,16 @@ public class RankGUI implements Listener {
         lore.add(Component.empty());
         lore.add(ChatUtils.toComponent("§e§lBenefits:"));
 
-        for (String benefit : benefits) {
-            String parsed = benefit;
+        int maxBenefits = Math.min(benefits.size(), 4);
+        for (int i = 0; i < maxBenefits; i++) {
+            String parsed = benefits.get(i);
             if (Bukkit.getPluginManager().getPlugin("PlaceholderAPI") != null) {
                 parsed = me.clip.placeholderapi.PlaceholderAPI.setPlaceholders(p, parsed);
             }
             lore.add(ChatUtils.toComponent("§8• §7" + parsed));
+        }
+        if (benefits.size() > 4) {
+            lore.add(ChatUtils.toComponent("§8  §o...dan masih banyak lagi!"));
         }
 
         lore.add(Component.empty());
@@ -200,6 +177,8 @@ public class RankGUI implements Listener {
         if (isOwned) {
             lore.add(ChatUtils.toComponent("§6§lSUDAH DIMILIKI"));
             lore.add(ChatUtils.toComponent("§7Kamu sudah memiliki rank ini."));
+            lore.add(Component.empty());
+            lore.add(ChatUtils.toComponent("§e[➡] Klik Kanan: §fPreview Uang Kit"));
         } else {
             lore.add(ChatUtils.toComponent("§e§lHarga:"));
             if (discount > 0) {
@@ -212,8 +191,8 @@ public class RankGUI implements Listener {
                 lore.add(ChatUtils.toComponent("§8• §6" + priceFormat.format(priceNC) + " NC"));
             }
             lore.add(Component.empty());
-            lore.add(ChatUtils.toComponent("§aKlik untuk membeli dengan NaturalCoin!"));
-            lore.add(ChatUtils.toComponent("§7(Atau kunjungi store untuk Rupiah)"));
+            lore.add(ChatUtils.toComponent("§a[⬅] Klik Kiri: §fBeli pakai NC"));
+            lore.add(ChatUtils.toComponent("§e[➡] Klik Kanan: §fPreview Uang Kit"));
         }
 
         meta.lore(lore);
@@ -259,7 +238,7 @@ public class RankGUI implements Listener {
 
     @EventHandler
     public void onClick(InventoryClickEvent e) {
-        if (!(e.getInventory().getHolder() instanceof RankHolder holder)) return;
+        if (!(e.getInventory().getHolder() instanceof RankHolder)) return;
         e.setCancelled(true);
 
         if (e.getClickedInventory() != e.getView().getTopInventory()) return;
@@ -267,32 +246,30 @@ public class RankGUI implements Listener {
 
         Player p = (Player) e.getWhoClicked();
         int slot = e.getSlot();
-        int currentPage = holder.getPage();
 
-        // Navigation
         if (slot == 49) {
-            // Close
             p.closeInventory();
             p.playSound(p.getLocation(), Sound.BLOCK_IRON_DOOR_CLOSE, 1f, 1.2f);
-        } else if (slot == 45 && currentPage > 1) {
-            // Prev page
-            openPage(p, currentPage - 1);
-        } else if (slot == 53 && currentPage < TOTAL_PAGES) {
-            // Next page
-            openPage(p, currentPage + 1);
         } else if (isRankSlot(slot)) {
-            // Rank item clicked
-            int slotIdx = getRankSlotIndex(slot);
-            int rankArrayIdx = ((currentPage - 1) * RANKS_PER_PAGE) + slotIdx;
+            int rankArrayIdx = getRankSlotIndex(slot);
             if (rankArrayIdx < 0 || rankArrayIdx >= ALL_RANKS.length) return;
 
             String rankId = ALL_RANKS[rankArrayIdx];
+            
+            if (e.getClick() == ClickType.RIGHT) {
+                // Right click -> Preview kit
+                p.closeInventory();
+                p.playSound(p.getLocation(), Sound.UI_BUTTON_CLICK, 1f, 1f);
+                p.performCommand("pk preview " + rankId);
+                return;
+            }
+
             if (p.hasPermission("group." + rankId)) {
                 p.playSound(p.getLocation(), Sound.ENTITY_VILLAGER_NO, 1f, 1f);
                 p.sendMessage(ChatUtils.colorize("§6§lNaturalSMP §8» §cKamu sudah memiliki rank ini!"));
                 return;
             }
-            openConfirmationGUI(p, rankId, currentPage);
+            openConfirmationGUI(p, rankId);
         }
     }
 
@@ -310,9 +287,9 @@ public class RankGUI implements Listener {
 
     // ─── Confirmation GUI ──────────────────────────────────────────────────────
 
-    private void openConfirmationGUI(Player p, String rankId, int fromPage) {
+    private void openConfirmationGUI(Player p, String rankId) {
         p.playSound(p.getLocation(), Sound.UI_BUTTON_CLICK, 1f, 1f);
-        Inventory inv = GUIUtils.createGUI(new ConfirmationHolder(rankId, fromPage), 27, "§8Konfirmasi Pembelian");
+        Inventory inv = GUIUtils.createGUI(new ConfirmationHolder(rankId), 27, "§8Konfirmasi Pembelian");
 
         ItemStack glass = GUIUtils.createFiller(Material.GRAY_STAINED_GLASS_PANE);
         for (int i = 0; i < 27; i++) inv.setItem(i, glass);
@@ -351,7 +328,7 @@ public class RankGUI implements Listener {
         if (e.getSlot() == 11) {
             processPurchase(p, rankId);
         } else if (e.getSlot() == 15) {
-            openPage(p, holder.getFromPage());
+            openGUI(p);
         }
     }
 
@@ -391,21 +368,16 @@ public class RankGUI implements Listener {
     // ─── Holders ──────────────────────────────────────────────────────────────
 
     public static class RankHolder implements InventoryHolder {
-        private final int page;
-        public RankHolder(int page) { this.page = page; }
-        public int getPage() { return page; }
+        public RankHolder() {}
         @Override public @NotNull Inventory getInventory() { return null; }
     }
 
     public static class ConfirmationHolder implements InventoryHolder {
         private final String rankId;
-        private final int fromPage;
-        public ConfirmationHolder(String rankId, int fromPage) {
+        public ConfirmationHolder(String rankId) {
             this.rankId = rankId;
-            this.fromPage = fromPage;
         }
         public String getRankId() { return rankId; }
-        public int getFromPage() { return fromPage; }
         @Override public @NotNull Inventory getInventory() { return null; }
     }
 }
