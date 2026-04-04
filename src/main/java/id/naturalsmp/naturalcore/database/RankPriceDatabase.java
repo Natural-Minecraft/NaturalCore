@@ -120,8 +120,8 @@ public class RankPriceDatabase {
                 double priceNCValue = rs.getDouble("price_virtual");
                 int discount = rs.getInt("discount");
 
-                // Extract rank ID from product ID (e.g., "rank-vip" -> "vip")
-                String rankId = productId.replace("rank-", "").replace("-plus", "");
+                // Extract rank ID from product ID (e.g., "rank-vip_plus" -> "vip_plus", or "rank-vip-plus" -> "vip_plus")
+                String rankId = productId.replace("rank-", "").replace("-", "_");
 
                 pricesRP.put(rankId, price);
                 pricesNC.put(rankId, priceNCValue);

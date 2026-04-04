@@ -25,7 +25,7 @@ public class TopupCommand implements CommandExecutor {
     private final NaturalCore plugin;
     private final TopupSuccessGUI gui;
 
-    private static final Set<String> VALID_RANKS = Set.of("midi", "vip", "mvp", "nature");
+    private static final Set<String> VALID_RANKS = Set.of("midi", "vip", "vip_plus", "mvp", "mvp_plus", "gold", "gold_plus", "nature", "nature_plus", "nature_plus_plus", "cakrawala", "investor");
     private static final int DEFAULT_RANK_DAYS = 30;
 
     public TopupCommand(NaturalCore plugin, TopupSuccessGUI gui) {
@@ -44,7 +44,7 @@ public class TopupCommand implements CommandExecutor {
             sender.sendMessage(
                     ChatUtils.colorize("&cUsage: /topupnotification <player> <amount|rank> [transaction_id]"));
             sender.sendMessage(ChatUtils.colorize("&7  amount: Number for NaturalCoin"));
-            sender.sendMessage(ChatUtils.colorize("&7  rank: midi, vip, mvp, nature (30 days)"));
+            sender.sendMessage(ChatUtils.colorize("&7  rank: valid rank name (30 days)"));
             return true;
         }
 
@@ -65,7 +65,7 @@ public class TopupCommand implements CommandExecutor {
                 handleCoinGrant(sender, playerName, amount, target, txId);
             } catch (NumberFormatException e) {
                 sender.sendMessage(ChatUtils
-                        .colorize("&cInvalid amount. Use a number for coins or midi/vip/mvp/nature for ranks."));
+                        .colorize("&cInvalid amount. Use a number for coins or a valid rank name for ranks."));
             }
         }
 

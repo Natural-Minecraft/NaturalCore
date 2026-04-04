@@ -182,12 +182,9 @@ public class RankGUI implements Listener {
         } else {
             lore.add(ChatUtils.toComponent("§e§lHarga:"));
             if (discount > 0) {
-                lore.add(ChatUtils.toComponent("§8• §7§mRp " + priceFormat.format(priceRP) + "§r §c-" + discount + "%"));
-                lore.add(ChatUtils.toComponent("§8• §a§lRp " + priceFormat.format(discountedRP)));
-                lore.add(ChatUtils.toComponent("§8• §7§m" + priceFormat.format(priceNC) + " NC"));
+                lore.add(ChatUtils.toComponent("§8• §7§m" + priceFormat.format(priceNC) + " NC§r §c-" + discount + "%"));
                 lore.add(ChatUtils.toComponent("§8• §6§l" + priceFormat.format(discountedNC) + " NC"));
             } else {
-                lore.add(ChatUtils.toComponent("§8• §fRp " + priceFormat.format(priceRP)));
                 lore.add(ChatUtils.toComponent("§8• §6" + priceFormat.format(priceNC) + " NC"));
             }
             lore.add(Component.empty());
