@@ -15,6 +15,7 @@ ranks:
       item: COAL
       name: "&7&lMEMBER &8|| &r%img__rank-member_%"
       benefits:
+        - "&8» &cNo Playervault"
         - "&8» &fRank Default Player"
         - "&8» &fHome Limit: &e3 Home"
         - "&8» &fBlock Claim Limit: &410.000 Blok"
@@ -105,6 +106,7 @@ ranks:
       item: LAPIS_LAZULI
       name: "&d&lMIDI &8|| &r%img__rank-midi_%"
       benefits:
+        - "&8» &f1 Player Vault"
         - "&8» &fAkses &e/enderchest &7(Virtual Enderchest)"
         - "&8» &fAkses &e/back &7(Teleport ke Tempat Sebelumnya)"
         - "&8» &fHome Limit: &e5 Home"
@@ -129,6 +131,7 @@ ranks:
       item: IRON_INGOT
       name: "&a&lVIP &8|| &r%img__rank-vip_%"
       benefits:
+        - "&8» &f2 Player Vault + Auto Sort"
         - "&8» &fSemua Fitur &d&lMIDI"
         - "&8» &fAkses &e/nick &7(Nama Samaran)"
         - "&8» &fHome Limit: &e10 Home"
@@ -154,6 +157,7 @@ ranks:
       item: IRON_BLOCK
       name: "&a&lVIP+ &8|| &r%img__rank-vip_%"
       benefits:
+        - "&8» &f4 Player Vault"
         - "&8» &fSemua Fitur &a&lVIP"
         - "&8» &fAkses &e/craft &7(Portable Crafting)"
         - "&8» &fHome Limit: &e13 Home"
@@ -175,6 +179,7 @@ ranks:
       item: GOLD_INGOT
       name: "&b&lMVP &8|| &r%img__rank-mvp_%"
       benefits:
+        - "&8» &f6 Player Vault"
         - "&8» &fSemua Fitur &a&lVIP+"
         - "&8» &fAkses &e/fly &7(Terbang di Survival)"
         - "&8» &fAkses &e/anvil &7(Portable Anvil)"
@@ -199,6 +204,7 @@ ranks:
       item: GOLD_BLOCK
       name: "&b&lMVP+ &8|| &r%img__rank-mvp_%"
       benefits:
+        - "&8» &f8 Player Vault"
         - "&8» &fSemua Fitur &b&lMVP"
         - "&8» &fAkses &e/repair &7(Perbaiki Item)"
         - "&8» &fHome Limit: &e18 Home"
@@ -220,6 +226,7 @@ ranks:
       item: RAW_GOLD
       name: "&6&lGOLD"
       benefits:
+        - "&8» &f10 Player Vault"
         - "&8» &fSemua Fitur &b&lMVP+"
         - "&8» &fAkses &e/disposal &7(Tempat Sampah)"
         - "&8» &fHome Limit: &e20 Home"
@@ -241,6 +248,7 @@ ranks:
       item: RAW_GOLD_BLOCK
       name: "&6&lGOLD+"
       benefits:
+        - "&8» &f12 Player Vault"
         - "&8» &fSemua Fitur &6&lGOLD"
         - "&8» &fHome Limit: &e25 Home"
         - "&8» &fBlock Claim Limit: &4112.000 Blok"
@@ -260,6 +268,7 @@ ranks:
       item: DIAMOND
       name: "&e&lNATURE &8|| &r%img__rank-nature_%"
       benefits:
+        - "&8» &f16 Player Vault"
         - "&8» &fSemua Fitur &6&lGOLD+"
         - "&8» &fAkses &e/ptime &7(Ubah Waktu Pribadi)"
         - "&8» &fAkses &e/pweather &7(Ubah Cuaca Pribadi)"
@@ -285,6 +294,7 @@ ranks:
       item: DIAMOND_BLOCK
       name: "&e&lNATURE+"
       benefits:
+        - "&8» &f20 Player Vault"
         - "&8» &fSemua Fitur &e&lNATURE"
         - "&8» &fBypass Server Full &7(Tetap Bisa Masuk)"
         - "&8» &fHome Limit: &e40 Home"
@@ -306,6 +316,7 @@ ranks:
       item: NETHERITE_SCRAP
       name: "&e&lNATURE++"
       benefits:
+        - "&8» &f24 Player Vault"
         - "&8» &fSemua Fitur &e&lNATURE+"
         - "&8» &fCustom Suffix &7(Akhiran Nama Bebas)"
         - "&8» &fHome Limit: &e50 Home"
@@ -327,6 +338,7 @@ ranks:
       item: NETHERITE_INGOT
       name: "&c&lCAKRAWALA"
       benefits:
+        - "&8» &f30 Player Vault"
         - "&8» &fSemua Fitur &e&lNATURE++"
         - "&8» &fBypass Semua Cooldown Command"
         - "&8» &fHome Limit: &e70 Home"
@@ -348,6 +360,7 @@ ranks:
       item: NETHERITE_BLOCK
       name: "&4&lINVESTOR"
       benefits:
+        - "&8» &f50 Player Vault"
         - "&8» &fSemua Fitur &c&lCAKRAWALA"
         - "&8» &fAkses &e/itp &7(Teleport Paksa)"
         - "&8» &fCustom Prefix &7(Awalan Nama Bebas)"
