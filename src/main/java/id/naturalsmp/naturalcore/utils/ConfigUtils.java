@@ -152,13 +152,36 @@ public class ConfigUtils {
      * Ambil string langsung dari messages.yml (tanpa prefix)
      */
     public static String getMessage(String path) {
-        String result = null;
-        if (getMessages().contains(path)) {
-            result = getMessages().getString(path);
-        } else if (getInternalMessages() != null && getInternalMessages().contains(path)) {
-            result = getInternalMessages().getString(path);
+        String result = NaturalCore.getInstance().getLanguageManager().getRawMessage("id", path);
+        if (result == null) {
+            if (getMessages().contains(path)) {
+                result = getMessages().getString(path);
+            } else if (getInternalMessages() != null && getInternalMessages().contains(path)) {
+                result = getInternalMessages().getString(path);
+            }
         }
+        if (result == null)
+            return "";
+        return ChatUtils.colorize(result);
+    }
 
+    public static String getMessage(org.bukkit.command.CommandSender sender, String path) {
+        String langCode = "id";
+        if (sender instanceof org.bukkit.entity.Player) {
+            langCode = NaturalCore.getInstance().getLanguageManager().getLanguage(((org.bukkit.entity.Player)sender).getUniqueId());
+        }
+        
+        String result = NaturalCore.getInstance().getLanguageManager().getRawMessage(langCode, path);
+        
+        // Fallbacks
+        if (result == null) {
+            if (getMessages().contains(path)) {
+                result = getMessages().getString(path);
+            } else if (getInternalMessages() != null && getInternalMessages().contains(path)) {
+                result = getInternalMessages().getString(path);
+            }
+        }
+        
         if (result == null)
             return "";
         return ChatUtils.colorize(result);
@@ -242,28 +265,45 @@ public class ConfigUtils {
         sendMessage(p, "prefix.moderation", path, placeholders);
     }
 
-    public static String getPrefix(String prefixPath) {
-        String prefix = getString("messages." + prefixPath, null);
-        if (prefix == null && prefixPath.equals("prefix.player")) {
-            prefix = getString("messages.prefix.general", "");
+    public static String getPrefix(org.bukkit.command.CommandSender sender, String prefixPath) {
+        String prefix = getMessage(sender, "messages." + prefixPath);
+        if ((prefix == null || prefix.isEmpty()) && prefixPath.equals("prefix.player")) {
+            prefix = getMessage(sender, "messages.prefix.general");
         }
         return prefix != null ? prefix : "";
     }
 
+    public static String getPrefix(String prefixPath) {
+        return getPrefix(Bukkit.getConsoleSender(), prefixPath);
+    }
+
     public static void sendMessage(org.bukkit.command.CommandSender sender, String prefixPath, String path,
             String... placeholders) {
-        String msg = getString(path);
+        // Multi-language fetch
+        String msg = getMessage(sender, path);
+        
+        // Fallback check since old paths might not use "messages." prefix correctly in getMessage logic directly
+        if ((msg == null || msg.isEmpty()) && !path.startsWith("messages.")) {
+            // Usually commands pass the path as "some.key", so it works with getMessage directly.
+            // If we didn't find it, try normal getString
+            msg = getString(path);
+        }
+
         if (msg == null || msg.isEmpty())
             return;
 
         // Apply placeholders (pairs: key, value)
         for (int i = 0; i < placeholders.length; i += 2) {
-            if (i + 1 < placeholders.length) {
-                msg = msg.replace(placeholders[i], placeholders[i + 1]);
-            }
+            String ph = placeholders[i];
+            String val = "";
+            if (i + 1 < placeholders.length) val = placeholders[i + 1];
+            // Safe replacement
+            try {
+               msg = msg.replace(ph, val);
+            } catch (Exception ignored) {}
         }
 
-        String prefix = getPrefix(prefixPath);
+        String prefix = getPrefix(sender, prefixPath);
         sender.sendMessage(prefix + msg);
     }
 }

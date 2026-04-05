@@ -104,16 +104,22 @@ public class NaturalCoreDatabase {
                 "yaw FLOAT NOT NULL, " +
                 "pitch FLOAT NOT NULL)";
 
+        String languageTable = "CREATE TABLE IF NOT EXISTS player_languages (" +
+                "uuid VARCHAR(36) PRIMARY KEY, " +
+                "lang VARCHAR(10) DEFAULT 'id')";
+
         try (PreparedStatement s1 = connection.prepareStatement(coreState);
                 PreparedStatement s2 = connection.prepareStatement(homesTable);
                 PreparedStatement s3 = connection.prepareStatement(spawnTable);
                 PreparedStatement s4 = connection.prepareStatement("CREATE TABLE IF NOT EXISTS vanished_players (" +
                         "uuid VARCHAR(36) PRIMARY KEY, " +
-                        "vanished_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP)")) {
+                        "vanished_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP)");
+                PreparedStatement s5 = connection.prepareStatement(languageTable)) {
             s1.execute();
             s2.execute();
             s3.execute();
             s4.execute();
+            s5.execute();
         }
     }
 
@@ -205,5 +211,32 @@ public class NaturalCoreDatabase {
             plugin.getLogger().log(Level.WARNING, "[CoreDB] Failed to get vanished players", e);
         }
         return vanished;
+    }
+
+    public String getLanguage(java.util.UUID uuid) {
+        if (!connect()) return "id"; // Default
+        String query = "SELECT lang FROM player_languages WHERE uuid = ?";
+        try (PreparedStatement stmt = connection.prepareStatement(query)) {
+            stmt.setString(1, uuid.toString());
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) return rs.getString("lang");
+            }
+        } catch (SQLException e) {
+            plugin.getLogger().log(Level.WARNING, "[CoreDB] Failed to get language for " + uuid, e);
+        }
+        return "id";
+    }
+
+    public void setLanguage(java.util.UUID uuid, String lang) {
+        if (!connect()) return;
+        String query = "INSERT INTO player_languages (uuid, lang) VALUES (?, ?) ON DUPLICATE KEY UPDATE lang = ?";
+        try (PreparedStatement stmt = connection.prepareStatement(query)) {
+            stmt.setString(1, uuid.toString());
+            stmt.setString(2, lang);
+            stmt.setString(3, lang);
+            stmt.executeUpdate();
+        } catch (SQLException e) {
+            plugin.getLogger().log(Level.WARNING, "[CoreDB] Failed to set language for " + uuid, e);
+        }
     }
 }
