@@ -11,9 +11,6 @@ import id.naturalsmp.naturalcore.spawn.SpawnCommand;
 import id.naturalsmp.naturalcore.spawn.SpawnManager;
 import id.naturalsmp.naturalcore.spawn.SpawnListener;
 
-import id.naturalsmp.naturalcore.spawn.SpawnListener;
-
-import id.naturalsmp.naturalcore.lang.LanguageManager;
 import id.naturalsmp.naturalcore.chat.GlobalNotificationListener;
 import id.naturalsmp.naturalcore.listeners.GuiSoundListener;
 import id.naturalsmp.naturalcore.season.*;
@@ -52,9 +49,6 @@ import id.naturalsmp.naturalcore.utility.CleanCommand;
 import id.naturalsmp.naturalcore.utility.MenuCommand;
 import id.naturalsmp.naturalcore.topup.TopupSuccessGUI;
 import id.naturalsmp.naturalcore.topup.TopupCommand;
-
-import id.naturalsmp.naturalcore.lang.LanguageCommand;
-import id.naturalsmp.naturalcore.lang.LanguageGUI;
 
 import id.naturalsmp.naturalcore.afk.AFKManager;
 import id.naturalsmp.naturalcore.announcement.BroadcastManager;
@@ -128,7 +122,6 @@ public final class NaturalCore extends JavaPlugin {
     private id.naturalsmp.naturalcore.database.NaturalCoreDatabase coreDatabase;
     private ChatGameManager chatGameManager;
     private ConnectionManager connectionManager;
-    private LanguageManager languageManager;
 
     @Override
     public void onEnable() {
@@ -149,10 +142,6 @@ public final class NaturalCore extends JavaPlugin {
         if (coreDatabase.isEnabled()) {
             coreDatabase.connect();
         }
-        
-        // Initialize Language Manager
-        this.languageManager = new LanguageManager(this);
-        
         generateEssentialsConfig(); // Generate reference for EssentialsX
 
         // Init text folder if not exists
@@ -452,12 +441,6 @@ public final class NaturalCore extends JavaPlugin {
         getServer().getPluginManager().registerEvents(new id.naturalsmp.naturalcore.listeners.LogListener(), this);
         getLogger().info("NaturalLogger System: ENABLED");
 
-        // Language System
-        LanguageGUI langGUI = new LanguageGUI(this);
-        getServer().getPluginManager().registerEvents(langGUI, this);
-        registerCmd("language", new LanguageCommand(langGUI));
-        registerCmd("lang", new LanguageCommand(langGUI));
-
         // 18. World Utils (NEW)
         WorldUtilCommand worldCmd = new WorldUtilCommand();
         registerCmd("day", worldCmd);
@@ -638,12 +621,8 @@ public final class NaturalCore extends JavaPlugin {
             hudManager.reload();
         if (seasonManager != null)
             seasonManager.loadData();
-        if (seasonManager != null)
-            seasonManager.loadData();
         if (permissionManager != null)
             permissionManager.loadRanks();
-        if (languageManager != null)
-            languageManager.loadLanguages();
         if (laggManager != null)
             laggManager.reload();
 
@@ -817,10 +796,6 @@ public final class NaturalCore extends JavaPlugin {
 
     public id.naturalsmp.naturalcore.utility.ServerHealthManager getHealthManager() {
         return healthManager;
-    }
-
-    public LanguageManager getLanguageManager() {
-        return languageManager;
     }
 
     public id.naturalsmp.naturalcore.utility.BackupManager getBackupManager() {

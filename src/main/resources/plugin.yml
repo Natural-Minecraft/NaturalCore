@@ -60,11 +60,6 @@ commands:
     description: Trigger TopUp success GUI and notification
     permission: naturalsmp.admin
 
-  # --- LANGUAGE MODULE ---
-  language:
-    description: Menu setting bahasa profil
-    aliases: [lang]
-
   # --- SYNC CLIENT ---
   sync:
     description: Kirim command ke Velocity proxy
