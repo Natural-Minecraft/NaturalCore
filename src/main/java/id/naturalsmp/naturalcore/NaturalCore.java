@@ -127,7 +127,6 @@ public final class NaturalCore extends JavaPlugin {
     private RankPriceDatabase rankPriceDatabase;
     private id.naturalsmp.naturalcore.database.NaturalCoreDatabase coreDatabase;
     private ChatGameManager chatGameManager;
-    private ChatGameManager chatGameManager;
     private ConnectionManager connectionManager;
     private LanguageManager languageManager;
 
