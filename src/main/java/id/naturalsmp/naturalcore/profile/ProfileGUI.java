@@ -58,13 +58,22 @@ public class ProfileGUI implements Listener {
             // LuckPerms Rank (Via Vault)
             try {
                 if (plugin.getVaultManager() != null && plugin.getVaultManager().getChat() != null) {
-                    data.rankName = plugin.getVaultManager().getChat().getPrimaryGroup(null, target);
-                    if (data.rankName != null) {
-                        data.rankName = data.rankName.substring(0, 1).toUpperCase() + data.rankName.substring(1);
+                    data.rankId = plugin.getVaultManager().getChat().getPrimaryGroup(null, target);
+                    if (data.rankId != null) {
+                        data.rankName = data.rankId.substring(0, 1).toUpperCase() + data.rankId.substring(1);
                     }
                 }
             } catch (Exception e) {
+                data.rankId = "member";
                 data.rankName = "Default";
+            }
+            
+            // Get Rank Benefits from Config
+            if (data.rankId != null && plugin.getPermissionManager() != null) {
+                var rankCfg = plugin.getPermissionManager().getRanks().get(data.rankId.toLowerCase());
+                if (rankCfg != null && rankCfg.guiBenefits != null) {
+                    data.rankBenefits = new ArrayList<>(rankCfg.guiBenefits);
+                }
             }
 
             // Status & Ping
@@ -140,23 +149,23 @@ public class ProfileGUI implements Listener {
         head.setItemMeta(headMeta);
         inv.setItem(13, head);
 
-        // 2. Statistics (Slot 29)
+        // 2. Statistics (Slot 28)
         List<String> statsLore = new ArrayList<>();
         statsLore.add("");
         statsLore.add("&f⚔ Marksman: &7" + data.kdr);
         statsLore.add("&f☠ Deaths: &c" + data.deaths);
         statsLore.add("&f⌚ Playtime: &b" + data.playtime);
         statsLore.add("&f📅 Join: &e" + data.firstJoin);
-        inv.setItem(29, createItem(Material.CLOCK, "&b&lSTATISTIK", statsLore.toArray(new String[0])));
+        inv.setItem(28, createItem(Material.CLOCK, "&b&lSTATISTIK", statsLore.toArray(new String[0])));
 
-        // 3. Economy Details (Slot 31) - Replaced with detailed view
+        // 3. Economy Details (Slot 30)
         List<String> ecoLore = new ArrayList<>();
         ecoLore.add("");
         ecoLore.add("&7Saldo Bank: &aRp " + data.moneyFormatted);
         ecoLore.add("&7Saldo Koin: &6" + (data.hasCoins ? data.coins : 0) + " NC");
-        inv.setItem(31, createItem(Material.GOLD_INGOT, "&6&lDOMPET DIGITAL", ecoLore.toArray(new String[0])));
+        inv.setItem(30, createItem(Material.GOLD_INGOT, "&6&lDOMPET DIGITAL", ecoLore.toArray(new String[0])));
 
-        // 4. AuraSkills (Slot 33)
+        // 4. AuraSkills (Slot 32)
         if (data.hasSkills) {
             List<String> skillLore = new ArrayList<>();
             skillLore.add("");
@@ -167,7 +176,21 @@ public class ProfileGUI implements Listener {
             skillLore.add("&f🏹 Archery: &eLvl " + data.archery);
             skillLore.add("");
             skillLore.add("&#55FF55&l➥ KLIK UNTUK BUKA SKILLS");
-            inv.setItem(33, createItem(Material.EXPERIENCE_BOTTLE, "&b&lAURASKILLS", skillLore.toArray(new String[0])));
+            inv.setItem(32, createItem(Material.EXPERIENCE_BOTTLE, "&b&lAURASKILLS", skillLore.toArray(new String[0])));
+        }
+
+        // 5. Rank Benefits (Slot 34)
+        if (data.rankBenefits != null && !data.rankBenefits.isEmpty()) {
+            List<String> benefitLore = new ArrayList<>();
+            benefitLore.add("");
+            for (String b : data.rankBenefits) {
+                // Parse PlaceholderAPI if target is online
+                if (target.isOnline() && Bukkit.getPluginManager().getPlugin("PlaceholderAPI") != null) {
+                    b = me.clip.placeholderapi.PlaceholderAPI.setPlaceholders(target.getPlayer(), b);
+                }
+                benefitLore.add(b);
+            }
+            inv.setItem(34, createItem(Material.DIAMOND, "&#FF88FF&lBENEFIT RANK", benefitLore.toArray(new String[0])));
         }
 
         // 5. Social Actions (Slot 49) - Only if viewing others
@@ -186,7 +209,9 @@ public class ProfileGUI implements Listener {
 
     private static class ProfileData {
         String rankDisplay;
+        String rankId;
         String rankName; // LuckPerms Rank
+        List<String> rankBenefits;
         String moneyFormatted;
         boolean isOnline;
         int ping;
