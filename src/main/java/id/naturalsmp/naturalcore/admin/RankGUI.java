@@ -20,6 +20,7 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.inventory.meta.SkullMeta;
 import org.jetbrains.annotations.NotNull;
 import su.nightexpress.coinsengine.api.CoinsEngineAPI;
 
@@ -29,8 +30,8 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Rank Shop GUI - Displays all 12 donator ranks with prices fetched from MySQL.
- * 4x3 Grid (Slots: 10,12,14,16, 19,21,23,25, 28,30,32,34)
+ * Rank Shop GUI - 54-slot layout, ALL benefits shown, PlayerHead info, kit preview.
+ * Left click = buy (NC), Right click = /kits preview <rank>
  */
 public class RankGUI implements Listener {
 
@@ -43,39 +44,55 @@ public class RankGUI implements Listener {
             "gold_plus", "nature", "nature_plus", "nature_plus_plus", "cakrawala", "investor"
     };
 
+    // Kit name mapping (for /kits preview <name>)
+    private static final Map<String, String> KIT_NAME_MAP = new java.util.HashMap<>() {{
+        put("midi",             "MIDI");
+        put("vip",              "VIP");
+        put("vip_plus",         "VIPPLUS");
+        put("mvp",              "MVP");
+        put("mvp_plus",         "MVPPLUS");
+        put("gold",             "GOLD");
+        put("gold_plus",        "GOLDPLUS");
+        put("nature",           "NATURE");
+        put("nature_plus",      "NATUREPLUS");
+        put("nature_plus_plus", "NATUREPLUSPLUS");
+        put("cakrawala",        "CAKRAWALA");
+        put("investor",         "INVESTOR");
+    }};
+
     // Default materials fallback per rank
-    private static final java.util.Map<String, Material> RANK_MATERIAL_MAP = new java.util.HashMap<>() {{
-        put("midi",            Material.LAPIS_LAZULI);
-        put("vip",             Material.IRON_INGOT);
-        put("vip_plus",        Material.IRON_BLOCK);
-        put("mvp",             Material.GOLD_INGOT);
-        put("mvp_plus",        Material.GOLD_BLOCK);
-        put("gold",            Material.RAW_GOLD);
-        put("gold_plus",       Material.RAW_GOLD_BLOCK);
-        put("nature",          Material.DIAMOND);
-        put("nature_plus",     Material.DIAMOND_BLOCK);
-        put("nature_plus_plus",Material.NETHERITE_SCRAP);
-        put("cakrawala",       Material.NETHERITE_INGOT);
-        put("investor",        Material.NETHERITE_BLOCK);
+    private static final Map<String, Material> RANK_MATERIAL_MAP = new java.util.HashMap<>() {{
+        put("midi",             Material.LAPIS_LAZULI);
+        put("vip",              Material.IRON_INGOT);
+        put("vip_plus",         Material.IRON_BLOCK);
+        put("mvp",              Material.GOLD_INGOT);
+        put("mvp_plus",         Material.GOLD_BLOCK);
+        put("gold",             Material.RAW_GOLD);
+        put("gold_plus",        Material.RAW_GOLD_BLOCK);
+        put("nature",           Material.DIAMOND);
+        put("nature_plus",      Material.DIAMOND_BLOCK);
+        put("nature_plus_plus", Material.NETHERITE_SCRAP);
+        put("cakrawala",        Material.NETHERITE_INGOT);
+        put("investor",         Material.NETHERITE_BLOCK);
     }};
 
-    // Rank color codes
-    private static final java.util.Map<String, String> RANK_COLOR_MAP = new java.util.HashMap<>() {{
-        put("midi",            "<#FF88FF>");
-        put("vip",             "<#55FF55>");
-        put("vip_plus",        "<#88FF88>");
-        put("mvp",             "<#55FFFF>");
-        put("mvp_plus",        "<#33DDDD>");
-        put("gold",            "<#FFAA00>");
-        put("gold_plus",       "<#FFCC44>");
-        put("nature",          "<#FFFF55>");
-        put("nature_plus",     "<#FFFF88>");
-        put("nature_plus_plus","<#AAFFAA>");
-        put("cakrawala",       "<#FF5555>");
-        put("investor",        "<#AA2200>");
+    // Rank color codes (MiniMessage)
+    private static final Map<String, String> RANK_COLOR_MAP = new java.util.HashMap<>() {{
+        put("midi",             "<#FF88FF>");
+        put("vip",              "<#55FF55>");
+        put("vip_plus",         "<#88FF88>");
+        put("mvp",              "<#55FFFF>");
+        put("mvp_plus",         "<#33DDDD>");
+        put("gold",             "<#FFAA00>");
+        put("gold_plus",        "<#FFCC44>");
+        put("nature",           "<#FFFF55>");
+        put("nature_plus",      "<#FFFF88>");
+        put("nature_plus_plus", "<#AAFFAA>");
+        put("cakrawala",        "<#FF5555>");
+        put("investor",         "<#AA2200>");
     }};
 
-    // 4x3 Grid spacing
+    // 4x3 Grid slots (54-slot inventory, rows 1-4 middle columns)
     private static final int[] RANK_ITEM_SLOTS = { 10, 12, 14, 16, 19, 21, 23, 25, 28, 30, 32, 34 };
 
     public RankGUI(NaturalCore plugin) {
@@ -86,8 +103,8 @@ public class RankGUI implements Listener {
 
     public void openGUI(Player p) {
         p.playSound(p.getLocation(), Sound.BLOCK_AMETHYST_BLOCK_CHIME, 1.0f, 1.2f);
-        
-        String title = ConfigUtils.getMessage("ranks.gui-title") != null ? 
+
+        String title = ConfigUtils.getMessage("ranks.gui-title") != null ?
                        ConfigUtils.getMessage("ranks.gui-title") : "§8Rank Shop";
         Inventory inv = GUIUtils.createGUI(new RankHolder(), 54, title);
 
@@ -123,8 +140,11 @@ public class RankGUI implements Listener {
                     benefits, isOwned));
         }
 
-        // Navigation / Info
-        inv.setItem(4, createInfoItem());
+        // Slot 4: Player Head (rank info + all benefits)
+        inv.setItem(4, createPlayerHeadItem(p, ranks));
+
+        // Slot 40: Info item
+        inv.setItem(40, createInfoItem());
 
         // Close button
         inv.setItem(49, createItem(Material.BARRIER, "§c§lTUTUP", List.of("§7Klik untuk keluar menu.")));
@@ -132,16 +152,62 @@ public class RankGUI implements Listener {
         p.openInventory(inv);
     }
 
-    // ─── Item Builders ─────────────────────────────────────────────────────────
+    // ─── Player Head Item ─────────────────────────────────────────────────────
 
-    private Material getMaterial(String rankId, PermissionManager.RankConfig rankConfig) {
-        if (rankConfig != null && rankConfig.guiItem != null) {
-            try {
-                return Material.valueOf(rankConfig.guiItem.toUpperCase());
-            } catch (IllegalArgumentException ignored) {}
+    @SuppressWarnings("deprecation")
+    private ItemStack createPlayerHeadItem(Player p, Map<String, PermissionManager.RankConfig> ranks) {
+        ItemStack skull = new ItemStack(Material.PLAYER_HEAD);
+        SkullMeta meta = (SkullMeta) skull.getItemMeta();
+        if (meta == null) return skull;
+
+        meta.setOwningPlayer(p);
+
+        // Find player's highest rank
+        String playerRankId = "member";
+        String playerRankDisplay = "§7Member";
+        for (int i = ALL_RANKS.length - 1; i >= 0; i--) {
+            if (p.hasPermission("group." + ALL_RANKS[i])) {
+                playerRankId = ALL_RANKS[i];
+                PermissionManager.RankConfig rc = ranks.get(playerRankId);
+                playerRankDisplay = rc != null ? rc.displayName : ALL_RANKS[i].toUpperCase();
+                break;
+            }
         }
-        return RANK_MATERIAL_MAP.getOrDefault(rankId, Material.PAPER);
+
+        // Title: [Rank Prefix] PlayerName
+        String headTitle = playerRankDisplay + " §f" + p.getName();
+        meta.displayName(ChatUtils.toComponent(headTitle));
+
+        // Lore: show all benefits of player's current rank
+        List<Component> lore = new ArrayList<>();
+        lore.add(Component.empty());
+        lore.add(ChatUtils.toComponent("§e§lRank Aktifmu: §r" + playerRankDisplay));
+        lore.add(Component.empty());
+
+        PermissionManager.RankConfig currentRankCfg = ranks.get(playerRankId);
+        if (currentRankCfg != null && currentRankCfg.guiBenefits != null && !currentRankCfg.guiBenefits.isEmpty()) {
+            lore.add(ChatUtils.toComponent("§6§lSemua Benefits Rankmu:"));
+            for (String benefit : currentRankCfg.guiBenefits) {
+                String parsed = benefit;
+                if (Bukkit.getPluginManager().getPlugin("PlaceholderAPI") != null) {
+                    parsed = me.clip.placeholderapi.PlaceholderAPI.setPlaceholders(p, parsed);
+                }
+                lore.add(ChatUtils.toComponent("  " + parsed));
+            }
+        } else {
+            lore.add(ChatUtils.toComponent("§7Kamu belum memiliki rank premium."));
+            lore.add(ChatUtils.toComponent("§7Beli rank untuk akses fitur eksklusif!"));
+        }
+
+        lore.add(Component.empty());
+        lore.add(ChatUtils.toComponent("§b→ store.naturalsmp.net"));
+
+        meta.lore(lore);
+        skull.setItemMeta(meta);
+        return skull;
     }
+
+    // ─── Rank Item ────────────────────────────────────────────────────────────
 
     private ItemStack createRankItem(Player p, Material mat, String color, String displayId, String rankId,
             double priceRP, double priceNC, double discountedRP, double discountedNC,
@@ -160,25 +226,22 @@ public class RankGUI implements Listener {
         lore.add(Component.empty());
         lore.add(ChatUtils.toComponent("§e§lBenefits:"));
 
-        int maxBenefits = Math.min(benefits.size(), 4);
-        for (int i = 0; i < maxBenefits; i++) {
-            String parsed = benefits.get(i);
+        // Show ALL benefits (no cap)
+        for (String benefit : benefits) {
+            String parsed = benefit;
             if (Bukkit.getPluginManager().getPlugin("PlaceholderAPI") != null) {
                 parsed = me.clip.placeholderapi.PlaceholderAPI.setPlaceholders(p, parsed);
             }
-            lore.add(ChatUtils.toComponent("§8• §7" + parsed));
-        }
-        if (benefits.size() > 4) {
-            lore.add(ChatUtils.toComponent("§8  §o...dan masih banyak lagi!"));
+            lore.add(ChatUtils.toComponent(parsed));
         }
 
         lore.add(Component.empty());
 
         if (isOwned) {
-            lore.add(ChatUtils.toComponent("§6§lSUDAH DIMILIKI"));
-            lore.add(ChatUtils.toComponent("§7Kamu sudah memiliki rank ini."));
+            lore.add(ChatUtils.toComponent("§a§lSUDAH DIMILIKI ✔"));
+            lore.add(ChatUtils.toComponent("§7Rank ini sudah aktif di akunmu."));
             lore.add(Component.empty());
-            lore.add(ChatUtils.toComponent("§e[➡] Klik Kanan: §fPreview Uang Kit"));
+            lore.add(ChatUtils.toComponent("§e[➡] Klik Kanan: §fPreview Uang Kit Rank"));
         } else {
             lore.add(ChatUtils.toComponent("§e§lHarga:"));
             if (discount > 0) {
@@ -189,13 +252,15 @@ public class RankGUI implements Listener {
             }
             lore.add(Component.empty());
             lore.add(ChatUtils.toComponent("§a[⬅] Klik Kiri: §fBeli pakai NC"));
-            lore.add(ChatUtils.toComponent("§e[➡] Klik Kanan: §fPreview Uang Kit"));
+            lore.add(ChatUtils.toComponent("§e[➡] Klik Kanan: §fPreview Uang Kit Rank"));
         }
 
         meta.lore(lore);
         item.setItemMeta(meta);
         return item;
     }
+
+    // ─── Info Item ────────────────────────────────────────────────────────────
 
     private ItemStack createInfoItem() {
         ItemStack item = new ItemStack(Material.BOOK);
@@ -231,6 +296,17 @@ public class RankGUI implements Listener {
         return item;
     }
 
+    // ─── Helper ───────────────────────────────────────────────────────────────
+
+    private Material getMaterial(String rankId, PermissionManager.RankConfig rankConfig) {
+        if (rankConfig != null && rankConfig.guiItem != null) {
+            try {
+                return Material.valueOf(rankConfig.guiItem.toUpperCase());
+            } catch (IllegalArgumentException ignored) {}
+        }
+        return RANK_MATERIAL_MAP.getOrDefault(rankId, Material.PAPER);
+    }
+
     // ─── Click Handlers ────────────────────────────────────────────────────────
 
     @EventHandler
@@ -247,27 +323,32 @@ public class RankGUI implements Listener {
         if (slot == 49) {
             p.closeInventory();
             p.playSound(p.getLocation(), Sound.BLOCK_IRON_DOOR_CLOSE, 1f, 1.2f);
-        } else if (isRankSlot(slot)) {
-            int rankArrayIdx = getRankSlotIndex(slot);
-            if (rankArrayIdx < 0 || rankArrayIdx >= ALL_RANKS.length) return;
-
-            String rankId = ALL_RANKS[rankArrayIdx];
-            
-            if (e.getClick() == ClickType.RIGHT) {
-                // Right click -> Preview kit
-                p.closeInventory();
-                p.playSound(p.getLocation(), Sound.UI_BUTTON_CLICK, 1f, 1f);
-                p.performCommand("pk preview " + rankId);
-                return;
-            }
-
-            if (p.hasPermission("group." + rankId)) {
-                p.playSound(p.getLocation(), Sound.ENTITY_VILLAGER_NO, 1f, 1f);
-                p.sendMessage(ChatUtils.colorize("§6§lNaturalSMP §8» §cKamu sudah memiliki rank ini!"));
-                return;
-            }
-            openConfirmationGUI(p, rankId);
+            return;
         }
+
+        if (!isRankSlot(slot)) return;
+
+        int rankArrayIdx = getRankSlotIndex(slot);
+        if (rankArrayIdx < 0 || rankArrayIdx >= ALL_RANKS.length) return;
+
+        String rankId = ALL_RANKS[rankArrayIdx];
+
+        if (e.getClick() == ClickType.RIGHT) {
+            // Right click → /kits preview <KitName>
+            String kitName = KIT_NAME_MAP.getOrDefault(rankId, rankId.toUpperCase());
+            p.closeInventory();
+            p.playSound(p.getLocation(), Sound.UI_BUTTON_CLICK, 1f, 1f);
+            p.performCommand("kits preview " + kitName);
+            return;
+        }
+
+        // Left click
+        if (p.hasPermission("group." + rankId)) {
+            p.playSound(p.getLocation(), Sound.ENTITY_VILLAGER_NO, 1f, 1f);
+            p.sendMessage(ChatUtils.colorize("§6§lNaturalSMP §8» §cKamu sudah memiliki rank ini! Klik Kanan untuk preview kit."));
+            return;
+        }
+        openConfirmationGUI(p, rankId);
     }
 
     private boolean isRankSlot(int slot) {
@@ -371,9 +452,7 @@ public class RankGUI implements Listener {
 
     public static class ConfirmationHolder implements InventoryHolder {
         private final String rankId;
-        public ConfirmationHolder(String rankId) {
-            this.rankId = rankId;
-        }
+        public ConfirmationHolder(String rankId) { this.rankId = rankId; }
         public String getRankId() { return rankId; }
         @Override public @NotNull Inventory getInventory() { return null; }
     }
