@@ -539,6 +539,7 @@ public class NaturalLaggManager implements Listener {
     // ==================== STACK MOB: GENERIC REMOVE HANDLER ====================
 
     @EventHandler(priority = EventPriority.MONITOR)
+    @SuppressWarnings("deprecation")
     public void onEntityRemove(org.bukkit.event.entity.EntityRemoveEvent e) {
         if (!mergingEnabled)
             return;

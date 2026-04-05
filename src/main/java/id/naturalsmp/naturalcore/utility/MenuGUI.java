@@ -81,7 +81,7 @@ public class MenuGUI implements Listener {
         // ── Row 1: Main Actions (Slots 19, 21, 23, 25) ───────────────────
 
         // Profil
-        inv.setItem(19, buildItem(Material.NAMETAG, "<#55FF55><bold>👤 PROFIL</bold>",
+        inv.setItem(19, buildItem(Material.NAME_TAG, "<#55FF55><bold>👤 PROFIL</bold>",
                 "§7Statistik, rank, skill,",
                 "§7dan informasi akunmu.",
                 "", "<#FFAA00>➥ Klik untuk membuka"));
