@@ -69,6 +69,7 @@ public class HUDManager implements Listener {
         components.add(new CombatComponent(plugin));
         components.add(new BiomeInfoComponent(plugin));
         components.add(new TipsComponent(plugin));
+        components.add(new XPEventComponent(plugin));
         components.add(new SeasonComponent(plugin));
         components.add(new VanishHUDComponent(plugin));
 
