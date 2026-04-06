@@ -43,29 +43,29 @@ public class ChatColorGUI implements Listener {
         inv.setItem(1, createRankHeader("default"));
         inv.setItem(3, createColorItem(p, Material.WHITE_WOOL, "&fWhite (Default)", "&f", "default"));
 
-        // --- ROW 2: MIDI ---
-        // Permissions: naturalsmp.color.midi
-        inv.setItem(10, createRankHeader("midi"));
-        inv.setItem(12, createColorItem(p, Material.PINK_WOOL, "&dPink", "&d", "naturalsmp.color.midi"));
-        inv.setItem(13, createColorItem(p, Material.MAGENTA_WOOL, "&5Magenta", "&5", "naturalsmp.color.midi"));
-        inv.setItem(14, createColorItem(p, Material.PURPLE_WOOL, "&5Purple", "&#8A2BE2", "naturalsmp.color.midi"));
+        // --- ROW 2: LEVEL 1 ---
+        // Permissions: naturalsmp.color.level1
+        inv.setItem(10, createRankHeader("level1"));
+        inv.setItem(12, createColorItem(p, Material.PINK_WOOL, "&dPink", "&d", "naturalsmp.color.level1"));
+        inv.setItem(13, createColorItem(p, Material.MAGENTA_WOOL, "&5Magenta", "&5", "naturalsmp.color.level1"));
+        inv.setItem(14, createColorItem(p, Material.PURPLE_WOOL, "&5Purple", "&#8A2BE2", "naturalsmp.color.level1"));
 
-        // --- ROW 3: VIP ---
-        // Permissions: naturalsmp.color.vip
-        inv.setItem(19, createRankHeader("vip"));
-        inv.setItem(21, createColorItem(p, Material.LIME_WOOL, "&aLime", "&a", "naturalsmp.color.vip"));
-        inv.setItem(22, createColorItem(p, Material.GREEN_WOOL, "&2Green", "&2", "naturalsmp.color.vip"));
-        inv.setItem(23, createColorItem(p, Material.YELLOW_WOOL, "&eYellow", "&e", "naturalsmp.color.vip"));
+        // --- ROW 3: LEVEL 2 ---
+        // Permissions: naturalsmp.color.level2
+        inv.setItem(19, createRankHeader("level2"));
+        inv.setItem(21, createColorItem(p, Material.LIME_WOOL, "&aLime", "&a", "naturalsmp.color.level2"));
+        inv.setItem(22, createColorItem(p, Material.GREEN_WOOL, "&2Green", "&2", "naturalsmp.color.level2"));
+        inv.setItem(23, createColorItem(p, Material.YELLOW_WOOL, "&eYellow", "&e", "naturalsmp.color.level2"));
 
-        // --- ROW 4: MVP ---
-        // Permissions: naturalsmp.color.mvp
-        inv.setItem(28, createRankHeader("mvp"));
-        inv.setItem(30, createColorItem(p, Material.LIGHT_BLUE_WOOL, "&bAqua", "&b", "naturalsmp.color.mvp"));
-        inv.setItem(31, createColorItem(p, Material.BLUE_WOOL, "&9Blue", "&9", "naturalsmp.color.mvp"));
-        inv.setItem(32, createColorItem(p, Material.CYAN_WOOL, "&3Cyan", "&3", "naturalsmp.color.mvp"));
+        // --- ROW 4: LEVEL 3 ---
+        // Permissions: naturalsmp.color.level3
+        inv.setItem(28, createRankHeader("level3"));
+        inv.setItem(30, createColorItem(p, Material.LIGHT_BLUE_WOOL, "&bAqua", "&b", "naturalsmp.color.level3"));
+        inv.setItem(31, createColorItem(p, Material.BLUE_WOOL, "&9Blue", "&9", "naturalsmp.color.level3"));
+        inv.setItem(32, createColorItem(p, Material.CYAN_WOOL, "&3Cyan", "&3", "naturalsmp.color.level3"));
 
-        // --- ROW 5: NATURE (BONUS) ---
-        inv.setItem(37, createRankHeader("nature"));
+        // --- ROW 5: LEVEL 4 (Font & Styles) ---
+        inv.setItem(37, createRankHeader("level4"));
         inv.setItem(39, createFontItem(p, Material.PAPER, "&fDefault Font", "default"));
         inv.setItem(40, createFontItem(p, Material.MAP, "&dSmall Caps", "SmallCaps"));
         inv.setItem(41, createFontItem(p, Material.WRITABLE_BOOK, "&eMath Sans", "MathSans"));
@@ -100,7 +100,7 @@ public class ChatColorGUI implements Listener {
 
     private ItemStack createColorItem(Player p, Material mat, String name, String code, String perm) {
         ChatColorManager manager = plugin.getChatColorManager();
-        boolean hasPerm = perm.equals("default") || p.hasPermission(perm) || p.hasPermission("naturalsmp.color.nature");
+        boolean hasPerm = perm.equals("default") || p.hasPermission(perm) || p.hasPermission("naturalsmp.color.level4");
 
         if (!hasPerm) {
             ItemStack item = new ItemStack(Material.GRAY_DYE);
@@ -143,7 +143,7 @@ public class ChatColorGUI implements Listener {
             isActive = manager.isItalic(p);
 
         List<Component> lore = new ArrayList<>();
-        if (!p.hasPermission("naturalsmp.color.nature")) {
+        if (!p.hasPermission("naturalsmp.color.level4")) {
             lore.add(ChatUtils.toComponent(ConfigUtils.getString("messages.utils.chatcolor-style-locked")));
         } else {
             lore.add(isActive ? ChatUtils.toComponent("&a&lENABLED") : ChatUtils.toComponent("&cDISABLED"));
@@ -160,7 +160,7 @@ public class ChatColorGUI implements Listener {
         meta.displayName(ChatUtils.toComponent(name));
 
         List<Component> lore = new ArrayList<>();
-        if (!p.hasPermission("naturalsmp.color.nature")) {
+        if (!p.hasPermission("naturalsmp.color.level4")) {
             lore.add(ChatUtils.toComponent(ConfigUtils.getString("messages.utils.chatcolor-style-locked")));
         } else {
             if (manager.getPlayerFont(p).equals(fontName)) {
@@ -252,7 +252,7 @@ public class ChatColorGUI implements Listener {
 
         // STYLES
         if (mat == Material.BOOK || mat == Material.FEATHER) {
-            if (!p.hasPermission("naturalsmp.color.nature")) {
+            if (!p.hasPermission("naturalsmp.color.level4")) {
                 p.playSound(p.getLocation(), Sound.BLOCK_NOTE_BLOCK_BASS, 1f, 0.5f);
                 return;
             }
@@ -279,7 +279,7 @@ public class ChatColorGUI implements Listener {
             if (current.getItemMeta().hasCustomModelData())
                 return;
 
-            if (!p.hasPermission("naturalsmp.color.nature")) {
+            if (!p.hasPermission("naturalsmp.color.level4")) {
                 p.playSound(p.getLocation(), Sound.BLOCK_NOTE_BLOCK_BASS, 1f, 0.5f);
                 return;
             }

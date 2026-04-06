@@ -468,17 +468,17 @@ permissions:
   naturalsmp.chat.color:
     description: Access to basic ChatColor
     default: true
-  naturalsmp.color.vip:
-    description: Access to VIP colors
+  naturalsmp.color.level1:
+    description: Access to Level 1 colors (MIDI)
     default: op
-  naturalsmp.color.mvp:
-    description: Access to MVP colors
+  naturalsmp.color.level2:
+    description: Access to Level 2 colors (VIP+)
     default: op
-  naturalsmp.color.midi:
-    description: Access to Midi colors
+  naturalsmp.color.level3:
+    description: Access to Level 3 colors (MVP+)
     default: op
-  naturalsmp.color.nature:
-    description: Access to ALL colors + fonts + styles
+  naturalsmp.color.level4:
+    description: Access to Level 4 colors (Nature+)
     default: op
 
   # --- Staff Permissions ---

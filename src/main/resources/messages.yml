@@ -244,7 +244,7 @@ chat:
   cooldown: "&e&l⚠ &7Tunggu &c%time% detik &7lagi."
   color:
     locked: "&#FF5555&l🔒 &cKamu tidak memiliki izin untuk warna ini!"
-    style-locked: "&#FF5555&l🔒 &cMembutuhkan Rank &#55FF55&lNature&c!"
+    style-locked: "&#FF5555&l🔒 &cMembutuhkan &5&lLevel 4&c (Nature+)!"
 
 fun:
   fireball-launch: "&#FF5500&l🔥 &7Fireball diluncurkan!"
@@ -287,10 +287,10 @@ gui:
     title: "<gradient:#FF69B4:#FF1493>❂ CHAT COLORS ❂</gradient>"
     category:
       default: "&#AAAAAA⬛ &#AAAAAAᴅᴇꜰᴀᴜʟᴛ"
-      midi: "&#FF55FF❂ &#FF55FFᴍɪᴅɪ"
-      vip: "&#55FF55❂ &#55FF55ᴠɪᴘ"
-      mvp: "&#00AAFF❂ &#00AAFFᴍᴠᴘ"
-      nature: "&#FFAA00❂ &#FFAA00ɴᴀᴛᴜʀᴇ"
+      level1: "&#FF55FF❂ &#FF55FF&lLEVEL 1 &7(Midi+)"
+      level2: "&#55FF55❂ &#55FF55&lLEVEL 2 &7(VIP+)"
+      level3: "&#00AAFF❂ &#00AAFF&lLEVEL 3 &7(MVP+)"
+      level4: "&#FFAA00❂ &#FFAA00&lLEVEL 4 &7(Nature+)"
 
 # --- TRADE SYSTEM ---
 trade:
