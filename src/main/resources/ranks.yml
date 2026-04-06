@@ -7,7 +7,7 @@
 # 3. Hierarchy: Rank di bawah mewarisi (inherit) rank di atasnya.
 
 ranks:
-  member:
+  default:
     display: "&7Member"
     prefix: ":_rank-member_: "
     weight: 0
@@ -101,7 +101,7 @@ ranks:
     display: "&dMidi"
     prefix: ":_rank-midi_: "
     weight: 100
-    inherit: member
+    inherit: default
     gui:
       item: LAPIS_LAZULI
       name: "&d&lMIDI &8|| &r%img__rank-midi_%"
@@ -117,7 +117,7 @@ ranks:
       - naturalsmp.enderchest
       - naturalsmp.back
       - naturalsmp.emoji.unlimited
-      - naturalsmp.color.midi
+      - naturalsmp.color.level1
       - naturalsmp.home.limit.midi
       - redprotect.limits.blocks.16000
       - redprotect.limits.claim.10
@@ -143,7 +143,7 @@ ranks:
       - naturalsmp.trash
       - naturalsmp.resource
       - naturalsmp.nick
-      - naturalsmp.color.vip
+      - naturalsmp.color.level2
       - naturalsmp.home.limit.vip
       - redprotect.limits.blocks.32000
       - redprotect.limits.claim.20
@@ -190,7 +190,7 @@ ranks:
     permissions:
       - naturalsmp.fly
       - naturalsmp.anvil
-      - naturalsmp.color.mvp
+      - naturalsmp.color.level3
       - naturalsmp.home.limit.mvp
       - redprotect.limits.blocks.64000
       - redprotect.limits.claim.40
@@ -280,7 +280,7 @@ ranks:
       - naturalsmp.ptime
       - naturalsmp.pweather
       - naturalsmp.temperature.immune
-      - naturalsmp.color.nature
+      - naturalsmp.color.level4
       - naturalsmp.home.limit.nature
       - redprotect.limits.blocks.128000
       - redprotect.limits.claim.80
@@ -405,10 +405,6 @@ rank-lainnya:
     display: "&2Developer"
     prefix: ":_staff-developer-server_: "
     weight: 2000
-  ai:
-    display: "&2AI"
-    prefix: " &f&r  "
-    weight: 2500
   owner:
     display: "&6Owner"
     prefix: ":_owner-server_: "
