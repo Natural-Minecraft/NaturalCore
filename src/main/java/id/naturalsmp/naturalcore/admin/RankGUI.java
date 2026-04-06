@@ -7,6 +7,9 @@ import id.naturalsmp.naturalcore.utils.ChatUtils;
 import id.naturalsmp.naturalcore.utils.ConfigUtils;
 import id.naturalsmp.naturalcore.utils.GUIUtils;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.event.ClickEvent;
+import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.Sound;
@@ -289,12 +292,9 @@ public class RankGUI implements Listener {
     // ─── Media Item ───────────────────────────────────────────────────────────
 
     private ItemStack createMediaItem() {
-        ItemStack item = new ItemStack(Material.PAPER); // Could use a custom model data if ItemsAdder is used
+        ItemStack item = new ItemStack(Material.PAPER);
         ItemMeta meta = item.getItemMeta();
         if (meta != null) {
-            if (Bukkit.getPluginManager().getPlugin("ItemsAdder") != null) {
-                // If using itemsadder, use a cool item
-            }
             meta.displayName(ChatUtils.toComponent("<gradient:#FF0000:#FF0077><b>Anda Terkenal?</b></gradient>"));
             List<Component> lore = new ArrayList<>();
             lore.add(ChatUtils.toComponent("§fApply %img__youtuber_% §7/ §f%img__tiktoker_% For Free."));
@@ -358,8 +358,13 @@ public class RankGUI implements Listener {
             } else {
                 p.closeInventory();
                 p.playSound(p.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, 1f, 1f);
-                p.sendMessage(ChatUtils.colorize("§6§lNaturalSMP §8» §aKlik link ini untuk mendaftar menjadi kreator:"));
-                p.sendMessage(ChatUtils.colorize("§bhttps://www.naturalsmp.net/#team"));
+                p.sendMessage(ChatUtils.toComponent("§6§lNaturalSMP §8» §aKlik link ini untuk mendaftar menjadi kreator:"));
+                String url = "https://www.naturalsmp.net/#team";
+                Component clickable = Component.text(url)
+                        .color(NamedTextColor.AQUA)
+                        .decorate(TextDecoration.UNDERLINED)
+                        .clickEvent(ClickEvent.openUrl(url));
+                p.sendMessage(clickable);
             }
             return;
         }

@@ -129,6 +129,7 @@ public final class NaturalCore extends JavaPlugin {
     
     private MediaManager mediaManager;
     private MediaGUI mediaGUI;
+    private MediaSneakListener mediaSneakListener;
 
     @Override
     public void onEnable() {
@@ -579,7 +580,8 @@ public final class NaturalCore extends JavaPlugin {
         registerCmd("youtuber", mediaCmd);
         registerCmd("tiktoker", mediaCmd);
         getServer().getPluginManager().registerEvents(mediaGUI, this);
-        getServer().getPluginManager().registerEvents(new MediaSneakListener(this), this);
+        this.mediaSneakListener = new MediaSneakListener(this);
+        getServer().getPluginManager().registerEvents(mediaSneakListener, this);
 
         // Selesai
         getLogger().info(
@@ -666,6 +668,9 @@ public final class NaturalCore extends JavaPlugin {
         }
         if (mediaManager != null) {
             mediaManager.saveData();
+        }
+        if (mediaSneakListener != null) {
+            mediaSneakListener.stop();
         }
         if (bannerManager != null) {
             bannerManager.saveAll();

@@ -4,6 +4,9 @@ import id.naturalsmp.naturalcore.NaturalCore;
 import id.naturalsmp.naturalcore.utils.ChatUtils;
 import id.naturalsmp.naturalcore.utils.GUIUtils;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.event.ClickEvent;
+import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.Sound;
@@ -13,6 +16,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryDragEvent;
 import org.bukkit.event.player.AsyncPlayerChatEvent;
+import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
@@ -146,8 +150,15 @@ public class MediaGUI implements Listener {
                 } else {
                     p.closeInventory();
                     p.playSound(p.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, 1f, 1f);
-                    p.sendMessage(ChatUtils.colorize("§6§lNaturalSMP §8» §aKlik link ini untuk mendaftar menjadi kreator:"));
-                    p.sendMessage(ChatUtils.colorize("§bhttps://www.naturalsmp.net/#team"));
+
+                    // Send clickable URL
+                    p.sendMessage(ChatUtils.toComponent("§6§lNaturalSMP §8» §aKlik link ini untuk mendaftar menjadi kreator:"));
+                    String url = "https://www.naturalsmp.net/#team";
+                    Component clickable = Component.text(url)
+                            .color(NamedTextColor.AQUA)
+                            .decorate(TextDecoration.UNDERLINED)
+                            .clickEvent(ClickEvent.openUrl(url));
+                    p.sendMessage(clickable);
                 }
             } else if (e.getSlot() == 15) {
                 openBenefitsGUI(p);
@@ -188,6 +199,11 @@ public class MediaGUI implements Listener {
                 openGUI(p);
             });
         }
+    }
+
+    @EventHandler
+    public void onQuit(PlayerQuitEvent e) {
+        pendingLinkInput.remove(e.getPlayer().getUniqueId());
     }
 
     public static class MediaHolder implements InventoryHolder {
