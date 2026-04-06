@@ -51,7 +51,7 @@ public class OfflineTPCommand implements CommandExecutor {
         }
 
         // 2. Check Cache (TeleportManager - Quit Location)
-        @SuppressWarnings("deprecation")
+        // Note: hasPlayedBefore() might be false if server just restarted and uuid
         OfflinePlayer offline = Bukkit.getOfflinePlayer(targetName);
 
         // Note: hasPlayedBefore() might be false if server just restarted and uuid

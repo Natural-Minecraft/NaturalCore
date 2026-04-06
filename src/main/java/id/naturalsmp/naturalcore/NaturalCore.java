@@ -739,16 +739,8 @@ public final class NaturalCore extends JavaPlugin {
         return homeGUI;
     }
 
-    public id.naturalsmp.naturalcore.chat.suffix.SuffixManager getSuffixManager() {
-        return suffixManager;
-    }
-
     public id.naturalsmp.naturalcore.afk.AFKManager getAFKManager() {
         return afkManager;
-    }
-
-    public id.naturalsmp.naturalcore.tier.TierManager getTierManager() {
-        return tierManager;
     }
 
     public id.naturalsmp.naturalcore.utility.ServerStatusGUI getStatusGUI() {
