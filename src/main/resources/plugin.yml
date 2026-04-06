@@ -382,6 +382,15 @@ commands:
     description: Teleport ke player offline
     aliases: [offlinetp]
     permission: naturalsmp.otp
+  prefix:
+    description: Buka menu pilihan prefix
+    permission: naturalsmp.prefix
+  suffix:
+    description: Buka menu pilihan suffix
+    permission: naturalsmp.suffix
+  itp:
+    description: Investor Teleport - Force teleport dengan animasi
+    permission: naturalsmp.itp
 
   chatview:
     description: Internal command to view chat snapshots

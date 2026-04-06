@@ -1,0 +1,17 @@
+# ==========================================
+#    NATURAL CORE - PREFIX SYSTEM
+# ==========================================
+# Format: id: "display"
+# Player needs permission: naturalsmp.prefix.<id> to use it.
+# Use /prefix create <id> <display> to create new prefixes in-game.
+# Use /prefix grant <player> <id> to grant a prefix to a player.
+
+prefixes:
+  star: "&6✦ "
+  crown: "&e♛ "
+  diamond: "&b◆ "
+  fire: "&c🔥 "
+  heart: "&d❤ "
+  thunder: "&e⚡ "
+  nature: "&a🌿 "
+  galaxy: "&5✧ "

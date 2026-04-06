@@ -116,6 +116,29 @@ public class SuffixManager {
         return availableSuffixes;
     }
 
+    /**
+     * Create a new suffix option in-game.
+     * @param id The suffix ID
+     * @param display The display format with color codes
+     * @return true if created successfully
+     */
+    public boolean createSuffix(String id, String display) {
+        if (availableSuffixes.containsKey(id)) return false;
+
+        availableSuffixes.put(id, display);
+        suffixConfig.set("suffixes." + id, display);
+        saveSuffixConfig();
+        return true;
+    }
+
+    private void saveSuffixConfig() {
+        try {
+            suffixConfig.save(suffixFile);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
     private void savePlayerConfig() {
         try {
             playerConfig.save(playerFile);

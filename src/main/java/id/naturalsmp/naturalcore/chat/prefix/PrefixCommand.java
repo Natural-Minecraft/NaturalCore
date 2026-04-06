@@ -1,19 +1,18 @@
-package id.naturalsmp.naturalcore.chat.suffix;
+package id.naturalsmp.naturalcore.chat.prefix;
 
 import id.naturalsmp.naturalcore.NaturalCore;
 import id.naturalsmp.naturalcore.utils.ChatUtils;
-import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
-public class SuffixCommand implements CommandExecutor {
+public class PrefixCommand implements CommandExecutor {
 
     private final NaturalCore plugin;
 
-    public SuffixCommand(NaturalCore plugin) {
+    public PrefixCommand(NaturalCore plugin) {
         this.plugin = plugin;
     }
 
@@ -21,7 +20,7 @@ public class SuffixCommand implements CommandExecutor {
     public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label,
             @NotNull String[] args) {
 
-        // Admin: /suffix create <id> <display...>
+        // Admin: /prefix create <id> <display...>
         if (args.length >= 3 && args[0].equalsIgnoreCase("create")) {
             if (!sender.hasPermission("naturalsmp.admin")) {
                 sender.sendMessage(ChatUtils.toComponent("&cNo permission."));
@@ -43,54 +42,54 @@ public class SuffixCommand implements CommandExecutor {
                 displayStr = displayStr.substring(1, displayStr.length() - 1);
             }
 
-            SuffixManager mgr = plugin.getSuffixManager();
-            if (mgr.getAvailableSuffixes().containsKey(id)) {
-                sender.sendMessage(ChatUtils.toComponent("&c&l✘ &cSuffix dengan ID tersebut sudah ada!"));
-                return true;
+            if (plugin.getPrefixManager().createPrefix(id, displayStr)) {
+                sender.sendMessage(ChatUtils.toComponent("&a&l✔ &7Prefix &e" + id + " &7berhasil dibuat! Preview: " + displayStr));
+            } else {
+                sender.sendMessage(ChatUtils.toComponent("&c&l✘ &cPrefix dengan ID tersebut sudah ada!"));
             }
-
-            // Save to config
-            mgr.createSuffix(id, displayStr);
-            sender.sendMessage(ChatUtils.toComponent("&a&l✔ &7Suffix &e" + id + " &7berhasil dibuat! Preview: " + displayStr));
             return true;
         }
 
-        // Admin: /suffix grant <player> <suffixId>
-        if (args.length >= 3 && args[0].equalsIgnoreCase("grant")) {
-            if (!sender.hasPermission("naturalsmp.admin")) {
-                sender.sendMessage(ChatUtils.toComponent("&cNo permission."));
-                return true;
-            }
-            Player target = Bukkit.getPlayer(args[1]);
-            if (target == null) {
-                sender.sendMessage(ChatUtils.toComponent("&cPlayer not found!"));
-                return true;
-            }
-            String suffixId = args[2].toLowerCase();
-            plugin.getSuffixManager().grantSuffix(target, suffixId);
-            sender.sendMessage(ChatUtils.toComponent("&a&l✔ &7Granted suffix &e" + suffixId + " &7to &f" + target.getName()));
-            return true;
-        }
-
-        // Admin: /suffix reload
+        // Admin: /prefix reload
         if (args.length > 0 && args[0].equalsIgnoreCase("reload")) {
             if (!sender.hasPermission("naturalsmp.admin")) {
                 sender.sendMessage(ChatUtils.toComponent("&cNo permission."));
                 return true;
             }
-            plugin.getSuffixManager().loadConfigs();
-            sender.sendMessage(ChatUtils.toComponent("&aSuffix configuration reloaded!"));
+            plugin.getPrefixManager().loadConfigs();
+            sender.sendMessage(ChatUtils.toComponent("&aPrefix configuration reloaded!"));
             return true;
         }
 
-        // Player: /suffix (open GUI)
+        // Admin: /prefix grant <player> <prefixId>
+        if (args.length >= 3 && args[0].equalsIgnoreCase("grant")) {
+            if (!sender.hasPermission("naturalsmp.admin")) {
+                sender.sendMessage(ChatUtils.toComponent("&cNo permission."));
+                return true;
+            }
+            Player target = org.bukkit.Bukkit.getPlayer(args[1]);
+            if (target == null) {
+                sender.sendMessage(ChatUtils.toComponent("&cPlayer not found!"));
+                return true;
+            }
+            String prefixId = args[2].toLowerCase();
+            plugin.getPrefixManager().grantPrefix(target, prefixId);
+            sender.sendMessage(ChatUtils.toComponent("&a&l✔ &7Granted prefix &e" + prefixId + " &7to &f" + target.getName()));
+            return true;
+        }
+
+        // Player: /prefix (open GUI)
         if (!(sender instanceof Player p)) {
             sender.sendMessage("Hanya player yang bisa menggunakan perintah ini.");
             return true;
         }
 
-        // Open GUI
-        new SuffixGUI(plugin).openGUI(p);
+        if (!p.hasPermission("naturalsmp.prefix")) {
+            sender.sendMessage(ChatUtils.toComponent("&cKamu tidak memiliki izin untuk menggunakan prefix!"));
+            return true;
+        }
+
+        new PrefixGUI(plugin).openGUI(p);
         return true;
     }
 }

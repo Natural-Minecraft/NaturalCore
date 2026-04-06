@@ -98,6 +98,7 @@ public final class NaturalCore extends JavaPlugin {
     private BannerManager bannerManager;
     private ProfileManager profileManager;
     private ProfileGUI profileGUI;
+    private id.naturalsmp.naturalcore.chat.prefix.PrefixManager prefixManager;
     private SuffixManager suffixManager;
     private AFKManager afkManager;
     private TierManager tierManager;
@@ -157,6 +158,7 @@ public final class NaturalCore extends JavaPlugin {
         // 2B. Init Backup System (v2.0)
         this.backupManager = new id.naturalsmp.naturalcore.utility.BackupManager(this);
         this.seasonResetManager = new id.naturalsmp.naturalcore.season.SeasonResetManager(this);
+        this.prefixManager = new id.naturalsmp.naturalcore.chat.prefix.PrefixManager(this);
         this.suffixManager = new id.naturalsmp.naturalcore.chat.suffix.SuffixManager(this);
 
         // 3. Setup Vault (Economy & Chat)
@@ -307,6 +309,10 @@ public final class NaturalCore extends JavaPlugin {
         registerCmd("tphere", tpCmd);
         registerCmd("tpa", tpCmd);
         registerCmd("tpahere", tpCmd);
+        registerCmd("tpaccept", tpCmd);
+        registerCmd("tpdeny", tpCmd);
+        registerCmd("otp", new id.naturalsmp.naturalcore.general.OfflineTPCommand(this));
+        registerCmd("itp", new id.naturalsmp.naturalcore.teleport.InvestorTPCommand(this));
 
         // 12. Seasons Module
         this.seasonManager = new SeasonManager(this);
@@ -319,8 +325,6 @@ public final class NaturalCore extends JavaPlugin {
         registerCmd("banner", bannerCmd);
         getCommand("banner").setTabCompleter(bannerCmd);
         getServer().getPluginManager().registerEvents(new BannerListener(bannerManager), this);
-        registerCmd("tpaccept", tpCmd);
-        registerCmd("tpdeny", tpCmd);
 
         // 12. Essentials Modules
         // A. Gamemode
@@ -483,7 +487,6 @@ public final class NaturalCore extends JavaPlugin {
         registerCmd("trade", new id.naturalsmp.naturalcore.trade.TradeCommand(this));
         registerCmd("playtime", new id.naturalsmp.naturalcore.playtime.PlaytimeCommand(this));
         registerCmd("back", new id.naturalsmp.naturalcore.general.BackCommand(this));
-        registerCmd("otp", new id.naturalsmp.naturalcore.general.OfflineTPCommand(this));
 
         // 21. Profile System (v1.8)
         this.profileManager = new id.naturalsmp.naturalcore.profile.ProfileManager(this);
@@ -517,6 +520,10 @@ public final class NaturalCore extends JavaPlugin {
         registerCmd("tier", new id.naturalsmp.naturalcore.tier.TierCommand(this));
         registerCmd("tieradmin", new id.naturalsmp.naturalcore.tier.TierAdminCommand(this));
         registerCmd("chatview", new id.naturalsmp.naturalcore.chat.ChatSnapshotCommand());
+
+        // Prefix System
+        registerCmd("prefix", new id.naturalsmp.naturalcore.chat.prefix.PrefixCommand(this));
+        getServer().getPluginManager().registerEvents(new id.naturalsmp.naturalcore.chat.prefix.PrefixGUI(this), this);
 
         getServer().getPluginManager().registerEvents(new id.naturalsmp.naturalcore.teleport.PlayerDeathListener(this),
                 this);
@@ -680,12 +687,12 @@ public final class NaturalCore extends JavaPlugin {
         return vaultManager;
     }
 
-    public WarpManager getWarpManager() {
-        return warpManager;
-    }
-
     public HomeManager getHomeManager() {
         return homeManager;
+    }
+
+    public WarpManager getWarpManager() {
+        return warpManager;
     }
 
     public SpawnManager getSpawnManager() {
@@ -694,6 +701,18 @@ public final class NaturalCore extends JavaPlugin {
 
     public TeleportManager getTeleportManager() {
         return teleportManager;
+    }
+
+    public SuffixManager getSuffixManager() {
+        return suffixManager;
+    }
+
+    public id.naturalsmp.naturalcore.chat.prefix.PrefixManager getPrefixManager() {
+        return prefixManager;
+    }
+
+    public TierManager getTierManager() {
+        return tierManager;
     }
 
     public VanishManager getVanishManager() {
