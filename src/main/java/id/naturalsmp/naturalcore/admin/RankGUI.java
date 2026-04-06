@@ -143,14 +143,14 @@ public class RankGUI implements Listener {
                     benefits, isOwned));
         }
 
-        // Slot 4: Player Head (rank info + all benefits)
-        inv.setItem(4, createPlayerHeadItem(p, ranks));
+        // Slot 4: Info item (top center)
+        inv.setItem(4, createInfoItem());
 
-        // Slot 40: Info item
-        inv.setItem(40, createInfoItem());
+        // Slot 45: Player Head (bottom-left)
+        inv.setItem(45, createPlayerHeadItem(p, ranks));
 
-        // Slot 50: Media item
-        inv.setItem(50, createMediaItem());
+        // Slot 53: Media item (bottom-right)
+        inv.setItem(53, createMediaItem(p));
 
         // Close button
         inv.setItem(49, createItem(Material.BARRIER, "§c§lTUTUP", List.of("§7Klik untuk keluar menu.")));
@@ -291,16 +291,25 @@ public class RankGUI implements Listener {
 
     // ─── Media Item ───────────────────────────────────────────────────────────
 
-    private ItemStack createMediaItem() {
+    private ItemStack createMediaItem(Player p) {
         ItemStack item = new ItemStack(Material.PAPER);
         ItemMeta meta = item.getItemMeta();
         if (meta != null) {
             meta.displayName(ChatUtils.toComponent("<gradient:#FF0000:#FF0077><b>Anda Terkenal?</b></gradient>"));
+            List<String> rawLore = List.of(
+                    "&fApply %img__youtuber_% &7/ &f%img__tiktoker_% For Free.",
+                    "",
+                    "§a[⬅] Klik Kiri: §fMenuju Link Pendaftaran",
+                    "§e[➡] Klik Kanan: §fPreview Kit & Benefits"
+            );
             List<Component> lore = new ArrayList<>();
-            lore.add(ChatUtils.toComponent("§fApply %img__youtuber_% §7/ §f%img__tiktoker_% For Free."));
-            lore.add(Component.empty());
-            lore.add(ChatUtils.toComponent("§a[⬅] Klik Kiri: §fMenuju Link Pendaftaran"));
-            lore.add(ChatUtils.toComponent("§e[➡] Klik Kanan: §fPreview Kit & Benefits"));
+            for (String line : rawLore) {
+                String parsed = line;
+                if (Bukkit.getPluginManager().getPlugin("PlaceholderAPI") != null) {
+                    parsed = me.clip.placeholderapi.PlaceholderAPI.setPlaceholders(p, parsed);
+                }
+                lore.add(ChatUtils.toComponent(parsed));
+            }
             meta.lore(lore);
             item.setItemMeta(meta);
         }
@@ -350,11 +359,11 @@ public class RankGUI implements Listener {
             return;
         }
 
-        if (slot == 50) {
+        if (slot == 53) {
             if (e.getClick() == ClickType.RIGHT) {
                 p.closeInventory();
                 p.playSound(p.getLocation(), Sound.UI_BUTTON_CLICK, 1f, 1f);
-                p.performCommand("media benefits"); // We will create this alias/command
+                p.performCommand("media benefits");
             } else {
                 p.closeInventory();
                 p.playSound(p.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, 1f, 1f);

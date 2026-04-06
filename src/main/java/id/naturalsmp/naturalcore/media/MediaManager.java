@@ -66,4 +66,12 @@ public class MediaManager {
         mediaLinks.put(uuid, link);
         saveData();
     }
+
+    public boolean hasLink(UUID uuid) {
+        return mediaLinks.containsKey(uuid);
+    }
+
+    public Map<UUID, String> getAllLinks() {
+        return new HashMap<>(mediaLinks);
+    }
 }
