@@ -408,6 +408,12 @@ commands:
   start:
     description: Menu awal pemilihan dunia (Survival/Resource/Dungeon)
 
+  # --- MEDIA ---
+  media:
+    description: Buka panel media / daftar media
+    aliases: [creators, creator, youtuber, tiktoker]
+    permission: naturalsmp.media.use
+
   # --- SOCIAL LINKS ---
   links:
     description: Tampilkan link official NaturalSMP

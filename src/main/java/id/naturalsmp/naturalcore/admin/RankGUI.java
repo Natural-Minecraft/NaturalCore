@@ -146,6 +146,9 @@ public class RankGUI implements Listener {
         // Slot 40: Info item
         inv.setItem(40, createInfoItem());
 
+        // Slot 50: Media item
+        inv.setItem(50, createMediaItem());
+
         // Close button
         inv.setItem(49, createItem(Material.BARRIER, "§c§lTUTUP", List.of("§7Klik untuk keluar menu.")));
 
@@ -241,7 +244,7 @@ public class RankGUI implements Listener {
             lore.add(ChatUtils.toComponent("§a§lSUDAH DIMILIKI ✔"));
             lore.add(ChatUtils.toComponent("§7Rank ini sudah aktif di akunmu."));
             lore.add(Component.empty());
-            lore.add(ChatUtils.toComponent("§e[➡] Klik Kanan: §fPreview Uang Kit Rank"));
+            lore.add(ChatUtils.toComponent("§e[➡] Klik Kanan: §fPreview Kit Rank"));
         } else {
             lore.add(ChatUtils.toComponent("§e§lHarga:"));
             if (discount > 0) {
@@ -252,7 +255,7 @@ public class RankGUI implements Listener {
             }
             lore.add(Component.empty());
             lore.add(ChatUtils.toComponent("§a[⬅] Klik Kiri: §fBeli pakai NC"));
-            lore.add(ChatUtils.toComponent("§e[➡] Klik Kanan: §fPreview Uang Kit Rank"));
+            lore.add(ChatUtils.toComponent("§e[➡] Klik Kanan: §fPreview Kit Rank"));
         }
 
         meta.lore(lore);
@@ -277,6 +280,27 @@ public class RankGUI implements Listener {
             lore.add(ChatUtils.toComponent("§e• Perpanjang otomatis via website"));
             lore.add(Component.empty());
             lore.add(ChatUtils.toComponent("§b→ store.naturalsmp.net"));
+            meta.lore(lore);
+            item.setItemMeta(meta);
+        }
+        return item;
+    }
+
+    // ─── Media Item ───────────────────────────────────────────────────────────
+
+    private ItemStack createMediaItem() {
+        ItemStack item = new ItemStack(Material.PAPER); // Could use a custom model data if ItemsAdder is used
+        ItemMeta meta = item.getItemMeta();
+        if (meta != null) {
+            if (Bukkit.getPluginManager().getPlugin("ItemsAdder") != null) {
+                // If using itemsadder, use a cool item
+            }
+            meta.displayName(ChatUtils.toComponent("<gradient:#FF0000:#FF0077><b>Anda Terkenal?</b></gradient>"));
+            List<Component> lore = new ArrayList<>();
+            lore.add(ChatUtils.toComponent("§fApply %img__youtuber_% §7/ §f%img__tiktoker_% For Free."));
+            lore.add(Component.empty());
+            lore.add(ChatUtils.toComponent("§a[⬅] Klik Kiri: §fMenuju Link Pendaftaran"));
+            lore.add(ChatUtils.toComponent("§e[➡] Klik Kanan: §fPreview Kit & Benefits"));
             meta.lore(lore);
             item.setItemMeta(meta);
         }
@@ -323,6 +347,20 @@ public class RankGUI implements Listener {
         if (slot == 49) {
             p.closeInventory();
             p.playSound(p.getLocation(), Sound.BLOCK_IRON_DOOR_CLOSE, 1f, 1.2f);
+            return;
+        }
+
+        if (slot == 50) {
+            if (e.getClick() == ClickType.RIGHT) {
+                p.closeInventory();
+                p.playSound(p.getLocation(), Sound.UI_BUTTON_CLICK, 1f, 1f);
+                p.performCommand("media benefits"); // We will create this alias/command
+            } else {
+                p.closeInventory();
+                p.playSound(p.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, 1f, 1f);
+                p.sendMessage(ChatUtils.colorize("§6§lNaturalSMP §8» §aKlik link ini untuk mendaftar menjadi kreator:"));
+                p.sendMessage(ChatUtils.colorize("§bhttps://www.naturalsmp.net/#team"));
+            }
             return;
         }
 

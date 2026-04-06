@@ -75,7 +75,10 @@ import id.naturalsmp.naturalcore.utility.ServerHealthManager;
 import id.naturalsmp.naturalcore.utility.ServerStatusGUI;
 import id.naturalsmp.naturalcore.utils.ConfigUpdater;
 import id.naturalsmp.naturalcore.database.RankPriceDatabase;
-import org.bukkit.Bukkit;
+import id.naturalsmp.naturalcore.media.MediaCommand;
+import id.naturalsmp.naturalcore.media.MediaGUI;
+import id.naturalsmp.naturalcore.media.MediaManager;
+import id.naturalsmp.naturalcore.media.MediaSneakListener;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -123,6 +126,9 @@ public final class NaturalCore extends JavaPlugin {
     private id.naturalsmp.naturalcore.database.NaturalCoreDatabase coreDatabase;
     private ChatGameManager chatGameManager;
     private ConnectionManager connectionManager;
+    
+    private MediaManager mediaManager;
+    private MediaGUI mediaGUI;
 
     @Override
     public void onEnable() {
@@ -563,6 +569,18 @@ public final class NaturalCore extends JavaPlugin {
             getLogger().info("Sync client initialized pointing to " + syncHost + ":" + syncPort);
         }
 
+        // 28. Media Module
+        this.mediaManager = new MediaManager(this);
+        this.mediaGUI = new MediaGUI(this);
+        MediaCommand mediaCmd = new MediaCommand(this);
+        registerCmd("media", mediaCmd);
+        registerCmd("creators", mediaCmd);
+        registerCmd("creator", mediaCmd);
+        registerCmd("youtuber", mediaCmd);
+        registerCmd("tiktoker", mediaCmd);
+        getServer().getPluginManager().registerEvents(mediaGUI, this);
+        getServer().getPluginManager().registerEvents(new MediaSneakListener(this), this);
+
         // Selesai
         getLogger().info(
                 ChatUtils.colorize("&6&lNaturalCore v" + getDescription().getVersion() + " &asudah aktif sepenuhnya!"));
@@ -645,6 +663,9 @@ public final class NaturalCore extends JavaPlugin {
 
         if (seasonManager != null) {
             seasonManager.saveData();
+        }
+        if (mediaManager != null) {
+            mediaManager.saveData();
         }
         if (bannerManager != null) {
             bannerManager.saveAll();
@@ -823,6 +844,14 @@ public final class NaturalCore extends JavaPlugin {
 
     public RankPriceDatabase getRankPriceDatabase() {
         return rankPriceDatabase;
+    }
+
+    public id.naturalsmp.naturalcore.media.MediaManager getMediaManager() {
+        return mediaManager;
+    }
+
+    public id.naturalsmp.naturalcore.media.MediaGUI getMediaGUI() {
+        return mediaGUI;
     }
 
     // --- HELPER UNTUK MENCEGAH CRASH ---
