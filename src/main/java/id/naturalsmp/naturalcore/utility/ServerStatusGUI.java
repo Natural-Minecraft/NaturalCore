@@ -73,7 +73,7 @@ public class ServerStatusGUI implements Listener {
                 "&7Monitoring by NaturalLagg."));
 
         // Refresh/Close
-        inv.setItem(40, createItem(Material.BARRIER, "&c&lCLOSE MENU", "&7Kembali ke game."));
+        inv.setItem(40, GUIUtils.createClosePaper());
 
         player.openInventory(inv);
         player.playSound(player.getLocation(), Sound.BLOCK_AMETHYST_BLOCK_CHIME, 1f, 1.2f);
@@ -140,7 +140,7 @@ public class ServerStatusGUI implements Listener {
         e.setCancelled(true);
         if (e.getClickedInventory() != e.getView().getTopInventory())
             return;
-        if (e.getCurrentItem() != null && e.getCurrentItem().getType() == Material.BARRIER) {
+        if (e.getRawSlot() == 40) {
             e.getWhoClicked().closeInventory();
         }
     }

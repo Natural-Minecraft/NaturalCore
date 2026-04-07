@@ -63,6 +63,23 @@ public class GUIUtils {
     }
 
     /**
+     * Membuat tombol Close/Tutup standar dengan icon X (CustomModelData 10063)
+     */
+    public static ItemStack createClosePaper() {
+        ItemStack item = new ItemStack(Material.PAPER);
+        ItemMeta meta = item.getItemMeta();
+        if (meta != null) {
+            meta.displayName(ChatUtils.toComponent("§c§lTUTUP"));
+            meta.setCustomModelData(10063);
+            List<Component> loreList = new ArrayList<>();
+            loreList.add(ChatUtils.toComponent("§7Klik untuk menutup menu."));
+            meta.lore(loreList);
+            item.setItemMeta(meta);
+        }
+        return item;
+    }
+
+    /**
      * Membuat filler/pane item (biasanya untuk dekorasi GUI).
      */
     public static ItemStack createFiller(Material material) {

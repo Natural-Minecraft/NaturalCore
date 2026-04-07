@@ -153,7 +153,7 @@ public class RankGUI implements Listener {
         inv.setItem(53, createMediaItem(p));
 
         // Close button
-        inv.setItem(49, createItem(Material.BARRIER, "§c§lTUTUP", List.of("§7Klik untuk keluar menu.")));
+        inv.setItem(49, GUIUtils.createClosePaper());
 
         p.openInventory(inv);
     }

@@ -101,7 +101,7 @@ public class NaturalCoreGUI implements Listener {
         inv.setItem(48, createItem(Material.REDSTONE_BLOCK, "&#FF0000&lDEEP RELOAD",
                 "&c&lREFRESH SISTEM", "&7Memperbarui seluruh konfigurasi.", "&7Warps & Spawn akan diload ulang."));
 
-        inv.setItem(49, createItem(Material.BARRIER, "&c&lCLOSE MENU", "&7Kembali ke dunia."));
+        inv.setItem(49, GUIUtils.createClosePaper());
 
         p.openInventory(inv);
         p.playSound(p.getLocation(), Sound.BLOCK_AMETHYST_BLOCK_CHIME, 1f, 1f);
@@ -141,16 +141,19 @@ public class NaturalCoreGUI implements Listener {
 
         Material mat = item.getType();
 
+        // Handle close button via slot since it uses PAPER
+        if (e.getRawSlot() == 49) {
+            p.closeInventory();
+            p.playSound(p.getLocation(), Sound.UI_BUTTON_CLICK, 1f, 1f);
+            return;
+        }
+
         // New Interaction Logic
         switch (mat) {
             case REDSTONE_BLOCK -> { // Deep Reload
                 p.closeInventory();
                 p.performCommand("nacore admin reload");
                 p.playSound(p.getLocation(), Sound.BLOCK_BEACON_ACTIVATE, 1f, 2f);
-            }
-            case BARRIER -> { // Close
-                p.closeInventory();
-                p.playSound(p.getLocation(), Sound.UI_BUTTON_CLICK, 1f, 1f);
             }
             case DIAMOND -> { // Topup Test
                 p.closeInventory();

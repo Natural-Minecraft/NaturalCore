@@ -106,8 +106,7 @@ public class MediaGUI implements Listener {
         }
 
         // Close button (bottom center)
-        inv.setItem(49, createItem(Material.BARRIER, "§c§lTUTUP",
-                List.of("§7Klik untuk menutup menu.")));
+        inv.setItem(49, GUIUtils.createClosePaper());
 
         // Apply/Register button (bottom left)
         ItemStack apply = createItem(Material.PAPER, "§a§lDaftar Menjadi Media",

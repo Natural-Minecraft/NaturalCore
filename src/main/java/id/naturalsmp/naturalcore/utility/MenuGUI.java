@@ -149,8 +149,7 @@ public class MenuGUI implements Listener {
                 "", "<#FFAA00>➥ Klik untuk vote"));
 
         // Close
-        inv.setItem(49, buildItem(Material.BARRIER, "<#FF5555><bold>✖ TUTUP</bold>",
-                "§7Klik untuk menutup menu."));
+        inv.setItem(49, GUIUtils.createClosePaper());
 
         // Tutorial
         inv.setItem(50, buildItem(Material.BOOK, "<#AAAAAA><bold>📖 TUTORIAL</bold>",
