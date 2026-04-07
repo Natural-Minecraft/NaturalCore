@@ -25,6 +25,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerInteractEntityEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.event.player.PlayerToggleSneakEvent;
+import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.scheduler.BukkitTask;
 
 import java.util.Collections;
@@ -120,6 +121,7 @@ public class MediaSneakListener implements Listener {
 
     @EventHandler
     public void onInteract(PlayerInteractEntityEvent e) {
+        if (e.getHand() != EquipmentSlot.HAND) return; // Only process main hand to prevent double firing
         Player observer = e.getPlayer();
         if (!(e.getRightClicked() instanceof Player mediaTarget)) return;
 
@@ -145,8 +147,8 @@ public class MediaSneakListener implements Listener {
                 observer.sendMessage(ChatUtils.toComponent("§b" + link));
             }
 
-            // Notify media player
-            mediaTarget.sendMessage(ChatUtils.toComponent("§6§lNaturalSMP §8» §e" + observer.getName() + " §asedang melihat link channel-mu!"));
+            // Notify media player via Action Bar
+            mediaTarget.sendActionBar(ChatUtils.toComponent("§e" + observer.getName() + " §asedang melihat link channel-mu!"));
         }
     }
 
