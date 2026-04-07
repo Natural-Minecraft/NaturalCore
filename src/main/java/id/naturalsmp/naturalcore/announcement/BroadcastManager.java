@@ -19,6 +19,7 @@ public class BroadcastManager {
     private FileConfiguration config;
     private final List<String> messages = new ArrayList<>();
     private int currentIndex = 0;
+    private org.bukkit.scheduler.BukkitTask broadcastTask;
 
     public BroadcastManager(NaturalCore plugin) {
         this.plugin = plugin;
@@ -40,8 +41,11 @@ public class BroadcastManager {
     }
 
     private void startTask() {
+        if (broadcastTask != null && !broadcastTask.isCancelled()) {
+            broadcastTask.cancel();
+        }
         int interval = config.getInt("settings.interval", 300); // Default 5 mins
-        new BukkitRunnable() {
+        broadcastTask = new BukkitRunnable() {
             @Override
             public void run() {
                 if (messages.isEmpty())
@@ -72,5 +76,12 @@ public class BroadcastManager {
 
     public void reload() {
         loadConfig();
+        startTask();
+    }
+    
+    public void stop() {
+        if (broadcastTask != null && !broadcastTask.isCancelled()) {
+            broadcastTask.cancel();
+        }
     }
 }

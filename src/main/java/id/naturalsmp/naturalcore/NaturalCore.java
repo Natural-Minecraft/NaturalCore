@@ -655,6 +655,8 @@ public final class NaturalCore extends JavaPlugin {
             laggManager.reload();
         if (mediaManager != null)
             mediaManager.loadData();
+        if (broadcastManager != null)
+            broadcastManager.reload();
 
         getLogger().info(ChatUtils.colorize("&6&lNaturalCore &aAll system configurations reloaded successfully!"));
     }
@@ -686,6 +688,9 @@ public final class NaturalCore extends JavaPlugin {
         }
         if (combatManager != null) {
             combatManager.stop();
+        }
+        if (broadcastManager != null) {
+            broadcastManager.stop();
         }
         if (hudManager != null) {
             hudManager.stop();
