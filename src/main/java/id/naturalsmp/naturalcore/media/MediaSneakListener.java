@@ -12,6 +12,10 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.event.ClickEvent;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
+import net.luckperms.api.LuckPermsProvider;
+import net.luckperms.api.model.user.User;
+import net.luckperms.api.node.NodeType;
+import net.luckperms.api.node.types.InheritanceNode;
 import org.bukkit.Bukkit;
 import org.bukkit.Sound;
 import org.bukkit.entity.Entity;
@@ -180,7 +184,15 @@ public class MediaSneakListener implements Listener {
     }
 
     private boolean isMedia(Player p) {
-        return p.hasPermission("naturalsmp.media");
+        try {
+            User user = LuckPermsProvider.get().getUserManager().getUser(p.getUniqueId());
+            if (user == null) return false;
+            for (InheritanceNode node : user.getNodes(NodeType.INHERITANCE)) {
+                String group = node.getGroupName().toLowerCase();
+                if (group.contains("youtube") || group.contains("tiktok")) return true;
+            }
+        } catch (Exception ignored) {}
+        return false;
     }
 
     private void sendGlowPacket(Player observer, Player target, boolean glowing) {

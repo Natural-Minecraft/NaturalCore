@@ -579,6 +579,7 @@ public final class NaturalCore extends JavaPlugin {
         registerCmd("creator", mediaCmd);
         registerCmd("youtuber", mediaCmd);
         registerCmd("tiktoker", mediaCmd);
+        if (getCommand("media") != null) getCommand("media").setTabCompleter(mediaCmd);
         getServer().getPluginManager().registerEvents(mediaGUI, this);
         this.mediaSneakListener = new MediaSneakListener(this);
         getServer().getPluginManager().registerEvents(mediaSneakListener, this);
@@ -652,6 +653,8 @@ public final class NaturalCore extends JavaPlugin {
             permissionManager.loadRanks();
         if (laggManager != null)
             laggManager.reload();
+        if (mediaManager != null)
+            mediaManager.loadData();
 
         getLogger().info(ChatUtils.colorize("&6&lNaturalCore &aAll system configurations reloaded successfully!"));
     }

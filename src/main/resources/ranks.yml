@@ -395,11 +395,11 @@ rank-lainnya:
   youtube:
     display: "&cYou&fTube"
     prefix: ":_youtuber_: "
-    weight: 15
+    weight: 215
   tiktok:
     display: "&bTikTok"
     prefix: ":_tiktoker_: "
-    weight: 15
+    weight: 215
   helper:
     display: "&bHelper"
     prefix: ":_staff-helper-server_: "

@@ -71,6 +71,11 @@ public class MediaManager {
         return mediaLinks.containsKey(uuid);
     }
 
+    public void removeLink(UUID uuid) {
+        mediaLinks.remove(uuid);
+        saveData();
+    }
+
     public Map<UUID, String> getAllLinks() {
         return new HashMap<>(mediaLinks);
     }
