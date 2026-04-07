@@ -7,6 +7,10 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.event.ClickEvent;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
+import net.luckperms.api.LuckPermsProvider;
+import net.luckperms.api.model.user.User;
+import net.luckperms.api.node.NodeType;
+import net.luckperms.api.node.types.InheritanceNode;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.OfflinePlayer;
@@ -36,17 +40,17 @@ public class MediaGUI implements Listener {
     private final NaturalCore plugin;
     private final Map<UUID, Boolean> pendingLinkInput = new HashMap<>();
 
-    // Border slots for 54-slot GUI (top row, bottom row, left column, right column)
+    // Border slots for 54-slot GUI
     private static final int[] BORDER_SLOTS = {
-            0, 1, 2, 3, 4, 5, 6, 7, 8,  // top row
-            9, 17,                         // row 2 edges
-            18, 26,                        // row 3 edges
-            27, 35,                        // row 4 edges
-            36, 44,                        // row 5 edges
-            45, 46, 47, 48, 49, 50, 51, 52, 53 // bottom row
+            0, 1, 2, 3, 4, 5, 6, 7, 8,
+            9, 17,
+            18, 26,
+            27, 35,
+            36, 44,
+            45, 46, 47, 48, 49, 50, 51, 52, 53
     };
 
-    // Content slots (inside the border, 5 rows x 7 columns = 35 slots)
+    // Content slots (inside border)
     private static final int[] CONTENT_SLOTS = {
             10, 11, 12, 13, 14, 15, 16,
             19, 20, 21, 22, 23, 24, 25,
@@ -65,13 +69,13 @@ public class MediaGUI implements Listener {
         boolean isMedia = p.hasPermission("naturalsmp.media");
 
         Inventory inv = GUIUtils.createGUI(new MediaHolder(), 54,
-                "§8\u2b50 Famous People \u2b50");
+                "§8⭐ Famous People ⭐");
 
-        // Fill border with gray glass pane
+        // Fill border
         ItemStack glass = GUIUtils.createFiller(Material.GRAY_STAINED_GLASS_PANE);
         for (int slot : BORDER_SLOTS) inv.setItem(slot, glass);
 
-        // Fill content area with air first (clear any leftover)
+        // Clear content area
         for (int slot : CONTENT_SLOTS) inv.setItem(slot, new ItemStack(Material.AIR));
 
         // Header item (top center)
@@ -79,23 +83,23 @@ public class MediaGUI implements Listener {
                 "<gradient:#FF4444:#FF00FF><b>Famous People</b></gradient>",
                 List.of("§7Daftar konten kreator resmi", "§7NaturalSMP yang terverifikasi.")));
 
-        // Get all media players
-        Map<UUID, String> allLinks = plugin.getMediaManager().getAllLinks();
+        // Get media players from LuckPerms groups "youtube" and "tiktok"
+        List<MediaEntry> mediaPlayers = getMediaPlayersFromLuckPerms();
 
         int slotIdx = 0;
-        for (Map.Entry<UUID, String> entry : allLinks.entrySet()) {
-            if (slotIdx >= CONTENT_SLOTS.length) break; // max 28 players per page
+        for (MediaEntry entry : mediaPlayers) {
+            if (slotIdx >= CONTENT_SLOTS.length) break;
 
-            UUID mediaUUID = entry.getKey();
-            String link = entry.getValue();
-            OfflinePlayer mediaPlayer = Bukkit.getOfflinePlayer(mediaUUID);
+            OfflinePlayer mediaPlayer = Bukkit.getOfflinePlayer(entry.uuid);
+            String link = plugin.getMediaManager().getLink(entry.uuid);
+            String platform = entry.platform;
 
-            inv.setItem(CONTENT_SLOTS[slotIdx], createMediaPlayerHead(mediaPlayer, link));
+            inv.setItem(CONTENT_SLOTS[slotIdx], createMediaPlayerHead(mediaPlayer, link, platform));
             slotIdx++;
         }
 
         // If no media players
-        if (allLinks.isEmpty()) {
+        if (mediaPlayers.isEmpty()) {
             inv.setItem(22, createItem(Material.BARRIER,
                     "§c§lBelum Ada Kreator",
                     List.of("§7Belum ada konten kreator yang", "§7terdaftar di server ini.")));
@@ -105,10 +109,10 @@ public class MediaGUI implements Listener {
         inv.setItem(49, createItem(Material.BARRIER, "§c§lTUTUP",
                 List.of("§7Klik untuk menutup menu.")));
 
-        // If player is media, add settings button at bottom-right corner
+        // Media Panel button (only visible for media rank holders)
         if (isMedia) {
             inv.setItem(53, createItem(Material.WRITABLE_BOOK,
-                    "§e§l\u2699 Media Panel",
+                    "§e§l⚙ Media Panel",
                     List.of(
                             "§7Buka panel pengaturan Media.",
                             "§7Ubah link channel, lihat benefits.",
@@ -120,35 +124,89 @@ public class MediaGUI implements Listener {
         p.openInventory(inv);
     }
 
+    // ─── LuckPerms Integration ────────────────────────────────────────────────
+
+    /**
+     * Get all online + offline players who have parent group "youtube" or "tiktok"
+     * by scanning all online players and checking their LuckPerms groups.
+     */
+    private List<MediaEntry> getMediaPlayersFromLuckPerms() {
+        List<MediaEntry> result = new ArrayList<>();
+
+        try {
+            net.luckperms.api.LuckPerms lp = LuckPermsProvider.get();
+
+            // Check all online players first
+            for (Player onlinePlayer : Bukkit.getOnlinePlayers()) {
+                User user = lp.getUserManager().getUser(onlinePlayer.getUniqueId());
+                if (user == null) continue;
+
+                String platform = getMediaPlatform(user);
+                if (platform != null) {
+                    result.add(new MediaEntry(onlinePlayer.getUniqueId(), platform));
+                }
+            }
+
+            // Also check players stored in media.yml (for offline media players)
+            for (UUID uuid : plugin.getMediaManager().getAllLinks().keySet()) {
+                // Skip if already added from online check
+                boolean alreadyAdded = result.stream().anyMatch(e -> e.uuid.equals(uuid));
+                if (alreadyAdded) continue;
+
+                // Load user data from LuckPerms (cached)
+                User user = lp.getUserManager().getUser(uuid);
+                if (user != null) {
+                    String platform = getMediaPlatform(user);
+                    if (platform != null) {
+                        result.add(new MediaEntry(uuid, platform));
+                    }
+                }
+            }
+
+        } catch (Exception e) {
+            plugin.getLogger().warning("Gagal memuat data media dari LuckPerms: " + e.getMessage());
+        }
+
+        return result;
+    }
+
+    /**
+     * Check if a LuckPerms user has parent group "youtube" or "tiktok".
+     * Returns the platform name, or null if not a media player.
+     */
+    private String getMediaPlatform(User user) {
+        for (InheritanceNode node : user.getNodes(NodeType.INHERITANCE)) {
+            String group = node.getGroupName().toLowerCase();
+            if (group.contains("youtube")) return "YouTube";
+            if (group.contains("tiktok")) return "TikTok";
+        }
+        return null;
+    }
+
     // ─── Media Panel (Settings for Media Players) ─────────────────────────────
 
     public void openMediaPanel(Player p) {
         p.playSound(p.getLocation(), Sound.UI_BUTTON_CLICK, 1f, 1f);
-        Inventory inv = GUIUtils.createGUI(new MediaPanelHolder(), 27, "§8\u2699 Media Panel");
+        Inventory inv = GUIUtils.createGUI(new MediaPanelHolder(), 27, "§8⚙ Media Panel");
 
         ItemStack glass = GUIUtils.createFiller(Material.GRAY_STAINED_GLASS_PANE);
         for (int i = 0; i < 27; i++) inv.setItem(i, glass);
 
-        // Setting Link Item
         String currentLink = plugin.getMediaManager().getLink(p.getUniqueId());
-        ItemStack setting = createItem(Material.WRITABLE_BOOK, "§e§lUbah Link Channel",
+        inv.setItem(11, createItem(Material.WRITABLE_BOOK, "§e§lUbah Link Channel",
                 List.of(
                         "§7Link saat ini:",
                         "§f" + currentLink,
                         "",
                         "§aKlik untuk mengubah link channelmu."
-                ));
-        inv.setItem(11, setting);
+                )));
 
-        // Benefits Item
-        ItemStack benefits = createItem(Material.DIAMOND, "§b§lKeuntungan Media",
+        inv.setItem(15, createItem(Material.DIAMOND, "§b§lKeuntungan Media",
                 List.of(
                         "§7Klik untuk melihat daftar lengkap",
                         "§7keuntungan sebagai Media."
-                ));
-        inv.setItem(15, benefits);
+                )));
 
-        // Back
         inv.setItem(22, createItem(Material.ARROW, "§c§lKEMBALI",
                 List.of("§7Kembali ke daftar Famous People.")));
 
@@ -186,7 +244,7 @@ public class MediaGUI implements Listener {
     // ─── Item Builders ────────────────────────────────────────────────────────
 
     @SuppressWarnings("deprecation")
-    private ItemStack createMediaPlayerHead(OfflinePlayer target, String link) {
+    private ItemStack createMediaPlayerHead(OfflinePlayer target, String link, String platform) {
         ItemStack skull = new ItemStack(Material.PLAYER_HEAD);
         SkullMeta meta = (SkullMeta) skull.getItemMeta();
         if (meta == null) return skull;
@@ -196,13 +254,19 @@ public class MediaGUI implements Listener {
         String name = target.getName() != null ? target.getName() : "Unknown";
         boolean isOnline = target.isOnline();
 
+        // Color code based on platform
+        String platformColor = platform.equals("YouTube") ? "§c" : "§d";
+        String platformIcon = platform.equals("YouTube") ? "▶" : "♪";
+
         meta.displayName(ChatUtils.toComponent(
                 (isOnline ? "§a" : "§7") + "§l" + name
-                + (isOnline ? " §a\u25cf" : " §c\u25cf")));
+                        + " " + platformColor + platformIcon + " " + platform
+                        + (isOnline ? " §a●" : " §c●")));
 
         List<Component> lore = new ArrayList<>();
         lore.add(Component.empty());
         lore.add(ChatUtils.toComponent("§7Status: " + (isOnline ? "§aOnline" : "§cOffline")));
+        lore.add(ChatUtils.toComponent("§7Platform: " + platformColor + platform));
         lore.add(ChatUtils.toComponent("§7Channel: §f" + link));
         lore.add(Component.empty());
         lore.add(ChatUtils.toComponent("§eKlik untuk melihat link channel."));
@@ -236,20 +300,17 @@ public class MediaGUI implements Listener {
             Player p = (Player) e.getWhoClicked();
             int slot = e.getSlot();
 
-            // Close
             if (slot == 49) {
                 p.closeInventory();
                 p.playSound(p.getLocation(), Sound.BLOCK_IRON_DOOR_CLOSE, 1f, 1.2f);
                 return;
             }
 
-            // Media Panel button (bottom-right, only for media players)
             if (slot == 53 && p.hasPermission("naturalsmp.media")) {
                 openMediaPanel(p);
                 return;
             }
 
-            // Clicked on a player head in content area?
             if (isContentSlot(slot)) {
                 ItemStack clicked = e.getCurrentItem();
                 if (clicked != null && clicked.getType() == Material.PLAYER_HEAD) {
@@ -285,10 +346,8 @@ public class MediaGUI implements Listener {
             Player p = (Player) e.getWhoClicked();
 
             if (e.getSlot() == 22) {
-                // Back → reopen main GUI
                 openGUI(p);
             } else if (e.getSlot() == 11) {
-                // Change link
                 p.closeInventory();
                 pendingLinkInput.put(p.getUniqueId(), true);
                 p.sendMessage(ChatUtils.colorize("§6§lNaturalSMP §8» §eSilakan ketik Link Channel kamu di chat."));
@@ -356,6 +415,18 @@ public class MediaGUI implements Listener {
     private boolean isContentSlot(int slot) {
         for (int s : CONTENT_SLOTS) if (s == slot) return true;
         return false;
+    }
+
+    // ─── Data Classes ─────────────────────────────────────────────────────────
+
+    private static class MediaEntry {
+        final UUID uuid;
+        final String platform;
+
+        MediaEntry(UUID uuid, String platform) {
+            this.uuid = uuid;
+            this.platform = platform;
+        }
     }
 
     // ─── Holders ──────────────────────────────────────────────────────────────

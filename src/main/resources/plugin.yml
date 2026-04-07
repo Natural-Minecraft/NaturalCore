@@ -412,7 +412,6 @@ commands:
   media:
     description: Buka panel media / daftar media
     aliases: [creators, creator, youtuber, tiktoker]
-    permission: naturalsmp.media.use
 
   # --- SOCIAL LINKS ---
   links:
