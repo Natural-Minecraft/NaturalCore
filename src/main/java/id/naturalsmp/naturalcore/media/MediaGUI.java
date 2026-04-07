@@ -109,6 +109,21 @@ public class MediaGUI implements Listener {
         inv.setItem(49, createItem(Material.BARRIER, "§c§lTUTUP",
                 List.of("§7Klik untuk menutup menu.")));
 
+        // Apply/Register button (bottom left)
+        ItemStack apply = createItem(Material.PAPER, "§a§lDaftar Menjadi Media",
+                List.of(
+                        "§7Ingin menjadi bagian dari tim Media kami?",
+                        "§7Kamu akan mendapatkan banyak keuntungan!",
+                        "",
+                        "§aKlik Kiri untuk mendapatkan link daftar."
+                ));
+        ItemMeta applyMeta = apply.getItemMeta();
+        if (applyMeta != null) {
+            applyMeta.setCustomModelData(10184); // Plus icon from ItemsAdder
+            apply.setItemMeta(applyMeta);
+        }
+        inv.setItem(45, apply);
+
         // Media Panel button (only visible for media rank holders)
         if (isMedia) {
             inv.setItem(53, createItem(Material.WRITABLE_BOOK,
@@ -308,6 +323,19 @@ public class MediaGUI implements Listener {
 
             if (slot == 53 && p.hasPermission("naturalsmp.media.openpanel")) {
                 openMediaPanel(p);
+                return;
+            }
+
+            if (slot == 45) {
+                p.closeInventory();
+                p.playSound(p.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, 1f, 1f);
+                p.sendMessage(ChatUtils.toComponent("§6§lNaturalSMP §8» §aKlik link ini untuk mendaftar menjadi kreator:"));
+                String url = "https://www.naturalsmp.net/#team";
+                Component clickable = Component.text(url)
+                        .color(NamedTextColor.AQUA)
+                        .decorate(TextDecoration.UNDERLINED)
+                        .clickEvent(ClickEvent.openUrl(url));
+                p.sendMessage(clickable);
                 return;
             }
 
