@@ -66,7 +66,7 @@ public class MediaGUI implements Listener {
 
     public void openGUI(Player p) {
         p.playSound(p.getLocation(), Sound.BLOCK_AMETHYST_BLOCK_CHIME, 1f, 1.2f);
-        boolean isMedia = p.hasPermission("naturalsmp.media");
+        boolean isMedia = p.hasPermission("naturalsmp.media.openpanel");
 
         Inventory inv = GUIUtils.createGUI(new MediaHolder(), 54,
                 "§8⭐ Famous People ⭐");
@@ -306,7 +306,7 @@ public class MediaGUI implements Listener {
                 return;
             }
 
-            if (slot == 53 && p.hasPermission("naturalsmp.media")) {
+            if (slot == 53 && p.hasPermission("naturalsmp.media.openpanel")) {
                 openMediaPanel(p);
                 return;
             }
@@ -365,7 +365,7 @@ public class MediaGUI implements Listener {
             if (e.getClickedInventory() != e.getView().getTopInventory()) return;
             if (e.getSlot() == 22) {
                 Player p = (Player) e.getWhoClicked();
-                if (p.hasPermission("naturalsmp.media")) {
+                if (p.hasPermission("naturalsmp.media.openpanel")) {
                     openMediaPanel(p);
                 } else {
                     openGUI(p);
