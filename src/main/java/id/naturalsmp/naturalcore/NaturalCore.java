@@ -544,7 +544,6 @@ public final class NaturalCore extends JavaPlugin {
         // 25.5. Social Links
         SocialCommand socialCmd = new SocialCommand();
         registerCmd("links", socialCmd);
-        registerCmd("vote", socialCmd);
         registerCmd("discord", socialCmd);
         registerCmd("instagram", socialCmd);
         registerCmd("whatsapp", socialCmd);

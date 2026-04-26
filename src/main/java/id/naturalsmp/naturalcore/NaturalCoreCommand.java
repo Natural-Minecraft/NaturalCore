@@ -247,6 +247,10 @@ public class NaturalCoreCommand implements CommandExecutor, TabCompleter {
                         plugin.getHomeGUI()).onCommand(sender, command, sub, proxyArgs);
                 return true;
             }
+            case "vote" -> {
+                new id.naturalsmp.naturalcore.general.SocialCommand().onCommand(sender, command, sub, proxyArgs);
+                return true;
+            }
         }
 
         ConfigUtils.sendError(sender, "Sub-command tidak ditemukan. Cek /nacore help.");
@@ -273,7 +277,7 @@ public class NaturalCoreCommand implements CommandExecutor, TabCompleter {
 
         if (args.length == 1) {
             List<String> list = new ArrayList<>(
-                    Arrays.asList("admin", "version", "help", "spawn", "home", "bal", "vanish", "heal", "feed", "fly", "givesuffix"));
+                    Arrays.asList("admin", "version", "help", "spawn", "home", "bal", "vanish", "heal", "feed", "fly", "givesuffix", "vote"));
             if (sender.hasPermission("naturalsmp.admin"))
                 list.add("reload");
             return list.stream().filter(s -> s.startsWith(args[0].toLowerCase()))

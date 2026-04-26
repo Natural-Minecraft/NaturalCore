@@ -416,8 +416,6 @@ commands:
   # --- SOCIAL LINKS ---
   links:
     description: Tampilkan link official NaturalSMP
-  vote:
-    description: Tampilkan link vote NaturalSMP
   discord:
     description: Tampilkan link discord NaturalSMP
   instagram:
