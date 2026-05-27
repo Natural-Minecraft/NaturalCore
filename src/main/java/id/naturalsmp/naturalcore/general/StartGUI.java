@@ -39,27 +39,12 @@ public class StartGUI implements Listener {
         for (int i = 0; i < 9; i++)
             inv.setItem(i, filler);
 
-        // 1. Dungeon (Slot 2)
-        ItemStack dungeon = new ItemStack(Material.DIAMOND_SWORD);
-        dungeon.addUnsafeEnchantment(Enchantment.SHARPNESS, 1);
-        ItemMeta dMeta = dungeon.getItemMeta();
-        dMeta.displayName(ChatUtils.toComponent("&#FF4444&l⚔ ᴅᴜɴɢᴇᴏɴ")); // Red/Gold
-        List<Component> dLore = new ArrayList<>();
-        dLore.add(ChatUtils.toComponent("&7Uji keberanianmu di dunia"));
-        dLore.add(ChatUtils.toComponent("&7penuh monster dan loot berharga!"));
-        dLore.add(Component.empty());
-        dLore.add(ChatUtils.toComponent("&#FFAA00&l➥ KLIK UNTUK MASUK"));
-        dMeta.lore(dLore);
-        dMeta.addItemFlags(ItemFlag.HIDE_ENCHANTS);
-        dungeon.setItemMeta(dMeta);
-        inv.setItem(2, dungeon);
-
-        // 2. Survival (Slot 4)
-        inv.setItem(4, createItem(Material.GRASS_BLOCK, "&#55FF55&l🌳 ꜱᴜʀᴠɪᴠᴀʟ",
+        // 1. Survival (Slot 3)
+        inv.setItem(3, createItem(Material.GRASS_BLOCK, "&#55FF55&l🌳 ꜱᴜʀᴠɪᴠᴀʟ",
                 "&7Mulailah petualanganmu di", "&7dunia survival utama.", "", "&#FFAA00&l➥ KLIK UNTUK MASUK"));
 
-        // 3. Resource (Slot 6)
-        inv.setItem(6, createItem(Material.DIAMOND_HOE, "&#FFEE55&l⛏ ʀᴇꜱᴏᴜʀᴄᴇ",
+        // 2. Resource (Slot 5)
+        inv.setItem(5, createItem(Material.DIAMOND_HOE, "&#FFEE55&l⛏ ʀᴇꜱᴏᴜʀᴄᴇ",
                 "&7Dunia khusus untuk mencari", "&7material tanpa merusak survival.", "",
                 "&#FFAA00&l➥ KLIK UNTUK MASUK"));
 
@@ -98,9 +83,8 @@ public class StartGUI implements Listener {
         p.playSound(p.getLocation(), Sound.UI_BUTTON_CLICK, 0.5f, 1f);
 
         switch (e.getRawSlot()) {
-            case 2 -> p.performCommand("dungeon");
-            case 4 -> p.performCommand("rtp");
-            case 6 -> p.performCommand("rsc");
+            case 3 -> p.performCommand("rtp");
+            case 5 -> p.performCommand("rsc");
         }
     }
 

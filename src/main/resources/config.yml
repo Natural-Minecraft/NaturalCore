@@ -76,8 +76,6 @@ lagg:
 
   # Worlds yang dikecualikan
   excluded-worlds:
-    - "dungeon"
-    - "dungeon_forest_cave"
     - "world_the_end"
 
 # ==========================================

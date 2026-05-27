@@ -399,6 +399,7 @@ commands:
   # --- v1.8.5 UTILITIES ---
   menu:
     description: Buka menu utama NaturalSMP
+    aliases: [ponsel, phone]
   ptime:
     description: Atur waktu personal player
     permission: naturalsmp.ptime
@@ -406,7 +407,7 @@ commands:
     description: Atur cuaca personal player
     permission: naturalsmp.pweather
   start:
-    description: Menu awal pemilihan dunia (Survival/Resource/Dungeon)
+    description: Menu awal pemilihan dunia (Survival/Resource)
 
   # --- MEDIA ---
   media:
