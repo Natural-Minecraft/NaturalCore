@@ -81,6 +81,11 @@ public class NaturalCoreDatabase {
                 "`value` TEXT NOT NULL, " +
                 "`updated_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP)";
 
+        // maintenance whitelist table
+        String whitelistTable = "CREATE TABLE IF NOT EXISTS maintenance_whitelist (" +
+                "id INT AUTO_INCREMENT PRIMARY KEY, " +
+                "username VARCHAR(16) NOT NULL UNIQUE)";
+
         // homes table
         String homesTable = "CREATE TABLE IF NOT EXISTS player_homes (" +
                 "id INT AUTO_INCREMENT PRIMARY KEY, " +
@@ -105,12 +110,14 @@ public class NaturalCoreDatabase {
                 "pitch FLOAT NOT NULL)";
 
         try (PreparedStatement s1 = connection.prepareStatement(coreState);
+                PreparedStatement s1_5 = connection.prepareStatement(whitelistTable);
                 PreparedStatement s2 = connection.prepareStatement(homesTable);
                 PreparedStatement s3 = connection.prepareStatement(spawnTable);
                 PreparedStatement s4 = connection.prepareStatement("CREATE TABLE IF NOT EXISTS vanished_players (" +
                         "uuid VARCHAR(36) PRIMARY KEY, " +
                         "vanished_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP)")) {
             s1.execute();
+            s1_5.execute();
             s2.execute();
             s3.execute();
             s4.execute();
@@ -160,11 +167,114 @@ public class NaturalCoreDatabase {
     }
 
     public String getMaintenanceWhitelist() {
-        return getState("maintenance_whitelist", "[]");
+        if (!connect())
+            return "[]";
+
+        java.util.List<String> whitelist = new java.util.ArrayList<>();
+        String query = "SELECT username FROM maintenance_whitelist";
+        try (PreparedStatement stmt = connection.prepareStatement(query);
+                ResultSet rs = stmt.executeQuery()) {
+            while (rs.next()) {
+                String username = rs.getString("username");
+                if (username != null && !username.trim().isEmpty()) {
+                    whitelist.add(username.trim().toLowerCase());
+                }
+            }
+        } catch (SQLException e) {
+            plugin.getLogger().log(Level.WARNING, "[CoreDB] Failed to get maintenance whitelist from table", e);
+            return getState("maintenance_whitelist", "[]");
+        }
+
+        // Migration logic: if the new table is empty but the old core_state has whitelist data, migrate it!
+        if (whitelist.isEmpty()) {
+            String oldVal = getState("maintenance_whitelist", "[]");
+            if (oldVal != null && !oldVal.equals("[]") && !oldVal.trim().isEmpty()) {
+                plugin.getLogger().info("[CoreDB] Migrating maintenance whitelist from core_state to maintenance_whitelist table...");
+                setMaintenanceWhitelist(oldVal);
+                // Re-query the table after migration to ensure it works
+                try (PreparedStatement stmt = connection.prepareStatement(query);
+                        ResultSet rs = stmt.executeQuery()) {
+                    while (rs.next()) {
+                        String username = rs.getString("username");
+                        if (username != null && !username.trim().isEmpty()) {
+                            whitelist.add(username.trim().toLowerCase());
+                        }
+                    }
+                } catch (SQLException e) {
+                    plugin.getLogger().log(Level.WARNING, "[CoreDB] Failed to query maintenance whitelist after migration", e);
+                }
+            }
+        }
+
+        return whitelist.toString();
     }
 
-    public void setMaintenanceWhitelist(String jsonArray) {
-        setState("maintenance_whitelist", jsonArray);
+    public void setMaintenanceWhitelist(String listStr) {
+        // Also save to core_state for compatibility/fallback/migration purposes
+        setState("maintenance_whitelist", listStr);
+
+        if (!connect())
+            return;
+
+        String clean = listStr.replace("[", "").replace("]", "").replace(" ", "");
+        java.util.List<String> newUsers = new java.util.ArrayList<>();
+        if (!clean.isEmpty()) {
+            for (String s : clean.split(",")) {
+                newUsers.add(s.trim().toLowerCase());
+            }
+        }
+
+        try {
+            connection.setAutoCommit(false);
+
+            // Delete players who are no longer whitelisted
+            if (newUsers.isEmpty()) {
+                try (PreparedStatement stmt = connection.prepareStatement("DELETE FROM maintenance_whitelist")) {
+                    stmt.executeUpdate();
+                }
+            } else {
+                StringBuilder deleteQuery = new StringBuilder("DELETE FROM maintenance_whitelist WHERE LOWER(username) NOT IN (");
+                for (int i = 0; i < newUsers.size(); i++) {
+                    deleteQuery.append("?");
+                    if (i < newUsers.size() - 1) {
+                        deleteQuery.append(",");
+                    }
+                }
+                deleteQuery.append(")");
+                try (PreparedStatement stmt = connection.prepareStatement(deleteQuery.toString())) {
+                    for (int i = 0; i < newUsers.size(); i++) {
+                        stmt.setString(i + 1, newUsers.get(i));
+                    }
+                    stmt.executeUpdate();
+                }
+            }
+
+            // Insert new whitelisted players
+            if (!newUsers.isEmpty()) {
+                try (PreparedStatement stmt = connection.prepareStatement("INSERT IGNORE INTO maintenance_whitelist (username) VALUES (?)")) {
+                    for (String user : newUsers) {
+                        stmt.setString(1, user);
+                        stmt.addBatch();
+                    }
+                    stmt.executeBatch();
+                }
+            }
+
+            connection.commit();
+        } catch (SQLException e) {
+            try {
+                connection.rollback();
+            } catch (SQLException rollbackEx) {
+                plugin.getLogger().log(Level.WARNING, "[CoreDB] Failed to rollback transaction", rollbackEx);
+            }
+            plugin.getLogger().log(Level.WARNING, "[CoreDB] Failed to set maintenance whitelist", e);
+        } finally {
+            try {
+                connection.setAutoCommit(true);
+            } catch (SQLException e) {
+                plugin.getLogger().log(Level.WARNING, "[CoreDB] Failed to restore autoCommit", e);
+            }
+        }
     }
 
     public void addVanished(java.util.UUID uuid) {
