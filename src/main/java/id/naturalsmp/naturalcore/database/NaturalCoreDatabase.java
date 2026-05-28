@@ -81,10 +81,12 @@ public class NaturalCoreDatabase {
                 "`value` TEXT NOT NULL, " +
                 "`updated_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP)";
 
-        // maintenance whitelist table
-        String whitelistTable = "CREATE TABLE IF NOT EXISTS maintenance_whitelist (" +
-                "id INT AUTO_INCREMENT PRIMARY KEY, " +
-                "username VARCHAR(16) NOT NULL UNIQUE)";
+        // maintenance whitelist & state table
+        String whitelistTable = "CREATE TABLE IF NOT EXISTS nvelo_mt (" +
+                "id INT PRIMARY KEY, " +
+                "username VARCHAR(64), " +
+                "uuid VARCHAR(64), " +
+                "value VARCHAR(255))";
 
         // homes table
         String homesTable = "CREATE TABLE IF NOT EXISTS player_homes (" +
@@ -121,6 +123,11 @@ public class NaturalCoreDatabase {
             s2.execute();
             s3.execute();
             s4.execute();
+        }
+
+        // Initialize row id = 0 for maintenance state if not exists
+        try (PreparedStatement sInit = connection.prepareStatement("INSERT IGNORE INTO nvelo_mt (id, username, uuid, value) VALUES (0, NULL, NULL, 'false')")) {
+            sInit.execute();
         }
     }
 
@@ -159,11 +166,33 @@ public class NaturalCoreDatabase {
     }
 
     public boolean getMaintenanceActive() {
+        if (!connect())
+            return false;
+        String query = "SELECT value FROM nvelo_mt WHERE id = 0";
+        try (PreparedStatement stmt = connection.prepareStatement(query);
+                ResultSet rs = stmt.executeQuery()) {
+            if (rs.next()) {
+                String val = rs.getString("value");
+                return val != null && (val.equalsIgnoreCase("true") || val.equalsIgnoreCase("global") || val.equalsIgnoreCase("active"));
+            }
+        } catch (SQLException e) {
+            plugin.getLogger().log(Level.WARNING, "[CoreDB] Failed to get maintenance active from nvelo_mt, falling back to core_state", e);
+        }
         return Boolean.parseBoolean(getState("maintenance_active", "false"));
     }
 
     public void setMaintenanceActive(boolean active) {
         setState("maintenance_active", String.valueOf(active));
+
+        if (!connect())
+            return;
+        String query = "UPDATE nvelo_mt SET value = ? WHERE id = 0";
+        try (PreparedStatement stmt = connection.prepareStatement(query)) {
+            stmt.setString(1, active ? "global" : "false");
+            stmt.executeUpdate();
+        } catch (SQLException e) {
+            plugin.getLogger().log(Level.WARNING, "[CoreDB] Failed to update maintenance active in nvelo_mt", e);
+        }
     }
 
     public String getMaintenanceWhitelist() {
@@ -171,7 +200,7 @@ public class NaturalCoreDatabase {
             return "[]";
 
         java.util.List<String> whitelist = new java.util.ArrayList<>();
-        String query = "SELECT username FROM maintenance_whitelist";
+        String query = "SELECT username FROM nvelo_mt WHERE id >= 1";
         try (PreparedStatement stmt = connection.prepareStatement(query);
                 ResultSet rs = stmt.executeQuery()) {
             while (rs.next()) {
@@ -181,7 +210,7 @@ public class NaturalCoreDatabase {
                 }
             }
         } catch (SQLException e) {
-            plugin.getLogger().log(Level.WARNING, "[CoreDB] Failed to get maintenance whitelist from table", e);
+            plugin.getLogger().log(Level.WARNING, "[CoreDB] Failed to get maintenance whitelist from nvelo_mt", e);
             return getState("maintenance_whitelist", "[]");
         }
 
@@ -189,7 +218,7 @@ public class NaturalCoreDatabase {
         if (whitelist.isEmpty()) {
             String oldVal = getState("maintenance_whitelist", "[]");
             if (oldVal != null && !oldVal.equals("[]") && !oldVal.trim().isEmpty()) {
-                plugin.getLogger().info("[CoreDB] Migrating maintenance whitelist from core_state to maintenance_whitelist table...");
+                plugin.getLogger().info("[CoreDB] Migrating maintenance whitelist from core_state to nvelo_mt table...");
                 setMaintenanceWhitelist(oldVal);
                 // Re-query the table after migration to ensure it works
                 try (PreparedStatement stmt = connection.prepareStatement(query);
@@ -227,13 +256,13 @@ public class NaturalCoreDatabase {
         try {
             connection.setAutoCommit(false);
 
-            // Delete players who are no longer whitelisted
+            // 1. Delete players who are no longer whitelisted (id >= 1)
             if (newUsers.isEmpty()) {
-                try (PreparedStatement stmt = connection.prepareStatement("DELETE FROM maintenance_whitelist")) {
+                try (PreparedStatement stmt = connection.prepareStatement("DELETE FROM nvelo_mt WHERE id >= 1")) {
                     stmt.executeUpdate();
                 }
             } else {
-                StringBuilder deleteQuery = new StringBuilder("DELETE FROM maintenance_whitelist WHERE LOWER(username) NOT IN (");
+                StringBuilder deleteQuery = new StringBuilder("DELETE FROM nvelo_mt WHERE id >= 1 AND LOWER(username) NOT IN (");
                 for (int i = 0; i < newUsers.size(); i++) {
                     deleteQuery.append("?");
                     if (i < newUsers.size() - 1) {
@@ -249,11 +278,43 @@ public class NaturalCoreDatabase {
                 }
             }
 
-            // Insert new whitelisted players
-            if (!newUsers.isEmpty()) {
-                try (PreparedStatement stmt = connection.prepareStatement("INSERT IGNORE INTO maintenance_whitelist (username) VALUES (?)")) {
-                    for (String user : newUsers) {
-                        stmt.setString(1, user);
+            // 2. Identify which players are already in the database to avoid duplicate inserts
+            java.util.Set<String> existingUsers = new java.util.HashSet<>();
+            try (PreparedStatement stmt = connection.prepareStatement("SELECT LOWER(username) FROM nvelo_mt WHERE id >= 1");
+                    ResultSet rs = stmt.executeQuery()) {
+                while (rs.next()) {
+                    String u = rs.getString(1);
+                    if (u != null) {
+                        existingUsers.add(u.trim().toLowerCase());
+                    }
+                }
+            }
+
+            // 3. Find players that need to be inserted
+            java.util.List<String> usersToInsert = new java.util.ArrayList<>();
+            for (String user : newUsers) {
+                if (!existingUsers.contains(user)) {
+                    usersToInsert.add(user);
+                }
+            }
+
+            // 4. Insert new players with sequential IDs (starting from 1)
+            if (!usersToInsert.isEmpty()) {
+                int nextId = 1;
+                try (PreparedStatement stmt = connection.prepareStatement("SELECT MAX(id) FROM nvelo_mt");
+                        ResultSet rs = stmt.executeQuery()) {
+                    if (rs.next()) {
+                        int max = rs.getInt(1);
+                        if (max >= 0) {
+                            nextId = max + 1;
+                        }
+                    }
+                }
+
+                try (PreparedStatement stmt = connection.prepareStatement("INSERT INTO nvelo_mt (id, username, uuid, value) VALUES (?, ?, NULL, NULL)")) {
+                    for (String user : usersToInsert) {
+                        stmt.setInt(1, nextId++);
+                        stmt.setString(2, user);
                         stmt.addBatch();
                     }
                     stmt.executeBatch();
@@ -267,7 +328,7 @@ public class NaturalCoreDatabase {
             } catch (SQLException rollbackEx) {
                 plugin.getLogger().log(Level.WARNING, "[CoreDB] Failed to rollback transaction", rollbackEx);
             }
-            plugin.getLogger().log(Level.WARNING, "[CoreDB] Failed to set maintenance whitelist", e);
+            plugin.getLogger().log(Level.WARNING, "[CoreDB] Failed to set maintenance whitelist in nvelo_mt", e);
         } finally {
             try {
                 connection.setAutoCommit(true);
