@@ -55,9 +55,6 @@ import id.naturalsmp.naturalcore.announcement.BroadcastManager;
 import id.naturalsmp.naturalcore.chat.suffix.SuffixManager;
 import id.naturalsmp.naturalcore.combat.CombatManager;
 import id.naturalsmp.naturalcore.hud.HUDManager;
-import id.naturalsmp.naturalcore.maintenance.MaintenanceCommand;
-import id.naturalsmp.naturalcore.maintenance.MaintenanceListener;
-import id.naturalsmp.naturalcore.maintenance.MaintenanceManager;
 import id.naturalsmp.naturalcore.permissions.PermissionManager;
 import id.naturalsmp.naturalcore.playtime.PlaytimeManager;
 import id.naturalsmp.naturalcore.profile.ProfileGUI;
@@ -109,7 +106,6 @@ public final class NaturalCore extends JavaPlugin {
     private id.naturalsmp.naturalcore.chat.ChatColorManager chatColorManager;
     private SeasonResetManager seasonResetManager;
     private HUDManager hudManager;
-    private MaintenanceManager maintenanceManager;
     private PermissionManager permissionManager;
     private StaffManager staffManager;
     private StaffGUI staffGUI;
@@ -238,33 +234,6 @@ public final class NaturalCore extends JavaPlugin {
         registerCmd("restart", new RestartAlertCommand());
         registerCmd("restartcancel", new RestartCancelCommand());
 
-        // 10. Maintenance Module
-        this.maintenanceManager = new MaintenanceManager(this);
-        registerCmd("maintenance", new MaintenanceCommand(maintenanceManager));
-        getServer().getPluginManager().registerEvents(new MaintenanceListener(maintenanceManager), this);
-
-        // Plugin Messaging
-        getServer().getMessenger().registerOutgoingPluginChannel(this, "natural:main");
-        getServer().getMessenger().registerIncomingPluginChannel(this, "natural:main", (channel, player, message) -> {
-            if (!channel.equals("natural:main"))
-                return;
-
-            java.io.ByteArrayInputStream b = new java.io.ByteArrayInputStream(message);
-            java.io.DataInputStream in = new java.io.DataInputStream(b);
-
-            try {
-                String subChannel = in.readUTF();
-                if (subChannel.equalsIgnoreCase("Maintenance")) {
-                    boolean active = in.readBoolean();
-                    if (maintenanceManager != null) {
-                        maintenanceManager.setMaintenance(active);
-                        // Whitelist sync could also be done here if needed
-                    }
-                }
-            } catch (java.io.IOException e) {
-                e.printStackTrace();
-            }
-        });
 
         // 11. Rank Price Database (MySQL)
         this.rankPriceDatabase = new RankPriceDatabase(this);
@@ -826,9 +795,6 @@ public final class NaturalCore extends JavaPlugin {
         return coreDatabase;
     }
 
-    public id.naturalsmp.naturalcore.maintenance.MaintenanceManager getMaintenanceManager() {
-        return maintenanceManager;
-    }
 
     public id.naturalsmp.naturalcore.utility.NaturalLaggManager getLaggManager() {
         return laggManager;

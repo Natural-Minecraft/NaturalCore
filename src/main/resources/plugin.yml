@@ -32,10 +32,6 @@ commands:
     description: Batalkan alert restart
     aliases: [rc]
     permission: naturalcs.restartalert
-  maintenance:
-    description: Mode maintenance
-    aliases: [mt]
-    permission: naturalsmp.maintenance.command
   bc:
     description: Broadcast
     aliases: [broadcast]
@@ -444,12 +440,6 @@ permissions:
     default: op
   naturalsmp.admin.banner:
     description: Create and manage interactive banners
-    default: op
-  naturalsmp.maintenance.bypass:
-    description: Bypass maintenance mode
-    default: op
-  naturalsmp.maintenance.command:
-    description: Toggle maintenance mode
     default: op
   naturalsmp.home.limit.*:
     description: Izin untuk semua jenis limit home
