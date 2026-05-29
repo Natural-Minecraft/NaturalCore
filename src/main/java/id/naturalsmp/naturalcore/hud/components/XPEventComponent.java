@@ -60,52 +60,24 @@ public class XPEventComponent extends AbstractHUDComponent {
         
         String baseText = "<gradient:#FFD700:#FF6B6B>✦ NaturalPass XP Event (" + multiplier + ") ✦</gradient> <gradient:#00FF88:#45B7D1>" + timeRemain + "</gradient>";
         
-        // Show with Mana for seamless integration similar to SeasonComponent
-        String manaDisplay = getManaDisplay(player, tick);
+        // Show with IQ for seamless integration similar to SeasonComponent
+        String iqDisplay = getIQDisplay(player, tick);
         
-        return baseText + " &7| " + manaDisplay;
+        return baseText + " &7| " + iqDisplay;
     }
 
-    private String getManaDisplay(Player player, int tick) {
-        String mana = "0";
-        String maxMana = "0";
+    private String getIQDisplay(Player player, int tick) {
+        String iq = "100"; // default placeholder fallback
 
         if (Bukkit.getPluginManager().isPluginEnabled("PlaceholderAPI")) {
-            mana = PlaceholderAPI.setPlaceholders(player, "%auraskills_mana_int%");
-            maxMana = PlaceholderAPI.setPlaceholders(player, "%auraskills_mana_max_int%");
-
-            if (mana.equals("%auraskills_mana_int%")) mana = "0";
-            if (maxMana.equals("%auraskills_mana_max_int%")) maxMana = "0";
-
-            boolean hasWarning = false;
-            if (plugin.getHudManager().getNotificationComponent() != null) {
-                hasWarning = plugin.getHudManager().getNotificationComponent().hasActiveWarning(player, NotificationComponent.NotificationType.MANA_WARNING);
+            // Using %naturalschool_iq% placeholder
+            String resolved = PlaceholderAPI.setPlaceholders(player, "%naturalschool_iq%");
+            if (resolved != null && !resolved.isEmpty() && !resolved.equals("%naturalschool_iq%")) {
+                iq = resolved;
             }
-
-            if (hasWarning) {
-                boolean blinkOn = (tick % 6) < 3;
-                if (blinkOn) {
-                    return "&c✦ &c" + mana + "&7/&c" + maxMana;
-                } else {
-                    return "&4✦ &4" + mana + "&7/&4" + maxMana;
-                }
-            }
-
-            String manaColor = "&b";
-            try {
-                int current = Integer.parseInt(mana);
-                int total = Integer.parseInt(maxMana);
-                double ratio = total > 0 ? (double) current / total : 0;
-                if (ratio >= 0.8) manaColor = "&b";
-                else if (ratio >= 0.5) manaColor = "&3";
-                else if (ratio >= 0.25) manaColor = "&e";
-                else manaColor = "&c";
-            } catch (Exception ignored) {}
-
-            return manaColor + "✦ &f" + mana + "&7/&f" + maxMana;
         }
 
-        return "&b✦ &f" + mana + "&7/&f" + maxMana;
+        return "&d🧠 &f" + iq + " &dIQ";
     }
 
     @Override

@@ -35,11 +35,11 @@ public class SeasonComponent extends AbstractHUDComponent {
         String seasonName = getSeasonDisplayName(currentSeason);
         String tempDisplay = formatTemperature(temp);
 
-        // Get mana from PlaceholderAPI
-        String manaDisplay = getManaDisplay(player, tick);
+        // Get IQ from PlaceholderAPI
+        String iqDisplay = getIQDisplay(player, tick);
 
-        // Premium format: Season | Temp | Mana
-        return seasonGradient + seasonName + " &7| " + tempDisplay + " &7| " + manaDisplay;
+        // Premium format: Season | Temp | IQ
+        return seasonGradient + seasonName + " &7| " + tempDisplay + " &7| " + iqDisplay;
     }
 
     private String getSeasonGradient(Season season) {
@@ -98,60 +98,18 @@ public class SeasonComponent extends AbstractHUDComponent {
         return color + icon + " " + String.format("%.1f", temp) + "°C";
     }
 
-    private String getManaDisplay(Player player, int tick) {
-        String mana = "N/A";
-        String maxMana = "N/A";
+    private String getIQDisplay(Player player, int tick) {
+        String iq = "100"; // default placeholder fallback
 
         if (Bukkit.getPluginManager().isPluginEnabled("PlaceholderAPI")) {
-            // Using AuraSkills placeholders specifically
-            mana = PlaceholderAPI.setPlaceholders(player, "%auraskills_mana_int%");
-            maxMana = PlaceholderAPI.setPlaceholders(player, "%auraskills_mana_max_int%");
-
-            // Clean up if placeholders didn't resolve or returned empty
-            if (mana == null || mana.isEmpty() || mana.equals("%auraskills_mana_int%"))
-                mana = "0";
-            if (maxMana == null || maxMana.isEmpty() || maxMana.equals("%auraskills_mana_max_int%"))
-                maxMana = "0";
-
-            // Check for active mana warning delegated from NotificationComponent
-            boolean hasWarning = false;
-            if (plugin.getHudManager().getNotificationComponent() != null) {
-                hasWarning = plugin.getHudManager().getNotificationComponent()
-                        .hasActiveWarning(player, NotificationComponent.NotificationType.MANA_WARNING);
+            // Using %naturalschool_iq% placeholder
+            String resolved = PlaceholderAPI.setPlaceholders(player, "%naturalschool_iq%");
+            if (resolved != null && !resolved.isEmpty() && !resolved.equals("%naturalschool_iq%")) {
+                iq = resolved;
             }
-
-            if (hasWarning) {
-                // Fast blink cycle: 6 ticks per phase (3 ticks ON, 3 ticks OFF)
-                boolean blinkOn = (tick % 6) < 3;
-                if (blinkOn) {
-                    return "&c✦ &c" + mana + "&7/&c" + maxMana;
-                } else {
-                    return "&4✦ &4" + mana + "&7/&4" + maxMana;
-                }
-            }
-
-            // Calculate mana percentage for dynamic colors
-            String manaColor = "&b"; // Default color
-            try {
-                int current = (int) Double.parseDouble(mana); // handle potential floats
-                int total = (int) Double.parseDouble(maxMana);
-                double ratio = total > 0 ? (double) current / total : 0;
-
-                if (ratio >= 0.8)
-                    manaColor = "&b"; // High/Full
-                else if (ratio >= 0.5)
-                    manaColor = "&3"; // Medium high
-                else if (ratio >= 0.25)
-                    manaColor = "&e"; // Low
-                else
-                    manaColor = "&c"; // Critical
-            } catch (Exception ignored) {
-            }
-
-            return manaColor + "✦ &f" + mana + "&7/&f" + maxMana;
         }
 
-        return "&b✦ &f" + mana + "&7/&f" + maxMana;
+        return "&d🧠 &f" + iq + " &dIQ";
     }
 
     @Override
