@@ -70,9 +70,9 @@ public class XPEventComponent extends AbstractHUDComponent {
         String iq = "100"; // default placeholder fallback
 
         if (Bukkit.getPluginManager().isPluginEnabled("PlaceholderAPI")) {
-            // Using %naturalschool_iq% placeholder
-            String resolved = PlaceholderAPI.setPlaceholders(player, "%naturalschool_iq%");
-            if (resolved != null && !resolved.isEmpty() && !resolved.equals("%naturalschool_iq%")) {
+            // Using %nskills_iq% placeholder
+            String resolved = PlaceholderAPI.setPlaceholders(player, "%nskills_iq%");
+            if (resolved != null && !resolved.isEmpty() && !resolved.equals("%nskills_iq%")) {
                 iq = resolved;
             }
         }
