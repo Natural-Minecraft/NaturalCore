@@ -553,8 +553,17 @@ public final class NaturalCore extends JavaPlugin {
         getServer().getPluginManager().registerEvents(mediaSneakListener, this);
 
         // Selesai
-        getLogger().info(
-                ChatUtils.colorize("&6&lNaturalCore v" + getDescription().getVersion() + " &asudah aktif sepenuhnya!"));
+        Bukkit.getConsoleSender().sendMessage(
+                ChatUtils.colorize(
+                    "\n" +
+                    "&6 _   _       _                  _     &e____                \n" +
+                    "&6| \\\\ | | __ _| |_ _   _ _ __ __ _| |   &e/ ___|___  _ __ ___ \n" +
+                    "&6|  \\\\| |/ _` | __| | | | '__/ _` | |   &e| |   / _ \\\\| '__/ _ \\\\\n" +
+                    "&6| |\\\\  | (_| | |_| |_| | | | (_| | |   &e| |__| (_) | | |  __/\n" +
+                    "&6|_| \\\\_|\\\\__,_|\\\\__|\\\\__,_|_|  \\\\__,_|_|   &e \\\\____\\\\___/|_|  \\\\___|\n" +
+                    "&f       >> &6NaturalCore v" + getDescription().getVersion() + " &fEnabled! <<\n"
+                )
+        );
     }
 
     private void generateEssentialsConfig() {
