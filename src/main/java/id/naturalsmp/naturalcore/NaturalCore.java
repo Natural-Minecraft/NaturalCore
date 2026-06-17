@@ -565,8 +565,6 @@ public final class NaturalCore extends JavaPlugin {
                     "&a===============\n"
                 )
         );
-                )
-        );
     }
 
     private void generateEssentialsConfig() {
